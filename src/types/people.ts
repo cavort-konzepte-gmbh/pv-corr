@@ -1,3 +1,18 @@
+export interface Person {
+  id: string;
+  hiddenId: string;
+  salutation: string;
+  title?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  addresses: {
+    private?: string;
+    business?: string;
+  };
+}
+
 export interface PersonField {
   id: string;
   hiddenId: string;

@@ -1,3 +1,4 @@
+import { supabase } from '../../lib/supabase';
 import React, { useState, useEffect } from 'react';
 import { Project, Zone } from '../../types/projects';
 import { Theme } from '../../types/theme';
@@ -66,9 +67,11 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   const [sortColumn, setSortColumn] = useState<'name' | 'timestamp' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [showDeleteDatapointConfirm, setShowDeleteDatapointConfirm] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleNameSave = async (e?: React.FormEvent) => {
     e?.preventDefault();
+    if (isSaving) return;
     
     if (!zone.id || !newName.trim()) {
       setError('Zone name is required');
@@ -77,6 +80,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     }
 
     try {
+      setIsSaving(true);
+      setIsSaving(true);
       // Update the zone in the database
       const { data: updatedZone, error } = await supabase
         .from('zones')
@@ -101,6 +106,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       console.error('Error updating zone:', err);
       setError(err instanceof Error ? err.message : 'Failed to update zone name');
       setEditingName(null);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -162,11 +169,17 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   };
 
   const handleSaveDatapoint = async (index: number) => {
-    const datapoint = datapoints[index];
+    if (isSaving) return;
+    
+    const datapoint = { ...datapoints[index] };
     if (!datapoint || Object.keys(datapoint).length === 0) {
       setError('Please enter at least one value');
       return;
     }
+
+    // Get the custom sequential ID if it was set
+    const sequentialId = datapoint.sequentialId || `DP${String(existingDatapoints.length + index + 1).padStart(3, '0')}`;
+    delete datapoint.sequentialId; // Remove from values object
 
     try {
       if (!standards[0]?.id) {
@@ -179,7 +192,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       const newDatapoint = await createDatapoint(zone.id, {
         type: standards[0].id,
         values: datapoint,
-        ratings: {} // The database will calculate ratings automatically
+        ratings: {}, // The database will calculate ratings automatically
+        sequentialId: sequentialId
       });
 
       if (!newDatapoint) {
@@ -208,6 +222,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     } catch (err) {
       console.error('Error saving datapoint:', err);
       setError(err instanceof Error ? err.message : 'Failed to save datapoint');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -796,7 +812,17 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                       <div className="flex items-center justify-between">
                         <input
                           type="text"
+                          name="sequentialId"
                           defaultValue={`DP${String(existingDatapoints.length + index + 1).padStart(3, '0')}`}
+                          onChange={(e) => {
+                            const newDatapoint = { ...datapoints[index] };
+                            newDatapoint.sequentialId = e.target.value;
+                            setDatapoints(prev => {
+                              const newDatapoints = [...prev];
+                              newDatapoints[index] = newDatapoint;
+                              return newDatapoints;
+                            });
+                          }}
                           className="w-full p-1 rounded text-sm font-mono"
                           style={{
                             backgroundColor: currentTheme.colors.surface,

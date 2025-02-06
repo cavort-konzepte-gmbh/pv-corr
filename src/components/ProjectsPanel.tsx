@@ -3,7 +3,8 @@ import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
 import { Folder, Plus, ChevronRight, Trash2, MapPin, User, Building2, DoorOpen, Edit2, X } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
-import { SavedPerson } from '../utils/sampleData';
+import { Person } from '../types/people';
+import { fetchPeople } from '../services/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
@@ -12,7 +13,7 @@ interface ProjectsPanelProps {
   currentTheme: Theme;
   projects: Project[];
   savedPlaces: SavedPlace[];
-  savedPeople: SavedPerson[];
+  savedPeople: Person[];
   savedCompanies: Company[];
   onProjectsChange: (projects: Project[]) => void;
 }
@@ -25,27 +26,45 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   savedCompanies,
   onProjectsChange
 }) => {
-  const [projectsList, setProjectsList] = useState<Project[]>(projects || []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNewProjectForm, setShowNewProjectForm] = useState(false);
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectName, setProjectName] = useState('');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('');
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [clientRef, setClientRef] = useState<string>('');
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
-  const [selectedManagerId, setSelectedManagerId] = useState<string>('');
+  const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+  const [peopleSearch, setPeopleSearch] = useState('');
+  const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
+
+  useEffect(() => {
+    const searchTerm = peopleSearch.toLowerCase();
+    const filtered = availablePeople.filter(person => 
+      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
+      person.email.toLowerCase().includes(searchTerm) ||
+      (person.title && person.title.toLowerCase().includes(searchTerm))
+    );
+    setFilteredPeople(filtered);
+  }, [peopleSearch, availablePeople]);
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        const fetchedProjects = await fetchProjects();
+        const [fetchedProjects, fetchedPeople] = await Promise.all([
+          fetchProjects(),
+          fetchPeople()
+        ]);
+        
         setProjectsList(fetchedProjects);
+        setAvailablePeople(fetchedPeople);
         onProjectsChange(fetchedProjects);
       } catch (err) {
         console.error('Error loading projects:', err);
@@ -56,11 +75,16 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     };
 
     loadProjects();
-  }, [onProjectsChange]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!projectName.trim()) {
+      setError('Project name is required');
+      return;
+    }
+
     // Prepare project data
     const projectData = {
       name: projectName,
@@ -70,19 +94,29 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       longitude: longitude || undefined,
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
-      managerId: selectedManagerId || undefined
+      managerId: selectedManagerId || undefined,
+      companyId: undefined // Add if needed
     };
 
     if (editingProject) {
       try {
-        const updatedProject = await updateProject({ ...editingProject, ...projectData });
+        // Preserve existing fields and update with new data
+        const updatedProject = await updateProject({
+          ...editingProject,
+          ...projectData,
+          fields: editingProject.fields // Keep existing fields
+        });
+
         const updatedProjects = projectsList.map(p =>
           p.id === editingProject.id ? { ...p, ...updatedProject } : p
         );
         onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
+        setError(null);
       } catch (error) {
         console.error('Failed to update project:', error);
+        setError('Failed to update project');
+        return;
       }
     } else {
       try {
@@ -90,8 +124,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
         const updatedProjects = [...projectsList, { ...newProject, fields: [], gates: [] }];
         onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
+        setError(null);
       } catch (error) {
         console.error('Failed to create project:', error);
+        setError('Failed to create project');
+        return;
       }
     }
 
@@ -103,18 +140,18 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setLatitude('');
     setLongitude('');
     setImageUrl('');
-    setSelectedManagerId('');
+    setSelectedManagerId(null);
   };
 
   const handleEdit = (project: Project) => {
     setEditingProject(project);
     setProjectName(project.name);
-    setSelectedPlaceId(project.placeId || '');
+    setSelectedPlaceId(project.placeId || null);
     setClientRef(project.clientRef || '');
     setLatitude(project.latitude || '');
     setLongitude(project.longitude || '');
     setImageUrl(project.imageUrl || '');
-    setSelectedManagerId(project.managerId || '');
+    setSelectedManagerId(project.managerId || null);
     setShowNewProjectForm(true);
   };
 
@@ -214,8 +251,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       Project Site
                     </label>
                     <select
-                      value={selectedPlaceId}
-                      onChange={(e) => setSelectedPlaceId(e.target.value)}
+                      value={selectedPlaceId || ''}
+                      onChange={(e) => setSelectedPlaceId(e.target.value || null)}
                       className="w-full p-2 rounded text-sm"
                       style={{
                         backgroundColor: currentTheme.colors.surface,
@@ -224,7 +261,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     >
-                      <option value="">Select project site</option>
+                      <option value="">No site assigned</option>
                       {savedPlaces.map(place => (
                         <option key={place.id} value={place.id}>
                           {place.name}
@@ -260,9 +297,22 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     >
                       Project Manager
                     </label>
+                    <input
+                      type="text"
+                      placeholder="Search people..."
+                      value={peopleSearch}
+                      onChange={(e) => setPeopleSearch(e.target.value)}
+                      className="w-full p-2 rounded text-sm mb-2"
+                      style={{
+                        backgroundColor: currentTheme.colors.surface,
+                        borderColor: currentTheme.colors.border,
+                        color: currentTheme.colors.text.primary,
+                        border: `1px solid ${currentTheme.colors.border}`
+                      }}
+                    />
                     <select
-                      value={selectedManagerId}
-                      onChange={(e) => setSelectedManagerId(e.target.value)}
+                      value={selectedManagerId || ''}
+                      onChange={(e) => setSelectedManagerId(e.target.value || null)}
                       className="w-full p-2 rounded text-sm"
                       style={{
                         backgroundColor: currentTheme.colors.surface,
@@ -271,11 +321,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     >
-                      <option value="">Select project manager</option>
-                      {savedPeople.map(person => (
+                      <option value="">No manager assigned</option>
+                      {filteredPeople.map(person => (
                         <option key={person.id} value={person.id}>
-                          {person.values.title ? `${person.values.title} ` : ''}
-                          {person.values.firstName} {person.values.lastName}
+                          {person.title ? `${person.title} ` : ''}
+                          {person.firstName} {person.lastName}
                         </option>
                       ))}
                     </select>
@@ -393,17 +443,45 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       {project.managerId && (
                         <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
                           <User size={12} />
-                          {(() => {
-                            const manager = savedPeople.find(p => p.id === project.managerId);
-                            if (!manager) return 'Unknown manager';
-                            return `${manager.values.title ? `${manager.values.title} ` : ''}${manager.values.firstName} ${manager.values.lastName}`;
-                          })()}
+                          <div className="flex flex-col gap-1">
+                            {(() => {
+                              const manager = availablePeople.find(p => p.id === project.managerId);
+                              if (!manager) return 'Unknown manager';
+                              return (
+                                <>
+                                  <div>
+                                    {manager.title ? `${manager.title} ` : ''}{manager.firstName} {manager.lastName}
+                                  </div>
+                                  {manager.email && (
+                                    <a 
+                                      href={`mailto:${manager.email}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="hover:underline"
+                                      style={{ color: currentTheme.colors.accent.primary }}
+                                    >
+                                      {manager.email}
+                                    </a>
+                                  )}
+                                  {manager.phone && (
+                                    <a 
+                                      href={`tel:${manager.phone}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="hover:underline"
+                                      style={{ color: currentTheme.colors.accent.primary }}
+                                    >
+                                      {manager.phone}
+                                    </a>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       )}
                       {project.placeId && (
                         <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                          <MapPin size={12} />
-                          {savedPlaces.find(p => p.id === project.placeId)?.values.name || 'Unknown location'}
+                          {savedPlaces && <MapPin size={12} />}
+                          {savedPlaces?.find(p => p.id === project.placeId)?.name || 'Unknown location'}
                         </div>
                       )}
                     </div>
@@ -490,14 +568,12 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                           handleDelete(showDeleteConfirm);
                         }
                       }}
-                      disabled={
-                        !projectsList.find(p => p.id === showDeleteConfirm)?.name === deleteConfirmName
-                      }
+                      disabled={deleteConfirmName !== (projectsList.find(p => p.id === showDeleteConfirm)?.name || '')}
                       className="px-4 py-2 rounded text-sm"
                       style={{
                         backgroundColor: currentTheme.colors.accent.primary,
                         color: 'white',
-                        opacity: deleteConfirmName === projectsList.find(p => p.id === showDeleteConfirm)?.name ? 1 : 0.5
+                        opacity: deleteConfirmName === (projectsList.find(p => p.id === showDeleteConfirm)?.name || '') ? 1 : 0.5
                       }}
                     >
                       Delete Project

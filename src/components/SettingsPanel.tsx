@@ -133,8 +133,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
     { id: 'places', label: t('settings.sample_data.places'), icon: 'MapPin' },
     { id: 'companies', label: t('settings.companies'), icon: 'Building2' },
     { id: 'people', label: t('settings.sample_data.people'), icon: 'Users' },
-    { id: 'projects', label: t('nav.projects'), icon: 'FolderOpen' },
-    { id: 'sample', label: t('settings.sample_data'), icon: 'Database' }
+    { id: 'projects', label: t('nav.projects'), icon: 'FolderOpen' }
   ];
 
   const handleSampleDataToggle = async (type: 'all' | 'places' | 'people' | 'projects' | 'companies') => {
@@ -396,135 +395,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 </div>
               </button>
             ))}
-          </div>
-        )}
-
-        {view === 'sample' && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 rounded"
-              style={{ backgroundColor: currentTheme.colors.border }}>
-              <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.sample_data')}
-                </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                  {t('settings.sample_data.description')}
-                </div>
-              </div>
-              <button 
-                onClick={async () => await handleSampleDataToggle('all')}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: sampleData.all ? currentTheme.colors.accent.primary : 'transparent',
-                  color: sampleData.all ? 'white' : currentTheme.colors.text.secondary,
-                  border: sampleData.all ? 'none' : `1px solid ${currentTheme.colors.border}`
-                }}
-              >
-                {t(sampleData.all ? 'settings.enabled' : 'settings.not_enabled')}
-              </button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 rounded ml-4"
-              style={{ backgroundColor: currentTheme.colors.border }}>
-              <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.sample_data.places')}
-                </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                  {t('settings.sample_data.places.description')}
-                </div>
-              </div>
-              <button 
-                onClick={async () => await handleSampleDataToggle('places')}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: sampleData.places ? currentTheme.colors.accent.primary : 'transparent',
-                  color: sampleData.places ? 'white' : currentTheme.colors.text.secondary,
-                  border: sampleData.places ? 'none' : `1px solid ${currentTheme.colors.border}`
-                }}
-              >
-                {t(sampleData.places ? 'settings.enabled' : 'settings.not_enabled')}
-              </button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 rounded ml-4"
-              style={{ backgroundColor: currentTheme.colors.border }}>
-              <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.sample_data.people')}
-                </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                  {t('settings.sample_data.people.description')}
-                  {!sampleData.places && (
-                    <span className="text-red-400 ml-1">{t('settings.sample_data.people.requires_places')}</span>
-                  )}
-                </div>
-              </div>
-              <button 
-                onClick={async () => await handleSampleDataToggle('people')}
-                disabled={!sampleData.places}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: sampleData.people ? currentTheme.colors.accent.primary : 'transparent',
-                  color: sampleData.people ? 'white' : currentTheme.colors.text.secondary,
-                  border: sampleData.people ? 'none' : `1px solid ${currentTheme.colors.border}`,
-                  opacity: !sampleData.places ? 0.5 : 1
-                }}
-              >
-                {t(sampleData.people ? 'settings.enabled' : 'settings.not_enabled')}
-              </button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 rounded ml-4"
-              style={{ backgroundColor: currentTheme.colors.border }}>
-              <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.companies')}
-                </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                  {t('settings.sample_data.companies.description')}
-                  {!sampleData.places && (
-                    <span className="text-red-400 ml-1">{t('settings.sample_data.companies.requires_places')}</span>
-                  )}
-                </div>
-              </div>
-              <button 
-                onClick={async () => await handleSampleDataToggle('companies')}
-                disabled={!sampleData.places || !sampleData.people}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: sampleData.companies ? currentTheme.colors.accent.primary : 'transparent',
-                  color: sampleData.companies ? 'white' : currentTheme.colors.text.secondary,
-                  border: sampleData.companies ? 'none' : `1px solid ${currentTheme.colors.border}`,
-                  opacity: (!sampleData.places || !sampleData.people) ? 0.5 : 1
-                }}
-              >
-                {t(sampleData.companies ? 'settings.enabled' : 'settings.not_enabled')}
-              </button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 rounded ml-4"
-              style={{ backgroundColor: currentTheme.colors.border }}>
-              <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.sample_data.projects')}
-                </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                  {t('settings.sample_data.projects.description')}
-                </div>
-              </div>
-              <button 
-                onClick={async () => await handleSampleDataToggle('projects')}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: sampleData.projects ? currentTheme.colors.accent.primary : 'transparent',
-                  color: sampleData.projects ? 'white' : currentTheme.colors.text.secondary,
-                  border: sampleData.projects ? 'none' : `1px solid ${currentTheme.colors.border}`
-                }}
-              >
-                {t(sampleData.projects ? 'settings.enabled' : 'settings.not_enabled')}
-              </button>
-            </div>
           </div>
         )}
 

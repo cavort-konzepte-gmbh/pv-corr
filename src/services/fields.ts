@@ -3,19 +3,8 @@ import { Field, Gate } from '../types/projects';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
 export const createField = async (projectId: string, field: Omit<Field, 'id' | 'hiddenId' | 'gates' | 'zones'>) => {
-  // First check if project exists
-  const { data: project, error: projectError } = await supabase
-    .from('projects')
-    .select('id')
-    .eq('id', projectId)
-    .single();
-
-  if (projectError) {
-    console.error('Error finding project:', projectError);
-    throw projectError;
-  }
-
-  const { data, error } = await supabase
+  // Create the field
+  const { data: newField, error } = await supabase
     .from('fields')
     .insert({
       project_id: projectId,
@@ -32,23 +21,16 @@ export const createField = async (projectId: string, field: Omit<Field, 'id' | '
     throw error;
   }
 
-  // Return the complete field data with gates and zones
-  const { data: completeField, error: refreshError } = await supabase
-    .from('fields')
-    .select(`
-      *,
-      gates (*),
-      zones (*)
-    `)
-    .eq('id', data.id)
-    .single();
-
-  if (refreshError) {
-    console.error('Error refreshing field data:', refreshError);
-    throw refreshError;
-  }
-
-  return completeField;
+  // Return the new field with empty gates and zones arrays
+  return {
+    id: newField.id,
+    hiddenId: newField.hidden_id,
+    name: newField.name,
+    latitude: newField.latitude || '',
+    longitude: newField.longitude || '',
+    gates: [],
+    zones: []
+  };
 };
 
 export const updateField = async (fieldId: string, field: Partial<Field>) => {
@@ -123,52 +105,42 @@ export const deleteField = async (fieldId: string) => {
 };
 
 export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hiddenId'>) => {
-  // First check if field exists
-  const { data: field, error: fieldError } = await supabase
-    .from('fields')
-    .select('id')
-    .eq('id', fieldId)
-    .single();
+  try {
+    // First check if field exists
+    const { data: field, error: fieldError } = await supabase
+      .from('fields')
+      .select('id')
+      .eq('id', fieldId)
+      .single();
 
-  if (fieldError) {
-    console.error('Error finding field:', fieldError);
-    throw fieldError;
+    if (fieldError) {
+      console.error('Error finding field:', fieldError);
+      throw fieldError;
+    }
+
+    // Then create the gate
+    const { data, error } = await supabase
+      .from('gates')
+      .insert({
+        field_id: fieldId,
+        hidden_id: generateHiddenId(),
+        name: gate.name,
+        latitude: gate.latitude,
+        longitude: gate.longitude
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating gate:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Error in createGate:', err);
+    throw err;
   }
-
-  // Then create the gate
-  const { data, error } = await supabase
-    .from('gates')
-    .insert({
-      field_id: fieldId,
-      hidden_id: generateHiddenId(),
-      name: gate.name,
-      latitude: gate.latitude,
-      longitude: gate.longitude
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error creating gate:', error);
-    throw error;
-  }
-
-  // Return the complete field data with gates
-  const { data: updatedField, error: refreshError } = await supabase
-    .from('fields')
-    .select(`
-      *,
-      gates (*)
-    `)
-    .eq('id', fieldId)
-    .single();
-
-  if (refreshError) {
-    console.error('Error refreshing field data:', refreshError);
-    throw refreshError;
-  }
-
-  return updatedField;
 };
 
 export const updateGate = async (gateId: string, gate: Partial<Gate>) => {

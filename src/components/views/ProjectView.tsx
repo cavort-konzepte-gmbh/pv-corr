@@ -42,26 +42,28 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [showNewFieldDialog, setShowNewFieldDialog] = useState(false);
   const [newFieldName, setNewFieldName] = useState('');
   const [newFieldError, setNewFieldError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const openInMaps = (latitude: string, longitude: string) => {
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
   const handleCreateField = async () => {
+    if (isSaving) return;
     if (!newFieldName.trim()) {
       setNewFieldError('Field name is required');
-      setShowNewFieldDialog(false);
       return;
     }
 
     try {
+      setIsSaving(true);
       const newField = await createField(project.id, {
         name: newFieldName.trim(),
         latitude: '',
         longitude: ''
       });
       
-      // Fetch fresh project data to ensure we have the complete state
+      // Fetch fresh projects data to ensure everything is in sync
       const updatedProjects = await fetchProjects();
       if (!updatedProjects) {
         throw new Error('Failed to refresh projects data');
@@ -80,7 +82,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     } catch (error) {
       console.error('Error creating field:', error);
       setNewFieldError('Failed to create field');
-      setShowNewFieldDialog(false);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -205,13 +208,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                         {project.fields.map(field => 
                           (field.gates || []).map(gate => (
                             <button
-                              key={gate.id}
+                              key={`${field.id}-${gate.id}`}
                               onClick={() => openInMaps(gate.latitude, gate.longitude)}
                               className="flex items-center gap-2 text-sm hover:underline ml-4"
                               style={{ color: currentTheme.colors.accent.primary }}
                             >
                               <DoorOpen size={14} />
-                              {field.name} - {gate.name} • {gate.latitude}, {gate.longitude}
+                              {field.name} • {gate.name} ({gate.latitude}, {gate.longitude})
                             </button>
                           ))
                         )}
@@ -308,6 +311,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     style={{ backgroundColor: currentTheme.colors.accent.primary }}
                   />
                   <span>{field.name}</span>
+                  {field.gates && field.gates.length > 0 && (
+                    <span className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                      • {field.gates.length} gates
+                    </span>
+                  )}
                 </div>
               </h3>
               <span 
@@ -373,6 +381,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       color: currentTheme.colors.text.primary
                     }}
                     autoFocus
+                   onKeyDown={(e) => {
+                     if (e.key === 'Enter') {
+                       e.preventDefault();
+                       handleCreateField();
+                     }
+                   }}
                   />
                   {newFieldError && (
                     <p className="text-sm mt-1" style={{ color: currentTheme.colors.accent.primary }}>

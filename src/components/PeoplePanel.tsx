@@ -15,9 +15,17 @@ interface PeoplePanelProps {
 
 interface SavedPerson {
   id: string;
-  values: Record<string, string>;
+  hiddenId: string;
+  values: {
+    salutation: string;
+    title?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
   addresses: {
-    private?: string;
+    private?: string | null;
     business?: string;
   };
 }
@@ -34,7 +42,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAddresses, setSelectedAddresses] = useState<{
-    homeAddress?: string;
+    private?: string;
     business?: string;
   }>({});
   const [showAddressSelect, setShowAddressSelect] = useState<'private' | 'business' | null>(null);
@@ -47,7 +55,18 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     try {
       const { data, error } = await supabase
         .from('people')
-        .select('*')
+        .select(`
+          id,
+          hidden_id,
+          salutation,
+          title,
+          first_name,
+          last_name,
+          email,
+          phone,
+          private_address_id,
+          business_address_id
+        `)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -57,14 +76,14 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         hiddenId: person.hidden_id,
         values: {
           salutation: person.salutation,
-          title: person.title,
+          title: person.title || '',
           firstName: person.first_name,
           lastName: person.last_name,
           email: person.email,
-          phone: person.phone
+          phone: person.phone || ''
         },
         addresses: {
-          private: person.private_address_id,
+          private: person.private_address_id || null,
           business: person.business_address_id
         }
       }));
@@ -80,21 +99,34 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
   const handleEditPerson = (person: SavedPerson) => {
     setEditingPerson(person);
-    setFormValues(person.values);
+    setFormValues({
+      salutation: person.values.salutation || '',
+      title: person.values.title || '',
+      firstName: person.values.firstName || '',
+      lastName: person.values.lastName || '',
+      email: person.values.email || '',
+      phone: person.values.phone || ''
+    });
     setSelectedAddresses(person.addresses);
     setShowNewPersonForm(true);
   };
 
   const handleInputChange = (fieldId: string, value: string) => {
-    setFormValues(prev => ({
-      ...prev,
-      [fieldId]: value
-    }));
+    setFormValues(prev => {
+      const newValues = { ...prev };
+      newValues[fieldId] = value;
+      return newValues;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    if (!formValues.salutation || !formValues.firstName || !formValues.lastName || !formValues.email) {
+      setError('Please fill in all required fields');
+      return;
+    }
 
     try {
       const personData = {
@@ -104,8 +136,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         last_name: formValues.lastName,
         email: formValues.email,
         phone: formValues.phone || null,
-        private_address_id: selectedAddresses.private,
-        business_address_id: selectedAddresses.business
+        private_address_id: selectedAddresses.private || null,
+        business_address_id: selectedAddresses.business || null
       };
 
       if (editingPerson) {

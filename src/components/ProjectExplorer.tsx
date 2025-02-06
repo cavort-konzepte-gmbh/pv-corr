@@ -258,6 +258,7 @@ const ProjectExplorer = () => {
 
   const addDatapoint = (projectId: string, fieldId: string, zoneId: string, data: any) => {
     const timestamp = new Date().toISOString();
+    const sequentialId = data.sequentialId || `DP${String(zone.datapoints?.length + 1 || 1).padStart(3, '0')}`;
     const changes = Object.entries(data.values).map(([paramId, value]) => ({
       timestamp,
       datapointId: data.id,
@@ -284,7 +285,7 @@ const ProjectExplorer = () => {
                 const newDatapoint = {
                   id: `dp-${Date.now()}`,
                   hiddenId: generateHiddenId(),
-                  sequentialId: `DP${String(zone.datapoints?.length + 1 || 1).padStart(3, '0')}`,
+                  sequentialId,
                   type: data.type,
                   values: data.values,
                   ratings: data.ratings,
@@ -564,6 +565,12 @@ const ProjectExplorer = () => {
                     color: currentTheme.colors.text.primary
                   }}
                   autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleCreateZone();
+                    }
+                  }}
                 />
                 {newZoneError && (
                   <p className="text-sm mt-1" style={{ color: currentTheme.colors.accent.primary }}>

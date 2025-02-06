@@ -24,11 +24,18 @@ export const updateDatapoint = async (datapointId: string, data: {
   try {
     const { data: updatedDatapoint, error } = await supabase
       .from('datapoints')
-      .update({
-        values: data.values,
-        sequential_id: data.sequential_id,
-        updated_at: new Date().toISOString()
-      })
+      .update(
+        data.sequential_id
+          ? {
+              values: data.values,
+              sequential_id: data.sequential_id,
+              updated_at: new Date().toISOString()
+            }
+          : {
+              values: data.values,
+              updated_at: new Date().toISOString()
+            }
+      )
       .eq('id', datapointId)
       .select()
       .single();
@@ -54,6 +61,7 @@ export const createDatapoint = async (zoneId: string, data: {
   type: string;
   values: Record<string, string>;
   ratings: Record<string, number>;
+  sequentialId?: string;
 }) => {
   try {
     // First verify the zone exists
@@ -72,7 +80,7 @@ export const createDatapoint = async (zoneId: string, data: {
       .insert({
         zone_id: zoneId,
         hidden_id: generateHiddenId(),
-        sequential_id: await generateSequentialId(zoneId),
+        sequential_id: data.sequentialId || await generateSequentialId(zoneId),
         type: data.type,
         values: data.values,
         ratings: data.ratings,

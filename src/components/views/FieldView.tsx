@@ -54,17 +54,20 @@ const FieldView: React.FC<FieldViewProps> = ({
     latitude: field.latitude || '',
     longitude: field.longitude || ''
   });
+  const [isSaving, setIsSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
 
   const handleGateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     
     if (!gateFormValues.name || !gateFormValues.latitude || !gateFormValues.longitude) return;
 
     setError(null);
 
     try {
+      setIsSaving(true);
       if (editingGate) {
         // Update existing gate
         await updateGate(editingGate.id, {
@@ -94,31 +97,39 @@ const FieldView: React.FC<FieldViewProps> = ({
     } catch (err) {
       console.error('Error saving gate:', err);
       setError(err instanceof Error ? err.message : 'Failed to save gate');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const gates = field.gates || [];
 
-  const handleCoordinatesSubmit = (e: React.FormEvent) => {
+  const handleCoordinatesSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     
-    const updatedFields = project.fields.map(f => {
-      if (f.id === field.id) {
-        return {
-          ...f,
-          latitude: coordinates.latitude || undefined,
-          longitude: coordinates.longitude || undefined
-        };
+    setError(null);
+
+    try {
+      setIsSaving(true);
+      await updateField(field.id, {
+        latitude: coordinates.latitude || undefined,
+        longitude: coordinates.longitude || undefined
+      });
+
+      // Refresh projects data to get the updated field
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
       }
-      return f;
-    });
 
-    onProjectsChange({
-      ...project,
-      fields: updatedFields
-    });
-
-    setShowCoordinatesForm(false);
+      setShowCoordinatesForm(false);
+    } catch (err) {
+      console.error('Error updating coordinates:', err);
+      setError('Failed to update coordinates');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEditGate = (gate: Gate) => {
@@ -307,6 +318,12 @@ const FieldView: React.FC<FieldViewProps> = ({
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleCoordinatesSubmit(e);
+                    }
+                  }}
                 />
               </div>
               <div>
@@ -324,6 +341,12 @@ const FieldView: React.FC<FieldViewProps> = ({
                     borderColor: currentTheme.colors.border,
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleCoordinatesSubmit(e);
+                    }
                   }}
                 />
               </div>
@@ -445,6 +468,12 @@ const FieldView: React.FC<FieldViewProps> = ({
                     borderColor: currentTheme.colors.border,
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleGateSubmit(e);
+                    }
                   }}
                 />
               </div>

@@ -49,28 +49,40 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onToggleExpand(project.id);
               }}
             >
-              <span 
-                className="w-4 flex items-center justify-center"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleExpand(project.id);
-                }}
-              >
-                {expandedItems.has(project.id) ? (
-                  <ChevronDown 
-                    size={14}
-                    style={{ color: currentTheme.colors.text.secondary }} 
-                  />
-                ) : (
-                  <ChevronRight 
-                    size={14}
-                    style={{ color: currentTheme.colors.text.secondary }} 
-                  />
-                )}
-              </span>
-              <span className="ml-1 font-mono text-xs truncate">
-                {project.name.length > 28 ? project.name.substring(0, 28) + '...' : project.name}
-              </span>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center min-w-0">
+                  <span 
+                    className="w-4 flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleExpand(project.id);
+                    }}
+                  >
+                    {expandedItems.has(project.id) ? (
+                      <ChevronDown 
+                        size={14}
+                        style={{ color: currentTheme.colors.text.secondary }} 
+                      />
+                    ) : (
+                      <ChevronRight 
+                        size={14}
+                        style={{ color: currentTheme.colors.text.secondary }} 
+                      />
+                    )}
+                  </span>
+                  <span className="ml-1 font-mono text-xs truncate">
+                    {project.name.length > 28 ? project.name.substring(0, 28) + '...' : project.name}
+                  </span>
+                </div>
+                <div 
+                  className="text-[10px] opacity-60 ml-1"
+                  style={{
+                    color: currentTheme.colors.text.secondary
+                  }}
+                >
+                  {project.fields.length}f
+                </div>
+              </div>
             </div>
             
             {expandedItems.has(project.id) && (
@@ -118,7 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           color: currentTheme.colors.text.secondary
                         }}
                       >
-                        {field.zones.length}z/{field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)}dp
+                        {field.zones.length}z
                       </div>
                     </div>
                     

@@ -5,12 +5,13 @@ import { Company, COMPANY_FIELDS } from '../types/companies';
 import { Building2, Plus, ChevronRight, Trash2, MapPin, User } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { generateHiddenId } from '../utils/generateHiddenId';
-import { SavedPerson } from '../utils/sampleData';
+import { Person } from '../types/people';
+import { fetchPeople } from '../services/people';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
   savedPlaces: SavedPlace[];
-  savedPeople: SavedPerson[];
+  savedPeople: Person[];
   savedCompanies: Company[];
   onSaveCompanies: (companies: Company[]) => void;
 }
@@ -31,9 +32,23 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   const [selectedCeoId, setSelectedCeoId] = useState<string>('');
   const [selectedContactId, setSelectedContactId] = useState<string>('');
   const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
 
   useEffect(() => {
-    fetchCompanies();
+    const loadData = async () => {
+      try {
+        const [companies, people] = await Promise.all([
+          fetchCompanies(),
+          fetchPeople()
+        ]);
+        setAvailablePeople(people);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load data');
+      }
+    };
+    
+    loadData();
   }, []);
 
   const fetchCompanies = async () => {
@@ -254,25 +269,32 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               >
                 CEO
               </label>
-              <select
-                value={selectedCeoId}
-                onChange={(e) => setSelectedCeoId(e.target.value)}
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.surface,
-                  borderColor: currentTheme.colors.border,
-                  color: currentTheme.colors.text.primary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
-              >
-                <option value="">Select CEO</option>
-                {savedPeople?.map(person => (
-                  <option key={person.id} value={person.id}>
-                    {person.values?.title ? `${person.values.title} ` : ''}
-                    {person.values?.firstName} {person.values?.lastName}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={selectedCeoId}
+                  onChange={(e) => setSelectedCeoId(e.target.value)}
+                  className="w-full p-2 rounded text-sm appearance-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.surface,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text.primary,
+                    border: `1px solid ${currentTheme.colors.border}`
+                  }}
+                >
+                  <option value="">Select CEO</option>
+                  {availablePeople.map(person => (
+                    <option key={person.id} value={person.id}>
+                      {person.salutation} {person.title ? `${person.title} ` : ''}
+                      {person.firstName} {person.lastName}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight 
+                  size={14} 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                  style={{ color: currentTheme.colors.text.secondary }}
+                />
+              </div>
             </div>
             <div>
               <label 
@@ -281,25 +303,32 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               >
                 Contact Person
               </label>
-              <select
-                value={selectedContactId}
-                onChange={(e) => setSelectedContactId(e.target.value)}
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.surface,
-                  borderColor: currentTheme.colors.border,
-                  color: currentTheme.colors.text.primary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
-              >
-                <option value="">Select Contact Person</option>
-                {savedPeople?.map(person => (
-                  <option key={person.id} value={person.id}>
-                    {person.values?.title ? `${person.values.title} ` : ''}
-                    {person.values?.firstName} {person.values?.lastName}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={selectedContactId}
+                  onChange={(e) => setSelectedContactId(e.target.value)}
+                  className="w-full p-2 rounded text-sm appearance-none"
+                  style={{
+                    backgroundColor: currentTheme.colors.surface,
+                    borderColor: currentTheme.colors.border,
+                    color: currentTheme.colors.text.primary,
+                    border: `1px solid ${currentTheme.colors.border}`
+                  }}
+                >
+                  <option value="">Select Contact Person</option>
+                  {availablePeople.map(person => (
+                    <option key={person.id} value={person.id}>
+                      {person.salutation} {person.title ? `${person.title} ` : ''}
+                      {person.firstName} {person.lastName}
+                    </option>
+                  ))}
+                </select>
+                <ChevronRight 
+                  size={14} 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+                  style={{ color: currentTheme.colors.text.secondary }}
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2">
               <button
@@ -386,9 +415,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   <div className="flex items-center gap-2">
                     <User size={14} />
                     CEO: {(() => {
-                      const manager = savedPeople?.find(p => p.id === company.ceoId);
+                      const manager = availablePeople.find(p => p.id === company.ceoId);
                       if (!manager) return 'Unknown manager';
-                      return `${manager.values?.title ? `${manager.values.title} ` : ''}${manager.values?.firstName} ${manager.values?.lastName}`;
+                      return `${manager.salutation} ${manager.title ? `${manager.title} ` : ''}${manager.firstName} ${manager.lastName}`;
                     })()}
                   </div>
                 )}
@@ -396,9 +425,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   <div className="flex items-center gap-2">
                     <User size={14} />
                     Contact: {(() => {
-                      const contact = savedPeople?.find(p => p.id === company.contactPersonId);
+                      const contact = availablePeople.find(p => p.id === company.contactPersonId);
                       if (!contact) return 'Unknown contact';
-                      return `${contact.values?.title ? `${contact.values.title} ` : ''}${contact.values?.firstName} ${contact.values?.lastName}`;
+                      return `${contact.salutation} ${contact.title ? `${contact.title} ` : ''}${contact.firstName} ${contact.lastName}`;
                     })()}
                   </div>
                 )}
