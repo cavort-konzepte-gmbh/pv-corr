@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+* {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+}
+
+.text-2xl {
+  font-size: 14px !important;
+}
+
+.text-lg {
+  font-size: 14px !important;
+}
+
+.writing-vertical-rl {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}

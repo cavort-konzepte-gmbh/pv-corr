@@ -1,0 +1,262 @@
+import { supabase } from '../lib/supabase';
+import { Field, Gate } from '../types/projects';
+import { generateHiddenId } from '../utils/generateHiddenId';
+
+export const createField = async (projectId: string, field: Omit<Field, 'id' | 'hiddenId' | 'gates' | 'zones'>) => {
+  // First check if project exists
+  const { data: project, error: projectError } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('id', projectId)
+    .single();
+
+  if (projectError) {
+    console.error('Error finding project:', projectError);
+    throw projectError;
+  }
+
+  const { data, error } = await supabase
+    .from('fields')
+    .insert({
+      project_id: projectId,
+      hidden_id: generateHiddenId(),
+      name: field.name,
+      latitude: field.latitude,
+      longitude: field.longitude
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating field:', error);
+    throw error;
+  }
+
+  // Return the complete field data with gates and zones
+  const { data: completeField, error: refreshError } = await supabase
+    .from('fields')
+    .select(`
+      *,
+      gates (*),
+      zones (*)
+    `)
+    .eq('id', data.id)
+    .single();
+
+  if (refreshError) {
+    console.error('Error refreshing field data:', refreshError);
+    throw refreshError;
+  }
+
+  return completeField;
+};
+
+export const updateField = async (fieldId: string, field: Partial<Field>) => {
+  if (!fieldId) {
+    throw new Error('Field ID is required for update');
+  }
+  
+  try {
+    // Prepare update data - only include fields that are provided
+    const updateData: Record<string, any> = {};
+    if (field.name !== undefined) updateData.name = field.name;
+    if (field.latitude !== undefined) updateData.latitude = field.latitude;
+    if (field.longitude !== undefined) updateData.longitude = field.longitude;
+
+    // Update the field
+    const { data, error } = await supabase
+      .from('fields')
+      .update(updateData)
+      .eq('id', fieldId)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error('Field not found');
+    }
+
+    // Fetch complete field data after update
+    const { data: completeField, error: fetchError } = await supabase
+      .from('fields')
+      .select(`
+        *,
+        gates (*),
+        zones (
+          *,
+          datapoints (*)
+        )
+      `)
+      .eq('id', fieldId)
+      .single();
+
+    if (fetchError) {
+      throw new Error('Failed to fetch updated field data');
+    }
+    
+    if (!completeField) {
+      throw new Error('Failed to retrieve updated field data');
+    }
+
+    return completeField;
+  } catch (error) {
+    console.error('Error updating field:', error);
+    throw error instanceof Error 
+      ? error 
+      : new Error('An unexpected error occurred while updating the field');
+  }
+};
+
+export const deleteField = async (fieldId: string) => {
+  const { error } = await supabase
+    .from('fields')
+    .delete()
+    .eq('id', fieldId);
+
+  if (error) {
+    console.error('Error deleting field:', error);
+    throw error;
+  }
+};
+
+export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hiddenId'>) => {
+  // First check if field exists
+  const { data: field, error: fieldError } = await supabase
+    .from('fields')
+    .select('id')
+    .eq('id', fieldId)
+    .single();
+
+  if (fieldError) {
+    console.error('Error finding field:', fieldError);
+    throw fieldError;
+  }
+
+  // Then create the gate
+  const { data, error } = await supabase
+    .from('gates')
+    .insert({
+      field_id: fieldId,
+      hidden_id: generateHiddenId(),
+      name: gate.name,
+      latitude: gate.latitude,
+      longitude: gate.longitude
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating gate:', error);
+    throw error;
+  }
+
+  // Return the complete field data with gates
+  const { data: updatedField, error: refreshError } = await supabase
+    .from('fields')
+    .select(`
+      *,
+      gates (*)
+    `)
+    .eq('id', fieldId)
+    .single();
+
+  if (refreshError) {
+    console.error('Error refreshing field data:', refreshError);
+    throw refreshError;
+  }
+
+  return updatedField;
+};
+
+export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
+  // First get the field_id
+  const { data: gateData, error: gateError } = await supabase
+    .from('gates')
+    .select('field_id')
+    .eq('id', gateId)
+    .single();
+
+  if (gateError) {
+    console.error('Error finding gate:', gateError);
+    throw gateError;
+  }
+
+  // Then update the gate
+  const { data, error } = await supabase
+    .from('gates')
+    .update({
+      name: gate.name,
+      latitude: gate.latitude,
+      longitude: gate.longitude
+    })
+    .eq('id', gateId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating gate:', error);
+    throw error;
+  }
+
+  // Return the complete field data with gates
+  const { data: updatedField, error: refreshError } = await supabase
+    .from('fields')
+    .select(`
+      *,
+      gates (*)
+    `)
+    .eq('id', gateData.field_id)
+    .single();
+
+  if (refreshError) {
+    console.error('Error refreshing field data:', refreshError);
+    throw refreshError;
+  }
+
+  return updatedField;
+};
+
+export const deleteGate = async (gateId: string) => {
+  // First get the field_id
+  const { data: gateData, error: gateError } = await supabase
+    .from('gates')
+    .select('field_id')
+    .eq('id', gateId)
+    .single();
+
+  if (gateError) {
+    console.error('Error finding gate:', gateError);
+    throw gateError;
+  }
+
+  // Then delete the gate
+  const { error } = await supabase
+    .from('gates')
+    .delete()
+    .eq('id', gateId);
+
+  if (error) {
+    console.error('Error deleting gate:', error);
+    throw error;
+  }
+
+  // Return the complete field data with remaining gates
+  const { data: updatedField, error: refreshError } = await supabase
+    .from('fields')
+    .select(`
+      *,
+      gates (*)
+    `)
+    .eq('id', gateData.field_id)
+    .single();
+
+  if (refreshError) {
+    console.error('Error refreshing field data:', refreshError);
+    throw refreshError;
+  }
+
+  return updatedField;
+};
