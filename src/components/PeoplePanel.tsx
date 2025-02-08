@@ -5,6 +5,7 @@ import { PERSON_FIELDS } from '../types/people';
 import { User, Plus, ChevronRight, MapPin } from 'lucide-react';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { SavedPlace } from './PlacesPanel';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 interface PeoplePanelProps {
   currentTheme: Theme;
@@ -119,8 +120,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const updateSelectedProject = async () => {
     setError(null);
     
     if (!formValues.salutation || !formValues.firstName || !formValues.lastName || !formValues.email) {
@@ -167,6 +167,11 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       console.error('Error saving person:', err);
       setError(err instanceof Error ? err.message : 'Failed to save person');
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedProject()
   };
 
   const handleDelete = async (personId: string) => {
@@ -183,6 +188,10 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       setError('Failed to delete person');
     }
   };
+
+  useKeyAction(() => {
+    updateSelectedProject();
+  }, showNewPersonForm);
 
   if (loading) {
     return (

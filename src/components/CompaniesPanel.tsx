@@ -7,6 +7,7 @@ import { SavedPlace } from './PlacesPanel';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
@@ -83,8 +84,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const updateSelectedCompany = async () => {
     setError(null);
     
     try {
@@ -129,6 +129,11 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
       console.error('Error saving company:', err);
       setError(err instanceof Error ? err.message : 'Failed to save company');
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedCompany();
   };
 
   const handleDelete = async (companyId: string) => {
@@ -161,6 +166,10 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
     setSelectedContactId(company.contactPersonId || '');
     setShowNewCompanyForm(true);
   };
+
+  useKeyAction(() => {
+    updateSelectedCompany();
+  }, showNewCompanyForm)
 
   return (
     <div className="p-6">

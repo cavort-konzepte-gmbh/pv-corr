@@ -8,6 +8,8 @@ import { fetchPeople } from '../services/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
+import { useDebounce } from '../hooks/useDebounce';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 interface ProjectsPanelProps {
   currentTheme: Theme;
@@ -24,7 +26,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   savedPlaces,
   savedPeople,
   savedCompanies,
-  onProjectsChange
+  onProjectsChange,
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,15 +46,18 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
 
-  useEffect(() => {
+  const debouncedPeopleSearch = useDebounce((peopleSearch: string) => {
     const searchTerm = peopleSearch.toLowerCase();
-    const filtered = availablePeople.filter(person => 
-      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
-      person.email.toLowerCase().includes(searchTerm) ||
-      (person.title && person.title.toLowerCase().includes(searchTerm))
+    const filtered = availablePeople.filter(
+      (person) =>
+        `${person.firstName} ${person.lastName}`
+          .toLowerCase()
+          .includes(searchTerm) ||
+        person.email.toLowerCase().includes(searchTerm) ||
+        (person.title && person.title.toLowerCase().includes(searchTerm))
     );
     setFilteredPeople(filtered);
-  }, [peopleSearch, availablePeople]);
+  });
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -60,12 +65,13 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
         setLoading(true);
         const [fetchedProjects, fetchedPeople] = await Promise.all([
           fetchProjects(),
-          fetchPeople()
+          fetchPeople(),
         ]);
-        
+
         setProjectsList(fetchedProjects);
         setAvailablePeople(fetchedPeople);
         onProjectsChange(fetchedProjects);
+        setFilteredPeople(fetchedPeople);
       } catch (err) {
         console.error('Error loading projects:', err);
         setError('Failed to load projects');
@@ -77,9 +83,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     loadProjects();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const updateSelectedProject = async () => {
     if (!projectName.trim()) {
       setError('Project name is required');
       return;
@@ -95,7 +99,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
       managerId: selectedManagerId || undefined,
-      companyId: undefined // Add if needed
+      companyId: undefined, // Add if needed
     };
 
     if (editingProject) {
@@ -143,6 +147,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setSelectedManagerId(null);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedProject();
+  };
+
   const handleEdit = (project: Project) => {
     setEditingProject(project);
     setProjectName(project.name);
@@ -158,7 +167,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const handleDelete = async (projectId: string) => {
     try {
       await deleteProject(projectId);
-      const updatedProjects = projectsList.filter(p => p.id !== projectId);
+      const updatedProjects = projectsList.filter((p) => p.id !== projectId);
       onProjectsChange(updatedProjects);
       setProjectsList(updatedProjects);
     } catch (error) {
@@ -172,12 +181,16 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
+  useKeyAction(() => {
+    updateSelectedProject();
+  }, showNewProjectForm);
+
   return (
     <div className="p-6">
       {error && (
-        <div 
+        <div
           className="p-4 mb-4 rounded"
-          style={{ 
+          style={{
             backgroundColor: currentTheme.colors.surface,
             color: currentTheme.colors.accent.primary,
             border: `1px solid ${currentTheme.colors.accent.primary}`
@@ -188,7 +201,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       )}
 
       {loading ? (
-        <div 
+        <div
           className="text-center p-4"
           style={{ color: currentTheme.colors.text.secondary }}
         >
@@ -199,9 +212,9 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
           <button
             onClick={() => setShowNewProjectForm(true)}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-            style={{ 
+            style={{
               backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
+              color: 'white',
             }}
           >
             <Plus size={16} />
@@ -210,18 +223,18 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
           {showNewProjectForm ? (
             <div>
-              <h3 
+              <h3
                 className="text-lg mb-6 flex items-center gap-2"
                 style={{ color: currentTheme.colors.text.primary }}
               >
                 <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
                 {editingProject ? 'Edit Project' : 'New Project'}
               </h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -239,12 +252,12 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         backgroundColor: currentTheme.colors.surface,
                         borderColor: currentTheme.colors.border,
                         color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
+                        border: `1px solid ${currentTheme.colors.border}`,
                       }}
                     />
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -270,7 +283,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -291,7 +304,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     />
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -301,7 +314,10 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       type="text"
                       placeholder="Search people..."
                       value={peopleSearch}
-                      onChange={(e) => setPeopleSearch(e.target.value)}
+                      onChange={(e) => {
+                        setPeopleSearch(e.target.value);
+                        debouncedPeopleSearch(e.target.value);
+                      }}
                       className="w-full p-2 rounded text-sm mb-2"
                       style={{
                         backgroundColor: currentTheme.colors.surface,
@@ -311,7 +327,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       }}
                     />
                     <select
-                      value={selectedManagerId || ''}
+                      value={selectedManagerId || ""}
                       onChange={(e) => setSelectedManagerId(e.target.value || null)}
                       className="w-full p-2 rounded text-sm"
                       style={{
@@ -322,7 +338,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       }}
                     >
                       <option value="">No manager assigned</option>
-                      {filteredPeople.map(person => (
+                      {filteredPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.title ? `${person.title} ` : ''}
                           {person.firstName} {person.lastName}
@@ -331,7 +347,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -352,7 +368,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     />
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -373,7 +389,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     />
                   </div>
                   <div>
-                    <label 
+                    <label
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -404,9 +420,9 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     }}
                     className="px-4 py-2 rounded text-sm"
                     style={{
-                      backgroundColor: 'transparent',
+                      backgroundColor: "transparent",
                       color: currentTheme.colors.text.secondary,
-                      border: `1px solid ${currentTheme.colors.border}`
+                      border: `1px solid ${currentTheme.colors.border}`,
                     }}
                   >
                     Cancel
@@ -416,7 +432,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     className="px-4 py-2 rounded text-sm"
                     style={{
                       backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
+                      color: 'white',
                     }}
                   >
                     {editingProject ? 'Save Changes' : 'Create Project'}
@@ -433,19 +449,21 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                   style={{
                     backgroundColor: currentTheme.colors.surface,
                     borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary
+                    color: currentTheme.colors.text.primary,
                   }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }}/>
                       <span className="font-medium">{project.name}</span>
                       {project.managerId && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                        <div
+                          className="flex items-center gap-1 text-xs"
+                          style={{ color: currentTheme.colors.text.secondary }}
+                        >
                           <User size={12} />
                           <div className="flex flex-col gap-1">
-                            {(() => {
-                              const manager = availablePeople.find(p => p.id === project.managerId);
+                            {(() => {const manager = availablePeople.find(p => p.id === project.managerId);
                               if (!manager) return 'Unknown manager';
                               return (
                                 <>
@@ -453,7 +471,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                                     {manager.title ? `${manager.title} ` : ''}{manager.firstName} {manager.lastName}
                                   </div>
                                   {manager.email && (
-                                    <a 
+                                    <a
                                       href={`mailto:${manager.email}`}
                                       onClick={(e) => e.stopPropagation()}
                                       className="hover:underline"
@@ -463,7 +481,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                                     </a>
                                   )}
                                   {manager.phone && (
-                                    <a 
+                                    <a
                                       href={`tel:${manager.phone}`}
                                       onClick={(e) => e.stopPropagation()}
                                       className="hover:underline"
@@ -479,9 +497,9 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         </div>
                       )}
                       {project.placeId && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                        <div className="flex items-center gap-1 text-xs"style={{ color: currentTheme.colors.text.secondary }}>
                           {savedPlaces && <MapPin size={12} />}
-                          {savedPlaces?.find(p => p.id === project.placeId)?.name || 'Unknown location'}
+                          {savedPlaces?.find((p) => p.id === project.placeId)?.name || 'Unknown location'}
                         </div>
                       )}
                     </div>
@@ -520,7 +538,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
             </div>
           )}
 
-          {showDeleteConfirm && (
+{showDeleteConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div 
                 className="p-6 rounded-lg max-w-md w-full"

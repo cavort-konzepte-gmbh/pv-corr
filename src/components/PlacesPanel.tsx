@@ -3,6 +3,8 @@ import { Theme } from '../types/theme';
 import { COUNTRIES, Country } from '../types/places';
 import { MapPin, Plus, ChevronRight } from 'lucide-react';
 import { fetchPlaces as fetchPlacesFromDB } from '../services/places';
+import { useKeyAction } from '../hooks/useKeyAction';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface PlacesPanelProps {
   currentTheme: Theme;
@@ -42,14 +44,9 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPlaces, setFilteredPlaces] = useState<SavedPlace[]>([]);
 
-  useEffect(() => {
-    loadPlaces();
-  }, []);
-
-  useEffect(() => {
-    // Filter places based on search term
+  const debouncedPlacesSearch = useDebounce((search: string) => {
     const filtered = savedPlaces.filter(place => 
-      place.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      place.name?.toLowerCase().includes(search.toLowerCase()) ||
       [
         place.street_name,
         place.street_number,
@@ -58,16 +55,21 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
         place.postal_code,
         place.state,
         place.province
-      ].some(value => value && value.toLowerCase().includes(searchTerm.toLowerCase()))
+      ].some(value => value && value.toLowerCase().includes(search.toLowerCase()))
     );
     setFilteredPlaces(filtered);
-  }, [searchTerm, savedPlaces]);
+  }, 500)
+
+  useEffect(() => {
+    loadPlaces();
+  }, []);
 
   const loadPlaces = async () => {
     try {
       const places = await fetchPlacesFromDB();
       setSavedPlaces(places);
       onSavePlaces(places);
+      setFilteredPlaces(places);
     } catch (err) {
       console.error('Error fetching places:', err);
       setError('Failed to load places');
@@ -113,8 +115,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const updateSelectedPlace = async () => {
     setError(null);
     const houseNumber = formValues.house_number || formValues.street_number;
 
@@ -151,6 +152,11 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
       setError('Failed to save place');
       return;
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedPlace();
   };
 
   const handleDelete = async (placeId: string) => {
@@ -162,6 +168,10 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
       setError('Failed to delete place');
     }
   };
+
+  useKeyAction(() => {
+    updateSelectedPlace();
+  }, showNewPlaceForm)
 
   return (
     <div className="p-6">
@@ -182,7 +192,10 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
           type="text"
           placeholder="Search places..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value)
+            debouncedPlacesSearch(e.target.value)
+          }}
           className="w-full p-3 rounded text-sm"
           style={{
             backgroundColor: currentTheme.colors.surface,

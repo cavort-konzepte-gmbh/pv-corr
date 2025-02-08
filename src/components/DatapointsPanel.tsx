@@ -5,6 +5,7 @@ import { Language, useTranslation } from '../types/language';
 import { fetchParameters, Parameter, createParameter, updateParameter, deleteParameter } from '../services/parameters';
 import { Standard, DEFAULT_STANDARDS } from '../types/standards';
 import { fetchStandards, createStandard, deleteStandard } from '../services/standards';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;
@@ -83,7 +84,6 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
       setError('Parameter name is required');
       return;
     }
-    
     try {
       // For open range type, we don't need to validate the range value
       const rangeValue = newColumn.range.type === 'open' 
@@ -153,6 +153,14 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
       setError('Failed to create standard');
     }
   };
+
+  useKeyAction(() => {
+    handleAddColumn();
+  }, showNewColumn)
+
+  useKeyAction(() => {
+    handleAddStandard();
+  }, showNewStandard)
 
   return (
     <div className="p-6">
