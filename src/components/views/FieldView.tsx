@@ -7,6 +7,7 @@ import { fetchProjects } from '../../services/projects';
 import { Language, useTranslation } from '../../types/language';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 import { Gate } from '../../types/projects';
+import { useKeyAction } from '../../hooks/useKeyAction';
 
 interface FieldViewProps {
   project: Project;
@@ -58,12 +59,10 @@ const FieldView: React.FC<FieldViewProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
 
-  const handleGateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const addGate = async () => {
     if (isSaving) return;
     
     if (!gateFormValues.name || !gateFormValues.latitude || !gateFormValues.longitude) return;
-
     setError(null);
 
     try {
@@ -100,12 +99,16 @@ const FieldView: React.FC<FieldViewProps> = ({
     } finally {
       setIsSaving(false);
     }
+  }
+
+  const handleGateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    addGate();
   };
 
   const gates = field.gates || [];
 
-  const handleCoordinatesSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const addCoordinates = async () => {
     if (isSaving) return;
     
     setError(null);
@@ -130,6 +133,11 @@ const FieldView: React.FC<FieldViewProps> = ({
     } finally {
       setIsSaving(false);
     }
+  }
+
+  const handleCoordinatesSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    addCoordinates();
   };
 
   const handleEditGate = (gate: Gate) => {
@@ -208,6 +216,14 @@ const FieldView: React.FC<FieldViewProps> = ({
       setEditingName(null);
     }
   };
+
+  useKeyAction(() => {
+    addGate();
+  }, showGatesPanel)
+
+  useKeyAction(() => {
+    addCoordinates();
+  }, showCoordinatesForm)
 
   return (
     <div className="p-6">
@@ -318,12 +334,6 @@ const FieldView: React.FC<FieldViewProps> = ({
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCoordinatesSubmit(e);
-                    }
-                  }}
                 />
               </div>
               <div>
@@ -341,12 +351,6 @@ const FieldView: React.FC<FieldViewProps> = ({
                     borderColor: currentTheme.colors.border,
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCoordinatesSubmit(e);
-                    }
                   }}
                 />
               </div>
@@ -468,12 +472,6 @@ const FieldView: React.FC<FieldViewProps> = ({
                     borderColor: currentTheme.colors.border,
                     color: currentTheme.colors.text.primary,
                     border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleGateSubmit(e);
-                    }
                   }}
                 />
               </div>

@@ -17,6 +17,7 @@ import FieldView from './views/FieldView';
 import ZoneView from './views/ZoneView';
 import SettingsPanel from './SettingsPanel';
 import { SavedPlace } from './PlacesPanel';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 const ProjectExplorer = () => {
   const { signOut } = useAuth();
@@ -357,6 +358,10 @@ const ProjectExplorer = () => {
     setNewName('');
   };
 
+  useKeyAction(() => {
+    handleCreateZone();
+  }, showNewZoneDialog)
+
   const renderContent = () => {
     if (view === 'settings') {
       return (
@@ -565,12 +570,6 @@ const ProjectExplorer = () => {
                     color: currentTheme.colors.text.primary
                   }}
                   autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCreateZone();
-                    }
-                  }}
                 />
                 {newZoneError && (
                   <p className="text-sm mt-1" style={{ color: currentTheme.colors.accent.primary }}>
