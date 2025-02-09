@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Theme } from '../../types/theme';
 import { Home, Settings, LogOut } from 'lucide-react';
-import { useTranslation } from '../../types/language';
+import { useTranslation, Language } from '../../types/language';
 
 interface NavigationBarProps {
   view: 'projects' | 'settings';

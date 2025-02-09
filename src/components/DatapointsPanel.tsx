@@ -188,7 +188,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
               }}
             >
               <Plus size={16} />
-              Add Parameter
+              {t("parameter.add")}
             </button>
             <button
               onClick={() => setShowNewStandard(true)}
@@ -199,7 +199,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
               }}
             >
               <Plus size={16} />
-              Add Standard
+              {t("standards.add")}
             </button>
           </div>
 
@@ -210,12 +210,12 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                 style={{ backgroundColor: currentTheme.colors.surface }}
               >
                 <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-                  {typeof newColumn.id === 'string' ? 'Edit Parameter' : 'Add New Parameter'}
+                  {typeof newColumn.id === 'string' ? t("parameter.edit"): t("parameter.new")}
                 </h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Name
+                      {t("parameter.name")}
                     </label>
                     <input
                       type="text"
@@ -231,13 +231,13 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Short Name
+                      {t("parameter.short_name")}
                     </label>
                     <input
                       type="text"
                       value={newColumn.shortName}
                       onChange={(e) => setNewColumn(prev => ({ ...prev, shortName: e.target.value }))}
-                      placeholder="Optional short name"
+                      placeholder={t("parameter.short_name.placeholder")}
                       className="w-full p-2 rounded text-sm"
                       style={{
                         backgroundColor: 'transparent',
@@ -248,7 +248,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Unit
+                      {t("parameter.unit")}
                     </label>
                     <select
                       value={newColumn.unit}
@@ -277,7 +277,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Range Type
+                      {t("parameter.range_type")}
                     </label>
                     <select
                       value={newColumn.range.type}
@@ -306,7 +306,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Range Value
+                      {t("parameter.range_value")}
                     </label>
                     <input
                       type="text"
@@ -351,7 +351,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     >
-                      Cancel
+                      {t("actions.cancel")}
                     </button>
                     <button
                       onClick={handleAddColumn}
@@ -361,7 +361,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                         color: 'white'
                       }}
                     >
-                      {typeof newColumn.id === 'string' ? 'Save Changes' : 'Add Parameter'}
+                      {typeof newColumn.id === 'string' ? t("general.save") : t("parameter.add")}
                     </button>
                   </div>
                 </div>
@@ -376,12 +376,12 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                 style={{ backgroundColor: currentTheme.colors.surface }}
               >
                 <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-                  Add New Standard
+                  {t("standards.new")}
                 </h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Standard Name
+                      {t("standards.name")}
                     </label>
                     <input
                       type="text"
@@ -397,7 +397,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      Select Parameters
+                      {t("standards.select_parameter")}
                     </label>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {parameters.map((param) => (
@@ -439,7 +439,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     >
-                      Cancel
+                      {t("actions.cancel")}
                     </button>
                     <button
                       onClick={handleAddStandard}
@@ -449,7 +449,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                         color: 'white'
                       }}
                     >
-                      Add Standard
+                      {t("standards.add")}
                     </button>
                   </div>
                   {selectedColumns.length === 0 && (
@@ -457,7 +457,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                       className="text-sm mt-2" 
                       style={{ color: currentTheme.colors.accent.primary }}
                     >
-                      Please select at least one parameter
+                      {t("standards.select_one_parameter")}
                     </div>
                   )}
                   {!newStandard.name.trim() && (
@@ -465,7 +465,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                       className="text-sm mt-2" 
                       style={{ color: currentTheme.colors.accent.primary }}
                     >
-                      Please enter a standard name
+                      {t("standards.enter_name")}
                     </div>
                   )}
                 </div>

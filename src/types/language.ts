@@ -14,7 +14,7 @@ export const LANGUAGES: { id: Language; name: string; direction: 'ltr' | 'rtl' }
   { id: 'ar', name: 'العربية', direction: 'rtl' }
 ];
 
-export const TRANSLATIONS: Translation = {
+export const TRANSLATIONS = {
   // General
   'general.save': {
     en: 'Save',
@@ -51,6 +51,13 @@ export const TRANSLATIONS: Translation = {
     fr: 'Ajouter',
     ar: 'إضافة'
   },
+  'general.save_changes': {
+    en: 'Save changes',
+    de: 'Änderungen speichern',
+    es: 'Guardar cambios',
+    fr: 'Enregistrer les modifications',
+    ar: 'حفظ التغييرات'
+  },
 
   // Navigation
   'nav.projects': {
@@ -66,6 +73,13 @@ export const TRANSLATIONS: Translation = {
     es: 'Ajustes',
     fr: 'Paramètres',
     ar: 'الإعدادات'
+  },
+  'nav.sign_out': {
+    en: 'Sign Out',
+    de: 'Abmelden',
+    es: 'Cerrar sesión',
+    fr: 'Déconnexion',
+    ar: 'تسجيل الخروج'
   },
 
   // Settings
@@ -257,6 +271,13 @@ export const TRANSLATIONS: Translation = {
     es: 'No activado',
     fr: 'Non activé',
     ar: 'غير مفعل'
+  },
+  'settings.theme_active': {
+    en: 'Currently active',
+    de: 'Aktuell aktiv',
+    es: 'Actualmente activo',
+    fr: 'Actuellement actif',
+    ar: 'نشط حالياً'
   },
   'standards.all': {
     en: 'All Standards',
@@ -474,11 +495,179 @@ export const TRANSLATIONS: Translation = {
     es: 'Valor en',
     fr: 'Valeur en',
     ar: 'القيمة في'
-  }
-};
+  },
+  'parameter.add': {
+    en: 'Add Parameter',
+    de: 'Parameter hinzufügen',
+    es: 'Añadir Parámetro',
+    fr: 'Ajouter un paramètre',
+    ar: 'إضافة معلمة'
+  },
+  'parameter.edit': {
+    en: 'Edit parameter',
+    de: 'Parameter bearbeiten',
+    es: 'Editar parámetro',
+    fr: 'Modifier le paramètre',
+    ar: 'تحرير المعلمة'
+  },
+  'parameter.new': {
+    en: 'Add new parameter',
+    de: 'Neuen Parameter hinzufügen',
+    es: 'Añadir nuevo parámetro',
+    fr: 'Ajouter un nouveau paramètre',
+    ar: 'إضافة معلمة جديدة'
+  },
+  'parameter.name': {
+    en: 'Name',
+    de: 'Name',
+    es: 'Nombre',
+    fr: 'Nom',
+    ar: 'اسم'
+  },
+  'parameter.short_name': {
+    en: 'Short name',
+    de: 'Kurzer Name',
+    es: 'Nombre corto',
+    fr: 'Nom court',
+    ar: 'الاسم المختصر'
+  },
+  'parameter.short_name.placeholder': {
+    en: 'Optional short name',
+    de: 'Optionaler kurzer Name',
+    es: 'Nombre corto opcional',
+    fr: 'Nom court optionnel',
+    ar: 'الاسم القصير الاختياري'
+  },
+  'parameter.unit': {
+    en: 'Unit',
+    de: 'Einheit',
+    es: 'Unidad',
+    fr: 'Unité',
+    ar: 'وحدة'
+  },
+  'parameter.range_type': {
+    en: 'Range Type',
+    de: 'Bereichstyp',
+    es: 'Tipo de rango',
+    fr: 'Type de plage',
+    ar: 'نوع النطاق'
+  },
+  'parameter.range_value': {
+    en: 'Range value',
+    de: 'Bereichswert',
+    es: 'Valor de rango',
+    fr: 'Valeur de plage',
+    ar: 'قيمة النطاق'
+  },
+  'standards.add': {
+    en: 'Add Standard',
+    de: 'Standard hinzufügen',
+    es: 'Añadir Estándar',
+    fr: 'Ajouter une norme',
+    ar: 'إضافة معيار'
+  },
+  'standards.new': {
+    en: 'Add new standard',
+    de: 'Neuen Standard hinzufügen',
+    es: 'Añadir nuevo estándar',
+    fr: 'Ajouter une nouvelle norme',
+    ar: 'إضافة معيار جديد'
+  },
+  'standards.name': {
+    en: 'Standard Name',
+    de: 'Standardname',
+    es: 'Nombre estándar',
+    fr: 'Nom standard',
+    ar: 'اسم المعيار'
+  },
+  'standards.select_parameter': {
+    en: 'Select parameters',
+    de: 'Parameter auswählen',
+    es: 'Seleccionar parámetros',
+    fr: 'Sélectionner des paramètres',
+    ar: 'اختر المعلمات'
+  },
+  'standards.select_one_parameter': {
+    en: 'Please select at least one parameter',
+    de: 'Bitte wählen Sie mindestens einen Parameter aus',
+    es: 'Por favor, seleccione al menos un parámetro',
+    fr: 'Veuillez sélectionner au moins un paramètre',
+    ar: 'يرجى تحديد معلمة واحدة على الأقل'
+  },
+  'standards.enter_name': {
+    en: 'Please enter a standard name',
+    de: 'Bitte geben Sie einen Standardnamen ein',
+    es: 'Por favor, ingrese un nombre estándar',
+    fr: 'Veuillez entrer un nom standard',
+    ar: 'يرجى إدخال اسم المعيار'
+  },
+  'place.add': {
+    en: 'Add place',
+    de: 'Ort hinzufügen',
+    es: 'Añadir lugar',
+    fr: 'Ajouter un lieu',
+    ar: 'إضافة مكان'
+  },
+  'place.new': {
+    en: 'Add New Place',
+    de: 'Neuen Ort hinzufügen',
+    es: 'Añadir nuevo lugar',
+    fr: 'Ajouter un nouveau lieu',
+    ar: 'إضافة مكان جديد'
+  },
+  'place.search': {
+    en: 'Search places...',
+    de: 'Orte suchen...',
+    es: 'Buscar lugares...',
+    fr: 'Rechercher des lieux...',
+    ar: 'بحث عن الأماكن...'
+  },
+  'place.loading': {
+    en: 'Loading places...',
+    de: 'Orte werden geladen...',
+    es: 'Cargando lugares...',
+    fr: 'Chargement des lieux...',
+    ar: 'تحميل الأماكن...'
+  },
+  'place.edit': {
+    en: 'Edit Place',
+    de: 'Ort bearbeiten',
+    es: 'Editar lugar',
+    fr: 'Modifier le lieu',
+    ar: 'تحرير المكان'
+  },
+  'place.select_country': {
+    en: 'Select country',
+    de: 'Land auswählen',
+    es: 'Seleccionar país',
+    fr: 'Sélectionner un pays',
+    ar: 'اختر البلد'
+  },
+  'place.new_place': {
+    en: 'New place in',
+    de: 'Neuer Ort in',
+    es: 'Nuevo lugar en',
+    fr: 'Nouveau lieu dans',
+    ar: 'مكان جديد في'
+  },
+  'utils': {
+    en: '',
+    de: '',
+    es: '',
+    fr: '',
+    ar: ''
+  },
+  'utils': {
+    en: '',
+    de: '',
+    es: '',
+    fr: '',
+    ar: ''
+  },
+} satisfies Translation;
 
 export const useTranslation = (currentLanguage: Language) => {
-  return (key: string) => {
-    return TRANSLATIONS[key]?.[currentLanguage] || TRANSLATIONS[key]?.['en'] || key;
+  return (key: keyof typeof TRANSLATIONS) => {
+    return TRANSLATIONS[key][currentLanguage] || TRANSLATIONS[key]['en'] || key;
   };
 };

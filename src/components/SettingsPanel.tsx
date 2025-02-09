@@ -274,7 +274,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               style={{ backgroundColor: currentTheme.colors.border }}>
               <div>
                 <span style={{ color: currentTheme.colors.text.primary }}>
-                  {t('settings.language')}
+                  {t('settings.language')} (Language)
                 </span>
                 <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
                   {t('settings.language.description')}
@@ -365,7 +365,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   <div>
                     <div className="font-medium">{theme.name}</div>
                     <div className="text-sm mt-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {theme.id === currentTheme.id && 'Currently active'}
+                      {theme.id === currentTheme.id && t("settings.theme_active")}
                     </div>
                   </div>
                   {theme.id === currentTheme.id && (
@@ -400,6 +400,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
         {view === 'places' && (
           <PlacesPanel 
+            currentLanguage={currentLanguage}
             currentTheme={currentTheme}
             savedPlaces={savedPlaces}
             onSavePlaces={setSavedPlaces}
