@@ -22,37 +22,37 @@ export interface CompanyField {
 export const COMPANY_FIELDS: CompanyField[] = [
   {
     id: 'name',
-    label: 'Company Name',
+    label: 'company.name',
     type: 'text',
     required: true
   },
   {
     id: 'website',
-    label: 'Website',
+    label: 'company.website',
     type: 'url',
     required: false
   },
   {
     id: 'email',
-    label: 'Email',
+    label: 'company.email',
     type: 'email',
     required: false
   },
   {
     id: 'phone',
-    label: 'Phone',
+    label: 'company.phone',
     type: 'tel',
     required: false
   },
   {
     id: 'vatId',
-    label: 'VAT ID',
+    label: 'company.vat_id',
     type: 'text',
     required: false
   },
   {
     id: 'registrationNumber',
-    label: 'Registration Number',
+    label: 'company.registration_number',
     type: 'text',
     required: false
   }

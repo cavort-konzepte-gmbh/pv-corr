@@ -2,6 +2,8 @@ import { supabase } from '../lib/supabase';
 import { Parameter, ParameterUnit } from '../types/parameters';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
+export type { Parameter }
+
 export const fetchParameters = async (): Promise<Parameter[]> => {
   const { data, error } = await supabase
     .from('parameters')

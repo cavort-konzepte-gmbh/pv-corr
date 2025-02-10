@@ -15,7 +15,7 @@ export interface Person {
 
 export interface PersonField {
   id: string;
-  hiddenId: string;
+  hiddenId?: string;
   label: string;
   type: 'text' | 'email' | 'tel' | 'select' | 'address';
   required: boolean;
@@ -25,51 +25,51 @@ export interface PersonField {
 export const PERSON_FIELDS: PersonField[] = [
   {
     id: 'salutation',
-    label: 'Salutation',
+    label: 'people.salutation',
     type: 'select',
     required: true,
     options: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.']
   },
   {
     id: 'title',
-    label: 'Title',
+    label: 'people.title',
     type: 'select',
     required: false,
     options: ['Dr.', 'Prof.']
   },
   {
     id: 'firstName',
-    label: 'First Name',
+    label: 'people.firstName',
     type: 'text',
     required: true
   },
   {
     id: 'lastName',
-    label: 'Last Name',
+    label: 'people.lastName',
     type: 'text',
     required: true
   },
   {
     id: 'email',
-    label: 'Email Address',
+    label: 'company.email',
     type: 'email',
     required: true
   },
   {
     id: 'phone',
-    label: 'Phone Number',
+    label: 'company.phone',
     type: 'tel',
     required: false
   },
   {
     id: 'privateAddress',
-    label: 'Private Address',
+    label: 'people.private_address',
     type: 'address',
     required: false
   },
   {
     id: 'businessAddress',
-    label: 'Business Address',
+    label: 'people.private_business',
     type: 'address',
     required: false
   }
