@@ -7,10 +7,12 @@ import { SavedPlace } from './PlacesPanel';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
+import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
+  currentLanguage: Language
   savedPlaces: SavedPlace[];
   savedPeople: Person[];
   savedCompanies: Company[];
@@ -19,6 +21,7 @@ interface CompaniesPanelProps {
 
 const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   currentTheme,
+  currentLanguage,
   savedPlaces,
   savedPeople,
   savedCompanies,
@@ -34,6 +37,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   const [selectedContactId, setSelectedContactId] = useState<string>('');
   const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const loadData = async () => {
@@ -191,7 +195,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
           className="text-center p-4"
           style={{ color: currentTheme.colors.text.secondary }}
         >
-          Loading companies...
+          {translation("company.loading")}
         </div>
       ) : (
         <>
@@ -204,7 +208,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
             }}
           >
             <Plus size={16} />
-            Add New Company
+            {translation("company.add")}
           </button>
 
           {showNewCompanyForm ? (
@@ -214,7 +218,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
             style={{ color: currentTheme.colors.text.primary }}
           >
             <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
-            {editingCompany ? 'Edit Company' : 'New Company'}
+            {editingCompany ? translation("company.edit") : translation("company.add")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -224,7 +228,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   className="block text-sm mb-1"
                   style={{ color: currentTheme.colors.text.secondary }}
                 >
-                  {field.label}
+                  {translation(field.label as any)}
                   {field.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
                 <input
@@ -250,7 +254,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 className="block text-sm mb-1"
                 style={{ color: currentTheme.colors.text.secondary }}
               >
-                Company Address
+                {translation("company.address")}
               </label>
               <select
                 value={selectedPlaceId}
@@ -310,7 +314,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 className="block text-sm mb-1"
                 style={{ color: currentTheme.colors.text.secondary }}
               >
-                Contact Person
+                {translation("company.contact_person")}
               </label>
               <div className="relative">
                 <select
@@ -355,7 +359,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   border: `1px solid ${currentTheme.colors.border}`
                 }}
               >
-                Cancel
+                {translation("actions.cancel")}
               </button>
               <button
                 type="submit"
@@ -365,7 +369,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   color: 'white'
                 }}
               >
-                {editingCompany ? 'Save Changes' : 'Create Company'}
+                {editingCompany ? translation("general.save_changes") : 'Create Company'}
               </button>
             </div>
           </form>

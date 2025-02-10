@@ -5,9 +5,11 @@ import { MapPin, Plus, ChevronRight } from 'lucide-react';
 import { fetchPlaces as fetchPlacesFromDB } from '../services/places';
 import { useKeyAction } from '../hooks/useKeyAction';
 import { useDebounce } from '../hooks/useDebounce';
+import { Language, useTranslation } from '../types/language';
 
 interface PlacesPanelProps {
   currentTheme: Theme;
+  currentLanguage: Language;
   savedPlaces: SavedPlace[];
   onSavePlaces: (places: SavedPlace[]) => void;
 }
@@ -31,6 +33,7 @@ export interface SavedPlace {
 
 const PlacesPanel: React.FC<PlacesPanelProps> = ({ 
   currentTheme, 
+  currentLanguage,
   savedPlaces: initialSavedPlaces,
   onSavePlaces 
 }) => {
@@ -43,6 +46,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPlaces, setFilteredPlaces] = useState<SavedPlace[]>([]);
+  const translation = useTranslation(currentLanguage)
 
   const debouncedPlacesSearch = useDebounce((search: string) => {
     const filtered = savedPlaces.filter(place => 
@@ -184,13 +188,13 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
         }}
       >
         <Plus size={16} />
-        Add New Place
+        {translation("place.new")}
       </button>
 
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search places..."
+          placeholder={translation("place.search")}
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value)
@@ -224,7 +228,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
           className="text-center p-4"
           style={{ color: currentTheme.colors.text.secondary }}
         >
-          Loading places...
+          {translation("place.loading")}
         </div>
       ) : (
         <>
@@ -235,8 +239,8 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                 style={{ color: currentTheme.colors.text.primary }}
               >
                 <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
-                {editingPlace ? 'Edit Place' : 
-                  selectedCountry ? `New Place in ${selectedCountry.name}` : 'Select Country'}
+                {editingPlace ? translation("place.edit") : 
+                  selectedCountry ? `${translation("place.new_place")} ${selectedCountry.name}` : translation("place.select_country")}
               </h3>
               
               {!selectedCountry ? (
@@ -305,7 +309,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     >
-                      Cancel
+                      {translation("actions.cancel")}
                     </button>
                     <button
                       type="submit"
@@ -315,7 +319,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                         color: 'white'
                       }}
                     >
-                      {editingPlace ? 'Save Changes' : 'Add Place'}
+                      {editingPlace ? translation("general.save_changes") : translation("place.add")}
                     </button>
                   </div>
                 </form>
