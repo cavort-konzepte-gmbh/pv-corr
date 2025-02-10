@@ -174,7 +174,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
           className="text-center p-4"
           style={{ color: currentTheme.colors.text.secondary }}
         >
-          Loading parameters and standards...
+          {t("datapoint.loading")}
         </div>
       ) : (
         <>

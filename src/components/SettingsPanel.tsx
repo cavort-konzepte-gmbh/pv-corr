@@ -410,6 +410,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         {view === 'people' && (
           <PeoplePanel 
             currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
             savedPlaces={savedPlaces}
             savedPeople={savedPeople}
             onSavePeople={setSavedPeople}
@@ -419,6 +420,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
         {view === 'companies' && (
           <CompaniesPanel
             currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
             savedPlaces={savedPlaces}
             savedPeople={savedPeople}
             savedCompanies={companies}

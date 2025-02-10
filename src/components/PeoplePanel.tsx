@@ -5,9 +5,11 @@ import { PERSON_FIELDS } from '../types/people';
 import { User, Plus, ChevronRight, MapPin } from 'lucide-react';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { SavedPlace } from './PlacesPanel';
+import { Language, useTranslation } from '../types/language';
 
 interface PeoplePanelProps {
   currentTheme: Theme;
+  currentLanguage: Language;
   savedPlaces: SavedPlace[];
   savedPeople: SavedPerson[];
   onSavePeople: (people: SavedPerson[]) => void;
@@ -31,7 +33,8 @@ interface SavedPerson {
 }
 
 const PeoplePanel: React.FC<PeoplePanelProps> = ({ 
-  currentTheme, 
+  currentTheme,
+  currentLanguage,
   savedPlaces, 
   savedPeople,
   onSavePeople 
@@ -46,6 +49,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     business?: string;
   }>({});
   const [showAddressSelect, setShowAddressSelect] = useState<'private' | 'business' | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     fetchPeople();
@@ -190,7 +194,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         className="text-center p-4"
         style={{ color: currentTheme.colors.text.secondary }}
       >
-        Loading people...
+        {translation("people.loading")}
       </div>
     );
   };
@@ -227,7 +231,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         }}
       >
         <Plus size={16} />
-        Add New Person
+        {translation("people.new")}
       </button>
 
       {showNewPersonForm ? (
@@ -237,7 +241,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
             style={{ color: currentTheme.colors.text.primary }}
           >
             <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
-            {editingPerson ? 'Edit Person' : 'Add New Person'}
+            {editingPerson ? translation("people.edit") : translation("people.new")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -248,7 +252,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                     className="block text-sm mb-1"
                     style={{ color: currentTheme.colors.text.secondary }}
                   >
-                    {field.label}
+                    {translation(field.label as any)}
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
                   {field.type === 'address' ? (
@@ -331,7 +335,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   border: `1px solid ${currentTheme.colors.border}`
                 }}
               >
-                Cancel
+                {translation("actions.cancel")}
               </button>
               <button
                 type="submit"
@@ -341,7 +345,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   color: 'white'
                 }}
               >
-                {editingPerson ? 'Save Changes' : 'Add Person'}
+                {editingPerson ? translation("settings.autosave") : translation("people.add")}
               </button>
             </div>
           </form>
@@ -450,7 +454,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   border: `1px solid ${currentTheme.colors.border}`
                 }}
               >
-                Cancel
+                {translation("actions.cancel")}
               </button>
             </div>
           </div>

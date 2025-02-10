@@ -293,6 +293,48 @@ export const TRANSLATIONS = {
     fr: 'Sélectionner Standard',
     ar: 'اختر المعيار'
   },
+  'standards.add': {
+    en: 'Add Standard',
+    de: 'Standard hinzufügen',
+    es: 'Añadir Estándar',
+    fr: 'Ajouter une norme',
+    ar: 'إضافة معيار'
+  },
+  'standards.new': {
+    en: 'Add new standard',
+    de: 'Neuen Standard hinzufügen',
+    es: 'Añadir nuevo estándar',
+    fr: 'Ajouter une nouvelle norme',
+    ar: 'إضافة معيار جديد'
+  },
+  'standards.name': {
+    en: 'Standard Name',
+    de: 'Standardname',
+    es: 'Nombre estándar',
+    fr: 'Nom standard',
+    ar: 'اسم المعيار'
+  },
+  'standards.select_parameter': {
+    en: 'Select parameters',
+    de: 'Parameter auswählen',
+    es: 'Seleccionar parámetros',
+    fr: 'Sélectionner des paramètres',
+    ar: 'اختر المعلمات'
+  },
+  'standards.select_one_parameter': {
+    en: 'Please select at least one parameter',
+    de: 'Bitte wählen Sie mindestens einen Parameter aus',
+    es: 'Por favor, seleccione al menos un parámetro',
+    fr: 'Veuillez sélectionner au moins un paramètre',
+    ar: 'يرجى تحديد معلمة واحدة على الأقل'
+  },
+  'standards.enter_name': {
+    en: 'Please enter a standard name',
+    de: 'Bitte geben Sie einen Standardnamen ein',
+    es: 'Por favor, ingrese un nombre estándar',
+    fr: 'Veuillez entrer un nom standard',
+    ar: 'يرجى إدخال اسم المعيار'
+  },
   'actions.cancel': {
     en: 'Cancel',
     de: 'Abbrechen',
@@ -341,6 +383,13 @@ export const TRANSLATIONS = {
     es: 'No hay cambios registrados',
     fr: 'Aucun changement enregistré',
     ar: 'لم يتم تسجيل أي تغييرات'
+  },
+  'datapoint.loading': {
+    en: 'Loading parameters and standards...',
+    de: 'Laden von Parametern und Standards...',
+    es: 'Cargando parámetros y estándares...',
+    fr: 'Chargement des paramètres et des normes...',
+    ar: 'تحميل المعلمات والمعايير...'
   },
   'actions.select_value': {
     en: 'Select value',
@@ -559,48 +608,6 @@ export const TRANSLATIONS = {
     fr: 'Valeur de plage',
     ar: 'قيمة النطاق'
   },
-  'standards.add': {
-    en: 'Add Standard',
-    de: 'Standard hinzufügen',
-    es: 'Añadir Estándar',
-    fr: 'Ajouter une norme',
-    ar: 'إضافة معيار'
-  },
-  'standards.new': {
-    en: 'Add new standard',
-    de: 'Neuen Standard hinzufügen',
-    es: 'Añadir nuevo estándar',
-    fr: 'Ajouter une nouvelle norme',
-    ar: 'إضافة معيار جديد'
-  },
-  'standards.name': {
-    en: 'Standard Name',
-    de: 'Standardname',
-    es: 'Nombre estándar',
-    fr: 'Nom standard',
-    ar: 'اسم المعيار'
-  },
-  'standards.select_parameter': {
-    en: 'Select parameters',
-    de: 'Parameter auswählen',
-    es: 'Seleccionar parámetros',
-    fr: 'Sélectionner des paramètres',
-    ar: 'اختر المعلمات'
-  },
-  'standards.select_one_parameter': {
-    en: 'Please select at least one parameter',
-    de: 'Bitte wählen Sie mindestens einen Parameter aus',
-    es: 'Por favor, seleccione al menos un parámetro',
-    fr: 'Veuillez sélectionner au moins un paramètre',
-    ar: 'يرجى تحديد معلمة واحدة على الأقل'
-  },
-  'standards.enter_name': {
-    en: 'Please enter a standard name',
-    de: 'Bitte geben Sie einen Standardnamen ein',
-    es: 'Por favor, ingrese un nombre estándar',
-    fr: 'Veuillez entrer un nom standard',
-    ar: 'يرجى إدخال اسم المعيار'
-  },
   'place.add': {
     en: 'Add place',
     de: 'Ort hinzufügen',
@@ -650,12 +657,152 @@ export const TRANSLATIONS = {
     fr: 'Nouveau lieu dans',
     ar: 'مكان جديد في'
   },
-  'utils': {
-    en: '',
-    de: '',
-    es: '',
-    fr: '',
-    ar: ''
+  'company.loading': {
+    en: 'Loading companies...',
+    de: 'Laden von Unternehmen...',
+    es: 'Cargando empresas...',
+    fr: 'Chargement des entreprises...',
+    ar: 'تحميل الشركات...'
+  },
+  'company.add': {
+    en: 'Add New Company',
+    de: 'Neues Unternehmen hinzufügen',
+    es: 'Agregar nueva empresa',
+    fr: 'Ajouter une nouvelle entreprise',
+    ar: 'إضافة شركة جديدة'
+  },
+  'company.edit': {
+    en: 'Edit Company',
+    de: 'Unternehmen bearbeiten',
+    es: 'Editar empresa',
+    fr: 'Modifier l\'entreprise',
+    ar: 'تعديل الشركة'
+  },
+  'company.name': {
+    en: 'Company Name',
+    de: 'Firmenname',
+    es: 'Nombre de la empresa',
+    fr: 'Nom de l\'entreprise',
+    ar: 'اسم الشركة'
+  },
+  'company.website': {
+    en: 'Website',
+    de: 'Webseite',
+    es: 'Sitio web',
+    fr: 'Site Web',
+    ar: 'الموقع الإلكتروني'
+  },
+  'company.email': {
+    en: 'Email',
+    de: 'E-Mail',
+    es: 'Correo electrónico',
+    fr: 'Email',
+    ar: 'البريد الإلكتروني'
+  },
+  'company.phone': {
+    en: 'Phone',
+    de: 'Telefon',
+    es: 'Teléfono',
+    fr: 'Téléphone',
+    ar: 'الهاتف'
+  },
+  'company.vat_id': {
+    en: 'VAT ID',
+    de: 'Mehrwertsteuernummer',
+    es: 'ID de VAT',
+    fr: 'Identifiant TVA',
+    ar: 'رقم ضريبة القيمة المضافة'
+  },
+  'company.registration_number': {
+    en: 'Registration Number',
+    de: 'Registrierungsnummer',
+    es: 'Número de registro',
+    fr: 'Numéro d\'enregistrement',
+    ar: 'رقم التسجيل'
+  },
+  'company.address': {
+    en: 'Company Address',
+    de: 'Firmenadresse',
+    es: 'Dirección de la empresa',
+    fr: 'Adresse de l\'entreprise',
+    ar: 'عنوان الشركة'
+  },
+  'company.contact_person': {
+    en: 'Contact Person',
+    de: 'Kontaktperson',
+    es: 'Persona de contacto',
+    fr: 'Personne de contact',
+    ar: 'شخص الاتصال'
+  },
+  'people.loading': {
+    en: 'Loading People...',
+    de: 'Laden von Personen...',
+    es: 'Cargando personas...',
+    fr: 'Chargement des personnes...',
+    ar: 'تحميل الأشخاص...'
+  },
+  'people.new': {
+    en: 'Add New Person',
+    de: 'Neue Person hinzufügen',
+    es: 'Agregar nueva persona',
+    fr: 'Ajouter une nouvelle personne',
+    ar: 'إضافة شخص جديد'
+  },
+  'people.salutation': {
+    en: 'Salutation',
+    de: 'Gruß',
+    es: 'Saludo',
+    fr: 'Salutation',
+    ar: 'تحية'
+  },
+  'people.title': {
+    en: 'Title',
+    de: 'Titel',
+    es: 'Título',
+    fr: 'Titre',
+    ar: 'عنوان'
+  },
+  'people.firstName': {
+    en: 'First Name',
+    de: 'Vorname',
+    es: 'Primer nombre',
+    fr: 'Prénom',
+    ar: 'الاسم الأول'
+  },
+  'people.lastName': {
+    en: 'Last Name',
+    de: 'Nachname',
+    es: 'Apellido',
+    fr: 'Nom de famille',
+    ar: 'اسم العائلة'
+  },
+  'people.private_address': {
+    en: 'Private Address',
+    de: 'Privatadresse',
+    es: 'Dirección privada',
+    fr: 'Adresse privée',
+    ar: 'العنوان الخاص'
+  },
+  'people.private_business': {
+    en: 'Business Address',
+    de: 'Geschäftsadresse',
+    es: 'Dirección de negocio',
+    fr: 'Adresse professionnelle',
+    ar: 'عنوان العمل'
+  },
+  'people.add': {
+    en: 'Add Person',
+    de: 'Person hinzufügen',
+    es: 'Agregar persona',
+    fr: 'Ajouter une personne',
+    ar: 'إضافة شخص'
+  },
+  'people.edit': {
+    en: 'Edit Person',
+    de: 'Person bearbeiten',
+    es: 'Editar persona',
+    fr: 'Modifier la personne',
+    ar: 'تعديل الشخص'
   },
   'utils': {
     en: '',
