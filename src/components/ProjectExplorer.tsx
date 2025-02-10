@@ -17,6 +17,7 @@ import FieldView from './views/FieldView';
 import ZoneView from './views/ZoneView';
 import SettingsPanel from './SettingsPanel';
 import { SavedPlace } from './PlacesPanel';
+import { fetchPlaces } from '../services/places';
 
 const ProjectExplorer = () => {
   const { signOut } = useAuth();
@@ -357,6 +358,21 @@ const ProjectExplorer = () => {
     setNewName('');
   };
 
+  useEffect(() => {
+  const fetchPlacesData = async () => {
+      try {
+        const fetchedPlaces = await fetchPlaces();
+        setSavedPlaces(fetchedPlaces);
+      } catch (err) {
+        console.error('Error fetching places:', err);
+        setError('Failed to load places');
+      }
+    };
+     fetchPlacesData();
+    
+  },[]);
+
+
   const renderContent = () => {
     if (view === 'settings') {
       return (
@@ -379,6 +395,7 @@ const ProjectExplorer = () => {
           onSaveCompanies={setCompanies}
           standards={standards}
           onStandardsChange={setStandards}
+         places={savedPlaces}
         />
         </div>
       );

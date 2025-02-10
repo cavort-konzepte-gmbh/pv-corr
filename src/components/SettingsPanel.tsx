@@ -34,6 +34,7 @@ interface SettingsPanelProps {
   onStandardsChange: (standards: Standard[]) => void;
   savedCompanies: Company[];
   onSaveCompanies: (companies: Company[]) => void;
+  places: SavedPlace[];
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -51,10 +52,11 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   projects,
   onProjectsChange,
   standards,
-  onStandardsChange
+  onStandardsChange,
+  places
 }) => {
   const t = useTranslation(currentLanguage);
-  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
+  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>(places);
   const [savedPeople, setSavedPeople] = useState<SavedPerson[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [sampleData, setSampleData] = useState({
