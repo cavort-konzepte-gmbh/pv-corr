@@ -45,16 +45,16 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAddresses, setSelectedAddresses] = useState<{
-    private?: string;
+    private?: string ;
     business?: string;
   }>({});
   const [showAddressSelect, setShowAddressSelect] = useState<'private' | 'business' | null>(null);
   const translation = useTranslation(currentLanguage);
 
+
   useEffect(() => {
     fetchPeople();
   }, []);
-
   const fetchPeople = async () => {
     try {
       const { data, error } = await supabase
@@ -72,7 +72,6 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
           business_address_id
         `)
         .order('created_at', { ascending: true });
-
       if (error) throw error;
 
       const formattedPeople = data.map(person => ({
@@ -101,6 +100,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     }
   };
 
+
+   
   const handleEditPerson = (person: SavedPerson) => {
     setEditingPerson(person);
     setFormValues({
@@ -415,13 +416,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
               Select {showAddressSelect === 'private' ? 'Private' : 'Business'} Address
             </h3>
             <div className="space-y-2">
-              {savedPlaces.map(place => {
-                const country = place.country;
-                const address = Object.entries(place.values)
-                  .filter(([key]) => key !== 'name')
-                  .map(([_, value]) => value)
-                  .join(', ');
-                 
+            {savedPlaces.map(place => {
                 return (
                   <button
                     key={place.id}
