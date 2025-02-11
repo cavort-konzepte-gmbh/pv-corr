@@ -43,7 +43,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-
+  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
   useEffect(() => {
     const searchTerm = peopleSearch.toLowerCase();
     const filtered = availablePeople.filter(person => 
@@ -95,6 +95,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
       managerId: selectedManagerId || undefined,
+      typeProject: typeProject || 'field',
       companyId: undefined // Add if needed
     };
 
@@ -152,6 +153,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setLongitude(project.longitude || '');
     setImageUrl(project.imageUrl || '');
     setSelectedManagerId(project.managerId || null);
+    setTypeProject(project.typeProject === 'roof' || project.typeProject === 'field' ? project.typeProject : 'field');
     setShowNewProjectForm(true);
   };
 
@@ -330,6 +332,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       ))}
                     </select>
                   </div>
+                 
                   <div>
                     <label 
                       className="block text-sm mb-1"
@@ -371,6 +374,28 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         border: `1px solid ${currentTheme.colors.border}`
                       }}
                     />
+                  </div>
+                  <div>
+                    <label 
+                      className="block text-sm mb-1"
+                      style={{ color: currentTheme.colors.text.secondary }}
+                    >
+                      Project Type
+                    </label>
+                    <select
+                      value={typeProject}
+                      onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
+                      className="w-full p-2 rounded text-sm"
+                      style={{
+                        backgroundColor: currentTheme.colors.surface,
+                        borderColor: currentTheme.colors.border,
+                        color: currentTheme.colors.text.primary,
+                        border: `1px solid ${currentTheme.colors.border}`
+                      }}
+                    >
+                      <option value="field">Field</option>
+                      <option value="roof">Roof</option>
+                    </select>
                   </div>
                   <div>
                     <label 
@@ -513,7 +538,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         acc + field.zones.reduce((zAcc, zone) => 
                           zAcc + (zone.datapoints?.length || 0), 0
                         ), 0
-                    ) } datapoints
+                    ) } datapoints • Project Type: {project.typeProject|| 'UNDEFINED'}
                   </div>
                 </div>
               ))}
