@@ -19,7 +19,7 @@ export interface Theme {
   colors: ThemeColors;
 }
 
-export type ThemeId = 'tokyo-night' | 'ferra' | 'monokai' | 'nord';
+export type ThemeId = 'tokyo-night' | 'ferra' | 'monokai' | 'nord' | 'dracula';
 
 export const THEMES: Theme[] = [
   {
@@ -93,5 +93,23 @@ export const THEMES: Theme[] = [
         hover: '#4c6a92'
       }
     }
+  },
+  {
+    id: 'dracula',
+    name: 'Dracula',
+    colors: {
+      background: '#282A36',
+      surface: '#44475A',
+      border: '#6272A4',
+      text: {
+        primary: '#F8F8F2',
+        secondary: '#6272A4',
+        accent: '#8BE9FD'
+      },
+      accent: {
+        primary: '#BD93F9',
+        hover: '#FF79C6'
+      }
+    }
   }
-];
+]
