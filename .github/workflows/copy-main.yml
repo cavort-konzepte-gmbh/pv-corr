@@ -1,11 +1,10 @@
 name: Copy Main Branch
 
 on:
-  # Manual trigger only
   workflow_dispatch:
 
 jobs:
-  backup-main:
+  copy-main:
     runs-on: ubuntu-latest
     
     steps:
@@ -18,12 +17,24 @@ jobs:
         run: |
           git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
 
-      - name: Push to destination repository main branch
+      - name: Clone destination repository
+        run: |
+          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git dest-repo
+
+      - name: Copy files preserving .bolt
         run: |
           cd source-repo
-          git push --force https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git main:main
+          # Copy all files except .git
+          find . -mindepth 1 ! -regex '^.*/\.git.*' -exec cp -r --parents {} ../dest-repo/ \;
+          cd ../dest-repo
+          # Stage all changes but preserve .bolt
+          git add .
+          # Restore .bolt directory if it was deleted
+          git checkout main -- .bolt || true
+          git commit -m "Update from source repository"
+          git push origin main
 
       - name: Cleanup
         if: always()
         run: |
-          rm -rf source-repo
+          rm -rf source-repo dest-repo
