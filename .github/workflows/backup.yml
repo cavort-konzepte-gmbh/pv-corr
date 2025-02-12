@@ -8,6 +8,8 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write    # This gives permission to push to the repository
     
     steps:
       - name: Checkout repository
@@ -17,8 +19,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Create and push backup
         run: |
@@ -40,4 +42,4 @@ jobs:
           # Stage, commit and push
           git add .backup/
           git commit -m "Automated backup ${TIMESTAMP}"
-          git push origin HEAD
+          git push
