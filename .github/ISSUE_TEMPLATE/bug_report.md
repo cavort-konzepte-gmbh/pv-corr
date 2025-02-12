@@ -21,5 +21,14 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
+## Priority level
+[ ] Very High
+[ ] High
+[ ] Normal
+[ ] Low
+
+## Dependencies
+
+
 
 ## Screenshots
