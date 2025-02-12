@@ -17,7 +17,8 @@ export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => 
     image_url: project.imageUrl,
     place_id: project.placeId || null,
     manager_id: project.managerId || null,
-    company_id: project.companyId || null
+    company_id: project.companyId || null,
+    project_type: project.typeProject,
   };
   // Use RPC call to handle project creation and user association atomically
   const { data, error } = await supabase.rpc('create_project_with_owner', {
@@ -41,6 +42,7 @@ export const updateProject = async (project: Project) => {
     longitude: project.longitude,
     image_url: project.imageUrl,
     place_id: project.placeId,
+    type_project: project.typeProject,
     company_id: project.companyId || null,
     manager_id: project.managerId || null
   };
@@ -109,6 +111,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
       placeId: project.place_id,
       companyId: project.company_id,
       managerId: project.manager_id,
+      typeProject: project.type_project,
       fields: (project.fields || []).map(field => ({
         id: field.id,
         hiddenId: field.hidden_id,

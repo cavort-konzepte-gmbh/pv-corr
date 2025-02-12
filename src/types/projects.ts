@@ -12,6 +12,7 @@ export interface Project {
   managerId?: string;
   fields: Field[];
   activityLog?: ActivityLog[];
+  typeProject?: string;
 }
 
 export interface Gate {
