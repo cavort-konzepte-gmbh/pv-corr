@@ -1,0 +1,29 @@
+name: Copy Main Branch
+
+on:
+  # Manual trigger only
+  workflow_dispatch:
+
+jobs:
+  backup-main:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+
+      - name: Clone source repository main branch
+        run: |
+          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
+
+      - name: Push to destination repository main branch
+        run: |
+          cd source-repo
+          git push --force https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git main:main
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf source-repo
