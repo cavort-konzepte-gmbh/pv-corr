@@ -45,7 +45,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-
+  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
+  
   const debouncedPeopleSearch = useDebounce((peopleSearch: string) => {
     const searchTerm = peopleSearch.toLowerCase();
     const filtered = availablePeople.filter(
@@ -99,7 +100,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
       managerId: selectedManagerId || undefined,
-      companyId: undefined, // Add if needed
+      typeProject: typeProject || 'field',
+      companyId: undefined // Add if needed
     };
 
     if (editingProject) {
@@ -161,6 +163,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setLongitude(project.longitude || '');
     setImageUrl(project.imageUrl || '');
     setSelectedManagerId(project.managerId || null);
+    setTypeProject(project.typeProject === 'roof' || project.typeProject === 'field' ? project.typeProject : 'field');
     setShowNewProjectForm(true);
   };
 
@@ -346,6 +349,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       ))}
                     </select>
                   </div>
+                 
                   <div>
                     <label
                       className="block text-sm mb-1"
@@ -390,6 +394,28 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                   </div>
                   <div>
                     <label
+                      className="block text-sm mb-1"
+                      style={{ color: currentTheme.colors.text.secondary }}
+                    >
+                      Project Type
+                    </label>
+                    <select
+                      value={typeProject}
+                      onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
+                      className="w-full p-2 rounded text-sm"
+                      style={{
+                        backgroundColor: currentTheme.colors.surface,
+                        borderColor: currentTheme.colors.border,
+                        color: currentTheme.colors.text.primary,
+                        border: `1px solid ${currentTheme.colors.border}`
+                      }}
+                    >
+                      <option value="field">Field</option>
+                      <option value="roof">Roof</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label 
                       className="block text-sm mb-1"
                       style={{ color: currentTheme.colors.text.secondary }}
                     >
@@ -454,48 +480,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }}/>
+                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
                       <span className="font-medium">{project.name}</span>
-                      {project.managerId && (
-                        <div
-                          className="flex items-center gap-1 text-xs"
-                          style={{ color: currentTheme.colors.text.secondary }}
-                        >
-                          <User size={12} />
-                          <div className="flex flex-col gap-1">
-                            {(() => {const manager = availablePeople.find(p => p.id === project.managerId);
-                              if (!manager) return 'Unknown manager';
-                              return (
-                                <>
-                                  <div>
-                                    {manager.title ? `${manager.title} ` : ''}{manager.firstName} {manager.lastName}
-                                  </div>
-                                  {manager.email && (
-                                    <a
-                                      href={`mailto:${manager.email}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="hover:underline"
-                                      style={{ color: currentTheme.colors.accent.primary }}
-                                    >
-                                      {manager.email}
-                                    </a>
-                                  )}
-                                  {manager.phone && (
-                                    <a
-                                      href={`tel:${manager.phone}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="hover:underline"
-                                      style={{ color: currentTheme.colors.accent.primary }}
-                                    >
-                                      {manager.phone}
-                                    </a>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      )}
                       {project.placeId && (
                         <div className="flex items-center gap-1 text-xs"style={{ color: currentTheme.colors.text.secondary }}>
                           {savedPlaces && <MapPin size={12} />}
@@ -531,14 +517,14 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         acc + field.zones.reduce((zAcc, zone) => 
                           zAcc + (zone.datapoints?.length || 0), 0
                         ), 0
-                    ) } datapoints
+                    ) } datapoints • Project Type: {project.typeProject|| 'UNDEFINED'}
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-{showDeleteConfirm && (
+          {showDeleteConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div 
                 className="p-6 rounded-lg max-w-md w-full"
