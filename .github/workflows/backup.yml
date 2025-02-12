@@ -15,26 +15,29 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history
 
-      - name: Create backup directory
+      - name: Configure Git
         run: |
-          mkdir -p .backup
-          
-      - name: Create backup
-        run: |
-          # Create timestamp for backup name
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          BACKUP_NAME="backup_${TIMESTAMP}.tar.gz"
-          
-          # Create backup archive of the entire repository
-          git bundle create .backup/${BACKUP_NAME} --all
-          
-          # Keep only the last 7 backups
-          cd .backup
-          ls -t backup_*.tar.gz | tail -n +8 | xargs -r rm
-          
-          # Add .backup to git if not already tracked
-          git add .backup/${BACKUP_NAME}
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
+
+      - name: Create and push backup
+        run: |
+          # Ensure .backup directory exists
+          mkdir -p .backup
+          
+          # Create timestamp for backup name
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE=".backup/backup_${TIMESTAMP}.bundle"
+          
+          # Create git bundle backup
+          git bundle create "${BACKUP_FILE}" --all
+          
+          # Clean up old backups (keep last 7)
+          cd .backup
+          ls -t *.bundle 2>/dev/null | tail -n +8 | xargs -r rm
+          cd ..
+          
+          # Stage, commit and push
+          git add .backup/
           git commit -m "Automated backup ${TIMESTAMP}"
-          git push
+          git push origin HEAD
