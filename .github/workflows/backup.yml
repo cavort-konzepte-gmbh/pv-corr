@@ -10,76 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          python-version: '3.x'
+          fetch-depth: 0  # Fetch all history
 
-      - name: Install GitHub CLI
+      - name: Create backup directory
         run: |
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-
-      - name: Configure Git
+          mkdir -p .backup
+          
+      - name: Create backup
         run: |
+          # Create timestamp for backup name
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_NAME="backup_${TIMESTAMP}.tar.gz"
+          
+          # Create backup archive of the entire repository
+          git bundle create .backup/${BACKUP_NAME} --all
+          
+          # Keep only the last 7 backups
+          cd .backup
+          ls -t backup_*.tar.gz | tail -n +8 | xargs -r rm
+          
+          # Add .backup to git if not already tracked
+          git add .backup/${BACKUP_NAME}
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-
-      - name: Create Backup Repository
-        env:
-          GH_TOKEN: ${{ secrets.BACKUP_PAT }}
-        run: |
-          # Check if backup repo exists, create if it doesn't
-          if ! gh repo view ${{ github.repository_owner }}/repository-backup &>/dev/null; then
-            gh repo create ${{ github.repository_owner }}/repository-backup --private --description "Automated backup of repositories"
-          fi
-
-      - name: Clone Backup Repository
-        env:
-          GH_TOKEN: ${{ secrets.BACKUP_PAT }}
-        run: |
-          git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository_owner }}/repository-backup.git backup-workspace
-
-      - name: Fetch and Backup Repositories
-        env:
-          GH_TOKEN: ${{ secrets.BACKUP_PAT }}
-        run: |
-          cd backup-workspace
-          
-          # Get list of repositories
-          gh repo list ${{ github.repository_owner }} --json nameWithOwner --jq '.[].nameWithOwner' > repo_list.txt
-          
-          # Create backup timestamp
-          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          BACKUP_DIR="backup_${TIMESTAMP}"
-          mkdir -p "${BACKUP_DIR}"
-          
-          # Clone each repository
-          while IFS= read -r repo; do
-            echo "Backing up ${repo}..."
-            gh repo clone "${repo}" "${BACKUP_DIR}/${repo##*/}" -- --mirror
-          done < repo_list.txt
-          
-          # Create backup archive
-          tar czf "${BACKUP_DIR}.tar.gz" "${BACKUP_DIR}"
-          rm -rf "${BACKUP_DIR}"
-          
-          # Commit and push changes
-          git add "${BACKUP_DIR}.tar.gz" repo_list.txt
-          git commit -m "Backup ${TIMESTAMP}"
-          git push
-
-      - name: Cleanup Old Backups
-        env:
-          GH_TOKEN: ${{ secrets.BACKUP_PAT }}
-        run: |
-          cd backup-workspace
-          # Keep only the last 7 backups
-          ls -t backup_*.tar.gz | tail -n +8 | xargs -r rm
-          git add -A
-          git commit -m "Cleanup old backups" || true
+          git commit -m "Automated backup ${TIMESTAMP}"
           git push
