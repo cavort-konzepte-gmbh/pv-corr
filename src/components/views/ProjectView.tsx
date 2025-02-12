@@ -4,10 +4,10 @@ import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
 import { Plus, MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
 import { SavedPlace } from '../PlacesPanel';
-import { SavedPerson } from '../../utils/sampleData';
 import { Company } from '../../types/companies';
 import { createField } from '../../services/fields';
 import { fetchProjects } from '../../services/projects';
+import { Person } from '../../types/people';
 
 interface ProjectViewProps {
   project: Project;
@@ -15,7 +15,7 @@ interface ProjectViewProps {
   currentLanguage: Language;
   showHiddenIds: boolean;
   savedPlaces: SavedPlace[];
-  savedPeople: SavedPerson[];
+  savedPeople: Person[];
   savedCompanies: Company[];
   onFieldSelect: (fieldId: string) => void;
   onAddField: () => void;
@@ -156,30 +156,30 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
                 <div>
                   <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
-                    {projectManager.values.title ? `${projectManager.values.title} ` : ''}
-                    {projectManager.values.firstName} {projectManager.values.lastName}
+                    {projectManager?.title ? `${projectManager?.title} ` : ''}
+                    {projectManager?.firstName} {projectManager?.lastName}
                   </div>
                   <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
                     Project Manager
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail size={14} />
+                      <Mail size={14} style={{ color: currentTheme.colors.accent.primary }} />
                       <a 
-                        href={`mailto:${projectManager.values.email}`}
+                        href={`mailto:${projectManager.email}`}
                         style={{ color: currentTheme.colors.accent.primary }}
                       >
-                        {projectManager.values.email}
+                        {projectManager.email}
                       </a>
                     </div>
-                    {projectManager.values.phone && (
+                    {projectManager.phone && (
                       <div className="flex items-center gap-2 text-sm">
                         <Phone size={14} />
                         <a 
-                          href={`tel:${projectManager.values.phone}`}
+                          href={`tel:${projectManager.phone}`}
                           style={{ color: currentTheme.colors.accent.primary }}
                         >
-                          {projectManager.values.phone}
+                          {projectManager.phone}
                         </a>
                       </div>
                     )}

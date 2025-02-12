@@ -433,6 +433,13 @@ export const TRANSLATIONS = {
     fr: 'Points de données',
     ar: 'نقاط البيانات'
   },
+  'project.not_found': {
+    en: 'Project data not available',
+    de: 'Projektdaten nicht verfügbar',
+    es: 'Datos del proyecto no disponibles',
+    fr: 'Données du projet non disponibles',
+    ar: 'بيانات المشروع غير متوفرة'
+  },
   'field.new': {
     en: 'New Field',
     de: 'Neues Feld',

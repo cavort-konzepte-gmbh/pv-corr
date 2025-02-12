@@ -464,45 +464,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
-                      <span className="font-medium">{project.name}</span>
-                      {project.managerId && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
-                          <User size={12} />
-                          <div className="flex flex-col gap-1">
-                            {(() => {
-                              const manager = availablePeople.find(p => p.id === project.managerId);
-                              if (!manager) return 'Unknown manager';
-                              return (
-                                <>
-                                  <div>
-                                    {manager.title ? `${manager.title} ` : ''}{manager.firstName} {manager.lastName}
-                                  </div>
-                                  {manager.email && (
-                                    <a 
-                                      href={`mailto:${manager.email}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="hover:underline"
-                                      style={{ color: currentTheme.colors.accent.primary }}
-                                    >
-                                      {manager.email}
-                                    </a>
-                                  )}
-                                  {manager.phone && (
-                                    <a 
-                                      href={`tel:${manager.phone}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="hover:underline"
-                                      style={{ color: currentTheme.colors.accent.primary }}
-                                    >
-                                      {manager.phone}
-                                    </a>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </div>
-                        </div>
-                      )}
+                      <span className="font-medium">{project.name}</span>                
                       {project.placeId && (
                         <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
                           {savedPlaces && <MapPin size={12} />}

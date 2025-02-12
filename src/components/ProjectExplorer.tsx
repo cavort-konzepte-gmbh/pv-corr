@@ -18,12 +18,14 @@ import ZoneView from './views/ZoneView';
 import SettingsPanel from './SettingsPanel';
 import { SavedPlace } from './PlacesPanel';
 import { fetchPlaces } from '../services/places';
+import { Person } from '../types/people';
+import { fetchPeople } from '../services/people';
 
 const ProjectExplorer = () => {
   const { signOut } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
-  const [savedPeople, setSavedPeople] = useState<SavedPerson[]>([]);
+  const [savedPeople, setSavedPeople] = useState<Person[]>([]);
   const [showHiddenIds, setShowHiddenIds] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
   const [savedCompanies, setCompanies] = useState<Company[]>([]);
@@ -360,9 +362,11 @@ const ProjectExplorer = () => {
 
   useEffect(() => {
   const fetchPlacesData = async () => {
-      try {
-        const fetchedPlaces = await fetchPlaces();
-        setSavedPlaces(fetchedPlaces);
+      try {     
+        const [places, people] = await Promise.all([fetchPlaces(), fetchPeople()])
+        setSavedPlaces(places);
+        setSavedPeople(people );
+
       } catch (err) {
         console.error('Error fetching places:', err);
         setError('Failed to load places');
