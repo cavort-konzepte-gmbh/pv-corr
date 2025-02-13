@@ -1,5 +1,6 @@
 import React from 'react';
 import { Theme, THEMES } from '../types/theme';
+import { useAuth } from './auth/AuthProvider';
 import PlacesPanel, { SavedPlace } from './PlacesPanel';
 import PeoplePanel from './PeoplePanel';
 import CompaniesPanel from './CompaniesPanel';
@@ -14,7 +15,6 @@ import { useTranslation } from '../types/language';
 import { Standard } from '../types/standards';
 import { updateUserSettings } from '../services/userSettings';
 import { Company } from '../types/companies';
-import { ThemeId } from '../types/theme';
 
 interface SettingsPanelProps {
   view: 'general' | 'theme' | 'places' | 'people' | 'companies' | 'projects' | 'sample' | 'datapoints';
@@ -131,12 +131,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const menuItems = [
     { id: 'general', label: t('settings.general'), icon: 'Settings' },
     { id: 'theme', label: t('settings.theme'), icon: 'Palette' },
-    { id: 'datapoints', label: t('settings.datapoints'), icon: 'Database' },
     { id: 'places', label: t('settings.sample_data.places'), icon: 'MapPin' },
     { id: 'companies', label: t('settings.companies'), icon: 'Building2' },
     { id: 'people', label: t('settings.sample_data.people'), icon: 'Users' },
     { id: 'projects', label: t('nav.projects'), icon: 'FolderOpen' }
   ];
+
+  // Only show datapoints settings in admin interface
+  const { loginType } = useAuth();
+  if (loginType === 'admin') {
+    menuItems.splice(2, 0, { id: 'datapoints', label: t('settings.datapoints'), icon: 'Database' });
+  }
 
   const handleSampleDataToggle = async (type: 'all' | 'places' | 'people' | 'projects' | 'companies') => {
     const newValue = !sampleData[type];

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Theme } from '../../types/theme';
-import { Home, Settings, LogOut } from 'lucide-react';
+import { Home, Settings, LogOut, Shield } from 'lucide-react';
+import { useAuth } from '../auth/AuthProvider';
 import { useTranslation, Language } from '../../types/language';
 
 interface NavigationBarProps {
@@ -19,6 +20,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   onViewChange
 }) => {
   const t = useTranslation(currentLanguage);
+  const { isAdmin, loginType } = useAuth();
 
   return (
     <div

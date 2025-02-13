@@ -81,6 +81,20 @@ export const TRANSLATIONS = {
     fr: 'Déconnexion',
     ar: 'تسجيل الخروج'
   },
+  'nav.admin_panel': {
+    en: 'Admin Panel',
+    de: 'Admin-Panel',
+    es: 'Panel de administrador',
+    fr: 'Panneau d\'administration',
+    ar: 'لوحة الإدارة'
+  },
+  'nav.exit_admin': {
+    en: 'Exit Admin Mode',
+    de: 'Admin-Modus verlassen',
+    es: 'Salir del modo administrador',
+    fr: 'Quitter le mode admin',
+    ar: 'الخروج من وضع المسؤول'
+  },
 
   // Settings
   'settings.general': {

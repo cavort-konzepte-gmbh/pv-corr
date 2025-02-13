@@ -1,5 +1,5 @@
 import React from 'react';
-import ProjectExplorer from './components/ProjectExplorer';
+import DashboardLayout from './components/DashboardLayout';
 import { AuthProvider } from './components/auth/AuthProvider';
 import { Theme } from './types/theme';
 
@@ -26,7 +26,7 @@ const currentTheme: Theme = {
 function App() {
   return (
     <AuthProvider currentTheme={currentTheme}>
-      <ProjectExplorer />
+      <DashboardLayout />
     </AuthProvider>
   );
 }
