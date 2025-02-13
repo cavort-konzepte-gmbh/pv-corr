@@ -15,7 +15,7 @@ interface ProjectsPanelProps {
   savedPlaces: SavedPlace[];
   savedPeople: Person[];
   savedCompanies: Company[];
-  onProjectsChange: (projects: Project[]) => void;
+  onSelectProject: (projectId: string) => void;
 }
 
 const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
@@ -24,48 +24,34 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   savedPlaces,
   savedPeople,
   savedCompanies,
-  onProjectsChange
+  onSelectProject
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [projectsList, setProjectsList] = useState<Project[]>([]);
+  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectName, setProjectName] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [clientRef, setClientRef] = useState<string>('');
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [clientRef, setClientRef] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
+  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
-  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
-  useEffect(() => {
-    const searchTerm = peopleSearch.toLowerCase();
-    const filtered = availablePeople.filter(person => 
-      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
-      person.email.toLowerCase().includes(searchTerm) ||
-      (person.title && person.title.toLowerCase().includes(searchTerm))
-    );
-    setFilteredPeople(filtered);
-  }, [peopleSearch, availablePeople]);
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
 
   useEffect(() => {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        const [fetchedProjects, fetchedPeople] = await Promise.all([
-          fetchProjects(),
-          fetchPeople()
-        ]);
+        const fetchedProjects = await fetchProjects();
         
         setProjectsList(fetchedProjects);
-        setAvailablePeople(fetchedPeople);
-        onProjectsChange(fetchedProjects);
       } catch (err) {
         console.error('Error loading projects:', err);
         setError('Failed to load projects');
@@ -76,6 +62,16 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
     loadProjects();
   }, []);
+
+  useEffect(() => {
+    const searchTerm = peopleSearch.toLowerCase();
+    const filtered = availablePeople.filter(person => 
+      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
+      person.email.toLowerCase().includes(searchTerm) ||
+      (person.title && person.title.toLowerCase().includes(searchTerm))
+    );
+    setFilteredPeople(filtered);
+  }, [peopleSearch, availablePeople]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +107,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
         const updatedProjects = projectsList.map(p =>
           p.id === editingProject.id ? { ...p, ...updatedProject } : p
         );
-        onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
         setError(null);
       } catch (error) {
@@ -123,7 +118,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       try {
         const newProject = await createProject(projectData);
         const updatedProjects = [...projectsList, { ...newProject, fields: [], gates: [] }];
-        onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
         setError(null);
       } catch (error) {
@@ -161,7 +155,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     try {
       await deleteProject(projectId);
       const updatedProjects = projectsList.filter(p => p.id !== projectId);
-      onProjectsChange(updatedProjects);
       setProjectsList(updatedProjects);
     } catch (error) {
       console.error('Failed to delete project:', error);
@@ -455,6 +448,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                 <div
                   key={project.id}
                   className="p-4 rounded-lg border transition-all hover:translate-x-1"
+                  onClick={() => onSelectProject(project.id)}
                   style={{
                     backgroundColor: currentTheme.colors.surface,
                     borderColor: currentTheme.colors.border,
@@ -472,22 +466,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEdit(project)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ color: currentTheme.colors.text.secondary }}
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(project.id)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ color: currentTheme.colors.text.secondary }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
                   </div>
                   <div 
                     className="text-sm"
