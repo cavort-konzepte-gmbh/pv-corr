@@ -5,6 +5,8 @@ import { Project } from '../types/projects';
 import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2 } from 'lucide-react';
 import { updateField, createGate, updateGate, deleteGate, deleteField } from '../services/fields';
 import { fetchProjects } from '../services/projects';
+import { Person } from '../types/people';
+import { Company } from '../types/companies';
 
 interface FieldsPanelProps {
   currentTheme: Theme;
@@ -13,11 +15,15 @@ interface FieldsPanelProps {
   onProjectsChange: (projects: Project[]) => void;
   selectedProjectId?: string;
   onSelectField: (projectId: string, fieldId: string) => void;
+  people: Person[],
+  companies: Company[]
 }
 
 const FieldsPanel: React.FC<FieldsPanelProps> = ({
   currentTheme,
   projects,
+  people,
+  companies,
   selectedProjectId,
   onSelectField,
   onProjectsChange
@@ -34,10 +40,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
-
+  
   const selectedProject = selectedProjectId 
-    ? projects.find(p => p.id === selectedProjectId)
-    : null;
+  ? projects.find(p => p.id === selectedProjectId)
+  : null;
+
 
   if (!selectedProject) {
     return (
@@ -51,6 +58,8 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   }
 
   const fields = selectedProject.fields;
+  const manager = people.find(person => person.id === selectedProject.managerId);
+  const company = companies.find(company => company.id === selectedProject.companyId);
 
   const handleGateSubmit = async (fieldId: string, e: React.FormEvent) => {
     e.preventDefault();
@@ -188,7 +197,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
                   <div>
                     <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
-                      {/* Company name would be displayed here */}
+                      {company?.name}
                     </div>
                     <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
                       Construction Company
@@ -202,7 +211,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
                   <div>
                     <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
-                      {/* Manager name would be displayed here */}
+                      {manager?.firstName} {manager?.lastName}
                     </div>
                     <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
                       Project Manager
@@ -214,16 +223,16 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                           href="mailto:manager@example.com"
                           style={{ color: currentTheme.colors.accent.primary }}
                         >
-                          {/* Manager email would be displayed here */}
+                          {manager?.email}
                         </a>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Phone size={14} />
+                        <Phone size={14} style={{ color: currentTheme.colors.accent.primary }} />
                         <a 
                           href="tel:+1234567890"
                           style={{ color: currentTheme.colors.accent.primary }}
                         >
-                          {/* Manager phone would be displayed here */}
+                          {manager?.phone}
                         </a>
                       </div>
                     </div>

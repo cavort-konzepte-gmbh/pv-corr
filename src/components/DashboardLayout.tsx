@@ -17,6 +17,7 @@ import ZonesPanel from './ZonesPanel';
 import SettingsPanel from './SettingsPanel';
 import { LogOut, FolderOpen, Grid, Map, Settings, Database } from 'lucide-react';
 import DatapointsPanel from './DatapointsPanel';
+import { fetchCompanies } from '../services/companies';
 
 const DashboardLayout = () => {
   const { signOut } = useAuth();
@@ -47,10 +48,11 @@ const DashboardLayout = () => {
       setError(null);
       try {
         setLoading(true);
-        const [fetchedProjects, places, people] = await Promise.all([
+        const [fetchedProjects, places, people, companies] = await Promise.all([
           fetchProjects(),
           fetchPlaces(),
-          fetchPeople()
+          fetchPeople(),
+          fetchCompanies()
         ]);
         
         if (fetchedProjects) {
@@ -58,6 +60,7 @@ const DashboardLayout = () => {
         }
         setSavedPlaces(places);
         setSavedPeople(people);
+        setCompanies(companies)
       } catch (error) {
         console.error('Error loading initial data:', error);
         setError('Failed to load data. Please try again.');
@@ -130,6 +133,8 @@ const DashboardLayout = () => {
               setSelectedProjectId(projectId);
               setSelectedFieldId(fieldId);
             }}
+            people={savedPeople}
+            companies={savedCompanies}
           />
         );
       case 'zones':
