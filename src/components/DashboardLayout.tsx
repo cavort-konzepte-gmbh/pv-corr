@@ -81,6 +81,7 @@ const DashboardLayout = () => {
       const theme = THEMES.find(t => t.id === (settings.theme_id || 'ferra'));
       if (theme) {
         setCurrentTheme(theme);
+        document.documentElement.setAttribute('data-theme', theme.id);
       }
     };
 
@@ -89,6 +90,10 @@ const DashboardLayout = () => {
       window.removeEventListener('userSettingsLoaded', handleUserSettings as EventListener);
     };
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', currentTheme.id);
+  }, [currentTheme]);
 
   const renderContent = () => {
     const selectedProject = selectedProjectId 

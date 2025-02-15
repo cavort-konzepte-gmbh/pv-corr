@@ -86,14 +86,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
 
   if (loading) {
     return (
-      <div 
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: currentTheme.colors.background }}
-      >
-        <div 
-          className="text-sm"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+      <div className="min-h-screen flex items-center justify-center bg-theme">
+        <div className="text-sm text-secondary">
           Loading...
         </div>
       </div>

@@ -50,30 +50,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: currentTheme.colors.background }}>
-      <div 
-        className="max-w-sm w-full p-8 rounded-lg"
-        style={{ backgroundColor: currentTheme.colors.surface }}
-      >
+    <div className="min-h-screen flex items-center justify-center bg-theme">
+      <div className="max-w-sm w-full p-8 rounded-lg bg-surface">
         <div className="flex gap-4 mb-8">
           <button
             onClick={() => setLoginType('user')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm"
+            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
             style={{ 
               backgroundColor: loginType === 'user' ? currentTheme.colors.accent.primary : 'transparent',
               color: loginType === 'user' ? 'white' : currentTheme.colors.text.secondary,
-              border: `1px solid ${currentTheme.colors.border}`
             }}
           >
             User
           </button>
           <button
             onClick={() => setLoginType('admin')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm"
+            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
             style={{ 
               backgroundColor: loginType === 'admin' ? currentTheme.colors.accent.primary : 'transparent',
               color: loginType === 'admin' ? 'white' : currentTheme.colors.text.secondary,
-              border: `1px solid ${currentTheme.colors.border}`
             }}
           >
             Admin
@@ -82,10 +77,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
         {error && (
           <div 
-            className="p-4 mb-4 rounded text-sm"
+            className="p-4 mb-4 rounded text-sm text-primary"
             style={{ 
               backgroundColor: `${currentTheme.colors.accent.primary}20`,
-              color: currentTheme.colors.accent.primary
             }}
           >
             {error}
@@ -94,10 +88,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label 
-              className="block text-sm font-medium mb-2"
-              style={{ color: currentTheme.colors.text.secondary }}
-            >
+            <label className="block text-sm font-medium mb-2 text-secondary">
               Email
             </label>
             <input
@@ -105,21 +96,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm"
-              style={{
-                backgroundColor: 'transparent',
-                border: `1px solid ${currentTheme.colors.border}`,
-                color: currentTheme.colors.text.primary
-              }}
+              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"              
               placeholder="name@company.com"
             />
           </div>
 
           <div>
-            <label 
-              className="block text-sm font-medium mb-2"
-              style={{ color: currentTheme.colors.text.secondary }}
-            >
+            <label className="block text-sm font-medium mb-2 text-secondary">
               Password
             </label>
             <input
@@ -127,12 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm"
-              style={{
-                backgroundColor: 'transparent',
-                border: `1px solid ${currentTheme.colors.border}`,
-                color: currentTheme.colors.text.primary
-              }}
+              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"            
               placeholder="••••••••"
             />
           </div>
@@ -140,11 +118,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full p-2 rounded font-medium transition-opacity disabled:opacity-50 text-sm"
-            style={{ 
-              backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
-            }}
+            className="w-full p-2 rounded font-medium transition-opacity disabled:opacity-50 text-sm text-white bg-accent-primary"            
           >
             {loading ? 'Signing in...' : 'Continue'}
           </button>
