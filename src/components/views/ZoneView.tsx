@@ -302,45 +302,32 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-theme border-solid bg-surface">
           {error}
         </div>
       )}
 
       <div className="flex items-center gap-2 mb-6">
-        <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
+        <div className="text-2xl font-mono text-primary">
           {editingName?.id === zone.id ? (
             <form onSubmit={handleNameSave} className="flex items-center gap-2">
               <input
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="bg-transparent border-b px-1 outline-none font-mono text-2xl"
-                style={{ 
-                  borderColor: currentTheme.colors.accent.primary,
-                  color: currentTheme.colors.text.primary
-                }}
+                className="border-b px-1 outline-none font-mono text-2xl text-primary bg-accent-primary"                
                 autoFocus
               />
               <button
                 type="submit"
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.accent.primary }}
+                className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
               >
                 <Check size={16} />
               </button>
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.text.secondary }}
+                className="p-1 rounded hover:bg-opacity-80 text-secondary"
               >
                 <Trash2 size={16} />
               </button>
@@ -350,8 +337,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
               <span>{zone.name}</span>
               <button
                 onClick={(e) => handleNameEdit('zone', project.id, zone.id, zone.name, undefined, e)}
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.text.secondary }}
+                className="p-1 rounded hover:bg-opacity-80 text-secondary"
               >
                 <Edit2 size={14} />
               </button>
@@ -362,8 +348,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
           {zone.latitude && zone.longitude ? (
             <button
               onClick={() => openInMaps(zone.latitude!, zone.longitude!)}
-              className="text-sm flex items-center gap-1 hover:underline"
-              style={{ color: currentTheme.colors.accent.primary }}
+              className="text-sm flex items-center gap-1 hover:underline text-accent-primary"
             >
               <MapPin size={14} />
               {zone.latitude}, {zone.longitude}
@@ -371,8 +356,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
           ) : (
             <button
               onClick={() => setShowCoordinatesForm(true)}
-              className="text-sm flex items-center gap-1"
-              style={{ color: currentTheme.colors.text.secondary }}
+              className="text-sm flex items-center gap-1 text-secondary"
             >
               <MapPin size={14} />
               Add coordinates
@@ -381,8 +365,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
           {zone.latitude && zone.longitude && (
             <button
               onClick={() => setShowCoordinatesForm(true)}
-              className="text-sm"
-              style={{ color: currentTheme.colors.text.secondary }}
+              className="text-sm text-secondary"
             >
               <Edit2 size={14} />
             </button>
@@ -392,11 +375,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
 
       {showCoordinatesForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 text-primary">
               {zone.latitude && zone.longitude ? 'Edit Coordinates' : 'Add Coordinates'}
             </h3>
             <form onSubmit={async (e) => {
@@ -417,7 +397,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
               }
             }} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Latitude
                 </label>
                 <input
@@ -425,17 +405,11 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                   value={coordinates.latitude}
                   onChange={(e) => setCoordinates(prev => ({ ...prev, latitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Longitude
                 </label>
                 <input
@@ -443,35 +417,20 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                   value={coordinates.longitude}
                   onChange={(e) => setCoordinates(prev => ({ ...prev, longitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
                 />
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowCoordinatesForm(false)}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   Save
                 </button>
@@ -483,19 +442,13 @@ const ZoneView: React.FC<ZoneViewProps> = ({
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-4 flex items-center gap-2"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
-              <Trash2 size={20} style={{ color: currentTheme.colors.accent.primary }} />
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 flex items-center gap-2 text-primary">
+              <Trash2 className="text-accent-primary" size={20} />
               Delete Zone
             </h3>
             
-            <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
+            <p className="mb-4 text-secondary">
               This action cannot be undone. Please type the zone name <strong>{zone.name}</strong> to confirm deletion.
             </p>
             
@@ -505,12 +458,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                 value={deleteConfirmName}
                 onChange={(e) => setDeleteConfirmName(e.target.value)}
                 placeholder="Type zone name to confirm"
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.background,
-                  border: `1px solid ${currentTheme.colors.border}`,
-                  color: currentTheme.colors.text.primary
-                }}
+                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                
                 autoFocus
               />
               
@@ -521,12 +469,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                     setDeleteConfirmName('');
                     setEditingName(null);
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme bg-surface"                  
                 >
                   Cancel
                 </button>
@@ -546,10 +489,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                     }
                   }}
                   disabled={deleteConfirmName !== zone.name}
-                  className="px-4 py-2 rounded text-sm"
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white',
                     opacity: deleteConfirmName === zone.name ? 1 : 0.5
                   }}
                 >
@@ -562,38 +503,24 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       )}
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-theme border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           Loading...
         </div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg" style={{ color: currentTheme.colors.text.primary }}>
+            <h3 className="text-lg text-primary">
               Datapoints
             </h3>
             <button
               onClick={handleAddDatapoint}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2"
-              style={{ 
-                backgroundColor: currentTheme.colors.accent.primary,
-                color: 'white'
-              }}
+              className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
             >
               <Plus size={14} />
               Add Datapoint
@@ -601,28 +528,17 @@ const ZoneView: React.FC<ZoneViewProps> = ({
           </div>
 
           <div className="overflow-x-auto">
-            <table 
-              className="w-full border-collapse"
-              style={{
-                color: currentTheme.colors.text.primary,
-                borderColor: currentTheme.colors.border
-              }}
-            >
+            <table className="w-full border-collapse border-theme text-primary">
               <thead>
                 <tr>
                   <th
-                    className="p-2 text-left border font-normal sticky left-0 z-10"
-                    style={{
-                      borderColor: currentTheme.colors.border,
-                      backgroundColor: currentTheme.colors.background,
-                      minWidth: '200px'
-                    }}
+                    className="min-w-[200px] p-2 text-left border font-normal sticky left-0 z-10 border-theme bg-surface"                    
                     onClick={() => handleSort('name')}
                   >
                     <div className="flex items-center gap-2 cursor-pointer">
                       <span>Name</span>
                       {sortColumn === 'name' && (
-                        <span style={{ color: currentTheme.colors.text.secondary }}>
+                        <span className="text-secondary">
                           {sortDirection === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
@@ -631,52 +547,35 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                   {parameters.map(param => (
                     <th
                       key={param.id}
-                      className="p-2 text-left border font-normal"
-                      style={{ 
-                        borderColor: currentTheme.colors.border,
-                        width: '100px'
-                      }}
+                      className="w-24 p-2 text-left border font-normal border-theme"                      
                     >
                       <div className="flex flex-col items-center h-48">
-                        <div 
-                          className="writing-vertical-rl transform rotate-180 mb-2 text-center"
-                          style={{ height: '100px' }}
-                        >
+                        <div className="h-24 writing-vertical-rl transform rotate-180 mb-2 text-center">
                           {param.name}
                         </div>
-                        <div className="border-t w-full mb-2" style={{ borderColor: currentTheme.colors.border }} />
+                        <div className="border-t w-full mb-2 border-theme" />
                         {param.shortName && (
-                          <div className="text-xs mt-2 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+                          <div className="text-xs mt-2 text-center text-secondary">
                             {param.shortName}
                           </div>
                         )}
-                        <div className="text-xs mt-1 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+                        <div className="text-xs mt-1 text-center text-secondary">
                           {param.unit || '-'}
                         </div>
                       </div>
                     </th>
                   ))}
-                  <th
-                    className="p-2 text-left border font-normal"
-                    style={{ 
-                      borderColor: currentTheme.colors.border,
-                      width: '180px'
-                    }}
-                  >
+                  <th className="w-44 p-2 text-left border font-normal border-theme">
                     Actions
                   </th>
                   <th
-                    className="p-2 text-left border font-normal"
-                    style={{ 
-                      borderColor: currentTheme.colors.border,
-                      width: '180px'
-                    }}
+                    className="w-44 p-2 text-left border font-normal border-theme"                    
                     onClick={() => handleSort('timestamp')}
                   >
                     <div className="flex items-center gap-2 cursor-pointer">
                       <span>Timestamp</span>
                       {sortColumn === 'timestamp' && (
-                        <span style={{ color: currentTheme.colors.text.secondary }}>
+                        <span className="text-secondary">
                           {sortDirection === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
@@ -687,32 +586,17 @@ const ZoneView: React.FC<ZoneViewProps> = ({
               <tbody>
                 {sortedDatapoints.map((dp) => (
                   <tr key={dp.id}>
-                    <td 
-                      className="p-2 border sticky left-0 z-10"
-                      style={{ 
-                        borderColor: currentTheme.colors.border,
-                        backgroundColor: currentTheme.colors.surface
-                      }}
-                    >
+                    <td className="p-2 border sticky left-0 z-10 border-theme bg-surface">
                       <div className="flex items-center justify-between">
                         {editingDatapoint === Number(dp.id) ? (
                           <input
                             type="text"
                             value={editingSequentialId}
                             onChange={(e) => setEditingSequentialId(e.target.value)}
-                            className="w-full p-1 rounded text-sm font-mono"
-                            style={{
-                              backgroundColor: currentTheme.colors.surface,
-                              border: `1px solid ${currentTheme.colors.border}`,
-                              color: currentTheme.colors.text.primary
-                            }}
+                            className="w-full p-1 rounded text-sm font-mono text-primary border-theme border-solid bg-surface"                            
                           />
                         ) : (
-                          <span className="text-sm font-mono"
-                            style={{
-                              color: currentTheme.colors.text.primary
-                            }}
-                          >
+                          <span className="text-sm font-mono text-primary">
                             {dp.sequentialId}
                           </span>
                         )}
@@ -721,8 +605,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                     {parameters.map(param => (
                       <td 
                         key={param.id}
-                        className="p-2 border"
-                        style={{ borderColor: currentTheme.colors.border }}
+                        className="p-2 border border-theme"
                       >
                         {editingDatapoint === Number(dp.id) ? (
                           <input
@@ -732,12 +615,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                               ...prev,
                               [param.id]: e.target.value
                             }))}
-                            className="w-full p-1 rounded text-sm text-center"
-                            style={{
-                              backgroundColor: currentTheme.colors.surface,
-                              border: `1px solid ${currentTheme.colors.border}`,
-                              color: currentTheme.colors.text.primary
-                            }}
+                            className="w-full p-1 rounded text-sm text-center text-primary border-theme border-solid bg-surface"                            
                           />
                         ) : (
                           <span className="text-sm text-center block">
@@ -746,18 +624,14 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         )}
                       </td>
                     ))}
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
+                    <td className="p-2 border border-theme">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => editingDatapoint === Number(dp.id) ? 
                             handleSaveEdit(dp.id) : 
                             handleEditDatapoint(dp)
                           }
-                          className="p-1 rounded hover:bg-opacity-80"
-                          style={{ color: currentTheme.colors.text.secondary }}
+                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
                           {editingDatapoint === Number(dp.id) ? (
                             <Save size={14} />
@@ -778,8 +652,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                             "Cancel editing" : 
                             "Delete datapoint"
                           }
-                          className="p-1 rounded hover:bg-opacity-80"
-                          style={{ color: currentTheme.colors.text.secondary }}
+                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
                           {editingDatapoint === Number(dp.id) ? (
                             <X size={14} />
@@ -789,11 +662,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         </button>
                       </div>
                     </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <span className="text-sm text-center block font-mono" style={{ color: currentTheme.colors.text.secondary }}>
+                    <td className="p-2 border border-theme">
+                      <span className="text-sm text-center block font-mono text-secondary">
                         {new Date(dp.timestamp).toLocaleString()}
                       </span>
                     </td>
@@ -802,13 +672,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                 {/* Display new datapoint inputs */}
                 {datapoints.map((datapoint, index) => (
                   <tr key={index}>
-                    <td 
-                      className="p-2 border sticky left-0 z-10"
-                      style={{ 
-                        borderColor: currentTheme.colors.border,
-                        backgroundColor: currentTheme.colors.surface
-                      }}
-                    >
+                    <td className="p-2 border sticky left-0 z-10 border-theme bg-surface">
                       <div className="flex items-center justify-between">
                         <input
                           type="text"
@@ -823,17 +687,11 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                               return newDatapoints;
                             });
                           }}
-                          className="w-full p-1 rounded text-sm font-mono"
-                          style={{
-                            backgroundColor: currentTheme.colors.surface,
-                            border: `1px solid ${currentTheme.colors.border}`,
-                            color: currentTheme.colors.text.primary
-                          }}
+                          className="w-full p-1 rounded text-sm font-mono text-primary border-theme border-solid bg-surface"                          
                         />
                         <button
                           onClick={() => handleDeleteDatapoint(String(index))}
-                          className="ml-2 hover:opacity-80"
-                          style={{ color: currentTheme.colors.text.secondary }}
+                          className="ml-2 hover:opacity-80 text-secondary"
                         >
                           <X size={14} />
                         </button>
@@ -842,8 +700,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                     {parameters.map(param => (
                       <td 
                         key={param.id}
-                        className="p-2 border"
-                        style={{ borderColor: currentTheme.colors.border }}
+                        className="p-2 border border-theme"
                       >
                         <input
                           type="text"
@@ -856,12 +713,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                               handleSaveDatapoint(index);
                             }
                           }}
-                          className="w-full p-1 rounded text-sm text-center"
-                          style={{
-                            backgroundColor: currentTheme.colors.surface,
-                            border: `1px solid ${currentTheme.colors.border}`,
-                            color: currentTheme.colors.text.primary
-                          }}
+                          className="w-full p-1 rounded text-sm text-center text-primary border-theme border-solid bg-surface"                          
                         />
                       </td>
                     ))}
@@ -876,41 +728,26 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       {/* Delete Datapoint Confirmation Dialog */}
       {showDeleteDatapointConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-4 flex items-center gap-2"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
-              <Trash2 size={20} style={{ color: currentTheme.colors.accent.primary }} />
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 flex items-center gap-2 text-primary">
+              <Trash2 className="text-accent-primary" size={20} />
               Delete Datapoint
             </h3>
             
-            <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
+            <p className="mb-4 text-secondary">
               Are you sure you want to delete this datapoint? This action cannot be undone.
             </p>
             
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteDatapointConfirm(null)}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteDatapoint(showDeleteDatapointConfirm)}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.accent.primary,
-                  color: 'white'
-                }}
+                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
               >
                 Delete Datapoint
               </button>

@@ -147,45 +147,29 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       {/* Project Summary */}
-      <div
-        className="p-6 rounded-lg mb-8"
-        style={{ 
-          backgroundColor: currentTheme.colors.surface, 
-          border: `1px solid ${currentTheme.colors.border}`
-        }}
-      >
+      <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
         <div className="flex justify-between">
           <div className="flex-1">
-            <div className="text-2xl font-mono mb-6" style={{ color: currentTheme.colors.text.primary }}>
+            <div className="text-2xl font-mono mb-6 text-primary">
               {selectedProject.name}
             </div>
             <div className="flex flex-col gap-4">
               {selectedProject.clientRef && (
                 <div className="flex items-start gap-2">
-                  <div 
-                    className="w-4 h-4 flex items-center justify-center rounded"
-                    style={{ backgroundColor: currentTheme.colors.accent.primary }}
-                  >
+                  <div className="w-4 h-4 flex items-center justify-center rounded bg-accent-primary">
                     <span className="text-xs text-white font-mono">#</span>
                   </div>
                   <div>
-                    <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                    <div className="font-medium text-secondary">
                       {selectedProject.clientRef}
                     </div>
-                    <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                    <div className="text-sm text-secondary">
                       Project Reference
                     </div>
                   </div>
@@ -194,12 +178,12 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
 
               {selectedProject.companyId && (
                 <div className="flex items-start gap-2">
-                  <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                  <Building2 className="text-accent-primary" size={16} />
                   <div>
-                    <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                    <div className="font-medium text-secondary">
                       {company?.name}
                     </div>
-                    <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                    <div className="text-sm text-secondary">
                       Construction Company
                     </div>
                   </div>
@@ -208,29 +192,29 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
 
               {selectedProject.managerId && (
                 <div className="flex items-start gap-2">
-                  <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                  <User className="text-accent-primary" size={16} />
                   <div>
-                    <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                    <div className="font-medium text-primary">
                       {manager?.firstName} {manager?.lastName}
                     </div>
-                    <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                    <div className="text-sm text-secondary">
                       Project Manager
                     </div>
                     <div className="flex flex-col gap-1 mt-1">
                       <div className="flex items-center gap-2 text-sm">
-                        <Mail size={14} style={{ color: currentTheme.colors.accent.primary }} />
+                        <Mail className="text-accent-primary" size={14} />
                         <a 
                           href="mailto:manager@example.com"
-                          style={{ color: currentTheme.colors.accent.primary }}
+                          className="text-accent-primary"                        
                         >
                           {manager?.email}
                         </a>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
-                        <Phone size={14} style={{ color: currentTheme.colors.accent.primary }} />
+                        <Phone className="text-accent-primary" size={14} />
                         <a 
                           href="tel:+1234567890"
-                          style={{ color: currentTheme.colors.accent.primary }}
+                          className="text-accent-primary"
                         >
                           {manager?.phone}
                         </a>
@@ -242,12 +226,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
 
               {(selectedProject.latitude && selectedProject.longitude) && (
                 <div className="flex items-start gap-2">
-                  <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                  <MapPin className="text-accent-primary"size={16} />
                   <div>
                     <button
                       onClick={() => window.open(`https://www.google.com/maps?q=${selectedProject.latitude},${selectedProject.longitude}`, '_blank')}
-                      className="text-sm hover:underline"
-                      style={{ color: currentTheme.colors.accent.primary }}
+                      className="text-sm hover:underline text-accent-primary"
                     >
                       {selectedProject.latitude}, {selectedProject.longitude}
                     </button>
@@ -261,8 +244,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
               <img 
                 src={selectedProject.imageUrl} 
                 alt={selectedProject.name}
-                className="rounded-lg shadow-lg object-cover"
-                style={{ width: '300px', height: '200px' }}
+                className="w-72 h-48 rounded-lg shadow-lg object-cover"
               />
             </div>
           )}
@@ -274,32 +256,22 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
         {fields.map(field => (
           <div
             key={field.id}
-            className="p-4 rounded-lg transition-all hover:translate-y-[-2px]"
-            onClick={() => onSelectField(selectedProject.id, field.id)}
-            style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`,
-              boxShadow: `0 2px 4px ${currentTheme.colors.border}`,
-              cursor: 'pointer'
-            }}
+            className="p-4 rounded-lg transition-all hover:translate-y-[-2px] border-theme border-solid shadow-border bg-surface hover:cursor-pointer"
+            onClick={() => onSelectField(selectedProject.id, field.id)}            
           >
             <div className="flex items-center justify-between mb-2">
               <h3 
-                className="font-medium"
+                className="font-medium text-primary"
                 onClick={e => e.stopPropagation()}
-                style={{ color: currentTheme.colors.text.primary }}
               >
                 <div className="flex items-center gap-2">
                   <span>{field.name}</span>
                 </div>
               </h3>
-              <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+              <ChevronRight className="text-secondary" size={16} />
             </div>
             <div className="flex justify-between items-center" onClick={e => e.stopPropagation()}>
-              <span 
-                className="text-sm"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <span className="text-sm">
                 {field.zones.length} zones • {
                   field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)
                 } datapoints
@@ -311,8 +283,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                       e.stopPropagation();
                       window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, '_blank');
                     }}
-                    className="text-sm hover:underline"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="text-sm hover:underline text-accent-primary"
                   >
                     View on map
                   </button>
@@ -325,8 +296,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                         longitude: field.longitude || ''
                       });
                     }}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Edit2 size={14} />
                   </button>
@@ -339,8 +309,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   e.stopPropagation();
                   setShowGatesPanel(true);
                 }}
-                className="text-sm flex items-center gap-1"
-                style={{ color: currentTheme.colors.text.secondary }}
+                className="text-sm flex items-center gap-1 text-secondary"
               >
                 <Plus size={14} />
                 Add Gate
@@ -351,8 +320,8 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   className="flex items-center gap-1"
                   onClick={e => e.stopPropagation()}
                 >
-                  <DoorOpen size={14} style={{ color: currentTheme.colors.accent.primary }} />
-                  <span className="text-sm" style={{ color: currentTheme.colors.text.primary }}>
+                  <DoorOpen className="text-accent-primary" size={14} />
+                  <span className="text-sm text-primary">
                     {gate.name}
                   </span>
                   <button
@@ -365,15 +334,13 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                       });
                       setShowGatesPanel(true);
                     }}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Edit2 size={12} />
                   </button>
                   <button
                     onClick={() => handleDeleteGate(gate.id)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <X size={12} />
                   </button>
@@ -387,16 +354,13 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       {/* Gates Panel */}
       {showGatesPanel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 text-primary">
               {editingGate ? 'Edit Gate' : 'Add New Gate'}
             </h3>
             <form onSubmit={(e) => handleGateSubmit(selectedField.id, e)} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary text-secondary">
                   Gate Name
                 </label>
                 <input
@@ -414,7 +378,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Latitude
                 </label>
                 <input
@@ -432,7 +396,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Longitude
                 </label>
                 <input
@@ -494,7 +458,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             </h3>
             <form onSubmit={(e) => handleCoordinatesSubmit(selectedField.id, e)} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Latitude
                 </label>
                 <input
@@ -502,17 +466,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={coordinates.latitude}
                   onChange={(e) => setCoordinates(prev => ({ ...prev, latitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
+                <label className="block text-sm mb-1 text-secondary">
                   Longitude
                 </label>
                 <input
@@ -520,35 +478,20 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={coordinates.longitude}
                   onChange={(e) => setCoordinates(prev => ({ ...prev, longitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
                 />
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowCoordinatesForm(false)}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   Save
                 </button>
@@ -561,14 +504,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 text-primary">
               Delete Field
             </h3>
-            <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
+            <p className="mb-4 text-secondary">
               This action cannot be undone. Please type the field name to confirm deletion.
             </p>
             <div className="space-y-4">
@@ -577,13 +517,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                 value={deleteConfirmName}
                 onChange={(e) => setDeleteConfirmName(e.target.value)}
                 placeholder="Type field name to confirm"
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.surface,
-                  borderColor: currentTheme.colors.border,
-                  color: currentTheme.colors.text.primary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                
               />
               <div className="flex justify-end gap-2">
                 <button
@@ -591,12 +525,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     setShowDeleteConfirm(false);
                     setDeleteConfirmName('');
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
@@ -607,10 +536,8 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     }
                   }}
                   disabled={deleteConfirmName !== field.name}
-                  className="px-4 py-2 rounded text-sm"
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white',
                     opacity: deleteConfirmName === field.name ? 1 : 0.5
                   }}
                 >

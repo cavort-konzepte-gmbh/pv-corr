@@ -169,34 +169,20 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-theme border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           {translation("company.loading")}
         </div>
       ) : (
         <>
           <button
             onClick={() => setShowNewCompanyForm(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-            style={{ 
-              backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
-            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"            
           >
             <Plus size={16} />
             {translation("company.add")}
@@ -204,21 +190,15 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
 
           {showNewCompanyForm ? (
             <div>
-          <h3 
-            className="text-lg mb-6 flex items-center gap-2"
-            style={{ color: currentTheme.colors.text.primary }}
-          >
-            <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
+          <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+            <Building2 className="text-accent-primary" size={16} />
             {editingCompany ? translation("company.edit") : translation("company.add")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             {COMPANY_FIELDS.map(field => (
               <div key={field.id}>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   {translation(field.label as any)}
                   {field.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
@@ -230,33 +210,18 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                     [field.id]: e.target.value
                   }))}
                   required={field.required}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
                 />
               </div>
             ))}
             <div>
-              <label 
-                className="block text-sm mb-1"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <label className="block text-sm mb-1 text-secondary">
                 {translation("company.address")}
               </label>
               <select
                 value={selectedPlaceId}
                 onChange={(e) => setSelectedPlaceId(e.target.value)}
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.surface,
-                  borderColor: currentTheme.colors.border,
-                  color: currentTheme.colors.text.primary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                
               >
                 <option value="">Select project site</option>
                 {savedPlaces?.map(place => (
@@ -267,23 +232,14 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               </select>
             </div>
             <div>
-              <label 
-                className="block text-sm mb-1"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <label className="block text-sm mb-1 text-secondary">
                 CEO
               </label>
               <div className="relative">
                 <select
                   value={selectedCeoId}
                   onChange={(e) => setSelectedCeoId(e.target.value)}
-                  className="w-full p-2 rounded text-sm appearance-none"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm appearance-none text-primary border-theme border-solid bg-surface"                  
                 >
                   <option value="">Select CEO</option>
                   {availablePeople.map(person => (
@@ -295,29 +251,19 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </select>
                 <ChevronRight 
                   size={14} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary"
                 />
               </div>
             </div>
             <div>
-              <label 
-                className="block text-sm mb-1"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <label className="block text-sm mb-1 text-secondary">
                 {translation("company.contact_person")}
               </label>
               <div className="relative">
                 <select
                   value={selectedContactId}
                   onChange={(e) => setSelectedContactId(e.target.value)}
-                  className="w-full p-2 rounded text-sm appearance-none"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm appearance-none text-primary border-theme border-solid bg-surface"
                 >
                   <option value="">Select Contact Person</option>
                   {availablePeople.map(person => (
@@ -329,8 +275,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </select>
                 <ChevronRight 
                   size={14} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary"
                 />
               </div>
             </div>
@@ -343,22 +288,13 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   setFormValues({});
                   setSelectedPlaceId('');
                 }}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
                 {translation("actions.cancel")}
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.accent.primary,
-                  color: 'white'
-                }}
+                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
               >
                 {editingCompany ? translation("general.save_changes") : 'Create Company'}
               </button>
@@ -370,19 +306,14 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
           {savedCompanies.map(company => (
             <div
               key={company.id}
-              className="p-4 rounded-lg border transition-all hover:translate-x-1"
-              style={{
-                backgroundColor: currentTheme.colors.surface,
-                borderColor: currentTheme.colors.border,
-                color: currentTheme.colors.text.primary
-              }}
+              className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme border-solid bg-surface"              
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                  <Building2 className="text-accent-primary" size={16} />
                   <span className="font-medium">{company.name}</span>
                   {company.placeId && (
-                    <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                    <div className="flex items-center gap-1 text-xs text-secondary">
                       <MapPin size={12} />
                       {savedPlaces?.find(p => p.id === company.placeId)?.name || 'Unknown location'}
                     </div>
@@ -391,24 +322,19 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleEdit(company)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <ChevronRight size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(company.id)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
               </div>
-              <div 
-                className="text-sm space-y-2"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <div className="text-sm space-y-2 text-secondary">
                 {company.placeId && (
                   <div className="flex items-center gap-2">
                     <MapPin size={14} />
@@ -441,7 +367,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       href={company.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: currentTheme.colors.accent.primary }}
+                      className="text-accent-primary"
                     >
                       {company.website}
                     </a>
@@ -451,7 +377,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   <div>
                     <a 
                       href={`mailto:${company.email}`}
-                      style={{ color: currentTheme.colors.accent.primary }}
+                      className="text-accent-primary"
                     >
                       {company.email}
                     </a>
@@ -461,7 +387,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   <div>
                     <a 
                       href={`tel:${company.phone}`}
-                      style={{ color: currentTheme.colors.accent.primary }}
+                      className="text-accent-primary"
                     >
                       {company.phone}
                     </a>

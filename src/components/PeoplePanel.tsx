@@ -191,10 +191,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
   if (loading) {
     return (
-      <div 
-        className="text-center p-4"
-        style={{ color: currentTheme.colors.text.secondary }}
-      >
+      <div className="text-center p-4 text-secondary">
         {translation("people.loading")}
       </div>
     );
@@ -211,25 +208,14 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary bg-surface">
           {error}
         </div>
       )}
 
       <button
         onClick={() => setShowNewPersonForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         {translation("people.new")}
@@ -237,11 +223,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
       {showNewPersonForm ? (
         <div>
-          <h3 
-            className="text-lg mb-6 flex items-center gap-2"
-            style={{ color: currentTheme.colors.text.primary }}
-          >
-            <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
+          <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+            <User className="text-accent-primary" size={16} />
             {editingPerson ? translation("people.edit") : translation("people.new")}
           </h3>
           
@@ -249,10 +232,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
             <div className="grid grid-cols-2 gap-4">
               {PERSON_FIELDS.map(field => (
                 <div key={field.id}>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     {translation(field.label as any)}
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
@@ -260,13 +240,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowAddressSelect(field.id === 'privateAddress' ? 'private' : 'business')}
-                      className="w-full p-2 rounded text-sm text-left flex items-center justify-between"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-left flex items-center justify-between border-primary border-theme border-solid bg-surface"                      
                     >
                       <span className="flex items-center gap-2">
                         <MapPin size={16} />
@@ -287,13 +261,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       value={formValues[field.id] || ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                       required={field.required}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">Select {field.label}</option>
                       {field.options?.map(option => (
@@ -308,13 +276,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       value={formValues[field.id] || ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                       required={field.required}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   )}
                 </div>
@@ -329,22 +291,13 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   setEditingPerson(null);
                   setSelectedAddresses({});
                 }}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
                 {translation("actions.cancel")}
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.accent.primary,
-                  color: 'white'
-                }}
+                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
               >
                 {editingPerson ? translation("settings.autosave") : translation("people.add")}
               </button>
@@ -356,34 +309,26 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
           {savedPeople.map(person => (
             <div
               key={person.id}
-              className="p-4 rounded-lg border transition-all hover:translate-x-1"
-              onClick={() => handleEditPerson(person)}
-              style={{
-                backgroundColor: currentTheme.colors.surface,
-                borderColor: currentTheme.colors.border,
-                color: currentTheme.colors.text.primary,
-                cursor: 'pointer'
-              }}
+              className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
+              onClick={() => handleEditPerson(person)}              
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                  <User className="text-accent-primary" size={16} />
                   <span className="font-medium">
                     {person.values.salutation} 
                     {person.values.title ? ` ${person.values.title}` : ''} 
                     {` ${person.values.firstName} ${person.values.lastName}`}
                   </span>
                 </div>
-                <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+                <ChevronRight className="text-secondary" size={16} />
               </div>
-              <div className="text-sm flex flex-col gap-1"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <div className="text-sm flex flex-col gap-1 text-secondary">
                 <div>{person.values.email} • {person.values.phone || 'No phone'}</div>
                 {(person.addresses.private || person.addresses.business) && (
                   <div className="flex flex-col gap-2 mt-2">
                     {person.addresses.private && (
-                      <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                      <div className="flex items-center gap-1 text-xs text-secondary">
                         <MapPin size={12} />
                         <span>Private: {
                           savedPlaces?.find(p => p.id === person.addresses.private)?.name || 'Address not found'
@@ -391,7 +336,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       </div>
                     )}
                     {person.addresses.business && (
-                      <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                      <div className="flex items-center gap-1 text-xs text-secondary">
                         <MapPin size={12} />
                         <span>Business: {
                           savedPlaces?.find(p => p.id === person.addresses.business)?.name || 'Address not found'
@@ -408,11 +353,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
       {showAddressSelect && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg font-mono mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg font-mono mb-4 text-primary">
               Select {showAddressSelect === 'private' ? 'Private' : 'Business'} Address
             </h3>
             <div className="space-y-2">
@@ -421,11 +363,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   <button
                     key={place.id}
                     onClick={() => handleAddressSelect(showAddressSelect, place.id)}
-                    className="w-full p-4 rounded text-left hover:translate-x-1 transition-transform flex flex-col gap-1"
-                    style={{ 
-                      backgroundColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text.primary
-                    }}
+                    className="w-full p-4 rounded text-left hover:translate-x-1 transition-transform flex flex-col gap-1 text-primary bg-border"                    
                   >
                     <div className="font-medium">{place?.name || 'Unnamed Place'}</div>
                     <div className="text-sm mt-1" style={{ color: currentTheme.colors.text.secondary }}>
@@ -442,12 +380,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
               })}
               <button
                 onClick={() => setShowAddressSelect(null)}
-                className="w-full mt-4 p-2 rounded text-sm"
-                style={{ 
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="w-full mt-4 p-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
                 {translation("actions.cancel")}
               </button>

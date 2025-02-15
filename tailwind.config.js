@@ -23,6 +23,9 @@ export default {
         theme: 'var(--background)',
         border: 'var(--border)',
       },
+      boxShadow: {
+        theme: '0 2px 4px var(--border)'
+      }
     },
   },
   plugins: [],

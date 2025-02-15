@@ -67,11 +67,11 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4 p-4 rounded" style={{ backgroundColor: currentTheme.colors.surface }}>
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4 p-4 rounded bg-surface">
       <div className="grid grid-cols-2 gap-4">
         {standard.parameters?.map((param, index) => (
           <div key={param.parameterCode || index}>
-            <label className="block font-mono text-sm mb-2" style={{ color: currentTheme.colors.text.primary }}>
+            <label className="block font-mono text-sm mb-2 text-primary">
               {param.parameterCode}
             </label>
             <input
@@ -81,12 +81,7 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                 ...prev,
                 [param.parameterCode]: e.target.value
               }))}
-              className="w-full p-2 rounded font-mono text-sm border focus:outline-none"
-              style={{
-                backgroundColor: currentTheme.colors.surface,
-                color: currentTheme.colors.text.primary,
-                borderColor: currentTheme.colors.border
-              }}
+              className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"              
             />
           </div>
         ))}
@@ -96,23 +91,14 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded font-mono text-sm"
-          style={{ 
-            backgroundColor: 'transparent',
-            color: currentTheme.colors.text.secondary,
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="px-4 py-2 rounded font-mono text-sm text-secondary border-theme border-solid bg-transparent"          
         >
           {t('actions.cancel')}
         </button>
         <button
           type="submit"
           disabled={Object.keys(formValues).length === 0}
-          className="px-4 py-2 rounded font-mono text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ 
-            backgroundColor: currentTheme.colors.accent.primary,
-            color: 'white'
-          }}
+          className="px-4 py-2 rounded font-mono text-sm disabled:opacity-50 disabled:cursor-not-allowed text-white bg-accent-primary"          
         >
           {t('datapoint.new')}
         </button>
