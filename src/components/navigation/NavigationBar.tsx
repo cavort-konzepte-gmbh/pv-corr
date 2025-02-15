@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Theme } from '../../types/theme';
-import { Home, Settings, LogOut, Shield } from 'lucide-react';
+import { Home, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import { useTranslation, Language } from '../../types/language';
 

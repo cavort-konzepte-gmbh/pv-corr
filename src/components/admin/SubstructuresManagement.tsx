@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Link, Image } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Link } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 
 interface SubstructuresManagementProps {

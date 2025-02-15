@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
 import { Project } from '../types/projects';
-import { Database, MapPin, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 interface ZonesPanelProps {
   currentTheme: Theme;

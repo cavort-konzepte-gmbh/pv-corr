@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Project } from '../../types/projects';
+import { Field, Project } from '../../types/projects';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { Plus, MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
+import { MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
 import { SavedPlace } from '../PlacesPanel';
 import { Company } from '../../types/companies';
 import { createField } from '../../services/fields';

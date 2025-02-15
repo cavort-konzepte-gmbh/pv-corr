@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Theme } from '../../types/theme';
-import { LogIn } from 'lucide-react';
 
 interface LoginFormProps {
   currentTheme: Theme;

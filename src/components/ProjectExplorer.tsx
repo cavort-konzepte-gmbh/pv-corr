@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Theme, THEMES } from '../types/theme';
 import { MapPin } from 'lucide-react';
-import { SavedPerson } from '../utils/sampleData';
 import { Language, LANGUAGES, useTranslation } from '../types/language';
 import { Project } from '../types/projects';
 import { Company } from '../types/companies';

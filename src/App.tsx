@@ -1,4 +1,3 @@
-import React from 'react';
 import DashboardLayout from './components/DashboardLayout';
 import { AuthProvider } from './components/auth/AuthProvider';
 import { Theme } from './types/theme';

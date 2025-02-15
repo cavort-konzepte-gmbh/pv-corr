@@ -201,8 +201,6 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <DatapointsPanel
             currentTheme={currentTheme}
             currentLanguage="en"
-            standards={standards}
-            onStandardsChange={setStandards}
           />
         )}
         {activeView === 'substructures' && (
