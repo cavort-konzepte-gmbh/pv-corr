@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
-import { Folder, Plus, ChevronRight, Trash2, MapPin, User, Building2, DoorOpen, Edit2, X } from 'lucide-react';
+import { Folder, Plus, ChevronRight, MapPin } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
-import { fetchPeople } from '../services/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';

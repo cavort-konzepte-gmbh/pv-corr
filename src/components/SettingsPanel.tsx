@@ -90,7 +90,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   };
 
   const handleThemeChange = async (theme: Theme) => {
-    const success = await updateUserSettings({ theme_id: theme.id as ThemeId });
+    const success = await updateUserSettings({ theme_id: theme.id as any });
     if (success) {
       onThemeChange(theme);
     }

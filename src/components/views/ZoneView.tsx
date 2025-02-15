@@ -3,10 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Project, Zone } from '../../types/projects';
 import { Theme } from '../../types/theme';
 import { Standard } from '../../types/standards';
-import { Edit2, Save, History, Check, X, Trash2, MapPin, Plus } from 'lucide-react';
+import { Edit2, Save, Check, X, Trash2, MapPin, Plus } from 'lucide-react';
 import { Language, useTranslation } from '../../types/language';
-import DatapointForm from '../DatapointForm';
-import StandardSelector from '../StandardSelector';
 import { Parameter } from '../../types/parameters';
 import { fetchParameters } from '../../services/parameters';
 import { fetchStandards } from '../../services/standards';
@@ -30,6 +28,7 @@ interface ZoneViewProps {
   onCancelNewDatapoint: () => void;
   handleSubmitDatapoint: (datapoint: any) => void;
   onProjectsChange: (projects: Project[]) => void;
+  setEditingName: (name: any) => void;
 }
 
 const ZoneView: React.FC<ZoneViewProps> = ({
@@ -43,7 +42,8 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   handleNameEdit,
   onCancelNewDatapoint,
   handleSubmitDatapoint,
-  onProjectsChange
+  onProjectsChange,
+  setEditingName
 }) => {
   const t = useTranslation(currentLanguage);
   const [showStandardSelector, setShowStandardSelector] = useState(false);
@@ -276,7 +276,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     if (sortColumn === column) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortColumn(column);
+      setSortColumn(column as 'name' | 'timestamp');
       setSortDirection('asc');
     }
   };
@@ -685,7 +685,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {sortedDatapoints.map((dp, index) => (
+                {sortedDatapoints.map((dp) => (
                   <tr key={dp.id}>
                     <td 
                       className="p-2 border sticky left-0 z-10"
@@ -695,7 +695,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        {editingDatapoint === dp.id ? (
+                        {editingDatapoint === Number(dp.id) ? (
                           <input
                             type="text"
                             value={editingSequentialId}
@@ -724,7 +724,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         className="p-2 border"
                         style={{ borderColor: currentTheme.colors.border }}
                       >
-                        {editingDatapoint === dp.id ? (
+                        {editingDatapoint === Number(dp.id) ? (
                           <input
                             type="text"
                             value={editingValues[param.id] || ''}
@@ -752,14 +752,14 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                     >
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          onClick={() => editingDatapoint === dp.id ? 
+                          onClick={() => editingDatapoint === Number(dp.id) ? 
                             handleSaveEdit(dp.id) : 
                             handleEditDatapoint(dp)
                           }
                           className="p-1 rounded hover:bg-opacity-80"
                           style={{ color: currentTheme.colors.text.secondary }}
                         >
-                          {editingDatapoint === dp.id ? (
+                          {editingDatapoint === Number(dp.id) ? (
                             <Save size={14} />
                           ) : (
                             <Edit2 size={14} />
@@ -767,21 +767,21 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            if (editingDatapoint === dp.id) {
+                            if (editingDatapoint === Number(dp.id)) {
                               setEditingDatapoint(null);
                               setEditingValues({});
                             } else {
                               setShowDeleteDatapointConfirm(dp.id);
                             }
                           }}
-                          title={editingDatapoint === dp.id ? 
+                          title={editingDatapoint === Number(dp.id) ? 
                             "Cancel editing" : 
                             "Delete datapoint"
                           }
                           className="p-1 rounded hover:bg-opacity-80"
                           style={{ color: currentTheme.colors.text.secondary }}
                         >
-                          {editingDatapoint === dp.id ? (
+                          {editingDatapoint === Number(dp.id) ? (
                             <X size={14} />
                           ) : (
                             <Trash2 size={14} />
@@ -831,7 +831,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                           }}
                         />
                         <button
-                          onClick={() => handleDeleteDatapoint(index)}
+                          onClick={() => handleDeleteDatapoint(String(index))}
                           className="ml-2 hover:opacity-80"
                           style={{ color: currentTheme.colors.text.secondary }}
                         >

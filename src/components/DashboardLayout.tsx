@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Theme, THEMES } from '../types/theme';
 import { Language, LANGUAGES, useTranslation } from '../types/language';
 import { Project } from '../types/projects';
 import { Company } from '../types/companies';
-import { Standard } from '../types/standards';
 import { fetchProjects } from '../services/projects';
 import { useAuth } from './auth/AuthProvider';
-import { generateHiddenId } from '../utils/generateHiddenId';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';

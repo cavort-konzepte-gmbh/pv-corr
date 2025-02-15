@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
-import { Plus, X, Edit2, Save } from 'lucide-react';
+import { Edit2, Save } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
 import { Zone } from '../types/projects';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
-  selectedZone?: Zone;
-  onBack: () => void;
+  selectedZone?: Zone | null;
+  onBack?: () => void;
 }
 
 const DatapointsPanel: React.FC<DatapointsPanelProps> = ({

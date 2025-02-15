@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
 import { Project } from '../types/projects';
-import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2 } from 'lucide-react';
+import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, X } from 'lucide-react';
 import { updateField, createGate, updateGate, deleteGate, deleteField } from '../services/fields';
 import { fetchProjects } from '../services/projects';
 import { Person } from '../types/people';

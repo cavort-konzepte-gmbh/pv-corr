@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Theme, THEMES } from '../../types/theme';
-import { Palette, Plus, Edit2, Save, X, ArrowLeft } from 'lucide-react';
+import { Palette, Plus, Edit2, X, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface ThemeManagementProps {
