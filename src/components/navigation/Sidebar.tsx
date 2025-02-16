@@ -28,20 +28,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSelectItem
 }) => {
   return (
-    <div 
-      className="w-64 border-r h-screen overflow-auto"
-      style={{ 
-        backgroundColor: currentTheme.colors.surface,
-        borderColor: currentTheme.colors.border 
-      }}
-    >
+    <div className="w-64 border-r h-screen overflow-auto border-theme border-solid bg-surface">
       <div>
         {ensureArray(projects).map(project => (
           <div key={project.id}>
             <div 
-              className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group"
+              className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
               style={{
-                color: currentTheme.colors.text.primary,
                 backgroundColor: selectedItem?.type === 'project' && selectedItem?.id === project.id ? currentTheme.colors.background : 'transparent'
               }}
               onClick={() => {
@@ -74,12 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {project.name.length > 28 ? project.name.substring(0, 28) + '...' : project.name}
                   </span>
                 </div>
-                <div 
-                  className="text-[10px] opacity-60 ml-1"
-                  style={{
-                    color: currentTheme.colors.text.secondary
-                  }}
-                >
+                <div className="text-[10px] opacity-60 ml-1 text-secondary">
                   {project.fields.length}f
                 </div>
               </div>
@@ -90,9 +78,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {project.fields.map(field => (
                   <div key={field.id}>
                     <div 
-                      className="flex items-center h-7 pl-6 pr-2 cursor-pointer hover:bg-opacity-10 group"
+                      className="flex items-center h-7 pl-6 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                       style={{
-                        color: currentTheme.colors.text.primary,
                         backgroundColor: selectedItem?.type === 'field' && selectedItem?.id === field.id ? currentTheme.colors.background : 'transparent'
                       }}
                       onClick={() => {
@@ -111,12 +98,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                           {expandedItems.has(field.id) ? (
                             <ChevronDown 
                               size={14}
-                              style={{ color: currentTheme.colors.text.secondary }} 
+                              className='text-secondary'
                             />
                           ) : (
                             <ChevronRight 
                               size={14}
-                              style={{ color: currentTheme.colors.text.secondary }} 
+                              className='text-secondary'
                             />
                           )}
                         </span>
@@ -124,12 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           {field.name.length > 26 ? field.name.substring(0, 26) + '...' : field.name}
                         </span>
                       </div>
-                      <div 
-                        className="text-[10px] opacity-60 ml-1"
-                        style={{
-                          color: currentTheme.colors.text.secondary
-                        }}
-                      >
+                      <div className="text-[10px] opacity-60 ml-1 text-secondary">
                         {field.zones.length}z
                       </div>
                     </div>
@@ -139,9 +121,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                         {field.zones.map(zone => (
                           <div 
                             key={zone.id}
-                            className="flex items-center h-7 pl-10 pr-2 cursor-pointer hover:bg-opacity-10 group"
+                            className="flex items-center h-7 pl-10 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                             style={{
-                              color: currentTheme.colors.text.primary,
                               backgroundColor: selectedItem?.type === 'zone' && selectedItem?.id === zone.id ? currentTheme.colors.background : 'transparent'
                             }}
                             onClick={() => onSelectItem({
@@ -154,12 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <span className="font-mono text-xs truncate flex-1">
                               {zone.name.length > 24 ? zone.name.substring(0, 24) + '...' : zone.name}
                             </span>
-                            <span 
-                              className="text-[10px] opacity-60 ml-1"
-                              style={{
-                                color: currentTheme.colors.text.secondary
-                              }}
-                            >
+                            <span className="text-[10px] opacity-60 ml-1 text-secondary">
                               {zone.datapoints?.length || 0}dp
                             </span>
                           </div>

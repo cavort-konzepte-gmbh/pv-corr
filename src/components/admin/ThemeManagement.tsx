@@ -115,27 +115,18 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
+          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
-        >
+        <h2 className="text-2xl font-bold text-primary">
           Theme Management
         </h2>
       </div>
 
       {error && (
         <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
+          className="p-4 mb-4 rounded text-primary border-theme border-solid bg-surface"          
         >
           {error}
         </div>
@@ -143,11 +134,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
 
       <button
         onClick={handleNewTheme}
-        className="mb-6 px-4 py-2 rounded text-sm flex items-center gap-2"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="mb-6 px-4 py-2 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         Add New Theme
@@ -157,31 +144,18 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
         {themes.map(theme => (
           <div
             key={theme.id}
-            className="p-6 rounded-lg"
-            style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`
-            }}
+            className="p-6 rounded-lg border-theme border-solid bg-surface"            
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: theme.colors.accent.primary }}
-                >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent-primary">
                   <Palette size={16} style={{ color: 'white' }} />
                 </div>
                 <div>
-                  <h3 
-                    className="font-medium"
-                    style={{ color: currentTheme.colors.text.primary }}
-                  >
+                  <h3 className="font-medium text-primary">
                     {theme.name}
                   </h3>
-                  <p 
-                    className="text-sm"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <p className="text-sm text-secondary">
                     {theme.id}
                   </p>
                 </div>
@@ -189,16 +163,14 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleEditTheme(theme)}
-                  className="p-1 rounded hover:bg-opacity-80"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <Edit2 size={16} />
                 </button>
                 {theme.id !== currentTheme.id && (
                   <button
                     onClick={() => handleDeleteTheme(theme.id)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <X size={16} />
                   </button>
@@ -208,7 +180,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
 
             <div className="flex gap-2">
               <div 
-                className="flex-1 h-2 rounded"
+                className="flex-1 h-2 rounded bg-theme"
                 style={{ backgroundColor: theme.colors.background }}
               />
               <div 
@@ -230,44 +202,27 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
 
       {(editingTheme || showNewThemeForm) && themeForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-2xl w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-2xl w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               {editingTheme ? 'Edit Theme' : 'New Theme'}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Theme Name
                 </label>
                 <input
                   type="text"
                   value={themeForm.name}
                   onChange={(e) => setThemeForm({ ...themeForm, name: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Background Color
                   </label>
                   <input
@@ -282,10 +237,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Surface Color
                   </label>
                   <input
@@ -300,10 +252,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Border Color
                   </label>
                   <input
@@ -318,10 +267,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Primary Text Color
                   </label>
                   <input
@@ -339,10 +285,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Secondary Text Color
                   </label>
                   <input
@@ -360,10 +303,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Accent Text Color
                   </label>
                   <input
@@ -381,10 +321,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Primary Accent Color
                   </label>
                   <input
@@ -402,10 +339,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     Hover Accent Color
                   </label>
                   <input
@@ -430,22 +364,13 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                     setShowNewThemeForm(false);
                     setThemeForm(null);
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveTheme}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {editingTheme ? 'Save Changes' : 'Create Theme'}
                 </button>

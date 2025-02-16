@@ -169,34 +169,20 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           Loading projects...
         </div>
       ) : (
         <>
           <button
             onClick={() => setShowNewProjectForm(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-            style={{ 
-              backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
-            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"            
           >
             <Plus size={16} />
             Add New Project
@@ -204,21 +190,15 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
           {showNewProjectForm ? (
             <div>
-              <h3 
-                className="text-lg mb-6 flex items-center gap-2"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
-                <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+                <Folder className="text-accent-primary" size={16} />
                 {editingProject ? 'Edit Project' : 'New Project'}
               </h3>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Name
                       <span className="text-red-500 ml-1">*</span>
                     </label>
@@ -228,32 +208,17 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
                       required
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Site
                     </label>
                     <select
                       value={selectedPlaceId || ''}
                       onChange={(e) => setSelectedPlaceId(e.target.value || null)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">No site assigned</option>
                       {savedPlaces.map(place => (
@@ -264,10 +229,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Client Ref
                     </label>
                     <input
@@ -275,20 +237,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter client reference"
                       value={clientRef}
                       onChange={(e) => setClientRef(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Manager
                     </label>
                     <input
@@ -296,24 +249,12 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Search people..."
                       value={peopleSearch}
                       onChange={(e) => setPeopleSearch(e.target.value)}
-                      className="w-full p-2 rounded text-sm mb-2"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm mb-2 text-primary border-theme border-solid bg-surface"                      
                     />
                     <select
                       value={selectedManagerId || ''}
                       onChange={(e) => setSelectedManagerId(e.target.value || null)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">No manager assigned</option>
                       {filteredPeople.map(person => (
@@ -326,10 +267,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                   </div>
                  
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Latitude
                     </label>
                     <input
@@ -337,20 +275,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter latitude"
                       value={latitude}
                       onChange={(e) => setLatitude(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Longitude
                     </label>
                     <input
@@ -358,42 +287,24 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter longitude"
                       value={longitude}
                       onChange={(e) => setLongitude(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Type
                     </label>
                     <select
                       value={typeProject}
                       onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="field">Field</option>
                       <option value="roof">Roof</option>
                     </select>
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Image URL
                     </label>
                     <input
@@ -401,13 +312,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter image URL (e.g. https://images.unsplash.com/...)"
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                 </div>
@@ -419,22 +324,13 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       setEditingProject(null);
                       setProjectName('');
                     }}
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: currentTheme.colors.text.secondary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"                    
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                    
                   >
                     {editingProject ? 'Save Changes' : 'Create Project'}
                   </button>
@@ -446,31 +342,23 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
               {projectsList.map(project => (
                 <div
                   key={project.id}
-                  className="p-4 rounded-lg border transition-all hover:translate-x-1"
-                  onClick={() => onSelectProject(project.id)}
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary
-                  }}
+                  className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface"
+                  onClick={() => onSelectProject(project.id)}                  
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                      <Folder className="text-accent-primary" size={16} />
                       <span className="font-medium">{project.name}</span>                
                       {project.placeId && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                        <div className="flex items-center gap-1 text-xs text-secondary">
                           {savedPlaces && <MapPin size={12} />}
                           {savedPlaces?.find(p => p.id === project.placeId)?.name || 'Unknown location'}
                         </div>
                       )}
                     </div>
-                    <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+                    <ChevronRight className="text-secondary" size={16} />
                   </div>
-                  <div 
-                    className="text-sm"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <div className="text-sm text-secondary">
                     {project.fields.length} fields • {
                       project.fields.reduce((acc, field) => acc + field.zones.length, 0)
                     } zones • {
@@ -487,14 +375,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
           {showDeleteConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div 
-                className="p-6 rounded-lg max-w-md w-full"
-                style={{ backgroundColor: currentTheme.colors.surface }}
-              >
-                <h3 className="text-lg font-mono mb-4" style={{ color: currentTheme.colors.text.primary }}>
+              <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+                <h3 className="text-lg font-mono mb-4 text-primary">
                   Delete Project
                 </h3>
-                <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
+                <p className="mb-4 text-secondary">
                   This action cannot be undone. Please type the project name to confirm deletion.
                 </p>
                 <div className="space-y-4">
@@ -503,13 +388,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     value={deleteConfirmName}
                     onChange={(e) => setDeleteConfirmName(e.target.value)}
                     placeholder="Type project name to confirm"
-                    className="w-full p-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.surface,
-                      borderColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text.primary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                    
                   />
                   <div className="flex justify-end gap-2">
                     <button
@@ -517,12 +396,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         setShowDeleteConfirm(null);
                         setDeleteConfirmName('');
                       }}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: currentTheme.colors.text.secondary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                      
                     >
                       Cancel
                     </button>
@@ -534,10 +408,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         }
                       }}
                       disabled={deleteConfirmName !== (projectsList.find(p => p.id === showDeleteConfirm)?.name || '')}
-                      className="px-4 py-2 rounded text-sm"
+                      className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                       style={{
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white',
                         opacity: deleteConfirmName === (projectsList.find(p => p.id === showDeleteConfirm)?.name || '') ? 1 : 0.5
                       }}
                     >
