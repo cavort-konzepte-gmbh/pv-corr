@@ -379,7 +379,7 @@ const ProjectExplorer = () => {
   const renderContent = () => {
     if (view === 'settings') {
       return (
-        <div className="flex-1 overflow-auto" style={{ backgroundColor: currentTheme.colors.background }}>
+        <div className="flex-1 overflow-auto bg-theme">
           <SettingsPanel
           view={settingsView}
           onViewChange={setSettingsView}
@@ -516,16 +516,9 @@ const ProjectExplorer = () => {
   };
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: currentTheme.colors.background }}>
+    <div className="flex h-screen bg-theme">
       {error && (
-        <div 
-          className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            border: `1px solid ${currentTheme.colors.accent.primary}`,
-            color: currentTheme.colors.accent.primary
-          }}
-        >
+        <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
@@ -547,30 +540,21 @@ const ProjectExplorer = () => {
         onSelectItem={setSelectedItem}
       />
       )}
-      <div className="flex-1 overflow-auto" style={{ backgroundColor: currentTheme.colors.background }}>
+      <div className="flex-1 overflow-auto bg-surface">
         {renderContent()}
       </div>
       
       {showNewZoneDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-4 flex items-center gap-2"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
-              <MapPin size={20} style={{ color: currentTheme.colors.accent.primary }} />
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 flex items-center gap-2 text-primary">
+              <MapPin className="text-accent-primary" size={20} />
               {t('zone.new')}
             </h3>
             
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   {t('zone.name')}
                   <span className="text-red-500 ml-1">*</span>
                 </label>
@@ -578,12 +562,7 @@ const ProjectExplorer = () => {
                   type="text"
                   value={newZoneData?.name || ''}
                   onChange={(e) => setNewZoneData(prev => prev ? { ...prev, name: e.target.value } : null)}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    border: `1px solid ${currentTheme.colors.border}`,
-                    color: currentTheme.colors.text.primary
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -593,7 +572,7 @@ const ProjectExplorer = () => {
                   }}
                 />
                 {newZoneError && (
-                  <p className="text-sm mt-1" style={{ color: currentTheme.colors.accent.primary }}>
+                  <p className="text-sm mt-1 text-accent-primary">
                     {newZoneError}
                   </p>
                 )}
@@ -606,22 +585,13 @@ const ProjectExplorer = () => {
                     setNewZoneData(null);
                     setNewZoneError(null);
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   {t('actions.cancel')}
                 </button>
                 <button
                   onClick={handleCreateZone}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {t('actions.save')}
                 </button>

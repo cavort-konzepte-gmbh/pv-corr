@@ -49,24 +49,17 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
   return (
     <div className="p-6">
       {/* Field Summary */}
-      <div
-        className="p-6 rounded-lg mb-8"
-        style={{ 
-          backgroundColor: currentTheme.colors.surface, 
-          border: `1px solid ${currentTheme.colors.border}`
-        }}
-      >
-        <div className="text-2xl font-mono mb-4" style={{ color: currentTheme.colors.text.primary }}>
+      <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
+        <div className="text-2xl font-mono mb-4 text-primary">
           {selectedField.name}
         </div>
-        <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+        <div className="text-sm text-secondary">
           {selectedProject.name}
         </div>
         {selectedField.latitude && selectedField.longitude && (
           <button
             onClick={() => window.open(`https://www.google.com/maps?q=${selectedField.latitude},${selectedField.longitude}`, '_blank')}
-            className="text-sm hover:underline mt-2"
-            style={{ color: currentTheme.colors.accent.primary }}
+            className="text-sm hover:underline mt-2 text-accent-primary"
           >
             View on map
           </button>
@@ -78,33 +71,22 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
           <div className="flex items-center gap-2 mb-6">
             <button
               onClick={() => setSelectedZoneId(null)}
-              className="text-sm flex items-center gap-1"
-              style={{ color: currentTheme.colors.text.secondary }}
+              className="text-sm flex items-center gap-1 text-secondary"
             >
               ← Back to zones
             </button>
           </div>
 
           <div className="space-y-4">
-            <div
-              className="p-4 rounded-lg"
-              style={{ 
-                backgroundColor: currentTheme.colors.surface,
-                border: `1px solid ${currentTheme.colors.border}`
-              }}
-            >
+            <div className="p-4 rounded-lg border-theme border-solid bg-surface">
               <div className="flex items-center justify-between mb-4">
-                <h3 
-                  className="text-lg font-medium"
-                  style={{ color: currentTheme.colors.text.primary }}
-                >
+                <h3 className="text-lg font-medium text-primary">
                   {selectedZone.name}
                 </h3>
                 {selectedZone.latitude && selectedZone.longitude && (
                   <button
                     onClick={() => window.open(`https://www.google.com/maps?q=${selectedZone.latitude},${selectedZone.longitude}`, '_blank')}
-                    className="text-sm flex items-center gap-1 hover:underline"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="text-sm flex items-center gap-1 hover:underline text-accent-primary"
                   >
                     <MapPin size={14} />
                     View on map
@@ -135,18 +117,14 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
                             {Object.entries(datapoint.values).map(([key, value]) => (
                               <span 
                                 key={key}
-                                className="px-2 py-1 rounded text-xs"
-                                style={{ 
-                                  backgroundColor: currentTheme.colors.background,
-                                  border: `1px solid ${currentTheme.colors.border}`
-                                }}
+                                className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"                                
                               >
                                 {key}: {value}
                               </span>
                             ))}
                           </div>
                         </td>
-                        <td className="p-2 text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                        <td className="p-2 text-sm text-secondary">
                           {new Date(datapoint.timestamp).toLocaleString()}
                         </td>
                       </tr>
@@ -162,26 +140,14 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
           {zones.map(zone => (
             <div
               key={zone.id}
-              className="p-4 rounded-lg transition-all hover:translate-y-[-2px]"
-              onClick={() => onSelectZone(zone.id)}
-              style={{ 
-                backgroundColor: currentTheme.colors.surface,
-                border: `1px solid ${currentTheme.colors.border}`,
-                boxShadow: `0 2px 4px ${currentTheme.colors.border}`,
-                cursor: 'pointer'
-              }}
+              className="p-4 rounded-lg transition-all hover:translate-y-[-2px] border-theme border-solid shadow-border bg-surface"
+              onClick={() => onSelectZone(zone.id)}              
             >
-              <h3 
-                className="font-medium mb-2"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
+              <h3 className="font-medium mb-2 text-primary">
                 {zone.name}
               </h3>
               <div className="flex justify-between items-center">
-                <span 
-                  className="text-sm"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <span className="text-sm text-secondary">
                   {zone.datapoints?.length || 0} datapoints
                 </span>
                 {zone.latitude && zone.longitude && (
@@ -190,8 +156,7 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
                       e.stopPropagation();
                       window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank');
                     }}
-                    className="text-sm hover:underline"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="text-sm hover:underline text-accent-primary"
                   >
                     View on map
                   </button>
