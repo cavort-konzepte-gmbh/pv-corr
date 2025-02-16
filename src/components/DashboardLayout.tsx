@@ -208,7 +208,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
+    <div className="min-h-screen flex flex-col bg-theme">
       {/* Top Navigation Bar */}
       <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
         <div className="flex-1 flex items-center gap-6">

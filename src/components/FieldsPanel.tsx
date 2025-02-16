@@ -244,7 +244,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
               <img 
                 src={selectedProject.imageUrl} 
                 alt={selectedProject.name}
-                className="w-72 h-48 rounded-lg shadow-lg object-cover"
+                className="w-[300px] h-[200px] rounded-lg shadow-lg object-cover"
               />
             </div>
           )}
@@ -271,7 +271,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
               <ChevronRight className="text-secondary" size={16} />
             </div>
             <div className="flex justify-between items-center" onClick={e => e.stopPropagation()}>
-              <span className="text-sm">
+              <span className="text-sm text-secondary">
                 {field.zones.length} zones • {
                   field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)
                 } datapoints
