@@ -112,7 +112,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </div>
 
       {error && (
-        <div className="p-4 mb-4 rounded text-primary border-accent-primary border-solid bg-surface">
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}

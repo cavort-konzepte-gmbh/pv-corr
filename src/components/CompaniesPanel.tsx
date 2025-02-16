@@ -169,7 +169,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-theme border-solid bg-surface">
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}

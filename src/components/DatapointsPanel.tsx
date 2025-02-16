@@ -15,7 +15,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
   currentTheme,
   currentLanguage,
   selectedZone,
-  onBack
+  onBack,
 }) => {
   const t = useTranslation(currentLanguage);
   const [loading, setLoading] = useState(true);
@@ -47,9 +47,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface"          
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
@@ -82,7 +80,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {selectedZone.datapoints?.map(datapoint => (
+                {selectedZone.datapoints?.map((datapoint) => (
                   <tr key={datapoint.id}>
                     <td className="p-2 border border-theme">
                       {datapoint.sequentialId}
@@ -92,20 +90,22 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                     </td>
                     <td className="p-2 border border-theme">
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(datapoint.values).map(([key, value]) => (
-                          <span 
-                            key={key}
-                            className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"                            
-                          >
-                            {key}: {value}
-                          </span>
-                        ))}
+                        {Object.entries(datapoint.values).map(
+                          ([key, value]) => (
+                            <span
+                              key={key}
+                              className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"
+                            >
+                              {key}: {value}
+                            </span>
+                          )
+                        )}
                       </div>
                     </td>
                     <td className="p-2 border text-sm text-secondary border-theme">
                       {new Date(datapoint.timestamp).toLocaleString()}
                     </td>
-                    <td className="p-2 border border-theme"style={{ borderColor: currentTheme.colors.border }}>
+                    <td className="p-2 border border-theme">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => {

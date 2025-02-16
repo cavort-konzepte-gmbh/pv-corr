@@ -304,7 +304,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <div className="flex-1">
         {error && (
-          <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-primary border-theme border-solid bg-surface">
+          <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-accent-primary border-accent-primary border-solid bg-surface">
             {error}
           </div>
         )}

@@ -240,7 +240,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowAddressSelect(field.id === 'privateAddress' ? 'private' : 'business')}
-                      className="w-full p-2 rounded text-sm text-left flex items-center justify-between border-primary border-theme border-solid bg-surface"                      
+                      className="w-full p-2 rounded text-sm text-left flex items-center justify-between text-primary border-theme border-solid bg-surface"                      
                     >
                       <span className="flex items-center gap-2">
                         <MapPin size={16} />
