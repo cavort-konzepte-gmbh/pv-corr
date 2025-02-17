@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
-import { Folder, Plus, ChevronRight, Trash2, MapPin, User, Building2, DoorOpen, Edit2, X } from 'lucide-react';
+import { Folder, Plus, ChevronRight, Trash2, MapPin, User, Building2, DoorOpen, Edit2, X, Upload } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
+import MediaDialog from './MediaDialog';
 
 interface ProjectsPanelProps {
   currentTheme: Theme;
@@ -44,6 +46,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -166,6 +169,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const openInMaps = (latitude: string, longitude: string) => {
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
+
+
 
   return (
     <div className="p-6">
@@ -444,7 +449,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {projectsList.map(project => (
+              {projectsList.map((project, index) => (
                 <div
                   key={project.id}
                   className="p-4 rounded-lg border transition-all hover:translate-x-1"
@@ -466,7 +471,10 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         </div>
                       )}
                     </div>
-                    <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+                    <div className="flex items-center gap-2">
+
+                      <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+                    </div>
                   </div>
                   <div 
                     className="text-sm"
@@ -551,6 +559,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
           )}
         </>
       )}
+
     </div>
   );
 };

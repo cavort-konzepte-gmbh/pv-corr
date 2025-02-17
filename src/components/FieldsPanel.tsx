@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
 import { Project } from '../types/projects';
-import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2 } from 'lucide-react';
+import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2, Upload } from 'lucide-react';
 import { updateField, createGate, updateGate, deleteGate, deleteField } from '../services/fields';
 import { fetchProjects } from '../services/projects';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
+import MediaDialog from './MediaDialog';
 
 interface FieldsPanelProps {
   currentTheme: Theme;
@@ -34,7 +36,10 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
-
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
     : null;
@@ -135,6 +140,21 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
     }
   };
 
+  const handleShowMediaDialog = async (index: number, projectId: string) => {
+    setShowMediaDialog(0);
+    const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+    setMediaUrls(mediatwo);
+  };
+
+  const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, projectId: string) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      await uploadMedia(file, projectId);
+      const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+      setMediaUrls(mediatwo);
+    }
+  };
   return (
     <div className="p-6">
       {error && (
@@ -192,7 +212,9 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     </div>
                     <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
                       Construction Company
+                  
                     </div>
+               
                   </div>
                 </div>
               )}
@@ -258,11 +280,20 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             </div>
           )}
         </div>
+        <div className="flex items-center gap-4 mt-4">
+        <button
+  onClick={() => handleShowMediaDialog(0, selectedProject.id)}
+  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1"
+  style={{ color: currentTheme.colors.text.primary }}
+>
+  view media <Upload size={14} />
+</button>
+        </div>
       </div>
 
       {/* Fields Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {fields.map(field => (
+        {fields.map((field, index) => (
           <div
             key={field.id}
             className="p-4 rounded-lg transition-all hover:translate-y-[-2px]"
@@ -519,6 +550,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     border: `1px solid ${currentTheme.colors.border}`
                   }}
                 />
+           
               </div>
               <div className="flex justify-end gap-2">
                 <button
@@ -612,6 +644,20 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
           </div>
         </div>
       )}
+
+       
+<MediaDialog
+        isOpen={showMediaDialog !== null}
+        onClose={() => setShowMediaDialog(null)}
+        onFileChange={(e) => {
+          if (showMediaDialog !== null) {
+            handleFileChangeInDialog(e, selectedProject.id);
+          }
+        }}
+        mediaUrls={mediaUrls}
+        currentTheme={currentTheme}
+      />
+
     </div>
   );
 };
