@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Theme, THEMES } from '../types/theme';
 import { Language, LANGUAGES, useTranslation } from '../types/language';
 import { Project } from '../types/projects';
 import { Company } from '../types/companies';
-import { Standard } from '../types/standards';
 import { fetchProjects } from '../services/projects';
 import { useAuth } from './auth/AuthProvider';
-import { generateHiddenId } from '../utils/generateHiddenId';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
@@ -17,6 +15,7 @@ import ZonesPanel from './ZonesPanel';
 import SettingsPanel from './SettingsPanel';
 import { LogOut, FolderOpen, Grid, Map, Settings, Database } from 'lucide-react';
 import DatapointsPanel from './DatapointsPanel';
+import { fetchCompanies } from '../services/companies';
 
 const DashboardLayout = () => {
   const { signOut } = useAuth();
@@ -47,10 +46,11 @@ const DashboardLayout = () => {
       setError(null);
       try {
         setLoading(true);
-        const [fetchedProjects, places, people] = await Promise.all([
+        const [fetchedProjects, places, people, companies] = await Promise.all([
           fetchProjects(),
           fetchPlaces(),
-          fetchPeople()
+          fetchPeople(),
+          fetchCompanies()
         ]);
         
         if (fetchedProjects) {
@@ -58,6 +58,7 @@ const DashboardLayout = () => {
         }
         setSavedPlaces(places);
         setSavedPeople(people);
+        setCompanies(companies)
       } catch (error) {
         console.error('Error loading initial data:', error);
         setError('Failed to load data. Please try again.');
@@ -80,6 +81,7 @@ const DashboardLayout = () => {
       const theme = THEMES.find(t => t.id === (settings.theme_id || 'ferra'));
       if (theme) {
         setCurrentTheme(theme);
+        document.documentElement.setAttribute('data-theme', theme.id);
       }
     };
 
@@ -88,6 +90,10 @@ const DashboardLayout = () => {
       window.removeEventListener('userSettingsLoaded', handleUserSettings as EventListener);
     };
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', currentTheme.id);
+  }, [currentTheme]);
 
   const renderContent = () => {
     const selectedProject = selectedProjectId 
@@ -130,6 +136,8 @@ const DashboardLayout = () => {
               setSelectedProjectId(projectId);
               setSelectedFieldId(fieldId);
             }}
+            people={savedPeople}
+            companies={savedCompanies}
           />
         );
       case 'zones':
@@ -200,15 +208,9 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: currentTheme.colors.background }}>
+    <div className="min-h-screen flex flex-col bg-theme">
       {/* Top Navigation Bar */}
-      <div 
-        className="h-14 border-b flex items-center px-4"
-        style={{ 
-          backgroundColor: currentTheme.colors.surface,
-          borderColor: currentTheme.colors.border 
-        }}
-      >
+      <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
         <div className="flex-1 flex items-center gap-6">
           <button
             onClick={() => setView('projects')}
@@ -291,8 +293,7 @@ const DashboardLayout = () => {
           </button>
           <button
             onClick={signOut}
-            className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-            style={{ color: currentTheme.colors.text.secondary }}
+            className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
           >
             <LogOut size={18} />
             <span>Sign Out</span>
@@ -303,14 +304,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <div className="flex-1">
         {error && (
-          <div 
-            className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md"
-            style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.accent.primary}`,
-              color: currentTheme.colors.accent.primary
-            }}
-          >
+          <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-accent-primary border-accent-primary border-solid bg-surface">
             {error}
           </div>
         )}

@@ -22,7 +22,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: currentTheme.colors.background }}>
+    <div className="min-h-screen bg-theme">
       {activeView === 'database' ? (
         <DatabaseManagement 
           currentTheme={currentTheme} 
@@ -36,18 +36,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
       ) : (
         <div className="p-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 
-            className="text-2xl font-bold"
-            style={{ color: currentTheme.colors.text.primary }}
-          >
+          <h1 className="text-2xl font-bold text-primary">
             Admin Dashboard
           </h1>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors text-primary"
             style={{ 
               backgroundColor: `${currentTheme.colors.accent.primary}20`,
-              color: currentTheme.colors.accent.primary
             }}
           >
             <LogOut size={16} />
@@ -59,27 +55,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
           {/* User Management */}
           <div 
             onClick={() => setActiveView('users')}
-            className="p-6 rounded-lg"
-            style={{ backgroundColor: currentTheme.colors.surface }}
+            className="p-6 rounded-lg bg-surface"
           >
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
               >
-                <Users size={20} style={{ color: currentTheme.colors.accent.primary }} />
+                <Users className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 
-                  className="font-medium"
-                  style={{ color: currentTheme.colors.text.primary }}
-                >
+                <h3 className="font-medium text-primary">
                   User Management
                 </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <p className="text-sm text-secondary">
                   Manage user accounts
                 </p>
               </div>
@@ -89,27 +78,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
           {/* Database Management */}
           <div 
             onClick={() => setActiveView('database')}
-            className="p-6 rounded-lg"
-            style={{ backgroundColor: currentTheme.colors.surface }}
+            className="p-6 rounded-lg bg-surface"
           >
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
               >
-                <Database size={20} style={{ color: currentTheme.colors.accent.primary }} />
+                <Database className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 
-                  className="font-medium"
-                  style={{ color: currentTheme.colors.text.primary }}
-                >
+                <h3 className="font-medium text-primary">
                   Database
                 </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <p className="text-sm text-secondary">
                   Manage database records
                 </p>
               </div>
@@ -119,27 +101,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
           {/* Security Settings */}
           <div 
             onClick={() => setActiveView('security')}
-            className="p-6 rounded-lg"
-            style={{ backgroundColor: currentTheme.colors.surface }}
+            className="p-6 rounded-lg bg-surface"
           >
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
               >
-                <Shield size={20} style={{ color: currentTheme.colors.accent.primary }} />
+                <Shield className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 
-                  className="font-medium"
-                  style={{ color: currentTheme.colors.text.primary }}
-                >
+                <h3 className="font-medium text-primary">
                   Security
                 </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <p className="text-sm text-secondary">
                   Security settings
                 </p>
               </div>
@@ -149,27 +124,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
           {/* System Settings */}
           <div 
             onClick={() => setActiveView('settings')}
-            className="p-6 rounded-lg"
-            style={{ backgroundColor: currentTheme.colors.surface }}
+            className="p-6 rounded-lg bg-surface"
           >
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
               >
-                <Settings size={20} style={{ color: currentTheme.colors.accent.primary }} />
+                <Settings className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 
-                  className="font-medium"
-                  style={{ color: currentTheme.colors.text.primary }}
-                >
+                <h3 className="font-medium text-primary">
                   Settings
                 </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <p className="text-sm text-secondary">
                   System configuration
                 </p>
               </div>

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Theme } from '../../types/theme';
-import { Home, Settings, LogOut, Shield } from 'lucide-react';
+import { Home, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 import { useTranslation, Language } from '../../types/language';
 
@@ -23,13 +23,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const { isAdmin, loginType } = useAuth();
 
   return (
-    <div
-      className="w-12 border-r flex flex-col items-center py-4"
-      style={{ 
-        backgroundColor: currentTheme.colors.surface,
-        borderColor: currentTheme.colors.border 
-      }}
-    >
+    <div className="w-12 border-r flex flex-col items-center py-4 border-theme border-solid bg-surface">
       <div className="flex-1 flex flex-col items-center space-y-2">
         <button
           onClick={() => onViewChange('projects')}
@@ -48,12 +42,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       <div className="mt-auto">
         <button
           onClick={onSignOut}
-          className="p-2 rounded transition-colors mb-2"
-          title={t('nav.sign_out')}
-          style={{
-            backgroundColor: 'transparent',
-            color: currentTheme.colors.text.secondary
-          }}
+          className="p-2 rounded transition-colors mb-2 text-secondary bg-transparent"
+          title={t('nav.sign_out')}          
         >
           <LogOut size={20} />
         </button>
