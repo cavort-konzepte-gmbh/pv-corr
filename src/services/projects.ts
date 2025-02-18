@@ -59,7 +59,7 @@ export const updateProject = async (project: Project) => {
     throw error;
   }
 
-  return {...data, typeProject: data.type_project }; 
+  return {...data, typeProject: data.type_project}; 
 };
 
 export const deleteProject = async (projectId: string) => {
