@@ -163,7 +163,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             <div className="text-2xl font-mono mb-6" style={{ color: currentTheme.colors.text.primary }}>
               {selectedProject.name}
               {selectedProject.typeProject && (
-                <span className="ml-2 text-lg font-normal" style={{ color: currentTheme.colors.text.secondary }}>
+                <span className="ml-2 text-lg font-normal" style={{ color: currentTheme.colors.text.primary }}>
                   ({selectedProject.typeProject})
                 </span>
               )}

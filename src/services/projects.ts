@@ -58,7 +58,6 @@ export const updateProject = async (project: Project) => {
     console.error('Error updating project:', error);
     throw error;
   }
-
   return {...data, typeProject: data.type_project}; 
 };
 
