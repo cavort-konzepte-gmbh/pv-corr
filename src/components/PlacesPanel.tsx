@@ -171,11 +171,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
     <div className="p-6">
       <button
         onClick={() => setShowNewPlaceForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         {translation("place.new")}
@@ -187,45 +183,26 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
           placeholder={translation("place.search")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-3 rounded text-sm"
-          style={{
-            backgroundColor: currentTheme.colors.surface,
-            borderColor: currentTheme.colors.border,
-            color: currentTheme.colors.text.primary,
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="w-full p-3 rounded text-sm text-primary border-theme border-solid bg-surface"          
         />
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           {translation("place.loading")}
         </div>
       ) : (
         <>
           {showNewPlaceForm ? (
             <div>
-              <h3 
-                className="text-lg mb-6 flex items-center gap-2"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
-                <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
+              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+                <MapPin className="text-accent-primary" size={16} />
                 {editingPlace ? translation("place.edit") : 
                   selectedCountry ? `${translation("place.new_place")} ${selectedCountry.name}` : translation("place.select_country")}
               </h3>
@@ -236,15 +213,10 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                     <button
                       key={country.id}
                       onClick={() => handleCountrySelect(country)}
-                      className="p-4 rounded-lg border transition-all hover:translate-y-[-2px]"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary
-                      }}
+                      className="p-4 rounded-lg border transition-all hover:translate-y-[-2px] text-primary border-theme border-solid bg-surface"                      
                     >
                       <div className="flex items-center gap-2">
-                        <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                        <MapPin className="text-accent-primary" size={16} />
                         <span>{country.name}</span>
                       </div>
                     </button>
@@ -255,10 +227,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     {selectedCountry.fields.map(field => (
                       <div key={field.id}>
-                        <label 
-                          className="block text-sm mb-1"
-                          style={{ color: currentTheme.colors.text.secondary }}
-                        >
+                        <label className="block text-sm mb-1 text-secondary">
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
@@ -268,14 +237,8 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                           onChange={(e) => handleInputChange(field.id, e.target.value)}
                           required={field.required}
                           placeholder={field.placeholder}
-                          className="w-full p-2 rounded text-sm"
-                          autoFocus={field.id === 'name'}
-                          style={{
-                            backgroundColor: currentTheme.colors.surface,
-                            borderColor: currentTheme.colors.border,
-                            color: currentTheme.colors.text.primary,
-                            border: `1px solid ${currentTheme.colors.border}`
-                          }}
+                          className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          autoFocus={field.id === 'name'}                          
                         />
                       </div>
                     ))}
@@ -289,22 +252,13 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                         setEditingPlace(null);
                         setFormValues({});
                       }}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: currentTheme.colors.text.secondary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"                      
                     >
                       {translation("actions.cancel")}
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
+                      className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                      
                     >
                       {editingPlace ? translation("general.save_changes") : translation("place.add")}
                     </button>
@@ -321,26 +275,17 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                 return (
                   <div
                     key={place.id}
-                    className="p-4 rounded-lg border transition-all hover:translate-x-1"
-                    onClick={() => handleEditPlace(place)}
-                    style={{
-                      backgroundColor: currentTheme.colors.surface,
-                      borderColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text.primary,
-                      cursor: 'pointer'
-                    }}
+                    className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme border-solid bg-surface hover:cursor-pointer"
+                    onClick={() => handleEditPlace(place)}                    
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                        <MapPin className="text-accent-primary" size={16} />
                         <span className="font-medium">{place?.name || 'Unnamed Place'}</span>
                       </div>
-                      <ChevronRight size={16} style={{ color: currentTheme.colors.text.secondary }} />
+                      <ChevronRight className="text-secondary" size={16} />
                     </div>
-                    <div 
-                      className="text-sm"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <div className="text-sm text-secondary">
                       {[
                         place.street_name,
                         place.house_number || place.street_number,

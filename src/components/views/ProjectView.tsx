@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Project } from '../../types/projects';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { Plus, MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
+import { MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
 import { SavedPlace } from '../PlacesPanel';
 import { Company } from '../../types/companies';
 import { createField } from '../../services/fields';
@@ -90,7 +90,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   if (!project) {
     return (
       <div className="p-6">
-        <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+        <div className="text-sm text-secondary">
           {t('project.not_found')}
         </div>
       </div>
@@ -99,19 +99,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
   return (
     <div className="p-6">
-      <div
-        className="p-6 rounded-lg mb-8 relative overflow-hidden"
-        style={{ 
-          backgroundColor: currentTheme.colors.surface, 
-          border: `1px solid ${currentTheme.colors.border}`
-        }}
-      >
+      <div className="p-6 rounded-lg mb-8 relative overflow-hidden border-theme border-solid bg-surface">
         <div className="flex justify-between">
           <div className="flex-1">
-            <div className="text-2xl font-mono mb-6" style={{ color: currentTheme.colors.text.primary }}>
+            <div className="text-2xl font-mono mb-6 text-primary">
               {project.name}
               {showHiddenIds && (
-                <span className="text-xs opacity-50 ml-2" style={{ color: currentTheme.colors.text.secondary }}>
+                <span className="text-xs opacity-50 ml-2 text-secondary">
                   {project.hiddenId}
                 </span>
               )}
@@ -119,17 +113,14 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             <div className="flex flex-col gap-4">
           {project.clientRef && (
             <div className="flex items-start gap-2">
-              <div 
-                className="w-4 h-4 flex items-center justify-center rounded"
-                style={{ backgroundColor: currentTheme.colors.accent.primary }}
-              >
+              <div className="w-4 h-4 flex items-center justify-center rounded bg-accent-primary">
                 <span className="text-xs text-white font-mono">#</span>
               </div>
               <div>
-                <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                <div className="font-medium text-primary">
                   {project.clientRef}
                 </div>
-                <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                <div className="text-sm text-secondary">
                   Project Reference
                 </div>
               </div>
@@ -138,12 +129,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
             {projectCompany && (
               <div className="flex items-start gap-2">
-                <Building2 size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                <Building2 className="text-accent-primary" size={16}  />
                 <div>
-                  <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                  <div className="font-medium text-primary">
                     {projectCompany.name}
                   </div>
-                  <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                  <div className="text-sm text-secondary">
                     Construction Company
                     {projectCompany.vatId && ` • VAT ID: ${projectCompany.vatId}`}
                   </div>
@@ -153,21 +144,21 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
             {projectManager && (
               <div className="flex items-start gap-2">
-                <User size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                <User className="text-accent-primary" size={16} />
                 <div>
-                  <div className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
+                  <div className="font-medium text-primary">
                     {projectManager?.title ? `${projectManager?.title} ` : ''}
                     {projectManager?.firstName} {projectManager?.lastName}
                   </div>
-                  <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                  <div className="text-sm text-secondary">
                     Project Manager
                   </div>
                   <div className="flex flex-col gap-1 mt-1">
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail size={14} style={{ color: currentTheme.colors.accent.primary }} />
+                      <Mail className="text-accent-primary" size={14} />
                       <a 
                         href={`mailto:${projectManager.email}`}
-                        style={{ color: currentTheme.colors.accent.primary }}
+                        className="text-accent-primary"
                       >
                         {projectManager.email}
                       </a>
@@ -177,7 +168,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                         <Phone size={14} />
                         <a 
                           href={`tel:${projectManager.phone}`}
-                          style={{ color: currentTheme.colors.accent.primary }}
+                          className="text-accent-primary"
                         >
                           {projectManager.phone}
                         </a>
@@ -190,18 +181,17 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
             {(project.latitude && project.longitude) && (
               <div className="flex items-start gap-2">
-                <MapPin size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                <MapPin className="text-accent-primary" size={16} />
                 <div>
                   <button
                     onClick={() => openInMaps(project.latitude!, project.longitude!)}
-                    className="text-sm hover:underline"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="text-sm hover:underline text-accent-primary"
                   >
                     {project.latitude}, {project.longitude}
                   </button>
                   {project.fields.some(field => (field.gates || []).length > 0) && (
                     <div className="mt-2">
-                      <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+                      <div className="text-sm text-secondary">
                         Project Gates:
                       </div>
                       <div className="flex flex-col gap-1 mt-1">
@@ -210,8 +200,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                             <button
                               key={`${field.id}-${gate.id}`}
                               onClick={() => openInMaps(gate.latitude, gate.longitude)}
-                              className="flex items-center gap-2 text-sm hover:underline ml-4"
-                              style={{ color: currentTheme.colors.accent.primary }}
+                              className="flex items-center gap-2 text-sm hover:underline ml-4 text-accent-primary"
                             >
                               <DoorOpen size={14} />
                               {field.name} • {gate.name} ({gate.latitude}, {gate.longitude})
@@ -232,14 +221,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 <img 
                   src={project.imageUrl} 
                   alt={project.name}
-                  className="rounded-lg shadow-lg object-cover cursor-pointer"
-                  style={{ width: '300px', height: '200px' }}
+                  className="w-[300px] h-[200px] rounded-lg shadow-lg object-cover cursor-pointer"
                   onClick={() => setShowFullscreenImage(true)}
                 />
                 <button
-                  className="absolute top-2 right-2 p-1 rounded bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 p-1 rounded bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity text-white"
                   onClick={() => setShowFullscreenImage(true)}
-                  style={{ color: 'white' }}
                 >
                   <Maximize2 size={16} />
                 </button>
@@ -260,9 +247,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             className="max-w-[90vw] max-h-[90vh] object-contain"
           />
           <button
-            className="absolute top-4 right-4 p-2 rounded hover:bg-white hover:bg-opacity-10"
+            className="absolute top-4 right-4 p-2 rounded hover:bg-white hover:bg-opacity-10 text-white"
             onClick={() => setShowFullscreenImage(false)}
-            style={{ color: 'white' }}
           >
             <X size={24} />
           </button>
@@ -272,18 +258,18 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       <div className="grid grid-cols-2 gap-4 mb-8">
         <div className="bg-opacity-10 bg-white rounded p-4">
           <div className="flex items-baseline gap-2">
-            <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
+            <div className="text-2xl font-mono text-primary">
               {project.fields.length}
             </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>{t('project.fields')}</div>
+            <div className="text-sm text-secondary">{t('project.fields')}</div>
           </div>
         </div>
         <div className="bg-opacity-10 bg-white rounded p-4">
           <div className="flex items-baseline gap-2">
-            <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
+            <div className="text-2xl font-mono text-primary">
               {project.fields.reduce((acc, field) => acc + field.zones.length, 0)}
             </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>{t('project.zones')}</div>
+            <div className="text-sm text-secondary">{t('project.zones')}</div>
           </div>
         </div>
       </div>
@@ -292,40 +278,27 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         {project.fields.map(field => (
           <div
             key={field.id}
-            className="p-4 rounded cursor-pointer transition-all duration-200 hover:translate-x-1"
-            style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`,
-              boxShadow: `0 2px 4px ${currentTheme.colors.border}`
-            }}
+            className="p-4 rounded cursor-pointer transition-all duration-200 hover:translate-x-1 border-theme border-solid shadow-border bg-surface"            
             onClick={() => onFieldSelect(field.id)}
           >
             <div className="flex items-center justify-between mb-2">
               <h3 
-                className="font-mono text-lg flex items-center"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
+                className="font-mono text-lg flex items-center">
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: currentTheme.colors.accent.primary }}
-                  />
+                  <div className="w-2 h-2 rounded-full bg-accent-primary"/>
                   <span>{field.name}</span>
                   {field.gates && field.gates.length > 0 && (
-                    <span className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                    <span className="text-xs text-secondary">
                       • {field.gates.length} gates
                     </span>
                   )}
                 </div>
               </h3>
-              <span 
-                className="text-sm font-mono"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
+              <span className="text-sm font-mono text-secondary">
                 {field.zones.length} {t('project.zones')}
               </span>
             </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+            <div className="text-sm text-secondary">
               {field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)} {t('project.datapoints')}
             </div>
           </div>
@@ -334,39 +307,25 @@ const ProjectView: React.FC<ProjectViewProps> = ({
           onClick={async () => {
             setShowNewFieldDialog(true);
           }}
-          className="p-4 rounded font-mono text-sm transition-all duration-200 hover:translate-y-[-1px] w-full text-left"
-          style={{
-            backgroundColor: 'transparent',
-            color: currentTheme.colors.text.primary,
-            border: `1px dashed ${currentTheme.colors.border}`
-          }}
+          className="p-4 rounded font-mono text-sm transition-all duration-200 hover:translate-y-[-1px] w-full text-left text-primary border-theme border-solid bg-transparent"          
         >
           <div className="flex items-center gap-2">
-            <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+            <Folder size={16} />
             {t('field.new')}
           </div>
         </button>
 
         {showNewFieldDialog && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div 
-              className="p-6 rounded-lg max-w-md w-full"
-              style={{ backgroundColor: currentTheme.colors.surface }}
-            >
-              <h3 
-                className="text-lg mb-4 flex items-center gap-2"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
-                <Folder size={20} style={{ color: currentTheme.colors.accent.primary }} />
+            <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+              <h3 className="text-lg mb-4 flex items-center gap-2 text-primary">
+                <Folder className="text-accent-primary" size={20} />
                 {t('field.new')}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label 
-                    className="block text-sm mb-1"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <label className="block text-sm mb-1 text-secondary">
                     {t('field.name')}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
@@ -374,12 +333,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     type="text"
                     value={newFieldName}
                     onChange={(e) => setNewFieldName(e.target.value)}
-                    className="w-full p-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.background,
-                      border: `1px solid ${currentTheme.colors.border}`,
-                      color: currentTheme.colors.text.primary
-                    }}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                    
                     autoFocus
                    onKeyDown={(e) => {
                      if (e.key === 'Enter') {
@@ -389,7 +343,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                    }}
                   />
                   {newFieldError && (
-                    <p className="text-sm mt-1" style={{ color: currentTheme.colors.accent.primary }}>
+                    <p className="text-sm mt-1 text-accent-primary">
                       {newFieldError}
                     </p>
                   )}
@@ -402,22 +356,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       setNewFieldName('');
                       setNewFieldError(null);
                     }}
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: currentTheme.colors.text.secondary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                    
                   >
                     {t('actions.cancel')}
                   </button>
                   <button
                     onClick={handleCreateField}
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                    
                   >
                     {t('actions.save')}
                   </button>

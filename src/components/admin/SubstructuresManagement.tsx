@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Link, Image } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Link } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 
 interface SubstructuresManagementProps {
@@ -246,39 +246,26 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
+          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
           <ArrowLeft size={20} />
         </button>
         <h2 
-          className="text-2xl font-bold flex items-center gap-2"
-          style={{ color: currentTheme.colors.text.primary }}
+          className="text-2xl font-bold flex items-center gap-2 text-primary"
         >
           Substructures Management
         </h2>
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-primary border-theme border-solid bg-surface">
           {error}
         </div>
       )}
 
       <button
         onClick={() => setShowNewForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary, 
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
         Add New Substructure
@@ -286,23 +273,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
 
       {showNewForm ? (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               {editingId ? 'Edit Substructure' : 'New Substructure'}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }} 
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Manufacturer
                 </label>
                 <div className="flex gap-2">
@@ -317,12 +295,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         version_id: ''
                       });
                     }}
-                    className="flex-1 p-2 rounded text-sm" 
-                    style={{
-                      backgroundColor: currentTheme.colors.background,
-                      color: currentTheme.colors.text.primary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="flex-1 p-2 rounded text-sm text-primary border-theme border-solid bg-theme" 
                   >
                     <option value="">Select manufacturer</option>
                     {manufacturers.map(mfg => (
@@ -334,11 +307,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   <button
                     type="button"
                     onClick={() => setShowNewManufacturer(true)}
-                    className="px-3 py-1 rounded text-sm"
-                    style={{ 
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-3 py-1 rounded text-sm text-white bg-accent-primary"                    
                   >
                     <Plus size={14} />
                   </button>
@@ -346,10 +315,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }} 
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   System
                 </label>
                 <div className="flex gap-2">
@@ -363,12 +329,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         version_id: ''
                       });
                     }}
-                    className="flex-1 p-2 rounded text-sm" 
-                    style={{
-                      backgroundColor: currentTheme.colors.background,
-                      color: currentTheme.colors.text.primary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="flex-1 p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                     
                   >
                     <option value="">Select system</option>
                     {systems
@@ -383,11 +344,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   <button
                     type="button"
                     onClick={() => setShowNewSystem(true)}
-                    className="px-3 py-1 rounded text-sm"
-                    style={{ 
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-3 py-1 rounded text-sm text-white bg-accent-primary"                    
                     disabled={!formValues.manufacturer_id}
                   >
                     <Plus size={14} />
@@ -396,22 +353,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }} 
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Version
                 </label>
                 <div className="flex gap-2">
                   <select
                     value={formValues.version_id || ''}
                     onChange={(e) => setFormValues({ ...formValues, version_id: e.target.value })}
-                    className="flex-1 p-2 rounded text-sm" 
-                    style={{
-                      backgroundColor: currentTheme.colors.background,
-                      color: currentTheme.colors.text.primary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="flex-1 p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                     
                   >
                     <option value="">Select version</option>
                     {versions
@@ -426,11 +375,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   <button
                     type="button"
                     onClick={() => setShowNewVersion(true)}
-                    className="px-3 py-1 rounded text-sm"
-                    style={{ 
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-3 py-1 rounded text-sm text-white bg-accent-primary"                    
                     disabled={!formValues.system_id}
                   >
                     <Plus size={14} />
@@ -439,21 +384,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }} 
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Type
                 </label>
                 <select
                   value={formValues.type || ''}
                   onChange={(e) => setFormValues({ ...formValues, type: e.target.value as 'roof' | 'field' })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{ 
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 >
                   <option value="">Select type</option>
                   <option value="roof">Roof</option>
@@ -462,22 +399,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }} 
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Link URL
                 </label>
                 <input
                   type="url"
                   value={formValues.link || ''}
                   onChange={(e) => setFormValues({ ...formValues, link: e.target.value })}
-                  className="w-full p-2 rounded text-sm" 
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                   
                   placeholder="Optional URL"
                 />
               </div>
@@ -489,20 +418,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setEditingId(null);
                     setFormValues({});
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{ 
-                    color: currentTheme.colors.text.secondary
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{ 
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {editingId ? 'Update' : 'Create'}
                 </button>
@@ -515,34 +437,20 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       {/* New Manufacturer Dialog */}
       {showNewManufacturer && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               Add New Manufacturer
             </h3>
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Name
                 </label>
                 <input
                   type="text"
                   value={newManufacturerName}
                   onChange={(e) => setNewManufacturerName(e.target.value)}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -551,22 +459,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setShowNewManufacturer(false);
                     setNewManufacturerName('');
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddManufacturer}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   Add
                 </button>
@@ -579,24 +478,16 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       {/* New System Dialog */}
       {showNewSystem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               Add New System
             </h3>
 
             {dialogError && (
               <div 
-                className="p-4 mb-4 rounded"
+                className="p-4 mb-4 rounded border-theme border-solid text-primary"
                 style={{ 
                   backgroundColor: `${currentTheme.colors.accent.primary}20`,
-                  color: currentTheme.colors.accent.primary,
-                  border: `1px solid ${currentTheme.colors.accent.primary}`
                 }}
               >
                 {dialogError}
@@ -604,22 +495,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
             )}
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Name
                 </label>
                 <input
                   type="text"
                   value={newSystemName}
                   onChange={(e) => setNewSystemName(e.target.value)}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -628,22 +511,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setShowNewSystem(false);
                     setNewSystemName('');
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddSystem}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   Add
                 </button>
@@ -656,34 +530,20 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       {/* New Version Dialog */}
       {showNewVersion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               Add New Version
             </h3>
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Name
                 </label>
                 <input
                   type="text"
                   value={newVersionName}
                   onChange={(e) => setNewVersionName(e.target.value)}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -692,22 +552,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setShowNewVersion(false);
                     setNewVersionName('');
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddVersion}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   Add
                 </button>
@@ -721,11 +572,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         {substructures.map(substructure => (
           <div
             key={substructure.id}
-            className="p-4 rounded-lg"
-            style={{
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`
-            }}
+            className="p-4 rounded-lg border-theme border-solid bg-surface"            
           >
             <div className="flex justify-between">
               <div>
@@ -734,10 +581,9 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     {manufacturers.find(m => m.id === substructure.manufacturer_id)?.name} - {systems.find(s => s.id === substructure.system_id)?.name} ({versions.find(v => v.id === substructure.version_id)?.name})
                   </span>
                   <span 
-                    className="text-xs px-2 py-1 rounded"
+                    className="text-xs px-2 py-1 rounded text-primary"
                     style={{ 
                       backgroundColor: `${currentTheme.colors.accent.primary}20`,
-                      color: currentTheme.colors.accent.primary
                     }}
                   >
                     {substructure.type}
@@ -751,16 +597,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setFormValues(substructure);
                     setShowNewForm(true);
                   }}
-                  className="p-1 rounded hover:bg-opacity-80"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <Edit2 size={14} />
                 </button>
                 <button 
                   onClick={() => handleDelete(substructure.id)}
-                  className="p-1 rounded hover:bg-opacity-80"
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   type="button"
-                  style={{ color: currentTheme.colors.text.secondary }}
                 >
                   <X size={14} />
                 </button>
