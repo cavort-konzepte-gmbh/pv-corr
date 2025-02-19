@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
-import { Folder, Plus, ChevronRight,  MapPin, Upload } from 'lucide-react';
+import { Folder, Plus, ChevronRight,  MapPin } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
 import { Company } from '../types/companies';
@@ -361,7 +361,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         </div>
                       )}
                     </div>
-
                     <ChevronRight className="text-secondary" size={16} />
                   </div>
                   <div className="text-sm text-secondary">

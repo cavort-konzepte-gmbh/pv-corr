@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
-import {  Edit2, Save, Upload } from 'lucide-react';
+import { Plus, X, Edit2, Save, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
 import { Zone } from '../types/projects';
 import MediaDialog from './MediaDialog';
@@ -102,9 +102,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                 </tr>
               </thead>
               <tbody>
-
                 {selectedZone.datapoints?.map((datapoint, index) => (
-
                   <tr key={datapoint.id}>
                     <td className="p-2 border border-theme">
                       {datapoint.sequentialId}

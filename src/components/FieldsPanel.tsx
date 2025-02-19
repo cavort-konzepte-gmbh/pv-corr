@@ -9,7 +9,7 @@ import MediaDialog from './MediaDialog';
 import { fetchProjects } from '../services/projects';
 import { Person } from '../types/people';
 import { Company } from '../types/companies';
->>>>>>> 834d9bf0b8b54c10c66b06e19a58b7be5f77ff47
+
 
 interface FieldsPanelProps {
   currentTheme: Theme;
@@ -43,7 +43,6 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
-
   const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);

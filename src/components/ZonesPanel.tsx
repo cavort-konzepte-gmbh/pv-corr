@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
 import { Project } from '../types/projects';
-import { MapPin, Upload } from 'lucide-react';
+import { MapPin,Upload } from 'lucide-react';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 import MediaDialog from './MediaDialog';
 

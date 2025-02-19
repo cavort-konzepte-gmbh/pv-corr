@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Project, Zone } from '../../types/projects';
 import { Theme } from '../../types/theme';
 import { Standard } from '../../types/standards';
-import { Edit2, Save,  Check, X, Trash2, MapPin, Plus, Upload } from 'lucide-react';
+import { Edit2, Save, Check, X, Trash2, MapPin, Plus, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../../types/language';
 import { Parameter } from '../../types/parameters';
 import { fetchParameters } from '../../services/parameters';
