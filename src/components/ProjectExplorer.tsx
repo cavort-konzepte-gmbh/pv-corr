@@ -19,6 +19,7 @@ import { SavedPlace } from './PlacesPanel';
 import { fetchPlaces } from '../services/places';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 const ProjectExplorer = () => {
   const { signOut } = useAuth();
@@ -375,6 +376,9 @@ const ProjectExplorer = () => {
     
   },[]);
 
+  useKeyAction(() => {
+    handleCreateZone();
+  }, showNewZoneDialog)
 
   const renderContent = () => {
     if (view === 'settings') {
@@ -564,12 +568,6 @@ const ProjectExplorer = () => {
                   onChange={(e) => setNewZoneData(prev => prev ? { ...prev, name: e.target.value } : null)}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                   autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCreateZone();
-                    }
-                  }}
                 />
                 {newZoneError && (
                   <p className="text-sm mt-1 text-accent-primary">

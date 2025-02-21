@@ -131,6 +131,7 @@ const DashboardLayout = () => {
             projects={projects}
             onProjectsChange={setProjects}
             selectedProjectId={selectedProjectId} 
+            selectedField={selectedFieldId}
             onSelectField={(projectId, fieldId) => {
               setView('zones');
               setSelectedProjectId(projectId);

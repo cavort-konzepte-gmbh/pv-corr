@@ -7,6 +7,9 @@ import { Person } from '../types/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
+import { useDebounce } from '../hooks/useDebounce';
+import { useKeyAction } from '../hooks/useKeyAction';
+import { fetchPeople } from '../services/people';
 
 interface ProjectsPanelProps {
   currentTheme: Theme;
@@ -33,6 +36,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [projectName, setProjectName] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [clientRef, setClientRef] = useState('');
+  
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -44,12 +48,31 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
 
+  const debouncedPeopleSearch = useDebounce((peopleSearch: string) => {
+    const searchTerm = peopleSearch.toLowerCase();
+    const filtered = availablePeople.filter(
+      (person) =>
+        `${person.firstName} ${person.lastName}`
+          .toLowerCase()
+          .includes(searchTerm) ||
+        person.email.toLowerCase().includes(searchTerm) ||
+        (person.title && person.title.toLowerCase().includes(searchTerm))
+    );
+    setFilteredPeople(filtered);
+  });
+
   useEffect(() => {
     const loadProjects = async () => {
       try {
         setLoading(true);
-        const fetchedProjects = await fetchProjects();
+        const [fetchedProjects, fetchedPeople] = await Promise.all([
+          fetchProjects(),
+          fetchPeople(),
+        ]);
+
         setProjectsList(fetchedProjects);
+        setAvailablePeople(fetchedPeople);
+        setFilteredPeople(fetchedPeople);
       } catch (err) {
         console.error('Error loading projects:', err);
         setError('Failed to load projects');
@@ -60,20 +83,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
     loadProjects();
   }, []);
-
-  useEffect(() => {
-    const searchTerm = peopleSearch.toLowerCase();
-    const filtered = availablePeople.filter(person => 
-      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
-      person.email.toLowerCase().includes(searchTerm) ||
-      (person.title && person.title.toLowerCase().includes(searchTerm))
-    );
-    setFilteredPeople(filtered);
-  }, [peopleSearch, availablePeople]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     
+  const updateSelectedProject = async () => {
     if (!projectName.trim()) {
       setError('Project name is required');
       return;
@@ -137,6 +148,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setTypeProject('field');
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedProject();
+  };
+
   const handleEdit = (project: Project) => {
     setEditingProject(project);
     setProjectName(project.name);
@@ -166,6 +182,10 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
+  useKeyAction(() => {
+    updateSelectedProject();
+  }, showNewProjectForm);
+
   return (
     <div className="p-6">
       {error && (
@@ -194,7 +214,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                 <Folder className="text-accent-primary" size={16} />
                 {editingProject ? 'Edit Project' : 'New Project'}
               </h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -248,16 +268,19 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       type="text"
                       placeholder="Search people..."
                       value={peopleSearch}
-                      onChange={(e) => setPeopleSearch(e.target.value)}
+                      onChange={(e) => {
+                        setPeopleSearch(e.target.value)
+                        debouncedPeopleSearch(e.target.value)
+                      }}
                       className="w-full p-2 rounded text-sm mb-2 text-primary border-theme border-solid bg-surface"                      
                     />
                     <select
-                      value={selectedManagerId || ''}
+                      value={selectedManagerId || ""}
                       onChange={(e) => setSelectedManagerId(e.target.value || null)}
                       className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">No manager assigned</option>
-                      {filteredPeople.map(person => (
+                      {filteredPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.title ? `${person.title} ` : ''}
                           {person.firstName} {person.lastName}
@@ -352,7 +375,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       {project.placeId && (
                         <div className="flex items-center gap-1 text-xs text-secondary">
                           {savedPlaces && <MapPin size={12} />}
-                          {savedPlaces?.find(p => p.id === project.placeId)?.name || 'Unknown location'}
+                          {savedPlaces?.find((p) => p.id === project.placeId)?.name || 'Unknown location'}
                         </div>
                       )}
                     </div>
