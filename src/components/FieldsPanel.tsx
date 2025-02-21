@@ -158,6 +158,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
           <div className="flex-1">
             <div className="text-2xl font-mono mb-6 text-primary">
               {selectedProject.name}
+              {selectedProject.typeProject && (
+                <span className="ml-2 text-lg font-normal" style={{ color: currentTheme.colors.text.primary }}>
+                  ({selectedProject.typeProject})
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-4">
               {selectedProject.clientRef && (

@@ -49,7 +49,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       try {
         setLoading(true);
         const fetchedProjects = await fetchProjects();
-        
         setProjectsList(fetchedProjects);
       } catch (err) {
         console.error('Error loading projects:', err);
@@ -90,7 +89,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
       managerId: selectedManagerId || undefined,
-      typeProject: typeProject || 'field',
+      typeProject: typeProject, 
       companyId: undefined // Add if needed
     };
 
@@ -135,6 +134,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setLongitude('');
     setImageUrl('');
     setSelectedManagerId(null);
+    setTypeProject('field');
   };
 
   const handleEdit = (project: Project) => {
@@ -366,7 +366,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         acc + field.zones.reduce((zAcc, zone) => 
                           zAcc + (zone.datapoints?.length || 0), 0
                         ), 0
-                    ) } datapoints • Project Type: {project.typeProject|| 'UNDEFINED'}
+                    ) } datapoints • Project Type: {project.typeProject}
                   </div>
                 </div>
               ))}
