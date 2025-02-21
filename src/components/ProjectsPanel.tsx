@@ -36,6 +36,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [projectName, setProjectName] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [clientRef, setClientRef] = useState('');
+  
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -82,16 +83,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
     loadProjects();
   }, []);
-
-  useEffect(() => {
-    const searchTerm = peopleSearch.toLowerCase();
-    const filtered = availablePeople.filter(person => 
-      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
-      person.email.toLowerCase().includes(searchTerm) ||
-      (person.title && person.title.toLowerCase().includes(searchTerm))
-    );
-    setFilteredPeople(filtered);
-  }, [peopleSearch, availablePeople]);
     
   const updateSelectedProject = async () => {
     if (!projectName.trim()) {
@@ -277,7 +268,10 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       type="text"
                       placeholder="Search people..."
                       value={peopleSearch}
-                      onChange={(e) => setPeopleSearch(e.target.value)}
+                      onChange={(e) => {
+                        setPeopleSearch(e.target.value)
+                        debouncedPeopleSearch(e.target.value)
+                      }}
                       className="w-full p-2 rounded text-sm mb-2 text-primary border-theme border-solid bg-surface"                      
                     />
                     <select

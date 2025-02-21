@@ -159,7 +159,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             <div className="text-2xl font-mono mb-6 text-primary">
               {selectedProject.name}
               {selectedProject.typeProject && (
-                <span className="ml-2 text-lg font-normal" style={{ color: currentTheme.colors.text.primary }}>
+                <span className="ml-2 text-lg font-normal text-primary">
                   ({selectedProject.typeProject})
                 </span>
               )}
@@ -365,7 +365,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             </h3>
             <form onSubmit={(e) => handleGateSubmit(selectedField.id, e)} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary text-secondary">
+                <label className="block text-sm mb-1 text-secondary">
                   Gate Name
                 </label>
                 <input
@@ -373,13 +373,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.name}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, name: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div>
@@ -391,13 +385,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.latitude}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, latitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div>
@@ -409,13 +397,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.longitude}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, longitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -426,22 +408,13 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     setGateFormValues({ name: '', latitude: '', longitude: '' });
                     setEditingGate(null);
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {editingGate ? 'Save Changes' : 'Add Gate'}
                 </button>
@@ -454,11 +427,8 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       {/* Coordinates Form */}
       {showCoordinatesForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 text-primary">
               {coordinates.latitude && coordinates.longitude ? 'Edit Coordinates' : 'Add Coordinates'}
             </h3>
             <form onSubmit={(e) => handleCoordinatesSubmit(selectedField.id, e)} className="space-y-4">
