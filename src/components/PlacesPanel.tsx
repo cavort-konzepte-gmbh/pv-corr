@@ -62,7 +62,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
       ].some(value => value && value.toLowerCase().includes(search.toLowerCase()))
     );
     setFilteredPlaces(filtered);
-  }, 500)
+  })
 
   useEffect(() => {
     loadPlaces();
