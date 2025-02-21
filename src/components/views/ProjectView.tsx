@@ -8,6 +8,7 @@ import { Company } from '../../types/companies';
 import { createField } from '../../services/fields';
 import { fetchProjects } from '../../services/projects';
 import { Person } from '../../types/people';
+import { useKeyAction } from '../../hooks/useKeyAction';
 
 interface ProjectViewProps {
   project: Project;
@@ -54,7 +55,6 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       setNewFieldError('Field name is required');
       return;
     }
-
     try {
       setIsSaving(true);
       const newField = await createField(project.id, {
@@ -86,6 +86,10 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       setIsSaving(false);
     }
   };
+  
+  useKeyAction(() => {
+    handleCreateField();
+  }, showNewFieldDialog)
 
   if (!project) {
     return (
@@ -335,12 +339,6 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     onChange={(e) => setNewFieldName(e.target.value)}
                     className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                    
                     autoFocus
-                   onKeyDown={(e) => {
-                     if (e.key === 'Enter') {
-                       e.preventDefault();
-                       handleCreateField();
-                     }
-                   }}
                   />
                   {newFieldError && (
                     <p className="text-sm mt-1 text-accent-primary">
