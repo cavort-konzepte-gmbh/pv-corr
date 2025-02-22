@@ -4,7 +4,7 @@ import { Plus, X, Edit2, Save, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
 import { Zone } from '../types/projects';
 import MediaDialog from './MediaDialog';
-import { useSupabaseMedia, fetchMedia, fetchMediaUrlsByEntityId } from '../services/media';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;

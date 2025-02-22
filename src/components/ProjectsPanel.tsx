@@ -7,8 +7,6 @@ import { Person } from '../types/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
-import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
-import MediaDialog from './MediaDialog';
 
 interface ProjectsPanelProps {
   currentTheme: Theme;

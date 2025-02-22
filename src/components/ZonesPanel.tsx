@@ -26,7 +26,7 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
   onSelectZone
 }) => {
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
-  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("fields-panels");
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -91,8 +91,7 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
       <div className="flex items-center gap-4 mt-4">
         <button
   onClick={() => handleShowMediaDialog(0, selectedField.id)}
-  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1"
-  style={{ color: currentTheme.colors.text.primary }}
+  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1 text-accent-primary"
 >
   view media <Upload size={14} />
 </button>

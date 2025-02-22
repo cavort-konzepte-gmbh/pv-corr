@@ -43,7 +43,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("projects-fields");
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -276,7 +276,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
         <div className="flex items-center gap-4 mt-4">
         <button
   onClick={() => handleShowMediaDialog(0, selectedProject.id)}
-  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1"
+  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1 text-primary"
   style={{ color: currentTheme.colors.text.primary }}
 >
   view media <Upload size={14} />

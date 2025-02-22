@@ -11,7 +11,7 @@ import { fetchStandards } from '../../services/standards';
 import { updateZone, deleteZone } from '../../services/zones';
 import { fetchProjects } from '../../services/projects';
 import { createDatapoint, deleteDatapoint, updateDatapoint } from '../../services/datapoints';
-import { useSupabaseMedia, fetchMedia, fetchMediaUrlsByEntityId } from '../../services/media';
+import { useSupabaseMedia,  fetchMediaUrlsByEntityId } from '../../services/media';
 
 const openInMaps = (latitude: string, longitude: string) => {
 };
@@ -68,7 +68,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [showDeleteDatapointConfirm, setShowDeleteDatapointConfirm] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const {  uploadMedia} = useSupabaseMedia("zone-data-points");
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -258,7 +258,6 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       setPreview(URL.createObjectURL(file));
       await uploadMedia(file, datapointId);
       const mediatwo=  await fetchMediaUrlsByEntityId(datapointId);
-      const media = await fetchMedia("");
       setMediaUrls(mediatwo);
     }
   };
