@@ -12,6 +12,8 @@ import { updateZone, deleteZone } from '../../services/zones';
 import { fetchProjects } from '../../services/projects';
 import { createDatapoint, deleteDatapoint, updateDatapoint } from '../../services/datapoints';
 import { useSupabaseMedia,  fetchMediaUrlsByEntityId } from '../../services/media';
+import { useKeyAction } from '../../hooks/useKeyAction';
+
 
 const openInMaps = (latitude: string, longitude: string) => {
 };
@@ -317,11 +319,39 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     return sorted;
   }, [existingDatapoints, sortColumn, sortDirection]);
 
+
   const handleShowMediaDialog = async (index: number , datapoint: string) => {
     setShowMediaDialog(index);
     const mediatwo= await fetchMediaUrlsByEntityId(datapoint);
     setMediaUrls(mediatwo);
   };
+
+  const addCoordinates = async () => {
+    try {
+      await updateZone(zone.id, {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+      });
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
+      }
+      setShowCoordinatesForm(false);
+    } catch (err) {
+      console.error('Error updating coordinates:', err);
+      setError('Failed to update coordinates');
+    }
+  }
+
+  const handleCoordinates = async (e: React.FormEvent) => {
+    e.preventDefault();
+    addCoordinates();
+  }
+
+  useKeyAction(() => {
+    addCoordinates();
+  }, showCoordinatesForm);
+
 
   return (
     
@@ -405,23 +435,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
             <h3 className="text-lg mb-4 text-primary">
               {zone.latitude && zone.longitude ? 'Edit Coordinates' : 'Add Coordinates'}
             </h3>
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              try {
-                await updateZone(zone.id, {
-                  latitude: coordinates.latitude,
-                  longitude: coordinates.longitude
-                });
-                const updatedProjects = await fetchProjects();
-                if (updatedProjects) {
-                  onProjectsChange(updatedProjects);
-                }
-                setShowCoordinatesForm(false);
-              } catch (err) {
-                console.error('Error updating coordinates:', err);
-                setError('Failed to update coordinates');
-              }
-            }} className="space-y-4">
+            <form onSubmit={handleCoordinates} className="space-y-4">
               <div>
                 <label className="block text-sm mb-1 text-secondary">
                   Latitude

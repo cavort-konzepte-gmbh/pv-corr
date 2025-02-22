@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Project } from '../types/projects';
+import { t } from '../utils/translations';
 
 export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,19 +19,18 @@ export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => 
     place_id: project.placeId || null,
     manager_id: project.managerId || null,
     company_id: project.companyId || null,
-    project_type: project.typeProject,
+    type_project: project.typeProject,
   };
   // Use RPC call to handle project creation and user association atomically
   const { data, error } = await supabase.rpc('create_project_with_owner', {
     project_data: projectData
   });
-
   if (error) {
     console.error('Error creating project:', error);
     throw error;
   }
 
-  return data;
+  return {...data, typeProject: data.type_project };
 };
 
 export const updateProject = async (project: Project) => {
@@ -58,8 +58,7 @@ export const updateProject = async (project: Project) => {
     console.error('Error updating project:', error);
     throw error;
   }
-
-  return data;
+  return {...data, typeProject: data.type_project}; 
 };
 
 export const deleteProject = async (projectId: string) => {

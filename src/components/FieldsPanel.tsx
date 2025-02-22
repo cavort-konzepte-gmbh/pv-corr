@@ -9,6 +9,7 @@ import MediaDialog from './MediaDialog';
 import { fetchProjects } from '../services/projects';
 import { Person } from '../types/people';
 import { Company } from '../types/companies';
+import { useKeyAction } from '../hooks/useKeyAction';
 
 
 interface FieldsPanelProps {
@@ -17,6 +18,7 @@ interface FieldsPanelProps {
   projects: Project[];
   onProjectsChange: (projects: Project[]) => void;
   selectedProjectId?: string;
+  selectedField: string | undefined;
   onSelectField: (projectId: string, fieldId: string) => void;
   people: Person[],
   companies: Company[]
@@ -28,6 +30,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   people,
   companies,
   selectedProjectId,
+  selectedField,
   onSelectField,
   onProjectsChange
 }) => {
@@ -68,9 +71,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const manager = people.find(person => person.id === selectedProject.managerId);
   const company = companies.find(company => company.id === selectedProject.companyId);
 
-  const handleGateSubmit = async (fieldId: string, e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleUpdateGate = async (fieldId: string) => {
     if (!gateFormValues.name || !gateFormValues.latitude || !gateFormValues.longitude) {
       setError('All gate fields are required');
       return;
@@ -96,6 +97,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       console.error('Error saving gate:', err);
       setError('Failed to save gate');
     }
+  }
+
+  const handleGateSubmit = async (fieldId: string, e: React.FormEvent) => {
+    e.preventDefault();
+    handleUpdateGate(fieldId);
   };
 
   const handleDeleteGate = async (gateId: string) => {
@@ -113,9 +119,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
     }
   };
 
-  const handleCoordinatesSubmit = async (fieldId: string, e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleUpdateCoordinates = async (fieldId: string) => {
     try {
       await updateField(fieldId, coordinates);
       
@@ -131,6 +135,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       console.error('Error updating coordinates:', err);
       setError('Failed to update coordinates');
     }
+  }
+
+  const handleCoordinatesSubmit = async (fieldId: string, e: React.FormEvent) => {
+    e.preventDefault();
+    handleUpdateCoordinates(fieldId);
   };
 
   const handleDeleteField = async (fieldId: string) => {
@@ -166,6 +175,16 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       setMediaUrls(mediatwo);
     }
   };
+
+  useKeyAction(() => {
+    handleUpdateGate(selectedField as string);
+  }, showGatesPanel)
+
+  useKeyAction(() => {
+    handleUpdateCoordinates(selectedField as string);
+  }, showCoordinatesForm)
+
+
   return (
     <div className="p-6">
       {error && (
@@ -180,6 +199,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
           <div className="flex-1">
             <div className="text-2xl font-mono mb-6 text-primary">
               {selectedProject.name}
+              {selectedProject.typeProject && (
+                <span className="ml-2 text-lg font-normal text-primary">
+                  ({selectedProject.typeProject})
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-4">
               {selectedProject.clientRef && (
@@ -391,9 +415,9 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
             <h3 className="text-lg mb-4 text-primary">
               {editingGate ? 'Edit Gate' : 'Add New Gate'}
             </h3>
-            <form onSubmit={(e) => handleGateSubmit(selectedField.id, e)} className="space-y-4">
+            <form onSubmit={(e) => handleGateSubmit(selectedField as string, e)} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary text-secondary">
+                <label className="block text-sm mb-1 text-secondary">
                   Gate Name
                 </label>
                 <input
@@ -401,13 +425,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.name}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, name: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div>
@@ -419,13 +437,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.latitude}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, latitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div>
@@ -437,13 +449,7 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                   value={gateFormValues.longitude}
                   onChange={(e) => setGateFormValues(prev => ({ ...prev, longitude: e.target.value }))}
                   required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -454,22 +460,13 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                     setGateFormValues({ name: '', latitude: '', longitude: '' });
                     setEditingGate(null);
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {editingGate ? 'Save Changes' : 'Add Gate'}
                 </button>
@@ -482,14 +479,11 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       {/* Coordinates Form */}
       {showCoordinatesForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-4 text-primary">
               {coordinates.latitude && coordinates.longitude ? 'Edit Coordinates' : 'Add Coordinates'}
             </h3>
-            <form onSubmit={(e) => handleCoordinatesSubmit(selectedField.id, e)} className="space-y-4">
+            <form onSubmit={(e) => handleCoordinatesSubmit(selectedField as string, e)} className="space-y-4">
               <div>
                 <label className="block text-sm mb-1 text-secondary">
                   Latitude
