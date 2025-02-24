@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
-import { Edit2, Save } from 'lucide-react';
+import { Plus, X, Edit2, Save, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
 import { Zone } from '../types/projects';
+import MediaDialog from './MediaDialog';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;
@@ -22,10 +24,30 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
 
   useEffect(() => {
     setLoading(false);
   }, []);
+
+  const handleShowMediaDialog = async (index: number, projectId: string) => {
+    setShowMediaDialog(index);
+    const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+    setMediaUrls(mediatwo);
+  };
+
+  const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, projectId: string) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      await uploadMedia(file, projectId);
+      const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+      setMediaUrls(mediatwo);
+    }
+  };
 
   if (!selectedZone) {
     return (
@@ -81,7 +103,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {selectedZone.datapoints?.map((datapoint) => (
+                {selectedZone.datapoints?.map((datapoint, index) => (
                   <tr key={datapoint.id}>
                     <td className="p-2 border border-theme">
                       {datapoint.sequentialId}
@@ -127,6 +149,13 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                             <Edit2 size={14} />
                           )}
                         </button>
+                        <button
+                          onClick={() => handleShowMediaDialog(index, datapoint.id)}
+                          className="p-1 rounded hover:bg-opacity-80"
+                          style={{ color: currentTheme.colors.text.secondary }}
+                        >
+                          <Upload size={14} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -136,6 +165,18 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
           </div>
         </div>
       )}
+
+      <MediaDialog
+        isOpen={showMediaDialog !== null}
+        onClose={() => setShowMediaDialog(null)}
+        onFileChange={(e) => {
+          if (showMediaDialog !== null) {
+            handleFileChangeInDialog(e, selectedZone.datapoints[showMediaDialog].id);
+          }
+        }}
+        mediaUrls={mediaUrls}
+        currentTheme={currentTheme}
+      />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Project, Zone } from '../../types/projects';
 import { Theme } from '../../types/theme';
 import { Standard } from '../../types/standards';
-import { Edit2, Save, Check, X, Trash2, MapPin, Plus } from 'lucide-react';
+import { Edit2, Save, Check, X, Trash2, MapPin, Plus, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../../types/language';
 import { Parameter } from '../../types/parameters';
 import { fetchParameters } from '../../services/parameters';
@@ -11,10 +11,11 @@ import { fetchStandards } from '../../services/standards';
 import { updateZone, deleteZone } from '../../services/zones';
 import { fetchProjects } from '../../services/projects';
 import { createDatapoint, deleteDatapoint, updateDatapoint } from '../../services/datapoints';
+import { useSupabaseMedia,  fetchMediaUrlsByEntityId } from '../../services/media';
 import { useKeyAction } from '../../hooks/useKeyAction';
 
+
 const openInMaps = (latitude: string, longitude: string) => {
-  window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
 };
 
 interface ZoneViewProps {
@@ -69,6 +70,10 @@ const ZoneView: React.FC<ZoneViewProps> = ({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [showDeleteDatapointConfirm, setShowDeleteDatapointConfirm] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const {  uploadMedia} = useSupabaseMedia("zone-data-points");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
 
   const handleNameSave = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -111,6 +116,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       setIsSaving(false);
     }
   };
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -177,6 +183,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
       setError('Please enter at least one value');
       return;
     }
+    
 
     // Get the custom sequential ID if it was set
     const sequentialId = datapoint.sequentialId || `DP${String(existingDatapoints.length + index + 1).padStart(3, '0')}`;
@@ -245,6 +252,18 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     }
   };
 
+
+
+  const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, datapointId: string) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      await uploadMedia(file, datapointId);
+      const mediatwo=  await fetchMediaUrlsByEntityId(datapointId);
+      setMediaUrls(mediatwo);
+    }
+  };
+
   const handleEditDatapoint = (datapoint: any) => {
     setEditingDatapoint(datapoint.id);
     setEditingValues(datapoint.values);
@@ -300,6 +319,13 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     return sorted;
   }, [existingDatapoints, sortColumn, sortDirection]);
 
+
+  const handleShowMediaDialog = async (index: number , datapoint: string) => {
+    setShowMediaDialog(index);
+    const mediatwo= await fetchMediaUrlsByEntityId(datapoint);
+    setMediaUrls(mediatwo);
+  };
+
   const addCoordinates = async () => {
     try {
       await updateZone(zone.id, {
@@ -326,7 +352,9 @@ const ZoneView: React.FC<ZoneViewProps> = ({
     addCoordinates();
   }, showCoordinatesForm);
 
+
   return (
+    
     <div className="p-6">
       {error && (
         <div className="p-4 mb-4 rounded text-accent-primary border-theme border-solid bg-surface">
@@ -398,6 +426,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
             </button>
           )}
         </div>
+        
       </div>
 
       {showCoordinatesForm && (
@@ -582,7 +611,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                   <th
                     className="w-44 p-2 text-left border font-normal border-theme"                    
                     onClick={() => handleSort('timestamp')}
-                  >
+                  > 
                     <div className="flex items-center gap-2 cursor-pointer">
                       <span>Timestamp</span>
                       {sortColumn === 'timestamp' && (
@@ -594,6 +623,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                   </th>
                 </tr>
               </thead>
+            
               <tbody>
                 {sortedDatapoints.map((dp) => (
                   <tr key={dp.id}>
@@ -678,6 +708,15 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         {new Date(dp.timestamp).toLocaleString()}
                       </span>
                     </td>
+                    <td 
+                      className="p-2 border"
+                      style={{ borderColor: currentTheme.colors.border }}
+                    >
+                      <label className="cursor-pointer">
+                        <Upload size={16} onClick={() => handleShowMediaDialog(index , dp.id)} />
+                      </label>
+
+                    </td>
                   </tr>
                 ))}
                 {/* Display new datapoint inputs */}
@@ -728,6 +767,7 @@ const ZoneView: React.FC<ZoneViewProps> = ({
                         />
                       </td>
                     ))}
+    
                   </tr>
                 ))}
               </tbody>
@@ -762,6 +802,54 @@ const ZoneView: React.FC<ZoneViewProps> = ({
               >
                 Delete Datapoint
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Dialog */}
+      {showMediaDialog !== null && ( 
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div 
+            className="p-6 rounded-lg max-w-3xl w-full"
+            style={{ backgroundColor: currentTheme.colors.surface }}
+          >
+            <h3 
+              className="text-lg mb-4 flex items-center gap-2"
+              style={{ color: currentTheme.colors.text.primary }}
+            >
+              Media
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                {mediaUrls.slice(0,mediaUrls.length).map((url, index) => (
+                  <img key={index} src={url} alt={`Media ${index}`} className="w-full h-32 object-cover" />
+                ))}
+              
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <label className="cursor-pointer px-4 py-2 rounded text-sm" style={{ backgroundColor: currentTheme.colors.accent.primary, color: 'white' }}>
+                  <Upload size={16} /> Upload Media
+                  <input
+                    type="file"
+                    onChange={(e) => handleFileChangeInDialog(e, existingDatapoints[showMediaDialog].id)}
+                    className="hidden"
+                  />
+                </label>
+                <button
+                  onClick={() => setShowMediaDialog(null)}
+                  className="px-4 py-2 rounded text-sm"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: currentTheme.colors.text.secondary,
+                    border: `1px solid ${currentTheme.colors.border}`
+                  }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

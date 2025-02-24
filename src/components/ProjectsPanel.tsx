@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
-import { Folder, Plus, ChevronRight, MapPin } from 'lucide-react';
+import { Folder, Plus, ChevronRight,  MapPin } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
 import { Company } from '../types/companies';
@@ -48,6 +48,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
   const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
 
+
   const debouncedPeopleSearch = useDebounce((peopleSearch: string) => {
     const searchTerm = peopleSearch.toLowerCase();
     const filtered = availablePeople.filter(
@@ -60,6 +61,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     );
     setFilteredPeople(filtered);
   });
+
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -182,9 +184,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
+
   useKeyAction(() => {
     updateSelectedProject();
   }, showNewProjectForm);
+
 
   return (
     <div className="p-6">
@@ -362,7 +366,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {projectsList.map(project => (
+              {projectsList.map((project, index) => (
                 <div
                   key={project.id}
                   className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface"
@@ -445,6 +449,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
           )}
         </>
       )}
+
     </div>
   );
 };

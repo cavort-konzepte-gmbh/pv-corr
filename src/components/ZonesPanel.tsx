@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
 import { Project } from '../types/projects';
-import { MapPin } from 'lucide-react';
+import { MapPin,Upload } from 'lucide-react';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
+import MediaDialog from './MediaDialog';
+
 
 interface ZonesPanelProps {
   currentTheme: Theme;
@@ -23,7 +26,27 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
   onSelectZone
 }) => {
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("fields-panels");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
 
+
+    const handleShowMediaDialog = async (index: number, projectId: string) => {
+      setShowMediaDialog(0);
+      const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+      setMediaUrls(mediatwo);
+    };
+  
+    const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, projectId: string) => {
+      if (event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        setPreview(URL.createObjectURL(file));
+        await uploadMedia(file, projectId);
+        const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+        setMediaUrls(mediatwo);
+      }
+    };
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
     : null;
@@ -65,7 +88,14 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
           </button>
         )}
       </div>
-
+      <div className="flex items-center gap-4 mt-4">
+        <button
+  onClick={() => handleShowMediaDialog(0, selectedField.id)}
+  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1 text-accent-primary"
+>
+  view media <Upload size={14} />
+</button>
+        </div>
       {selectedZone ? (
         <div>
           <div className="flex items-center gap-2 mb-6">
@@ -166,6 +196,17 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
           ))}
         </div>
       )}
+      <MediaDialog
+        isOpen={showMediaDialog !== null}
+        onClose={() => setShowMediaDialog(null)}
+        onFileChange={(e) => {
+          if (showMediaDialog !== null) {
+            handleFileChangeInDialog(e, selectedField.id);
+          }
+        }}
+        mediaUrls={mediaUrls}
+        currentTheme={currentTheme}
+      />
     </div>
   );
 };
