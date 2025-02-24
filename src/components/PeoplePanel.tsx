@@ -7,6 +7,7 @@ import { generateHiddenId } from '../utils/generateHiddenId';
 import { SavedPlace } from './PlacesPanel';
 import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
+import { toCase } from '../utils/cases';
 
 interface PeoplePanelProps {
   currentTheme: Theme;
@@ -135,12 +136,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
     try {
       const personData = {
-        salutation: formValues.salutation,
-        title: formValues.title || null,
-        first_name: formValues.firstName,
-        last_name: formValues.lastName,
-        email: formValues.email,
-        phone: formValues.phone || null,
+        ...toCase(formValues, "snakeCase"),
         private_address_id: selectedAddresses.private || null,
         business_address_id: selectedAddresses.business || null
       };

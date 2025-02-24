@@ -6,6 +6,7 @@ import { fetchPlaces as fetchPlacesFromDB } from '../services/places';
 import { useKeyAction } from '../hooks/useKeyAction';
 import { useDebounce } from '../hooks/useDebounce';
 import { Language, useTranslation } from '../types/language';
+import { toCase } from '../utils/cases';
 
 interface PlacesPanelProps {
   currentTheme: Theme;
@@ -126,18 +127,10 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
     try {
       const placeData = {
         country: selectedCountry?.id,
-        name: formValues.name,
         street_number: houseNumber,
-        street_name: formValues.street_name || '',
-        apartment: formValues.apartment || '',
-        city: formValues.city || '',
-        state: formValues.state || '',
+        house_number: houseNumber,
+        ...toCase(formValues, "snakeCase"),
         postal_code: formValues.postal_code || formValues.zip || '',
-        district: formValues.district || '',
-        building: formValues.building || '',
-        room: formValues.room || '',
-        province: formValues.province || '',
-        house_number: houseNumber
       };
     
       if (editingPlace) {

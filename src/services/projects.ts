@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Project } from '../types/projects';
-import { t } from '../utils/translations';
+import { toCase } from '../utils/cases';
 
 export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -9,47 +9,27 @@ export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => 
   }
 
   // Prepare project data with explicit imageUrl
-  const projectData = {
-    name: project.name,
-    hidden_id: project.hiddenId,
-    client_ref: project.clientRef,
-    latitude: project.latitude,
-    longitude: project.longitude,
-    image_url: project.imageUrl,
-    place_id: project.placeId || null,
-    manager_id: project.managerId || null,
-    company_id: project.companyId || null,
-    type_project: project.typeProject,
-  };
+  const toSnakeCase = toCase<Omit<Project, "id" | "fields">>(project, "snakeCase")
+
   // Use RPC call to handle project creation and user association atomically
   const { data, error } = await supabase.rpc('create_project_with_owner', {
-    project_data: projectData
+    project_data: toSnakeCase
   });
   if (error) {
     console.error('Error creating project:', error);
     throw error;
   }
 
-  return {...data, typeProject: data.type_project };
+  return toCase<Project>(data, "camelCase");
 };
 
 export const updateProject = async (project: Project) => {
   // Prepare update data with explicit imageUrl
-  const updateData = {
-    name: project.name,
-    client_ref: project.clientRef,
-    latitude: project.latitude,
-    longitude: project.longitude,
-    image_url: project.imageUrl,
-    place_id: project.placeId,
-    type_project: project.typeProject,
-    company_id: project.companyId || null,
-    manager_id: project.managerId || null
-  };
+  const updateDataToSnakeCase = toCase(project, "snakeCase");
 
   const { data, error } = await supabase
     .from('projects')
-    .update(updateData)
+    .update(updateDataToSnakeCase)
     .eq('id', project.id)
     .select()
     .single();
@@ -58,7 +38,7 @@ export const updateProject = async (project: Project) => {
     console.error('Error updating project:', error);
     throw error;
   }
-  return {...data, typeProject: data.type_project}; 
+  return toCase<Project>(data, "camelCase"); 
 };
 
 export const deleteProject = async (projectId: string) => {
@@ -98,7 +78,6 @@ export const fetchProjects = async (): Promise<Project[]> => {
     if (!data) {
       return [];
     }
-
     return data.map(project => ({
       id: project.id,
       hiddenId: project.hidden_id,
