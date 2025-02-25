@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { SavedPlace } from '../components/PlacesPanel';
 import { generateHiddenId } from '../utils/generateHiddenId';
+import { toCase } from '../utils/cases';
 
 export const fetchPlaces = async (): Promise<SavedPlace[]> => {
   try {
@@ -30,22 +31,16 @@ export const fetchPlaces = async (): Promise<SavedPlace[]> => {
       throw error;
     }
 
-    return data.map(place => ({
-      id: place.id,
-      country: place.country,
-      name: place.name,
-      street_number: place.street_number || '',
-      street_name: place.street_name || '',
-      apartment: place.apartment || '',
-      city: place.city || '',
-      state: place.state || '',
-      postal_code: place.postal_code || '',
-      district: place.district || '',
-      building: place.building || '',
-      room: place.room || '',
-      province: place.province || '',
-      house_number: place.house_number || ''
-    }));
+    return data.map(place => {
+      const toCamelCase = toCase<SavedPlace>(place, "camelCase")
+      return {
+        ...toCamelCase,
+        street_number: toCamelCase.street_number,
+        house_number: toCamelCase.house_number,
+        street_name: toCamelCase.street_name,
+        postal_code: toCamelCase.postal_code,
+      }
+    });
   } catch (err) {
     console.error('Error in fetchPlaces:', err);
     throw new Error('Failed to fetch places');

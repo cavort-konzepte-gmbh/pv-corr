@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Parameter } from '../types/parameters';
+import { toCase } from '../utils/cases';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
 export type { Parameter }
@@ -14,17 +15,7 @@ export const fetchParameters = async (): Promise<Parameter[]> => {
     console.error('Error fetching parameters:', error);
     throw error;
   }
-
-  return data.map(param => ({
-    id: param.id,
-    hiddenId: param.hidden_id,
-    name: param.name,
-    customName: param.custom_name,
-    shortName: param.short_name,
-    unit: param.unit,
-    rangeType: param.range_type,
-    rangeValue: param.range_value
-  }));
+  return data.map(param => toCase(param, "camelCase"))
 };
 
 export const createParameter = async (parameter: Omit<Parameter, 'id' | 'hiddenId'>) => {

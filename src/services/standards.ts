@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Standard } from '../types/standards';
+import { toCase } from '../utils/cases';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
 export const fetchStandards = async (): Promise<Standard[]> => {
@@ -23,14 +24,7 @@ export const fetchStandards = async (): Promise<Standard[]> => {
     console.error('Error fetching standards:', error);
     throw error;
   }
-
-  return data.map(standard => ({
-    id: standard.id,
-    hiddenId: standard.hidden_id,
-    name: standard.name,
-    description: standard.description,
-    parameters: standard.parameters
-  }));
+  return data.map(standard => toCase<Standard>(standard, "camelCase"))
 };
 
 export const createStandard = async (standard: Omit<Standard, 'id' | 'hiddenId'>) => {
