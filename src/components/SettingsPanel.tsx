@@ -1,5 +1,6 @@
 import React from 'react';
 import { Theme, THEMES } from '../types/theme';
+import { useAuth } from './auth/AuthProvider';
 import PlacesPanel, { SavedPlace } from './PlacesPanel';
 import PeoplePanel from './PeoplePanel';
 import CompaniesPanel from './CompaniesPanel';
@@ -14,7 +15,6 @@ import { useTranslation } from '../types/language';
 import { Standard } from '../types/standards';
 import { updateUserSettings } from '../services/userSettings';
 import { Company } from '../types/companies';
-import { ThemeId } from '../types/theme';
 
 interface SettingsPanelProps {
   view: 'general' | 'theme' | 'places' | 'people' | 'companies' | 'projects' | 'sample' | 'datapoints';
@@ -90,7 +90,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   };
 
   const handleThemeChange = async (theme: Theme) => {
-    const success = await updateUserSettings({ theme_id: theme.id as ThemeId });
+    const success = await updateUserSettings({ theme_id: theme.id as any });
     if (success) {
       onThemeChange(theme);
     }
@@ -131,12 +131,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const menuItems = [
     { id: 'general', label: t('settings.general'), icon: 'Settings' },
     { id: 'theme', label: t('settings.theme'), icon: 'Palette' },
-    { id: 'datapoints', label: t('settings.datapoints'), icon: 'Database' },
     { id: 'places', label: t('settings.sample_data.places'), icon: 'MapPin' },
     { id: 'companies', label: t('settings.companies'), icon: 'Building2' },
     { id: 'people', label: t('settings.sample_data.people'), icon: 'Users' },
     { id: 'projects', label: t('nav.projects'), icon: 'FolderOpen' }
   ];
+
+  // Only show datapoints settings in admin interface
+  const { loginType } = useAuth();
+  if (loginType === 'admin') {
+    menuItems.splice(2, 0, { id: 'datapoints', label: t('settings.datapoints'), icon: 'Database' });
+  }
 
   const handleSampleDataToggle = async (type: 'all' | 'places' | 'people' | 'projects' | 'companies') => {
     const newValue = !sampleData[type];
@@ -244,20 +249,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
   return (
     <div className="flex h-screen">
-      <div 
-        className="w-64 border-r h-screen overflow-auto"
-        style={{ 
-          backgroundColor: currentTheme.colors.surface,
-          borderColor: currentTheme.colors.border 
-        }}
-      >
+      <div className="w-64 border-r h-screen overflow-auto border-theme bg-surface">
         <div>
           {menuItems.map(item => (
             <div
               key={item.id}
-              className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group"
+              className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
               style={{
-                color: currentTheme.colors.text.primary,
                 backgroundColor: view === item.id ? currentTheme.colors.background : 'transparent'
               }}
               onClick={() => onViewChange(item.id as any)}
@@ -269,28 +267,22 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
           ))}
         </div>
       </div>
-      <div className="flex-1 p-6 overflow-auto" style={{ backgroundColor: currentTheme.colors.background }}>
+      <div className="flex-1 p-6 overflow-auto bg-theme">
         {view === 'general' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded"
-              style={{ backgroundColor: currentTheme.colors.border }}>
+            <div className="flex items-center justify-between p-3 rounded bg-border">
               <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
+                <span className="text-primary">
                   {t('settings.language')} (Language)
                 </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                <div className="text-xs text-secondary">
                   {t('settings.language.description')}
                 </div>
               </div>
               <select
                 value={currentLanguage}
                 onChange={(e) => handleLanguageChange(e.target.value as Language)}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
               >
                 {LANGUAGES.map(lang => (
                   <option key={lang.id} value={lang.id}>
@@ -300,38 +292,31 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </select>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded"
-              style={{ backgroundColor: currentTheme.colors.border }}>
+            <div className="flex items-center justify-between p-3 rounded bg-border">
               <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
+                <span className="text-primary">
                   {t('settings.decimal_separator')}
                 </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                <div className="text-xs text-secondary">
                   {t('settings.decimal_separator.description')}
                 </div>
               </div>
               <select
                 value={decimalSeparator}
                 onChange={(e) => handleDecimalSeparatorChange(e.target.value as ',' | '.')}
-                className="px-3 py-1 rounded text-sm"
-                style={{ 
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
               >
                 <option value=",">{t('settings.decimal_separator.comma')}</option>
                 <option value=".">{t('settings.decimal_separator.point')}</option>
               </select>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded"
-              style={{ backgroundColor: currentTheme.colors.border }}>
+            <div className="flex items-center justify-between p-3 rounded bg-border">
               <div>
-                <span style={{ color: currentTheme.colors.text.primary }}>
+                <span className="text-primary">
                   {t('settings.hidden_ids')}
                 </span>
-                <div className="text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                <div className="text-xs text-secondary">
                   {t('settings.hidden_ids.description')}
                 </div>
               </div>
@@ -356,25 +341,17 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <button
                 key={theme.id}
                 onClick={() => handleThemeChange(theme)}
-                className="w-full p-4 rounded text-left transition-all duration-200 hover:translate-x-1"
-                style={{ 
-                  backgroundColor: currentTheme.colors.surface,
-                  border: `1px solid ${currentTheme.colors.border}`,
-                  color: currentTheme.colors.text.primary
-                }}
+                className="w-full p-4 text-primary rounded text-left transition-all duration-200 border-theme border-solid bg-surface hover:translate-x-1"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">{theme.name}</div>
-                    <div className="text-sm mt-1" style={{ color: currentTheme.colors.text.secondary }}>
+                    <div className="text-sm mt-1 text-secondary">
                       {theme.id === currentTheme.id && t("settings.theme_active")}
                     </div>
                   </div>
                   {theme.id === currentTheme.id && (
-                    <div 
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: theme.colors.accent.primary }}
-                    />
+                    <div className="w-2 h-2 rounded-full bg-accent-primary" />
                   )}
                 </div>
                 <div className="flex gap-2 mt-3">

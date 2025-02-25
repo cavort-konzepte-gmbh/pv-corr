@@ -1,672 +1,182 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
-import { Plus, X, Edit2 } from 'lucide-react';
+import { Plus, X, Edit2, Save, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
-import { fetchParameters, Parameter, createParameter, updateParameter, deleteParameter } from '../services/parameters';
-import { Standard, DEFAULT_STANDARDS } from '../types/standards';
-import { fetchStandards, createStandard, deleteStandard } from '../services/standards';
+import { Zone } from '../types/projects';
+import MediaDialog from './MediaDialog';
+import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
-  standards: Standard[];
-  onStandardsChange: (standards: Standard[]) => void;
-}
-
-interface Column {
-  id: number | string;
-  name: string;
-  shortName: string;
-  unit: string;
-  range: {
-    type: 'range' | 'selection' | 'open';
-    value: string;
-  };
-  type: string;
+  selectedZone?: Zone | null;
+  onBack?: () => void;
 }
 
 const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
   currentTheme,
   currentLanguage,
-  standards,
-  onStandardsChange
+  selectedZone,
+  onBack,
 }) => {
   const t = useTranslation(currentLanguage);
-  const [parameters, setParameters] = useState<Parameter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [localStandards, setLocalStandards] = useState<Standard[]>(standards || DEFAULT_STANDARDS);
-  const [newColumn, setNewColumn] = useState<Column>({
-    id: 0,
-    name: '',
-    shortName: '',
-    unit: 'Ohm.m',
-    range: { type: 'range', value: '' },
-    type: 'number'
-  });
-  const [showNewColumn, setShowNewColumn] = useState(false);
-  const [showNewStandard, setShowNewStandard] = useState(false);
-  const [newStandard, setNewStandard] = useState<Standard>({
-    id: '',
-    name: '',
-    parameters: []
-  });
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("zone-data-points");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [fetchedParams, fetchedStandards] = await Promise.all([
-          fetchParameters(),
-          fetchStandards()
-        ]);
+    setLoading(false);
+  }, []);
 
-        setParameters(fetchedParams);
-        if (fetchedStandards?.length > 0) {
-          setLocalStandards(fetchedStandards);
-          onStandardsChange(fetchedStandards);
-        }
-      } catch (err) {
-        console.error('Error loading data:', err instanceof Error ? err.message : err);
-        setError(err instanceof Error ? err.message : 'Failed to load data');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleShowMediaDialog = async (index: number, projectId: string) => {
+    setShowMediaDialog(index);
+    const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+    setMediaUrls(mediatwo);
+  };
 
-    loadData();
-  }, [onStandardsChange]);
-
-  const handleAddColumn = async () => {
-    if (!newColumn.name.trim()) {
-      setError('Parameter name is required');
-      return;
-    }
-    
-    try {
-      // For open range type, we don't need to validate the range value
-      const rangeValue = newColumn.range.type === 'open' 
-        ? newColumn.range.value // Accept any value for open type
-        : newColumn.range.value.trim(); // Trim for other types
-
-      const paramData = {
-        name: newColumn.name.trim(),
-        shortName: newColumn.shortName,
-        unit: newColumn.unit === '' ? undefined : newColumn.unit,
-        rangeType: newColumn.range.type as Parameter['rangeType'],
-        rangeValue
-      };
-
-      if (typeof newColumn.id === 'string') {
-        await updateParameter(newColumn.id, paramData);
-      } else {
-        await createParameter(paramData);
-      }
-
-      // Refresh parameters list
-      const updatedParams = await fetchParameters();
-      setParameters(updatedParams);
-      setError(null);
-
-      // Reset form and close modal
-      setNewColumn({
-        id: 0,
-        name: '',
-        shortName: '',
-        unit: 'Ohm.m',
-        range: { type: 'range', value: '' },
-        type: 'number'
-      });
-      setShowNewColumn(false);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
-      setError(`Failed to ${typeof newColumn.id === 'string' ? 'update' : 'create'} parameter: ${errorMessage}`);
+  const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, projectId: string) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setPreview(URL.createObjectURL(file));
+      await uploadMedia(file, projectId);
+      const mediatwo = await fetchMediaUrlsByEntityId(projectId);
+      setMediaUrls(mediatwo);
     }
   };
 
-  const handleAddStandard = async () => {
-    if (!newStandard.name.trim()) return;
-    if (selectedColumns.length === 0) return;
-    
-    const standardData = {
-      name: newStandard.name.trim(),
-      parameters: selectedColumns.map(colId => ({
-        parameterId: colId,
-        parameterCode: parameters.find(p => p.id === colId)?.shortName || `Z${colId}`,
-        ratingRanges: []
-      }))
-    };
+  if (!selectedZone) {
+    return (
+      <div className="p-6 text-center text-secondary">
+        Please select a zone to view its datapoints
+      </div>
+    );
+  }
 
-    try {
-      await createStandard(standardData);
-      const updatedStandards = await fetchStandards();
-      setLocalStandards(updatedStandards);
-      onStandardsChange(updatedStandards);
-      
-      // Reset form and close modal
-      setNewStandard({ id: '', name: '', parameters: [] });
-      setSelectedColumns([]);
-      setShowNewStandard(false);
-    } catch (err) {
-      console.error('Error creating standard:', err);
-      setError('Failed to create standard');
-    }
-  };
 
   return (
     <div className="p-6">
-      {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={onBack}
+          className="text-sm flex items-center gap-1 text-secondary"
         >
+          ← Back to zones
+        </button>
+      </div>
+
+      {error && (
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           {t("datapoint.loading")}
         </div>
       ) : (
-        <>
-          <div className="flex gap-4 mb-6">
-            <button
-              onClick={() => setShowNewColumn(true)}
-              className="px-4 py-2 rounded text-sm flex items-center gap-2"
-              style={{ 
-                backgroundColor: currentTheme.colors.accent.primary,
-                color: 'white'
-              }}
-            >
-              <Plus size={16} />
-              {t("parameter.add")}
-            </button>
-            <button
-              onClick={() => setShowNewStandard(true)}
-              className="px-4 py-2 rounded text-sm flex items-center gap-2"
-              style={{ 
-                backgroundColor: currentTheme.colors.accent.primary,
-                color: 'white'
-              }}
-            >
-              <Plus size={16} />
-              {t("standards.add")}
-            </button>
-          </div>
-
-          {showNewColumn && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div 
-                className="p-6 rounded-lg max-w-2xl w-full"
-                style={{ backgroundColor: currentTheme.colors.surface }}
-              >
-                <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-                  {typeof newColumn.id === 'string' ? t("parameter.edit"): t("parameter.new")}
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("parameter.name")}
-                    </label>
-                    <input
-                      type="text"
-                      value={newColumn.name}
-                      onChange={(e) => setNewColumn(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("parameter.short_name")}
-                    </label>
-                    <input
-                      type="text"
-                      value={newColumn.shortName}
-                      onChange={(e) => setNewColumn(prev => ({ ...prev, shortName: e.target.value }))}
-                      placeholder={t("parameter.short_name.placeholder")}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("parameter.unit")}
-                    </label>
-                    <select
-                      value={newColumn.unit}
-                      onChange={(e) => setNewColumn(prev => ({ ...prev, unit: e.target.value }))}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    >
-                      <option value="">No unit</option>
-                      <option value="Ohm.m">Ohm.m</option>
-                      <option value="Ohm.cm">Ohm.cm</option>
-                      <option value="mmol/kg">mmol/kg</option>
-                      <option value="mg/kg">mg/kg</option>
-                      <option value="g/mol">g/mol</option>
-                      <option value="mg/mmol">mg/mmol</option>
-                      <option value="%">%</option>
-                      <option value="ppm">ppm</option>
-                      <option value="V">V</option>
-                      <option value="mV">mV</option>
-                      <option value="A">A</option>
-                      <option value="mA">mA</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("parameter.range_type")}
-                    </label>
-                    <select
-                      value={newColumn.range.type}
-                      onChange={(e) => setNewColumn(prev => ({
-                        ...prev,
-                        range: {
-                          type: e.target.value as 'range' | 'selection' | 'open',
-                          value: ''
-                        }
-                      }))}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    >
-                      <option value="range">Range (e.g., 0-100)</option>
-                      <option value="selection">Selection (e.g., [1,2,3])</option>
-                      <option value="open">Open (no restriction)</option>
-                      <option value="greater">Greater than (&gt;0)</option>
-                      <option value="less">Less than (&lt;100)</option>
-                      <option value="greaterEqual">Greater than or equal (≥0)</option>
-                      <option value="lessEqual">Less than or equal (≤100)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("parameter.range_value")}
-                    </label>
-                    <input
-                      type="text"
-                      value={newColumn.range.value}
-                      onChange={(e) => setNewColumn(prev => ({
-                        ...prev,
-                        range: {
-                          ...prev.range,
-                          value: e.target.value
-                        }
-                      }))}
-                      placeholder={
-                        newColumn.range.type === 'range' ? '0-100' : 
-                        newColumn.range.type === 'selection' ? '1,2,3' : 
-                        newColumn.range.type === 'open' ? 'Any value allowed' : 'greater than 0'
-                      }
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 mt-6">
-                    <button
-                      onClick={() => {
-                        setShowNewColumn(false);
-                        setNewColumn({
-                          id: 0,
-                          name: '',
-                          shortName: '',
-                          unit: 'Ohm.m',
-                          range: { type: 'range', value: '' },
-                          type: 'number'
-                        });
-                      }}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: currentTheme.colors.text.secondary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
-                    >
-                      {t("actions.cancel")}
-                    </button>
-                    <button
-                      onClick={handleAddColumn}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
-                    >
-                      {typeof newColumn.id === 'string' ? t("general.save") : t("parameter.add")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {showNewStandard && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div 
-                className="p-6 rounded-lg max-w-2xl w-full"
-                style={{ backgroundColor: currentTheme.colors.surface }}
-              >
-                <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-                  {t("standards.new")}
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("standards.name")}
-                    </label>
-                    <input
-                      type="text"
-                      value={newStandard.name}
-                      onChange={(e) => setNewStandard(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${currentTheme.colors.border}`,
-                        color: currentTheme.colors.text.primary
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {t("standards.select_parameter")}
-                    </label>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {parameters.map((param) => (
-                        <label
-                          key={param.id}
-                          className="flex items-center gap-2 p-2 rounded"
-                          style={{
-                            backgroundColor: currentTheme.colors.border,
-                            color: currentTheme.colors.text.primary
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedColumns.includes(param.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedColumns(prev => [...prev, param.id]);
-                              } else {
-                                setSelectedColumns(prev => prev.filter(id => id !== param.id));
-                              }
-                            }}
-                          />
-                          {param.name}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-6">
-                    <button
-                      onClick={() => {
-                        setShowNewStandard(false);
-                        setNewStandard({ id: '', name: '', parameters: [] });
-                        setSelectedColumns([]);
-                      }}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: currentTheme.colors.text.secondary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
-                    >
-                      {t("actions.cancel")}
-                    </button>
-                    <button
-                      onClick={handleAddStandard}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
-                    >
-                      {t("standards.add")}
-                    </button>
-                  </div>
-                  {selectedColumns.length === 0 && (
-                    <div 
-                      className="text-sm mt-2" 
-                      style={{ color: currentTheme.colors.accent.primary }}
-                    >
-                      {t("standards.select_one_parameter")}
-                    </div>
-                  )}
-                  {!newStandard.name.trim() && (
-                    <div 
-                      className="text-sm mt-2" 
-                      style={{ color: currentTheme.colors.accent.primary }}
-                    >
-                      {t("standards.enter_name")}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
+        <div className="space-y-6">
           <div className="overflow-x-auto">
-            <table 
-              className="w-full border-collapse" 
-              style={{ 
-                color: currentTheme.colors.text.primary,
-                borderColor: currentTheme.colors.border
-              }}
-            >
+            <table className="w-full border-collapse border-theme text-primary">
               <thead>
                 <tr>
-                  <th 
-                    className="p-2 text-left border font-normal w-16"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
-                    #
+                  <th className="p-2 text-left border font-normal border-theme">
+                    ID
                   </th>
-                  <th 
-                    className="p-2 text-left border font-normal w-1/3"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
-                    Parameter
+                  <th className="p-2 text-left border font-normal border-theme">
+                    Type
                   </th>
-                  <th 
-                    className="p-2 text-left border font-normal w-24"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
-                    Short Name
+                  <th className="p-2 text-left border font-normal border-theme">
+                    Values
                   </th>
-                  <th 
-                    className="p-2 text-left border font-normal w-24"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
-                    Unit
+                  <th className="p-2 text-left border font-normal border-theme">
+                    Timestamp
                   </th>
-                  <th 
-                    className="p-2 text-left border font-normal w-48"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
-                    Range
-                  </th>
-                  <th 
-                    className="p-2 text-center border font-normal w-24"
-                    style={{ borderColor: currentTheme.colors.border }}
-                  >
+                  <th className="p-2 text-center border font-normal border-theme">
                     Actions
                   </th>
-                  {standards.map(standard => (
-                    <th 
-                      key={standard.id}
-                      className="p-2 text-center border font-normal w-24"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span>{standard.name}</span>
-                        <button
-                          onClick={() => {
-                            if (confirm('Are you sure you want to delete this standard?')) {
-                              deleteStandard(standard.id)
-                                .then(async () => {
-                                  const updatedStandards = await fetchStandards();
-                                  setLocalStandards(updatedStandards);
-                                  onStandardsChange(updatedStandards);
-                                })
-                                .catch(err => {
-                                  console.error('Error deleting standard:', err);
-                                  setError('Failed to delete standard');
-                                });
-                            }
-                          }}
-                          className="p-1 rounded hover:bg-opacity-80"
-                          style={{ color: currentTheme.colors.text.secondary }}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </th>
-                  ))}
                 </tr>
               </thead>
               <tbody>
-                {parameters.map((param, index) => (
-                  <tr
-                    key={param.id}
-                    className="text-[10px]"
-                    style={{ backgroundColor: currentTheme.colors.surface }}
-                  >
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      {index + 1}
+                {selectedZone.datapoints?.map((datapoint, index) => (
+                  <tr key={datapoint.id}>
+                    <td className="p-2 border border-theme">
+                      {datapoint.sequentialId}
                     </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <div>
-                        <div className="font-medium">{param.customName || param.name}</div>
-                        {param.description && (
-                          <div className="text-xs mt-1" style={{ color: currentTheme.colors.text.secondary }}>
-                            {param.description}
-                          </div>
+                    <td className="p-2 border border-theme">
+                      {datapoint.type}
+                    </td>
+                    <td className="p-2 border border-theme">
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(datapoint.values).map(
+                          ([key, value]) => (
+                            <span
+                              key={key}
+                              className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"
+                            >
+                              {key}: {value}
+                            </span>
+                          )
                         )}
                       </div>
                     </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <span className="font-mono">{param.shortName || '-'}</span>
+                    <td className="p-2 border text-sm text-secondary border-theme">
+                      {new Date(datapoint.timestamp).toLocaleString()}
                     </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <span className="font-mono">{param.unit || '-'}</span>
-                    </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <span className="font-mono">
-                        {param.rangeType === 'range' ? param.rangeValue : 
-                         param.rangeType === 'selection' ? `[${param.rangeValue}]` : 
-                         param.rangeValue}
-                      </span>
-                    </td>
-                    <td 
-                      className="p-2 border"
-                      style={{ borderColor: currentTheme.colors.border }}
-                    >
-                      <div className="flex justify-center gap-2">
+                    <td className="p-2 border border-theme">
+                      <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => {
-                            setNewColumn({
-                              id: param.id,
-                              name: param.name,
-                              shortName: param.shortName || '',
-                              unit: param.unit || '',
-                              range: {
-                                type: param.rangeType as 'range' | 'selection' | 'open',
-                                value: param.rangeValue
-                              },
-                              type: param.rangeType === 'selection' ? 'select' : 'number'
-                            });
-                            setShowNewColumn(true);
-                          }}
-                          className="p-1 rounded hover:bg-opacity-80"
-                          style={{ color: currentTheme.colors.text.secondary }}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (confirm('Are you sure you want to delete this parameter?')) {
-                              deleteParameter(param.id)
-                                .then(() => fetchParameters())
-                                .then(updatedParams => setParameters(updatedParams))
-                                .catch(err => {
-                                  console.error('Error deleting parameter:', err);
-                                  setError('Failed to delete parameter');
-                                });
+                            if (editingDatapoint === datapoint.id) {
+                              // Save changes
+                              setEditingDatapoint(null);
+                              setEditingValues({});
+                            } else {
+                              setEditingDatapoint(datapoint.id);
+                              setEditingValues(datapoint.values);
                             }
                           }}
+                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        >
+                          {editingDatapoint === datapoint.id ? (
+                            <Save size={14} />
+                          ) : (
+                            <Edit2 size={14} />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleShowMediaDialog(index, datapoint.id)}
                           className="p-1 rounded hover:bg-opacity-80"
                           style={{ color: currentTheme.colors.text.secondary }}
                         >
-                          <X size={14} />
+                          <Upload size={14} />
                         </button>
                       </div>
                     </td>
-                    {standards.map(standard => (
-                      <td 
-                        key={standard.id}
-                        className="p-2 border text-center"
-                        style={{ 
-                          borderColor: currentTheme.colors.border,
-                          backgroundColor: standard.parameters?.some(p => p.parameterId === param.id)
-                            ? `${currentTheme.colors.accent.primary}20` 
-                            : 'transparent'
-                        }}
-                      >
-                        {standard.parameters?.some(p => p.parameterId === param.id) && (
-                          <span style={{ color: currentTheme.colors.accent.primary }}>×</span>
-                        )}
-                      </td>
-                    ))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       )}
+
+      <MediaDialog
+        isOpen={showMediaDialog !== null}
+        onClose={() => setShowMediaDialog(null)}
+        onFileChange={(e) => {
+          if (showMediaDialog !== null) {
+            handleFileChangeInDialog(e, selectedZone.datapoints[showMediaDialog].id);
+          }
+        }}
+        mediaUrls={mediaUrls}
+        currentTheme={currentTheme}
+      />
     </div>
   );
 };

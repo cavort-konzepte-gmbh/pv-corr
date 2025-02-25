@@ -1,194 +1,78 @@
 import React, { useState } from 'react';
 import { Field, Project } from '../../types/projects';
 import { Theme } from '../../types/theme';
-import { Edit2, Check, Plus, DoorOpen, MapPin, X, Trash2 } from 'lucide-react';
-import { updateField, createGate, updateGate, deleteGate, deleteField } from '../../services/fields';
-import { fetchProjects } from '../../services/projects';
 import { Language, useTranslation } from '../../types/language';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { Gate } from '../../types/projects';
+import { MapPin, User, Mail, Phone, Building2, X, DoorOpen, Maximize2, Folder } from 'lucide-react';
+import { SavedPlace } from '../PlacesPanel';
+import { Company } from '../../types/companies';
+import { createField } from '../../services/fields';
+import { fetchProjects } from '../../services/projects';
+import { Person } from '../../types/people';
 
-interface FieldViewProps {
+interface ProjectViewProps {
   project: Project;
-  field: Field;
-  showHiddenIds: boolean;
   currentTheme: Theme;
   currentLanguage: Language;
-  editingName: any;
-  newName: string;
-  setEditingName: (name: any) => void;
-  setNewName: (name: string) => void;
-  handleNameEdit: (type: string, projectId: string, id: string, currentName: string, fieldId?: string, e?: React.MouseEvent) => void;
-  onZoneSelect: (zoneId: string) => void;
-  onAddZone: () => void;
-  onProjectsChange: (updatedProject: Project) => void;
+  showHiddenIds: boolean;
+  savedPlaces: SavedPlace[];
+  savedPeople: Person[];
+  savedCompanies: Company[];
+  onFieldSelect: (fieldId: string) => void;
+  onAddField: () => void;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
-const FieldView: React.FC<FieldViewProps> = ({ 
+const ProjectView: React.FC<ProjectViewProps> = ({
   project,
-  field,
-  showHiddenIds,
   currentTheme,
   currentLanguage,
-  editingName,
-  newName,
-  setEditingName,
-  setNewName,
-  handleNameEdit,
-  onZoneSelect,
-  onAddZone,
+  showHiddenIds,
+  savedPlaces,
+  savedPeople,
+  savedCompanies,
+  onFieldSelect,
+  onAddField,
   onProjectsChange
 }) => {
   const t = useTranslation(currentLanguage);
-  const [error, setError] = useState<string | null>(null);
-  const [showNewZoneForm, setShowNewZoneForm] = useState(false);
-  const [showGatesPanel, setShowGatesPanel] = useState(false);
-  const [editingGate, setEditingGate] = useState<Gate | null>(null);
-  const [gateFormValues, setGateFormValues] = useState({
-    name: '',
+  const projectPlace = project.placeId ? savedPlaces.find(p => p.id === project.placeId) : null;
+  const projectManager = project.managerId ? savedPeople.find(p => p.id === project.managerId) : null;
+  const projectCompany = savedCompanies.find(c => c.id === project.companyId);
+  const [showFullscreenImage, setShowFullscreenImage] = useState(false);
+  const [showNewFieldDialog, setShowNewFieldDialog] = useState(false);
+  const [newFieldName, setNewFieldName] = useState('');
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+  const [editingFieldName, setEditingFieldName] = useState('');
+  const [newFieldError, setNewFieldError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteFieldConfirm, setShowDeleteFieldConfirm] = useState<string | null>(null);
+  const [deleteFieldConfirmName, setDeleteFieldConfirmName] = useState('');
+  const [showFieldCoordinatesForm, setShowFieldCoordinatesForm] = useState(false);
+  const [fieldCoordinates, setFieldCoordinates] = useState({
+    fieldId: '',
     latitude: '',
     longitude: ''
   });
-  const [showCoordinatesForm, setShowCoordinatesForm] = useState(false);
-  const [coordinates, setCoordinates] = useState({
-    latitude: field.latitude || '',
-    longitude: field.longitude || ''
-  });
-  const [isSaving, setIsSaving] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteConfirmName, setDeleteConfirmName] = useState('');
-
-  const handleGateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSaving) return;
-    
-    if (!gateFormValues.name || !gateFormValues.latitude || !gateFormValues.longitude) return;
-
-    setError(null);
-
-    try {
-      setIsSaving(true);
-      if (editingGate) {
-        // Update existing gate
-        await updateGate(editingGate.id, {
-          name: gateFormValues.name,
-          latitude: gateFormValues.latitude,
-          longitude: gateFormValues.longitude
-        });
-      } else {
-        // Create new gate
-        await createGate(field.id, {
-          name: gateFormValues.name,
-          latitude: gateFormValues.latitude,
-          longitude: gateFormValues.longitude
-        });
-      }
-
-      // Refresh projects data
-      const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
-
-      // Reset form
-      setGateFormValues({ name: '', latitude: '', longitude: '' });
-      setEditingGate(null);
-      setShowGatesPanel(false);
-    } catch (err) {
-      console.error('Error saving gate:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save gate');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const gates = field.gates || [];
-
-  const handleCoordinatesSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSaving) return;
-    
-    setError(null);
-
-    try {
-      setIsSaving(true);
-      await updateField(field.id, {
-        latitude: coordinates.latitude || undefined,
-        longitude: coordinates.longitude || undefined
-      });
-
-      // Refresh projects data to get the updated field
-      const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
-
-      setShowCoordinatesForm(false);
-    } catch (err) {
-      console.error('Error updating coordinates:', err);
-      setError('Failed to update coordinates');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleEditGate = (gate: Gate) => {
-    setEditingGate(gate);
-    setGateFormValues({
-      name: gate.name,
-      latitude: gate.latitude,
-      longitude: gate.longitude
-    });
-    setShowGatesPanel(true);
-  };
-
-  const handleDeleteGate = async (gateId: string) => {
-    setError(null);
-    try {
-      await deleteGate(gateId);
-      
-      // Refresh projects data
-      const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
-    } catch (err) {
-      console.error('Error deleting gate:', err);
-      setError(err instanceof Error ? err.message : 'Failed to delete gate');
-    }
-  };
 
   const openInMaps = (latitude: string, longitude: string) => {
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
-  const handleNameSave = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    
-    if (showDeleteConfirm) {
-      setShowDeleteConfirm(false);
-      return;
-    }
-    
-    setError(null);
-
-    const trimmedName = newName.trim();
-    if (!field.id || !trimmedName) {
-      setError('Field name is required');
-      setEditingName(null);
+  const handleCreateField = async () => {
+    if (isSaving) return;
+    if (!newFieldName.trim()) {
+      setNewFieldError('Field name is required');
       return;
     }
 
     try {
-      // Update the field in the database
-      const updatedField = await updateField(field.id, {
-        name: trimmedName
+      setIsSaving(true);
+      const newField = await createField(project.id, {
+        name: newFieldName.trim(),
+        latitude: '',
+        longitude: ''
       });
-
-      if (!updatedField) {
-        throw new Error('No data returned from field update');
-      }
-
+      
       // Fetch fresh projects data to ensure everything is in sync
       const updatedProjects = await fetchProjects();
       if (!updatedProjects) {
@@ -198,518 +82,379 @@ const FieldView: React.FC<FieldViewProps> = ({
       // Update the projects state with fresh data
       onProjectsChange(updatedProjects);
       
-      // Reset state
-      setNewName('');
-      setEditingName(null);
-      setError(null);
-    } catch (err) {
-      console.error('Error updating field:', err instanceof Error ? err.message : err);
-      setError(err instanceof Error ? err.message : 'Failed to update field name');
-      setEditingName(null);
+      // Reset form state
+      setShowNewFieldDialog(false);
+      setNewFieldName('');
+      setNewFieldError(null);
+
+      // Select the newly created field
+      onFieldSelect(newField.id);
+    } catch (error) {
+      console.error('Error creating field:', error);
+      setNewFieldError('Failed to create field');
+    } finally {
+      setIsSaving(false);
     }
   };
 
+  const handleEditField = (field: Field) => {
+    setEditingFieldId(field.id);
+    setEditingFieldName(field.name);
+  };
+
+  const handleSaveFieldName = async () => {
+    if (!editingFieldId || !editingFieldName.trim()) {
+      setNewFieldError('Field name is required');
+      return;
+    }
+
+    try {
+      await updateField(editingFieldId, { name: editingFieldName.trim() });
+      
+      // Refresh projects data
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
+      }
+
+      setEditingFieldId(null);
+      setEditingFieldName('');
+    } catch (err) {
+      console.error('Error updating field:', err);
+      setNewFieldError('Failed to update field name');
+    }
+  };
+
+  const handleDeleteField = async (fieldId: string) => {
+    try {
+      await deleteField(fieldId);
+      
+      // Refresh projects data
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
+      }
+
+      setShowDeleteFieldConfirm(null);
+      setDeleteFieldConfirmName('');
+    } catch (err) {
+      console.error('Error deleting field:', err);
+      setNewFieldError('Failed to delete field');
+    }
+  };
+
+  const handleUpdateFieldCoordinates = async () => {
+    if (!fieldCoordinates.fieldId) return;
+
+    try {
+      await updateField(fieldCoordinates.fieldId, {
+        latitude: fieldCoordinates.latitude,
+        longitude: fieldCoordinates.longitude
+      });
+
+      // Refresh projects data
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
+      }
+
+      setShowFieldCoordinatesForm(false);
+      setFieldCoordinates({ fieldId: '', latitude: '', longitude: '' });
+    } catch (err) {
+      console.error('Error updating field coordinates:', err);
+      setNewFieldError('Failed to update coordinates');
+    }
+  };
+
+  if (!project) {
+    return (
+      <div className="p-6">
+        <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
+          {t('project.not_found')}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
-          {editingName?.id === field.id ? (
-            <form onSubmit={handleNameSave} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="bg-transparent border-b px-1 outline-none font-mono text-2xl"
-                style={{ 
-                  borderColor: currentTheme.colors.accent.primary,
-                  color: currentTheme.colors.text.primary
-                }}
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.accent.primary }}
-              >
-                <Check size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
-                <Trash2 size={16} />
-              </button>
-            </form>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span>{field.name}</span>
-              <button
-                onClick={(e) => handleNameEdit('field', project.id, field.id, field.name, undefined, e)}
-                className="p-1 rounded hover:bg-opacity-80"
-                style={{ color: currentTheme.colors.text.secondary }}
-              >
-                <Edit2 size={14} />
-              </button>
+      <div className="p-6 rounded-lg mb-8 relative overflow-hidden border-theme border-solid bg-surface">
+        <div className="flex justify-between">
+          <div className="flex-1">
+            <div className="text-2xl font-mono mb-6 text-primary">
+              {project.name}
               {showHiddenIds && (
-                <span className="text-xs opacity-50" style={{ color: currentTheme.colors.text.secondary }}>
-                  {field.hiddenId}
+                <span className="text-xs opacity-50 ml-2 text-secondary">
+                  {project.hiddenId}
                 </span>
               )}
             </div>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {field.latitude && field.longitude ? (
-            <button
-              onClick={() => openInMaps(field.latitude!, field.longitude!)}
-              className="text-sm flex items-center gap-1 hover:underline"
-              style={{ color: currentTheme.colors.accent.primary }}
-            >
-              <MapPin size={14} />
-              {field.latitude}, {field.longitude}
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowCoordinatesForm(true)}
-              className="text-sm flex items-center gap-1"
-              style={{ color: currentTheme.colors.text.secondary }}
-            >
-              <MapPin size={14} />
-              Add coordinates
-            </button>
-          )}
-          {field.latitude && field.longitude && (
-            <button
-              onClick={() => setShowCoordinatesForm(true)}
-              className="text-sm"
-              style={{ color: currentTheme.colors.text.secondary }}
-            >
-              <Edit2 size={14} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {showCoordinatesForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-              {field.latitude && field.longitude ? 'Edit Coordinates' : 'Add Coordinates'}
-            </h3>
-            <form onSubmit={handleCoordinatesSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                  Latitude
-                </label>
-                <input
-                  type="text"
-                  value={coordinates.latitude}
-                  onChange={(e) => setCoordinates(prev => ({ ...prev, latitude: e.target.value }))}
-                  required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCoordinatesSubmit(e);
-                    }
-                  }}
-                />
+            <div className="flex flex-col gap-4">
+          {project.clientRef && (
+            <div className="flex items-start gap-2">
+              <div className="w-4 h-4 flex items-center justify-center rounded bg-accent-primary">
+                <span className="text-xs text-white font-mono">#</span>
               </div>
               <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                  Longitude
-                </label>
-                <input
-                  type="text"
-                  value={coordinates.longitude}
-                  onChange={(e) => setCoordinates(prev => ({ ...prev, longitude: e.target.value }))}
-                  required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleCoordinatesSubmit(e);
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCoordinatesForm(false)}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg" style={{ color: currentTheme.colors.text.primary }}>
-            Field Gates
-          </h3>
-          <button
-            onClick={() => setShowGatesPanel(true)}
-            className="px-3 py-1 rounded text-sm flex items-center gap-2"
-            style={{ 
-              backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
-            }}
-          >
-            <Plus size={14} />
-            Add Gate
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {gates.map(gate => (
-            <div
-              key={gate.id}
-              className="p-4 rounded transition-all hover:translate-y-[-2px]"
-              style={{ 
-                backgroundColor: currentTheme.colors.surface,
-                border: `1px solid ${currentTheme.colors.border}`
-              }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <DoorOpen size={16} style={{ color: currentTheme.colors.accent.primary }} />
-                  <span className="font-medium" style={{ color: currentTheme.colors.text.primary }}>
-                    {gate.name}
-                  </span>
+                <div className="font-medium text-accent-primary">
+                  {project.clientRef}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEditGate(gate)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
-                    <Edit2 size={14} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteGate(gate.id)}
-                    className="p-1 rounded hover:bg-opacity-80"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
-                    <X size={14} />
-                  </button>
+                <div className="text-sm text-secondary">
+                  Project Reference
                 </div>
               </div>
-              <button
-                onClick={() => openInMaps(gate.latitude, gate.longitude)}
-                className="text-sm flex items-center gap-1 mt-2 hover:underline"
-                style={{ color: currentTheme.colors.accent.primary }}
-              >
-                <MapPin size={12} />
-                {gate.latitude}, {gate.longitude}
-              </button>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-      {showGatesPanel && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 className="text-lg mb-4" style={{ color: currentTheme.colors.text.primary }}>
-              {editingGate ? 'Edit Gate' : 'Add New Gate'}
-            </h3>
-            <form onSubmit={handleGateSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                  Gate Name
-                </label>
-                <input
-                  type="text"
-                  value={gateFormValues.name}
-                  onChange={(e) => setGateFormValues(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleGateSubmit(e);
-                    }
-                  }}
-                />
+            {projectCompany && (
+              <div className="flex items-start gap-2">
+                <Building2 className="text-accent-primary" size={16} />
+                <div>
+                  <div className="font-medium text-primary">
+                    {projectCompany.name}
+                  </div>
+                  <div className="text-sm text-secondary">
+                    Construction Company
+                    {projectCompany.vatId && ` • VAT ID: ${projectCompany.vatId}`}
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                  Latitude
-                </label>
-                <input
-                  type="text"
-                  value={gateFormValues.latitude}
-                  onChange={(e) => setGateFormValues(prev => ({ ...prev, latitude: e.target.value }))}
-                  required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                />
+            )}
+
+            {projectManager && (
+              <div className="flex items-start gap-2">
+                <User className="text-accent-primary" size={16} />
+                <div>
+                  <div className="font-medium text-primary">
+                    {projectManager?.title ? `${projectManager?.title} ` : ''}
+                    {projectManager?.firstName} {projectManager?.lastName}
+                  </div>
+                  <div className="text-sm text-secondary">
+                    Project Manager
+                  </div>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="text-accent-primary" size={14} />
+                      <a 
+                        href={`mailto:${projectManager.email}`}
+                        style={{ color: currentTheme.colors.accent.primary }}
+                      >
+                        {projectManager.email}
+                      </a>
+                    </div>
+                    {projectManager.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone size={14} />
+                        <a 
+                          href={`tel:${projectManager.phone}`}
+                          style={{ color: currentTheme.colors.accent.primary }}
+                        >
+                          {projectManager.phone}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm mb-1" style={{ color: currentTheme.colors.text.secondary }}>
-                  Longitude
-                </label>
-                <input
-                  type="text"
-                  value={gateFormValues.longitude}
-                  onChange={(e) => setGateFormValues(prev => ({ ...prev, longitude: e.target.value }))}
-                  required
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                />
+            )}
+
+            {(project.latitude && project.longitude) && (
+              <div className="flex items-start gap-2">
+                <MapPin className="text-accent-primary" size={16} />
+                <div>
+                  <button
+                    onClick={() => openInMaps(project.latitude!, project.longitude!)}
+                    className="text-sm hover:underline text-accent-primary"
+                  >
+                    {project.latitude}, {project.longitude}
+                  </button>
+                  {project.fields.some(field => (field.gates || []).length > 0) && (
+                    <div className="mt-2">
+                      <div className="text-sm text-secondary">
+                        Project Gates:
+                      </div>
+                      <div className="flex flex-col gap-1 mt-1">
+                        {project.fields.map(field => 
+                          (field.gates || []).map(gate => (
+                            <button
+                              key={`${field.id}-${gate.id}`}
+                              onClick={() => openInMaps(gate.latitude, gate.longitude)}
+                              className="flex items-center gap-2 text-sm hover:underline ml-4 text-accent-primary"
+                            >
+                              <DoorOpen size={14} />
+                              {field.name} • {gate.name} ({gate.latitude}, {gate.longitude})
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex justify-end gap-2">
+            )}
+            </div>
+          </div>
+          {project.imageUrl && (
+            <div className="ml-6 flex-shrink-0">
+              <div className="relative group">
+                <img 
+                  src={project.imageUrl} 
+                  alt={project.name}
+                  className="w-[300px] h-[200px] rounded-lg shadow-lg object-cover cursor-pointer"
+                  onClick={() => setShowFullscreenImage(true)}
+                />
                 <button
-                  type="button"
-                  onClick={() => {
-                    setShowGatesPanel(false);
-                    setEditingGate(null);
-                    setGateFormValues({ name: '', latitude: '', longitude: '' });
-                  }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="absolute top-2 right-2 p-1 rounded bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity text-white"
+                  onClick={() => setShowFullscreenImage(true)}
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
-                >
-                  {editingGate ? 'Save Changes' : 'Add Gate'}
+                  <Maximize2 size={16} />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-opacity-10 bg-white rounded p-4">
-          <div className="flex items-baseline gap-2">
-            <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
-              {field.zones.length}
             </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>{t('project.zones')}</div>
-          </div>
-        </div>
-        <div className="bg-opacity-10 bg-white rounded p-4">
-          <div className="flex items-baseline gap-2">
-            <div className="text-2xl font-mono" style={{ color: currentTheme.colors.text.primary }}>
-              {field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)}
-            </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>{t('project.datapoints')}</div>
-          </div>
+          )}
         </div>
       </div>
       
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
+      {showFullscreenImage && project.imageUrl && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
+          onClick={() => setShowFullscreenImage(false)}
+        >
+          <img 
+            src={project.imageUrl} 
+            alt={project.name}
+            className="max-w-[90vw] max-h-[90vh] object-contain"
+          />
+          <button
+            className="absolute top-4 right-4 p-2 rounded hover:bg-white hover:bg-opacity-10 text-white"
+            onClick={() => setShowFullscreenImage(false)}
           >
-            <h3 
-              className="text-lg mb-4 flex items-center gap-2"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
-              <Trash2 size={20} style={{ color: currentTheme.colors.accent.primary }} />
-              Delete Field
-            </h3>
-            
-            <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
-              This action cannot be undone. Please type the field name <strong>{field.name}</strong> to confirm deletion.
-            </p>
-            
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={deleteConfirmName}
-                onChange={(e) => setDeleteConfirmName(e.target.value)}
-                placeholder="Type field name to confirm"
-                className="w-full p-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.background,
-                  border: `1px solid ${currentTheme.colors.border}`,
-                  color: currentTheme.colors.text.primary
-                }}
-                autoFocus
-              />
-              
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => {
-                    setShowDeleteConfirm(false);
-                    setDeleteConfirmName('');
-                    setEditingName(null);
-                  }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    if (deleteConfirmName === field.name) {
-                      try {
-                        await deleteField(field.id);
-                        const updatedProjects = await fetchProjects();
-                        if (updatedProjects) {
-                          onProjectsChange(updatedProjects);
-                        }
-                      } catch (err) {
-                        console.error('Error deleting field:', err);
-                        setError('Failed to delete field');
-                      }
-                    }
-                  }}
-                  disabled={deleteConfirmName !== field.name}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white',
-                    opacity: deleteConfirmName === field.name ? 1 : 0.5
-                  }}
-                >
-                  Delete Field
-                </button>
-              </div>
-            </div>
-          </div>
+            <X size={24} />
+          </button>
         </div>
       )}
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-opacity-10 bg-white rounded p-4">
+          <div className="flex items-baseline gap-2">
+            <div className="text-2xl font-mono text-primary">
+              {project.fields.length}
+            </div>
+            <div className="text-sm text-secondary">{t('project.fields')}</div>
+          </div>
+        </div>
+        <div className="bg-opacity-10 bg-white rounded p-4">
+          <div className="flex items-baseline gap-2">
+            <div className="text-2xl font-mono text-primary">
+              {project.fields.reduce((acc, field) => acc + field.zones.length, 0)}
+            </div>
+            <div className="text-sm text-secondary">{t('project.zones')}</div>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-4">
-        {field.zones.map(zone => (
+        {project.fields.map(field => (
           <div
-            key={zone.id}
-            className="p-4 rounded cursor-pointer transition-all duration-200 hover:translate-x-1"
+            key={field.id}
+            className="p-4 rounded cursor-pointer transition-all duration-200 hover:translate-x-1 border-theme border-solid bg-surface"
             style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`,
               boxShadow: `0 2px 4px ${currentTheme.colors.border}`
             }}
-            onClick={() => onZoneSelect(zone.id)}
+            onClick={() => onFieldSelect(field.id)}
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 
-                className="font-mono text-lg flex items-center"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
+              <h3 className="font-mono text-lg flex items-center text-primary">
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: currentTheme.colors.accent.primary }}
-                  />
-                  <span>{zone.name}</span>
+                  <div className="w-2 h-2 rounded-full bg-accent-primary"/>
+                  <span>{field.name}</span>
+                  {field.gates && field.gates.length > 0 && (
+                    <span className="text-xs text-secondary">
+                      • {field.gates.length} gates
+                    </span>
+                  )}
                 </div>
               </h3>
-              <div className="flex items-center gap-2">
-                {zone.latitude && zone.longitude && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openInMaps(zone.latitude!, zone.longitude!);
-                    }}
-                    className="text-sm flex items-center gap-1 hover:underline"
-                    style={{ color: currentTheme.colors.accent.primary }}
-                  >
-                    <MapPin size={14} />
-                    {zone.latitude}, {zone.longitude}
-                  </button>
-                )}
-                <span 
-                  className="text-sm font-mono"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
-                  {zone.datapoints?.length || 0} datapoints
-                </span>
-              </div>
+              <span className="text-sm font-mono text-secondary">
+                {field.zones.length} {t('project.zones')}
+              </span>
             </div>
-            <div className="text-sm" style={{ color: currentTheme.colors.text.secondary }}>
-              {project.name} / {field.name}
+            <div className="text-sm text-secondary">
+              {field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)} {t('project.datapoints')}
             </div>
           </div>
         ))}
         <button
-          onClick={onAddZone}
-          className="p-4 rounded font-mono text-sm transition-all duration-200 hover:translate-y-[-1px] w-full text-left"
-          style={{
-            backgroundColor: 'transparent',
-            color: currentTheme.colors.text.primary,
-            border: `1px dashed ${currentTheme.colors.border}`
+          onClick={async () => {
+            setShowNewFieldDialog(true);
           }}
+          className="p-4 rounded font-mono text-sm transition-all duration-200 hover:translate-y-[-1px] w-full text-left text-primary border-theme border-solid bg-transparent"          
         >
-          + {t('zone.new')}
+          <div className="flex items-center gap-2">
+            <Folder className="text-accent-primary" size={16} />
+            {t('field.new')}
+          </div>
         </button>
+
+        {showNewFieldDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+              <h3 className="text-lg mb-4 flex items-center gap-2 text-primary">
+                <Folder className="text-accent-primary" size={20} />
+                {t('field.new')}
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm mb-1 text-secondary">
+                    {t('field.name')}
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newFieldName}
+                    onChange={(e) => setNewFieldName(e.target.value)}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                    
+                    autoFocus
+                   onKeyDown={(e) => {
+                     if (e.key === 'Enter') {
+                       e.preventDefault();
+                       handleCreateField();
+                     }
+                   }}
+                  />
+                  {newFieldError && (
+                    <p className="text-sm mt-1 text-accent-primary">
+                      {newFieldError}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setShowNewFieldDialog(false);
+                      setNewFieldName('');
+                      setNewFieldError(null);
+                    }}
+                    className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                    
+                  >
+                    {t('actions.cancel')}
+                  </button>
+                  <button
+                    onClick={handleCreateField}
+                    className="px-4 py-2 rounded text-sm text-white bg-accent-primary "                    
+                  >
+                    {t('actions.save')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default FieldView;
+export default ProjectView;

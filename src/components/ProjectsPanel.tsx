@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../types/theme';
 import { Project } from '../types/projects';
-import { Folder, Plus, ChevronRight, Trash2, MapPin, User, Building2, DoorOpen, Edit2, X } from 'lucide-react';
+import { Folder, Plus, ChevronRight,  MapPin } from 'lucide-react';
 import { SavedPlace } from './PlacesPanel';
 import { Person } from '../types/people';
-import { fetchPeople } from '../services/people';
 import { Company } from '../types/companies';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { createProject, updateProject, deleteProject, fetchProjects } from '../services/projects';
+import { useDebounce } from '../hooks/useDebounce';
+import { useKeyAction } from '../hooks/useKeyAction';
+import { fetchPeople } from '../services/people';
 
 interface ProjectsPanelProps {
   currentTheme: Theme;
@@ -15,7 +17,7 @@ interface ProjectsPanelProps {
   savedPlaces: SavedPlace[];
   savedPeople: Person[];
   savedCompanies: Company[];
-  onProjectsChange: (projects: Project[]) => void;
+  onSelectProject: (projectId: string) => void;
 }
 
 const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
@@ -24,35 +26,42 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
   savedPlaces,
   savedPeople,
   savedCompanies,
-  onProjectsChange
+  onSelectProject
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [projectsList, setProjectsList] = useState<Project[]>([]);
+  const [showNewProjectForm, setShowNewProjectForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectName, setProjectName] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [clientRef, setClientRef] = useState<string>('');
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [clientRef, setClientRef] = useState('');
+  
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
+  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
-  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
   const [peopleSearch, setPeopleSearch] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Person[]>([]);
-  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
-  useEffect(() => {
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+
+
+  const debouncedPeopleSearch = useDebounce((peopleSearch: string) => {
     const searchTerm = peopleSearch.toLowerCase();
-    const filtered = availablePeople.filter(person => 
-      `${person.firstName} ${person.lastName}`.toLowerCase().includes(searchTerm) ||
-      person.email.toLowerCase().includes(searchTerm) ||
-      (person.title && person.title.toLowerCase().includes(searchTerm))
+    const filtered = availablePeople.filter(
+      (person) =>
+        `${person.firstName} ${person.lastName}`
+          .toLowerCase()
+          .includes(searchTerm) ||
+        person.email.toLowerCase().includes(searchTerm) ||
+        (person.title && person.title.toLowerCase().includes(searchTerm))
     );
     setFilteredPeople(filtered);
-  }, [peopleSearch, availablePeople]);
+  });
+
 
   useEffect(() => {
     const loadProjects = async () => {
@@ -60,12 +69,12 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
         setLoading(true);
         const [fetchedProjects, fetchedPeople] = await Promise.all([
           fetchProjects(),
-          fetchPeople()
+          fetchPeople(),
         ]);
-        
+
         setProjectsList(fetchedProjects);
         setAvailablePeople(fetchedPeople);
-        onProjectsChange(fetchedProjects);
+        setFilteredPeople(fetchedPeople);
       } catch (err) {
         console.error('Error loading projects:', err);
         setError('Failed to load projects');
@@ -76,10 +85,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
     loadProjects();
   }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     
+  const updateSelectedProject = async () => {
     if (!projectName.trim()) {
       setError('Project name is required');
       return;
@@ -95,7 +102,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       imageUrl: imageUrl || undefined,
       placeId: selectedPlaceId || undefined,
       managerId: selectedManagerId || undefined,
-      typeProject: typeProject || 'field',
+      typeProject: typeProject, 
       companyId: undefined // Add if needed
     };
 
@@ -111,7 +118,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
         const updatedProjects = projectsList.map(p =>
           p.id === editingProject.id ? { ...p, ...updatedProject } : p
         );
-        onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
         setError(null);
       } catch (error) {
@@ -123,7 +129,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
       try {
         const newProject = await createProject(projectData);
         const updatedProjects = [...projectsList, { ...newProject, fields: [], gates: [] }];
-        onProjectsChange(updatedProjects);
         setProjectsList(updatedProjects);
         setError(null);
       } catch (error) {
@@ -142,6 +147,12 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     setLongitude('');
     setImageUrl('');
     setSelectedManagerId(null);
+    setTypeProject('field');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateSelectedProject();
   };
 
   const handleEdit = (project: Project) => {
@@ -161,7 +172,6 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     try {
       await deleteProject(projectId);
       const updatedProjects = projectsList.filter(p => p.id !== projectId);
-      onProjectsChange(updatedProjects);
       setProjectsList(updatedProjects);
     } catch (error) {
       console.error('Failed to delete project:', error);
@@ -174,37 +184,29 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
     window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
   };
 
+
+  useKeyAction(() => {
+    updateSelectedProject();
+  }, showNewProjectForm);
+
+
   return (
     <div className="p-6">
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div 
-          className="text-center p-4"
-          style={{ color: currentTheme.colors.text.secondary }}
-        >
+        <div className="text-center p-4 text-secondary">
           Loading projects...
         </div>
       ) : (
         <>
           <button
             onClick={() => setShowNewProjectForm(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-            style={{ 
-              backgroundColor: currentTheme.colors.accent.primary,
-              color: 'white'
-            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"            
           >
             <Plus size={16} />
             Add New Project
@@ -212,21 +214,15 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
           {showNewProjectForm ? (
             <div>
-              <h3 
-                className="text-lg mb-6 flex items-center gap-2"
-                style={{ color: currentTheme.colors.text.primary }}
-              >
-                <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+                <Folder className="text-accent-primary" size={16} />
                 {editingProject ? 'Edit Project' : 'New Project'}
               </h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Name
                       <span className="text-red-500 ml-1">*</span>
                     </label>
@@ -236,32 +232,17 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
                       required
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Site
                     </label>
                     <select
                       value={selectedPlaceId || ''}
                       onChange={(e) => setSelectedPlaceId(e.target.value || null)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">No site assigned</option>
                       {savedPlaces.map(place => (
@@ -272,10 +253,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Client Ref
                     </label>
                     <input
@@ -283,48 +261,30 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter client reference"
                       value={clientRef}
                       onChange={(e) => setClientRef(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Manager
                     </label>
                     <input
                       type="text"
                       placeholder="Search people..."
                       value={peopleSearch}
-                      onChange={(e) => setPeopleSearch(e.target.value)}
-                      className="w-full p-2 rounded text-sm mb-2"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
+                      onChange={(e) => {
+                        setPeopleSearch(e.target.value)
+                        debouncedPeopleSearch(e.target.value)
                       }}
+                      className="w-full p-2 rounded text-sm mb-2 text-primary border-theme border-solid bg-surface"                      
                     />
                     <select
-                      value={selectedManagerId || ''}
+                      value={selectedManagerId || ""}
                       onChange={(e) => setSelectedManagerId(e.target.value || null)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="">No manager assigned</option>
-                      {filteredPeople.map(person => (
+                      {filteredPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.title ? `${person.title} ` : ''}
                           {person.firstName} {person.lastName}
@@ -334,10 +294,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                   </div>
                  
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Latitude
                     </label>
                     <input
@@ -345,20 +302,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter latitude"
                       value={latitude}
                       onChange={(e) => setLatitude(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Longitude
                     </label>
                     <input
@@ -366,42 +314,24 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter longitude"
                       value={longitude}
                       onChange={(e) => setLongitude(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Type
                     </label>
                     <select
                       value={typeProject}
                       onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     >
                       <option value="field">Field</option>
                       <option value="roof">Roof</option>
                     </select>
                   </div>
                   <div>
-                    <label 
-                      className="block text-sm mb-1"
-                      style={{ color: currentTheme.colors.text.secondary }}
-                    >
+                    <label className="block text-sm mb-1 text-secondary">
                       Project Image URL
                     </label>
                     <input
@@ -409,13 +339,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       placeholder="Enter image URL (e.g. https://images.unsplash.com/...)"
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
-                      className="w-full p-2 rounded text-sm"
-                      style={{
-                        backgroundColor: currentTheme.colors.surface,
-                        borderColor: currentTheme.colors.border,
-                        color: currentTheme.colors.text.primary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                      
                     />
                   </div>
                 </div>
@@ -427,22 +351,13 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                       setEditingProject(null);
                       setProjectName('');
                     }}
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      color: currentTheme.colors.text.secondary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"                    
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.accent.primary,
-                      color: 'white'
-                    }}
+                    className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                    
                   >
                     {editingProject ? 'Save Changes' : 'Create Project'}
                   </button>
@@ -451,48 +366,26 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {projectsList.map(project => (
+              {projectsList.map((project, index) => (
                 <div
                   key={project.id}
-                  className="p-4 rounded-lg border transition-all hover:translate-x-1"
-                  style={{
-                    backgroundColor: currentTheme.colors.surface,
-                    borderColor: currentTheme.colors.border,
-                    color: currentTheme.colors.text.primary
-                  }}
+                  className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface"
+                  onClick={() => onSelectProject(project.id)}                  
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Folder size={16} style={{ color: currentTheme.colors.accent.primary }} />
+                      <Folder className="text-accent-primary" size={16} />
                       <span className="font-medium">{project.name}</span>                
                       {project.placeId && (
-                        <div className="flex items-center gap-1 text-xs" style={{ color: currentTheme.colors.text.secondary }}>
+                        <div className="flex items-center gap-1 text-xs text-secondary">
                           {savedPlaces && <MapPin size={12} />}
-                          {savedPlaces?.find(p => p.id === project.placeId)?.name || 'Unknown location'}
+                          {savedPlaces?.find((p) => p.id === project.placeId)?.name || 'Unknown location'}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEdit(project)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ color: currentTheme.colors.text.secondary }}
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(project.id)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        style={{ color: currentTheme.colors.text.secondary }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    <ChevronRight className="text-secondary" size={16} />
                   </div>
-                  <div 
-                    className="text-sm"
-                    style={{ color: currentTheme.colors.text.secondary }}
-                  >
+                  <div className="text-sm text-secondary">
                     {project.fields.length} fields • {
                       project.fields.reduce((acc, field) => acc + field.zones.length, 0)
                     } zones • {
@@ -500,7 +393,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         acc + field.zones.reduce((zAcc, zone) => 
                           zAcc + (zone.datapoints?.length || 0), 0
                         ), 0
-                    ) } datapoints • Project Type: {project.typeProject|| 'UNDEFINED'}
+                    ) } datapoints • Project Type: {project.typeProject}
                   </div>
                 </div>
               ))}
@@ -509,14 +402,11 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
 
           {showDeleteConfirm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div 
-                className="p-6 rounded-lg max-w-md w-full"
-                style={{ backgroundColor: currentTheme.colors.surface }}
-              >
-                <h3 className="text-lg font-mono mb-4" style={{ color: currentTheme.colors.text.primary }}>
+              <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+                <h3 className="text-lg font-mono mb-4 text-primary">
                   Delete Project
                 </h3>
-                <p className="mb-4" style={{ color: currentTheme.colors.text.secondary }}>
+                <p className="mb-4 text-secondary">
                   This action cannot be undone. Please type the project name to confirm deletion.
                 </p>
                 <div className="space-y-4">
@@ -525,13 +415,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                     value={deleteConfirmName}
                     onChange={(e) => setDeleteConfirmName(e.target.value)}
                     placeholder="Type project name to confirm"
-                    className="w-full p-2 rounded text-sm"
-                    style={{
-                      backgroundColor: currentTheme.colors.surface,
-                      borderColor: currentTheme.colors.border,
-                      color: currentTheme.colors.text.primary,
-                      border: `1px solid ${currentTheme.colors.border}`
-                    }}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                    
                   />
                   <div className="flex justify-end gap-2">
                     <button
@@ -539,12 +423,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         setShowDeleteConfirm(null);
                         setDeleteConfirmName('');
                       }}
-                      className="px-4 py-2 rounded text-sm"
-                      style={{
-                        backgroundColor: 'transparent',
-                        color: currentTheme.colors.text.secondary,
-                        border: `1px solid ${currentTheme.colors.border}`
-                      }}
+                      className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                      
                     >
                       Cancel
                     </button>
@@ -556,10 +435,8 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
                         }
                       }}
                       disabled={deleteConfirmName !== (projectsList.find(p => p.id === showDeleteConfirm)?.name || '')}
-                      className="px-4 py-2 rounded text-sm"
+                      className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                       style={{
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white',
                         opacity: deleteConfirmName === (projectsList.find(p => p.id === showDeleteConfirm)?.name || '') ? 1 : 0.5
                       }}
                     >
@@ -572,6 +449,7 @@ const ProjectsPanel: React.FC<ProjectsPanelProps> = ({
           )}
         </>
       )}
+
     </div>
   );
 };
