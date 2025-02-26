@@ -1,8 +1,8 @@
 ---
-name: Feature Request
+name: Request
 about: Suggest an idea for this project
-title: '[FEATURE] '
-labels: enhancement
+title: ''
+labels: ''
 assignees: ''
 ---
 
@@ -10,7 +10,7 @@ assignees: ''
 
 
 
-## Feature Description
+## Description
 
 
 
@@ -20,4 +20,4 @@ assignees: ''
 [ ] Normal
 [ ] Low
 
-## Dependencies
+## Media
