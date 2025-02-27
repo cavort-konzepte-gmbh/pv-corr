@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
-import { Project } from '../types/projects';
-import { MapPin,Upload } from 'lucide-react';
+import { Project, Zone } from '../types/projects';
+import { Folder, MapPin,Plus,Upload } from 'lucide-react';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 import MediaDialog from './MediaDialog';
+import { createZone } from '../services/zones';
 
+const initialZone = {
+  name: '',
+  latitude: '',
+  longitude: ''
+}
 
 interface ZonesPanelProps {
   currentTheme: Theme;
@@ -30,6 +36,8 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [showNewZone, setShowNewZone] = useState<boolean>(false);
+  const [newZone, setNewZone] = useState<Pick<Zone, "name" > & Partial<Pick<Zone, "latitude" | "longitude">>>(initialZone);
 
 
     const handleShowMediaDialog = async (index: number, projectId: string) => {
@@ -47,6 +55,27 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
         setMediaUrls(mediatwo);
       }
     };
+
+  const handleResetAddZone = () => {
+    setShowNewZone(false);
+    setNewZone(initialZone);
+  }
+
+  const handleAddNewZone = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if(!newZone || !selectedFieldId) return;
+    createZone(selectedFieldId, newZone);
+    handleResetAddZone();
+  }
+
+  const handleChangeZone = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setNewZone(previous => ({
+      ...previous,
+      [name]: value
+    }));
+  }
+
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
     : null;
@@ -87,15 +116,24 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
             View on map
           </button>
         )}
-      </div>
       <div className="flex items-center gap-4 mt-4">
         <button
-  onClick={() => handleShowMediaDialog(0, selectedField.id)}
-  className="p-1 rounded hover:bg-opacity-80 flex items-center gap-1 text-accent-primary"
->
-  view media <Upload size={14} />
-</button>
-        </div>
+          className="p-1 rounded hover:bg-opacity-80 flex items-center gap-x-2 text-primary"
+          onClick={() => handleShowMediaDialog(0, selectedField.id)}
+        >
+          view media <Upload size={14} />
+        </button>
+      </div>
+      </div>
+
+      <button 
+        className="w-full py-3 px-4 mb-8 flex items-center justify-center gap-x-2 text-sm text-primary rounded border-accent-primary border-solid bg-accent-primary"
+        onClick={() => setShowNewZone(true)}
+      >
+        <Plus className="size-4 text-primary" />
+        Add Field
+      </button>
+
       {selectedZone ? (
         <div>
           <div className="flex items-center gap-2 mb-6">
@@ -207,6 +245,65 @@ const ZonesPanel: React.FC<ZonesPanelProps> = ({
         mediaUrls={mediaUrls}
         currentTheme={currentTheme}
       />
+
+      {showNewZone && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="flex gap-2 text-lg mb-4 text-primary">
+              <Folder className="text-accent-primary" />
+              Add New Zone
+            </h3>
+            <form onSubmit={handleAddNewZone}>
+              <label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
+                Field Name
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  type="text"
+                  name="name"
+                  required
+                  value={newZone.name}
+                  onChange={handleChangeZone}
+                />
+              </label>
+              <label className="block text-sm mb-1 text-secondary">
+                Latitude
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
+                  type="text"
+                  name="latitude"
+                  value={newZone.latitude}
+                  onChange={handleChangeZone}
+                />
+              </label>
+              <label className="block text-sm mb-1 text-secondary">
+                Longitude
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
+                  type="text"
+                  name="longitude"
+                  value={newZone.longitude}
+                  onChange={handleChangeZone}
+                />
+              </label>
+              <div className="w-full mt-6 flex items-center justify-end gap-x-2">
+                <button
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+                  type="button"
+                  onClick={handleResetAddZone}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
+                  type="submit"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

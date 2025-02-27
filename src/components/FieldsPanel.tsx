@@ -185,9 +185,10 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   };
 
   const handleChangeField = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
     setNewField(previous => ({
       ...previous,
-      [event.target.name]: event.target.value
+      [name]: value
     }))
   }
 
@@ -285,15 +286,17 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
                           {manager?.email}
                         </a>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Phone className="text-accent-primary" size={14} />
-                        <a 
-                          href="tel:+1234567890"
-                          className="text-accent-primary"
-                        >
-                          {manager?.phone}
-                        </a>
-                      </div>
+                      {manager?.phone && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="text-accent-primary" size={14} />
+                          <a 
+                            href="tel:+1234567890"
+                            className="text-accent-primary"
+                          >
+                            {manager?.phone}
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

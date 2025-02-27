@@ -69,6 +69,16 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
         </button>
       </div>
 
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-primary text-2xl">Datapoints</h2>
+        <button 
+          className="py-1.5 px-4 mb-8 flex items-center justify-center gap-x-2 text-sm text-primary rounded border-accent-primary border-solid bg-accent-primary"
+        >
+          <Plus className="size-4 text-primary" />
+          Add Field
+        </button>
+      </div>
+
       {error && (
         <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
