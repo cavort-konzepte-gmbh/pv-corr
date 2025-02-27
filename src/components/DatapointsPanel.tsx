@@ -2,9 +2,10 @@
 import { Theme } from '../types/theme';
 import { Plus, X, Edit2, Save, Upload } from 'lucide-react';
 import { Language, useTranslation } from '../types/language';
-import { Zone } from '../types/projects';
+import { Datapoint, Zone } from '../types/projects';
 import MediaDialog from './MediaDialog';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
+import { deleteDatapoint, updateDatapoint } from '../services/datapoints';
 
 interface DatapointsPanelProps {
   currentTheme: Theme;
@@ -48,6 +49,30 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
       setMediaUrls(mediatwo);
     }
   };
+
+  const handleChangeEditingValues = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setEditingValues({
+      ...editingValues,
+      [name]: value,
+    });
+  }
+
+  const handleUpdateSaveDatapoint = async (datapoint: Datapoint) => {
+    if (editingDatapoint === datapoint.id) {
+      // Save changes
+      updateDatapoint(datapoint.id, { values: editingValues });
+      setEditingDatapoint(null);
+      setEditingValues({});
+    } else {
+      setEditingDatapoint(datapoint.id);
+      setEditingValues(datapoint.values);
+    }
+  }
+
+  const handleDeleteDatapoint = async (datapointId: string) => {
+    deleteDatapoint(datapointId);
+  }
 
   if (!selectedZone) {
     return (
@@ -124,14 +149,29 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                     <td className="p-2 border border-theme">
                       <div className="flex flex-wrap gap-2">
                         {Object.entries(datapoint.values).map(
-                          ([key, value]) => (
-                            <span
-                              key={key}
-                              className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"
-                            >
-                              {key}: {value}
-                            </span>
-                          )
+                          ([key, value]) => {
+                            return  (
+                              <>
+                                {editingDatapoint !== datapoint.id && (                                  
+                                  <span
+                                    key={key}
+                                    className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"
+                                  >
+                                    {key}: {value}                                
+                                  </span>
+                                )}
+                                {editingDatapoint === datapoint.id && (
+                                  <input
+                                    key={key}
+                                    className="px-2 py-1 rounded text-xs border-theme border-solid bg-theme"
+                                    value={editingValues[key] ?? ""}
+                                    name={key}
+                                    onChange={handleChangeEditingValues}
+                                  />
+                                )}
+                              </>
+                            )
+                          }
                         )}
                       </div>
                     </td>
@@ -141,16 +181,7 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                     <td className="p-2 border border-theme">
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          onClick={() => {
-                            if (editingDatapoint === datapoint.id) {
-                              // Save changes
-                              setEditingDatapoint(null);
-                              setEditingValues({});
-                            } else {
-                              setEditingDatapoint(datapoint.id);
-                              setEditingValues(datapoint.values);
-                            }
-                          }}
+                          onClick={() => handleUpdateSaveDatapoint(datapoint)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
                           {editingDatapoint === datapoint.id ? (
@@ -158,6 +189,9 @@ const DatapointsPanel: React.FC<DatapointsPanelProps> = ({
                           ) : (
                             <Edit2 size={14} />
                           )}
+                        </button>
+                        <button onClick={() => handleDeleteDatapoint(datapoint.id)}>
+                          <X className="text-secondary" size={14} />
                         </button>
                         <button
                           onClick={() => handleShowMediaDialog(index, datapoint.id)}
