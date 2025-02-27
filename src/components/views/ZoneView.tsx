@@ -818,15 +818,14 @@ const ZoneView: React.FC<ZoneViewProps> = ({
               className="text-lg mb-4 flex items-center gap-2"
               style={{ color: currentTheme.colors.text.primary }}
             >
-              Media
+              Medianpm r
             </h3>
             
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto">
                 {mediaUrls.slice(0,mediaUrls.length).map((url, index) => (
                   <img key={index} src={url} alt={`Media ${index}`} className="w-full h-32 object-cover" />
-                ))}
-              
+                ))}              
               </div>
               
               <div className="flex justify-end gap-2">
