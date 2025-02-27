@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Person } from '../types/people';
+import { toCase } from '../utils/cases';
 
 export const fetchPeople = async (): Promise<Person[]> => {
   try {
@@ -24,20 +25,16 @@ export const fetchPeople = async (): Promise<Person[]> => {
       throw error;
     }
 
-    return data.map(person => ({
-      id: person.id,
-      hiddenId: person.hidden_id,
-      salutation: person.salutation,
-      title: person.title || '',
-      firstName: person.first_name,
-      lastName: person.last_name,
-      email: person.email,
-      phone: person.phone || '',
-      addresses: {
-        private: person.private_address_id,
-        business: person.business_address_id
-      }
-    }));
+    return data.map(person => {
+      const toCamelCase = toCase<Person>(person, "camelCase");
+      return { 
+        ...toCamelCase, 
+        addresses: { 
+          private: person.private_address_id, 
+          business: person.business_address_id 
+        } 
+      };
+    })
   } catch (err) {
     console.error('Error in fetchPeople:', err);
     throw new Error('Failed to fetch people');

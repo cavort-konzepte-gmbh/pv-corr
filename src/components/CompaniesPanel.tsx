@@ -9,6 +9,8 @@ import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
 import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
+import { fetchCompanies as fetchCompaniesService } from '../services/companies';
+import { toCase } from '../utils/cases';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
@@ -42,7 +44,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [companies, people] = await Promise.all([
+        const [_, people] = await Promise.all([
           fetchCompanies(),
           fetchPeople()
         ]);
@@ -58,28 +60,8 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
 
   const fetchCompanies = async () => {
     try {
-      const { data, error } = await supabase
-        .from('companies')
-        .select('*')
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-
-      const formattedCompanies = data.map(company => ({
-        id: company.id,
-        hiddenId: company.hidden_id,
-        name: company.name,
-        website: company.website,
-        email: company.email,
-        phone: company.phone,
-        vatId: company.vat_id,
-        registrationNumber: company.registration_number,
-        placeId: company.place_id,
-        ceoId: company.ceo_id,
-        contactPersonId: company.contact_person_id
-      }));
-
-      onSaveCompanies(formattedCompanies);
+      const companies = await fetchCompaniesService()
+      onSaveCompanies(companies);
     } catch (err) {
       console.error('Error fetching companies:', err);
       setError('Failed to load companies');
@@ -92,17 +74,12 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
     setError(null);
     
     try {
-      const companyData = {
-        name: formValues.name,
-        website: formValues.website,
-        email: formValues.email,
-        phone: formValues.phone,
-        vat_id: formValues.vatId,
-        registration_number: formValues.registrationNumber,
+      const companyData = { 
+        ...toCase(formValues, "snakeCase"),
         place_id: selectedPlaceId || null,
         ceo_id: selectedCeoId || null,
         contact_person_id: selectedContactId || null
-      };
+      }
 
       if (editingCompany) {
         const { error } = await supabase

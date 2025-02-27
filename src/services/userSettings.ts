@@ -33,7 +33,6 @@ export const fetchUserSettings = async (): Promise<UserSettings | null> => {
         showHiddenIds: false,
         theme_id: 'ferra'
       };
-
       const { error: insertError } = await supabase
         .from('user_settings')
         .insert({
