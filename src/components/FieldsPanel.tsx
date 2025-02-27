@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { Theme } from '../types/theme';
 import { Language } from '../types/language';
-import { Project } from '../types/projects';
-import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2, Upload } from 'lucide-react';
-import { updateField, createGate, updateGate, deleteGate, deleteField } from '../services/fields';
+import { Field, Project } from '../types/projects';
+import { Building2, MapPin, User, Mail, Phone, ChevronRight, Edit2, Plus, DoorOpen, Save, X, Trash2, Upload, Folder } from 'lucide-react';
+import { updateField, createGate, updateGate, deleteGate, deleteField, createField } from '../services/fields';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../services/media';
 import MediaDialog from './MediaDialog';
 import { fetchProjects } from '../services/projects';
 import { Person } from '../types/people';
 import { Company } from '../types/companies';
 import { useKeyAction } from '../hooks/useKeyAction';
+
+const initialField = {
+  name: '',
+  latitude: '',
+  longitude: ''
+}
 
 
 interface FieldsPanelProps {
@@ -50,6 +56,8 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
   const [preview, setPreview] = useState<string | null>(null);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [showNewField, setShowNewField] = useState<boolean>(false);
+  const [newField, setNewField] = useState<Pick<Field, "name" | "longitude" | "latitude">>(initialField);
 
   const selectedProject = selectedProjectId 
   ? projects.find(p => p.id === selectedProjectId)
@@ -175,6 +183,25 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
       setMediaUrls(mediatwo);
     }
   };
+
+  const handleChangeField = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewField(previous => ({
+      ...previous,
+      [event.target.name]: event.target.value
+    }))
+  }
+
+  const handleResetAddField = () => {
+    setNewField(initialField);
+    setShowNewField(false);
+  }
+
+  const handleAddNewField = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if(!newField || !selectedProjectId) return;
+    createField(selectedProjectId, newField);
+    handleResetAddField();
+  }
 
   useKeyAction(() => {
     handleUpdateGate(selectedField as string);
@@ -307,6 +334,14 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
 </button>
         </div>
       </div>
+
+      <button 
+        className="w-full py-3 px-4 mb-8 flex items-center justify-center gap-x-2 text-sm text-primary rounded border-accent-primary border-solid bg-accent-primary"
+        onClick={() => setShowNewField(true)}
+      >
+        <Plus className="size-4 text-primary" />
+        Add Field
+      </button>
 
       {/* Fields Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -590,6 +625,66 @@ const FieldsPanel: React.FC<FieldsPanelProps> = ({
         currentTheme={currentTheme}
       />
 
+      {showNewField && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="flex gap-2 text-lg mb-4 text-primary">
+              <Folder className="text-accent-primary" />
+              Add New Field
+            </h3>
+            <form onSubmit={handleAddNewField}>
+              <label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
+                Field Name
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  type="text"
+                  name="name"
+                  required
+                  value={newField.name}
+                  onChange={handleChangeField}
+                />
+              </label>
+              <label className="block text-sm mb-1 text-secondary">
+                Latitude
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
+                  type="text"
+                  name="latitude"
+                  required
+                  value={newField.latitude}
+                  onChange={handleChangeField}
+                />
+              </label>
+              <label className="block text-sm mb-1 text-secondary">
+                Longitude
+                <input
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
+                  type="text"
+                  name="longitude"
+                  required
+                  value={newField.longitude}
+                  onChange={handleChangeField}
+                />
+              </label>
+              <div className="w-full mt-6 flex items-center justify-end gap-x-2">
+                <button
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+                  type="button"
+                  onClick={handleResetAddField}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
+                  type="submit"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
