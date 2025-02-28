@@ -78,7 +78,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
           </div>
           
           <div className="flex justify-end gap-2">
-            <label className="cursor-pointer px-4 py-2 rounded text-sm" style={{ backgroundColor: currentTheme.colors.accent.primary, color: 'white' }}>
+            <label className="cursor-pointer px-4 py-2 rounded text-sm flex items-center gap-x-2" style={{ backgroundColor: currentTheme.colors.accent.primary, color: 'white' }}>
               <Upload size={16} /> Upload Media
               <input
                 type="file"
