@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Theme } from '../../types/theme';
-import { Database, Settings, Table, ArrowLeft, Palette } from 'lucide-react';
-import DatapointsPanel from '../DatapointsPanel';
+import { Database, Settings, Table, ArrowLeft, Palette, ClipboardList } from 'lucide-react';
 import SubstructuresManagement from './SubstructuresManagement';
 import ThemeManagement from './ThemeManagement';
+import  {ParameterPanel } from './ParameterPanel';
+
+
 
 interface DatabaseManagementProps {
   currentTheme: Theme;
@@ -11,7 +13,7 @@ interface DatabaseManagementProps {
 }
 
 const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, onBack }) => {
-  const [activeView, setActiveView] = useState<'overview' | 'datapoints' | 'themes' | 'substructures'>('overview');
+  const [activeView, setActiveView] = useState<'overview' | 'parameters' | 'themes' | 'substructures' | 'standards'>('overview');
   const [standards, setStandards] = useState([]);
 
   return (
@@ -55,10 +57,10 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         </button>
 
         <button
-          onClick={() => setActiveView('datapoints')}
+          onClick={() => setActiveView('parameters')}
           className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
           style={{ 
-            border: `1px solid ${activeView === 'datapoints' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+            border: `1px solid ${activeView === 'parameters' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
           }}
         >
           <div className="flex items-center gap-4">
@@ -70,10 +72,35 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
             </div>
             <div className="text-left">
               <h3 className="font-medium text-primary">
-                Datapoints
+                Parameters
               </h3>
               <p className="text-sm text-secondary">
-                Manage parameters & standards
+                Manage parameters 
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('standards')}
+          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
+          style={{ 
+            border: `1px solid ${activeView === 'standards' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <ClipboardList className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Standards
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage standards
               </p>
             </div>
           </div>
@@ -150,8 +177,8 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
       </div>
 
       <div className="rounded-lg bg-surface">
-        {activeView === 'datapoints' && (
-          <DatapointsPanel
+        {activeView === 'parameters' && (
+          <ParameterPanel
             currentTheme={currentTheme}
             currentLanguage="en"
           />
@@ -177,6 +204,17 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
               Database Overview
             </h3>
             {/* Add overview content here */}
+          </div>
+        )}
+        {activeView === 'standards' && (
+          <div className="p-6">
+            <h3 
+              className="text-lg font-medium mb-4"
+              style={{ color: currentTheme.colors.text.primary }}
+            >
+              Standards Management
+            </h3>
+            {/* Add standards management content here */}
           </div>
         )}
       </div>
