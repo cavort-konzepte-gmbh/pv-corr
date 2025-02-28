@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { generateHiddenId } from '../utils/generateHiddenId';
+import { Datapoint } from '../types/projects';
 
 export const deleteDatapoint = async (datapointId: string) => {
   try {
@@ -122,3 +123,21 @@ async function generateSequentialId(zoneId: string): Promise<string> {
   const nextNum = parseInt(numStr, 10) + 1;
   return `DP${String(nextNum).padStart(3, '0')}`;
 }
+
+
+ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('datapoints')
+      .select()
+      .eq('zone_id', zoneId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Error fetching datapoints:', err);
+    throw err;
+  }}
