@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Theme, THEMES } from '../types/theme';
 import { Language, LANGUAGES, useTranslation } from '../types/language';
-import { Project } from '../types/projects';
+import { Project, Zone } from '../types/projects';
 import { Company } from '../types/companies';
 import { fetchProjects } from '../services/projects';
 import { useAuth } from './auth/AuthProvider';
@@ -35,6 +35,7 @@ const DashboardLayout = () => {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslation(currentLanguage);
   const { user } = useAuth();
+  const [selectedZone, setSelectedZone] = useState<Zone | undefined>();
 
   const handleLanguageChange = (language: Language) => {
     if (!language || !LANGUAGES.find(l => l.id === language)) return;
