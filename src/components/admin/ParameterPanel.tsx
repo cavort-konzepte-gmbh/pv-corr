@@ -17,6 +17,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewParameter, setIsNewParameter] = useState<boolean>(false);
   const [newParameter, setNewParameter] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -78,12 +79,21 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   };
 
   const handleAddNewParameter = async () => {
-    const newParam = await createParameter(newParameter);
-    const updatedParameters = await fetchParameters();
-    setParameters(updatedParameters);
-    resetValues();
-    setNewParameter({});
-    setIsNewParameter(false);
+    try {
+      if (!newParameter.rangeType) {
+        setError('Range type is required');
+        return;
+      }
+
+      const newParam = await createParameter(newParameter);
+      const updatedParameters = await fetchParameters();
+      setParameters(updatedParameters);
+      resetValues();
+      setNewParameter({});
+      setIsNewParameter(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleCancelNewParameter = () => {
@@ -155,13 +165,26 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <input
-                          type="text"
+                        <select
                           name="unit"
                           value={editingValues.unit || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        />
+                        >
+                          <option value="">No unit</option>
+                          <option value="Ohm.m">Ohm.m</option>
+                          <option value="Ohm.cm">Ohm.cm</option>
+                          <option value="mmol/kg">mmol/kg</option>
+                          <option value="mg/kg">mg/kg</option>
+                          <option value="g/mol">g/mol</option>
+                          <option value="mg/mmol">mg/mmol</option>
+                          <option value="%">%</option>
+                          <option value="ppm">ppm</option>
+                          <option value="V">V</option>
+                          <option value="mV">mV</option>
+                          <option value="A">A</option>
+                          <option value="mA">mA</option>
+                        </select>
                       ) : (
                         parameter.unit
                       )}
@@ -236,22 +259,43 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       />
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
+                      <select
                         name="unit"
                         value={newParameter.unit || ''}
                         onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
                         className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      >
+                        <option value="">No unit</option>
+                        <option value="Ohm.m">Ohm.m</option>
+                        <option value="Ohm.cm">Ohm.cm</option>
+                        <option value="mmol/kg">mmol/kg</option>
+                        <option value="mg/kg">mg/kg</option>
+                        <option value="g/mol">g/mol</option>
+                        <option value="mg/mmol">mg/mmol</option>
+                        <option value="%">%</option>
+                        <option value="ppm">ppm</option>
+                        <option value="V">V</option>
+                        <option value="mV">mV</option>
+                        <option value="A">A</option>
+                        <option value="mA">mA</option>
+                      </select>
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="rangeType"
+                      <select
                         value={newParameter.rangeType || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                        onChange={(e) => handleChangeParameter('rangeType', e.target.value)}
+                        required
                         className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      >
+                        <option value="">Select Range Type</option>
+                        <option value="range">Range</option>
+                        <option value="selection">Selection</option>
+                        <option value="open">Open</option>
+                        <option value="greater">Greater Than</option>
+                        <option value="less">Less Than</option>
+                        <option value="greaterEqual">Greater Than or Equal</option>
+                        <option value="lessEqual">Less Than or Equal</option>
+                      </select>
                     </td>
                     <td className="p-2 border border-theme">
                       <input

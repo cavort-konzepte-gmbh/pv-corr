@@ -3,13 +3,15 @@ import { Theme } from '../../types/theme';
 import { Users, Database, Settings, Shield, LogOut } from 'lucide-react';
 import DatabaseManagement from './DatabaseManagement';
 import UserManagement from './UserManagement';
+import AdminSettings from './AdminSettings';
 import { supabase } from '../../lib/supabase';
 
 interface AdminDashboardProps {
   currentTheme: Theme;
+  currentLanguage: Language;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
   const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'security' | 'settings'>('overview');
   
   const handleSignOut = async () => {
@@ -26,12 +28,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme }) => {
       {activeView === 'database' ? (
         <DatabaseManagement 
           currentTheme={currentTheme} 
+          currentLanguage={currentLanguage}
           onBack={() => setActiveView('overview')} 
         />
       ) : activeView === 'users' ? (
         <UserManagement 
           currentTheme={currentTheme} 
           onBack={() => setActiveView('overview')} 
+        />
+      ) : activeView === 'settings' ? (
+        <AdminSettings
+          currentTheme={currentTheme}
+          onBack={() => setActiveView('overview')}
         />
       ) : (
         <div className="p-8">

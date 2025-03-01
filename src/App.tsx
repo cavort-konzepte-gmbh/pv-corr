@@ -1,6 +1,7 @@
 import DashboardLayout from './components/DashboardLayout';
 import { AuthProvider } from './components/auth/AuthProvider';
 import { Theme } from './types/theme';
+import { Language } from './types/language';
 
 // Use the default theme for now
 const currentTheme: Theme = {
@@ -22,9 +23,12 @@ const currentTheme: Theme = {
   }
 };
 
+// Use English as default language
+const currentLanguage: Language = 'en';
+
 function App() {
   return (
-    <AuthProvider currentTheme={currentTheme}>
+    <AuthProvider currentTheme={currentTheme} currentLanguage={currentLanguage}>
       <DashboardLayout />
     </AuthProvider>
   );

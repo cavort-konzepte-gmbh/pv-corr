@@ -3,6 +3,10 @@ import { Zone } from '../types/projects';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
 export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hiddenId' | 'datapoints'>) => {
+  if (!fieldId) {
+    throw new Error('Field ID is required');
+  }
+
   // First check if field exists
   const { data: field, error: fieldError } = await supabase
     .from('fields')
@@ -31,9 +35,9 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
     console.error('Error creating zone:', error);
     throw error;
   }
-
-  // Return the complete zone data
-  const { data: completeZone, error: refreshError } = await supabase
+  
+  // Fetch complete zone data after creation
+  const { data: completeZone, error: fetchError } = await supabase
     .from('zones')
     .select(`
       *,
@@ -42,12 +46,12 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
     .eq('id', data.id)
     .single();
 
-  if (refreshError) {
-    console.error('Error refreshing zone data:', refreshError);
-    throw refreshError;
+  if (fetchError) {
+    console.error('Error fetching complete zone:', fetchError);
+    throw fetchError;
   }
 
-  return data;
+  return completeZone;
 };
 
 export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Zone> => {
