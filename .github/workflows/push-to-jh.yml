@@ -1,0 +1,50 @@
+name: Copy to cvrt-jh
+on:
+  workflow_dispatch:
+jobs:
+  copy-to-cvrt-jh:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+      
+      - name: Clone source repository (cavort-konzepte-gmbh)
+        run: |
+          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
+      
+      - name: Clone destination repository (cvrt-jh)
+        run: |
+          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git dest-repo
+          
+      - name: Clean destination repository (cvrt-jh/pv-corr)
+        run: |
+          cd dest-repo
+          # Clear out all existing content except .git directory
+          git rm -rf .
+          git clean -fxd
+          # Keep only the .git directory
+          git reset --hard
+          # Make sure we're on main branch
+          git checkout main
+      
+      - name: Copy files from cavort-konzepte-gmbh to cvrt-jh
+        run: |
+          cd source-repo
+          # Copy all files except .git, supabase, .backup directories, and specific workflow files
+          find . -mindepth 1 -not -path "./.git*" -not -path "./supabase*" -not -path "./.backup*" -not -path "./.github/workflows/copy-to-timestamp.yml" -exec cp -r --parents {} ../dest-repo/ \;
+      
+      - name: Commit and push to destination
+        run: |
+          cd dest-repo
+          # Stage all changes
+          git add .
+          git commit -m "Update from cavort-konzepte-gmbh/pv-corr as of $(date +'%Y-%m-%d %H:%M')"
+          git push https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git main
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf source-repo dest-repo
