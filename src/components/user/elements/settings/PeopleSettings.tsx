@@ -1,0 +1,29 @@
+import React from 'react';
+import { Theme } from '../../../../types/theme';
+import { Language } from '../../../../types/language';
+import PeoplePanel from '../../../PeoplePanel';
+
+interface PeopleSettingsProps {
+  currentTheme: Theme;
+  currentLanguage: Language;
+  savedPeople: Person[];
+  onSavePeople: (people: Person[]) => void;
+}
+
+const PeopleSettings: React.FC<PeopleSettingsProps> = ({
+  currentTheme,
+  currentLanguage,
+  savedPeople,
+  onSavePeople
+}) => {
+  return (
+    <PeoplePanel
+      currentTheme={currentTheme}
+      currentLanguage={currentLanguage}
+      savedPeople={savedPeople}
+      onSavePeople={onSavePeople}
+    />
+  );
+};
+
+export default PeopleSettings;

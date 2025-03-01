@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Language } from '../types/language';
 import { ThemeId } from '../types/theme';
-
 export interface UserSettings {
   language: Language;
   decimalSeparator: ',' | '.';
@@ -14,49 +13,16 @@ export const fetchUserSettings = async (): Promise<UserSettings | null> => {
   if (!session) return null;
 
   try {
-    const { data, error } = await supabase
-      .from('user_settings')
-      .select('language, decimal_separator, show_hidden_ids, theme_id')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
+    const metadata = session.user.user_metadata || {};
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
-      console.error('Error fetching user settings:', error);
-      return null;
-    }
-
-    // If no settings exist yet, create default settings
-    if (!data) {
-      const defaultSettings: UserSettings = {
-        language: 'en',
-        decimalSeparator: ',',
-        showHiddenIds: false,
-        theme_id: 'ferra'
-      };
-      const { error: insertError } = await supabase
-        .from('user_settings')
-        .insert({
-          user_id: session.user.id,
-          language: defaultSettings.language,
-          decimal_separator: defaultSettings.decimalSeparator,
-          show_hidden_ids: defaultSettings.showHiddenIds,
-          theme_id: defaultSettings.theme_id
-        });
-
-      if (insertError) {
-        console.error('Error creating default settings:', insertError);
-        return null;
-      }
-
-      return defaultSettings;
-    }
-
+    // Return settings from metadata with defaults
     return {
-      language: data.language as Language,
-      decimalSeparator: data.decimal_separator as ',' | '.',
-      showHiddenIds: data.show_hidden_ids,
-      theme_id: data.theme_id || 'ferra' as ThemeId
+      language: metadata.language || 'en',
+      decimalSeparator: metadata.decimal_separator || ',',
+      showHiddenIds: metadata.show_hidden_ids || false,
+      theme_id: metadata.theme_id || 'ferra'
     };
+
   } catch (err) {
     console.error('Error in fetchUserSettings:', err);
     return null;
@@ -64,49 +30,35 @@ export const fetchUserSettings = async (): Promise<UserSettings | null> => {
 };
 
 export const updateUserSettings = async (settings: Partial<UserSettings>): Promise<boolean> => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return false;
-  
   try {
-    // First check if settings exist for this user
-    const { data: existingSettings } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
+    // Get current user metadata first
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!user) throw new Error('No user found');
 
-    const updateData = {
+    // Merge new settings with existing metadata
+    const metadata = {
+      ...user.user_metadata,
       ...(settings.language && { language: settings.language }),
       ...(settings.decimalSeparator && { decimal_separator: settings.decimalSeparator }),
       ...(settings.showHiddenIds !== undefined && { show_hidden_ids: settings.showHiddenIds }),
       ...(settings.theme_id && { theme_id: settings.theme_id })
     };
 
-    if (!existingSettings) {
-      // If no settings exist, create new settings
-      const { error: insertError } = await supabase
-        .from('user_settings')
-        .insert({
-          user_id: session.user.id,
-          ...updateData
-        });
+    // Update user metadata
+    const { error } = await supabase.auth.updateUser({
+      data: metadata
+    });
 
-      if (insertError) {
-        console.error('Error creating user settings:', insertError);
-        return false;
-      }
-    } else {
-      // If settings exist, update them
-      const { error: updateError } = await supabase
-        .from('user_settings')
-        .update(updateData)
-        .eq('user_id', session.user.id);
-
-      if (updateError) {
-        console.error('Error updating user settings:', updateError);
-        return false;
-      }
+    if (error) {
+      console.error('Error updating user settings:', error);
+      return false;
     }
+
+    // Dispatch event with updated settings
+    window.dispatchEvent(new CustomEvent('userSettingsLoaded', { 
+      detail: metadata
+    }));
 
     return true;
   } catch (error) {

@@ -2,7 +2,6 @@ export interface Company {
   id: string;
   hiddenId: string;
   name: string;
-  placeId?: string;
   ceoId?: string;
   contactPersonId?: string;
   website?: string;

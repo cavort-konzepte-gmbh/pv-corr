@@ -1,50 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { Shield, User, Search, Edit2, Save, X, ArrowLeft } from 'lucide-react';
+import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
+import { createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
 
 interface UserManagementProps {
   currentTheme: Theme;
   onBack: () => void;
 }
 
-interface UserData {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  display_name: string;
-  admin_level: 'super_admin' | 'admin' | 'user';
-  created_at: string;
-}
-
 const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack }) => {
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>('user');
+  const [showNewUserForm, setShowNewUserForm] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: '',
+    password: '',
+    displayName: ''
+  });
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_management')
-        .select('*');
-
-      if (error) throw error;
-
-      const formattedUsers = data.map(user => ({
-        id: user.id,
-        email: user.email || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
-        display_name: user.display_name || user.email,
-        admin_level: (user.admin_level || 'user') as 'super_admin' | 'admin' | 'user',
-        created_at: user.created_at
-      }));
-
-      setUsers(formattedUsers);
+      setLoading(true);
+      const users = await listUsers();
+      setUsers(users);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Failed to load users');
@@ -59,37 +42,75 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
 
   const handleUpdateRole = async (userId: string) => {
     try {
-      const { error } = await supabase.rpc('update_user_role', {
-        target_user_id: userId,
-        new_role: selectedRole
-      }); 
+      setError(null);
+      await updateUser(userId, {
+        adminLevel: selectedRole
+      });
 
-      if (error) throw error;
-
-      // Refresh user list
+      // Refresh user list and reset state
       await fetchUsers();
       setEditingUser(null);
+      setError(null);
     } catch (err) {
       console.error('Error updating user role:', err);
-      setError('Failed to update user role');
+      setError(err instanceof Error ? err.message : 'Failed to update user role');
     }
   };
 
-  const handleUpdateUser = async (userId: string, data: Partial<UserData>) => {
+  const handleUpdateUser = async (userId: string, data: { firstName?: string; lastName?: string }) => {
     try {
-      const { error } = await supabase
-        .from('user_management')
-        .update(data)
-        .eq('id', userId);
+      // Get current user data
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        {
+        user_metadata: {
+          admin_level: selectedRole
+        }
+      }
+      );
 
       if (error) throw error;
-
-      // Refresh user list
       await fetchUsers();
       setEditingUser(null);
     } catch (err) {
       console.error('Error updating user:', err);
       setError('Failed to update user');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      setError(null);
+      await deleteUser(userId);
+      // Refresh user list
+      await fetchUsers();
+      setError(null);
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete user');
+    }
+  };
+
+  const handleCreateUser = async () => {
+    try {
+      setError(null);
+      if (!newUser.email || !newUser.password) {
+        setError('Email and password are required');
+        return;
+      }
+
+      await createUser({
+        email: newUser.email,
+        password: newUser.password,
+        displayName: newUser.displayName
+      });
+
+      await fetchUsers();
+      setShowNewUserForm(false);
+      setNewUser({ email: '', password: '', displayName: '' });
+    } catch (err) {
+      console.error('Error creating user:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create user');
     }
   };
 
@@ -112,10 +133,27 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </div>
 
       {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        <div 
+          className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface"
+          style={{ borderWidth: '1px' }}
+        >
           {error}
+          <button 
+            onClick={() => setError(null)} 
+            className="ml-2 text-accent-primary hover:text-accent-hover"
+          >
+            <X size={16} />
+          </button>
         </div>
       )}
+
+      <button
+        onClick={() => setShowNewUserForm(true)}
+        className="px-4 py-2 mb-6 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+      >
+        <Plus size={16} />
+        Add New User
+      </button>
 
       <div className="flex items-center gap-4 p-4 mb-6 rounded-lg bg-surface">
         <Search size={20} style={{ color: currentTheme.colors.text.secondary }} />
@@ -129,6 +167,11 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </div>
 
       <div className="rounded-lg overflow-hidden bg-surface">
+        {loading && (
+          <div className="text-center p-4 text-secondary">
+            Loading...
+          </div>
+        )}
         <table className="w-full">
           <thead>
             <tr>
@@ -163,26 +206,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                     <div>
                       <div className="flex flex-col">
                         <span className="text-primary">
-                          {editingUser === user.id ? (
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={user.first_name}
-                                onChange={(e) => handleUpdateUser(user.id, { first_name: e.target.value })}
-                                placeholder="First name"
-                                className="p-1 rounded text-sm text-primary border-theme border-solid bg-theme"                                
-                              />
-                              <input
-                                type="text"
-                                value={user.last_name}
-                                onChange={(e) => handleUpdateUser(user.id, { last_name: e.target.value })}
-                                placeholder="Last name"
-                                className="p-1 rounded text-sm text-primary border-theme border-solid bg-theme"                                
-                              />
-                            </div>
-                          ) : (
-                            user.display_name || user.email
-                          )}
+                          {user.displayName}
                         </span>
                         <span className="text-sm text-secondary">
                           {user.email}
@@ -192,60 +216,65 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                   </div>
                 </td>
                 <td className="p-4">
-                  {editingUser === user.id ? (
-                    <select
-                      value={selectedRole}
-                      onChange={(e) => setSelectedRole(e.target.value as any)}
-                      className="p-1 rounded text-sm text-primary border-theme border-solid bg-theme"                      
-                    >
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                      <option value="super_admin">Super Admin</option>
-                    </select>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Shield className="text-accent-primary" size={16} />
-                      <span className="text-sm text-primary">
-                        {user.admin_level === 'super_admin' ? 'Super Admin' : 
-                         user.admin_level === 'admin' ? 'Admin' : 'User'}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Shield className="text-accent-primary" size={16} />
+                    <span className="text-sm text-secondary">
+                      {user.adminLevel === 'super_admin' ? 'Super Admin' : 
+                       user.adminLevel === 'admin' ? 'Admin' : 'User'}
+                    </span>
+                  </div>
                 </td>
                 <td className="p-4 text-sm text-secondary">
-                  {new Date(user.created_at).toLocaleDateString()}
+                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
                 </td>
                 <td className="p-4 text-right">
                   {editingUser === user.id ? (
                     <div className="flex items-center justify-end gap-2">
                       <button
-                        onClick={() => {
-                          handleUpdateRole(user.id);
-                          handleUpdateUser(user.id, {
-                            admin_level: selectedRole
-                          });
-                        }}
+                        onClick={() => handleUpdateRole(user.id)}
+                        disabled={loading}
                         className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
+                        style={{ opacity: loading ? 0.5 : 1 }}
                       >
                         <Save size={16} />
                       </button>
                       <button
                         onClick={() => setEditingUser(null)}
+                        disabled={loading}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        style={{ opacity: loading ? 0.5 : 1 }}
                       >
                         <X size={16} />
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => {
-                        setEditingUser(user.id);
-                        setSelectedRole(user.admin_level);
-                      }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    >
-                      <Edit2 size={16} />
-                    </button>
+                   <div className="flex items-center justify-end gap-2">
+                     <button
+                       onClick={() => {
+                         if (loading) return;
+                         setEditingUser(user.id);
+                         setSelectedRole(user.adminLevel);
+                       }}
+                       disabled={loading}
+                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                       style={{ opacity: loading ? 0.5 : 1 }}
+                     >
+                       <Edit2 size={16} />
+                     </button>
+                     {user.adminLevel !== 'super_admin' && (
+                       <button
+                         onClick={() => {
+                           if (loading) return;
+                           handleDeleteUser(user.id);
+                         }}
+                         disabled={loading}
+                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                         style={{ opacity: loading ? 0.5 : 1 }}
+                       >
+                         <Trash2 size={16} />
+                       </button>
+                     )}
+                   </div>
                   )}
                 </td>
               </tr>
@@ -253,6 +282,77 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
           </tbody>
         </table>
       </div>
+
+      {showNewUserForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
+              <User className="text-accent-primary" size={20} />
+              Add New User
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm mb-1 text-secondary">
+                  Email Address
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm mb-1 text-secondary">
+                  Password
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm mb-1 text-secondary">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={newUser.displayName}
+                  onChange={(e) => setNewUser({ ...newUser, displayName: e.target.value })}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 mt-6">
+                <button
+                  onClick={() => {
+                    setShowNewUserForm(false);
+                    setNewUser({ email: '', password: '', displayName: '' });
+                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateUser}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
+                >
+                  Create User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

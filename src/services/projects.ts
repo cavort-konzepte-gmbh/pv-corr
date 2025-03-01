@@ -56,18 +56,37 @@ export const deleteProject = async (projectId: string) => {
 export const fetchProjects = async (): Promise<Project[]> => {
   try {
     const { data, error } = await supabase
-      .from('projects')
+      .from('user_projects')
       .select(`
-        *,
-        fields!fields_project_id_fkey (
-          *,
-          gates!gates_field_id_fkey (*),
-          zones!zones_field_id_fkey (
-            *,
-            datapoints!datapoints_zone_id_fkey (*)
+        project:projects (
+          id,
+          hidden_id,
+          name,
+          client_ref,
+          latitude,
+          longitude,
+          image_url,
+          company_id,
+          manager_id,
+          type_project,
+          fields:fields (
+            id,
+            hidden_id,
+            name,
+            latitude,
+            longitude,
+            has_fence,
+            gates:gates (*),
+            zones:zones (
+              id,
+              hidden_id,
+              name,
+              latitude,
+              longitude,
+              datapoints:datapoints (*)
+            )
           )
-        )
-      `)
+        )`)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -78,7 +97,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
     if (!data) {
       return [];
     }
-    return data.map(project => ({
+    return data.map(({ project }) => ({
       id: project.id,
       hiddenId: project.hidden_id,
       name: project.name,
@@ -86,7 +105,6 @@ export const fetchProjects = async (): Promise<Project[]> => {
       latitude: project.latitude,
       longitude: project.longitude,
       imageUrl: project.image_url,
-      placeId: project.place_id,
       companyId: project.company_id,
       managerId: project.manager_id,
       typeProject: project.type_project,
@@ -96,6 +114,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
         name: field.name,
         latitude: field.latitude,
         longitude: field.longitude,
+        has_fence: field.has_fence,
         gates: (field.gates || []).map(gate => ({
           id: gate.id,
           hiddenId: gate.hidden_id,
