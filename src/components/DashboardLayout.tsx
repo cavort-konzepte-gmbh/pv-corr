@@ -209,6 +209,7 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
               setSelectedZone(undefined);
             }}
+            onProjectsChange={setProjects}
           />
         ) : (
           <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>

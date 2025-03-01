@@ -4,6 +4,13 @@ import { Plus, Folder } from 'lucide-react';
 import { createField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
 
+const initialState = {
+  name: '',
+  latitude: '',
+  longitude: '',
+  has_fence: 'no'
+}
+
 interface FieldFormProps {
   currentTheme: Theme;
   selectedProjectId: string;
@@ -16,29 +23,19 @@ const FieldForm: React.FC<FieldFormProps> = ({
   onProjectsChange
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [newField, setNewField] = useState({
-    name: '',
-    latitude: '',
-    longitude: '',
-    has_fence: false
-  });
+  const [newField, setNewField] = useState(initialState);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
     setNewField(previous => ({
       ...previous,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
   const handleReset = () => {
-    setNewField({
-      name: '',
-      latitude: '',
-      longitude: '',
-      has_fence: false
-    });
+    setNewField(initialState);
     setShowForm(false);
   };
 
@@ -112,15 +109,8 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 <label>Has Fence</label>
                 <select
                   name="has_fence"
-                  value={newField.has_fence ? 'yes' : 'no'}
-                  onChange={(e) => handleChange({
-                    target: {
-                      name: 'has_fence',
-                      value: e.target.value === 'yes',
-                      type: 'checkbox',
-                      checked: e.target.value === 'yes'
-                    }
-                  } as React.ChangeEvent<HTMLInputElement>)}
+                  value={newField.has_fence}
+                  onChange={handleChange}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="no">No</option>

@@ -67,6 +67,7 @@ const Fields: React.FC<FieldsProps> = ({
         currentTheme={currentTheme}
         fields={selectedProject.fields}
         onSelectField={(fieldId) => onSelectField(selectedProject.id, fieldId)}
+        onProjectsChange={onProjectsChange}
       />
     </div>
   );

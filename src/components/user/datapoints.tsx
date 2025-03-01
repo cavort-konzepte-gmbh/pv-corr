@@ -20,6 +20,7 @@ interface DatapointsProps {
   };
   selectedZone?: Zone;
   onBack: () => void;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
 const Datapoints: React.FC<DatapointsProps> = ({
@@ -29,6 +30,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   field,
   selectedZone,
   onBack,
+  onProjectsChange
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +95,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentLanguage={currentLanguage}
         parameters={parameters}
         zoneId={selectedZone.id}
+        onProjectsChange={onProjectsChange}
       />
 
       <DatapointList
@@ -100,6 +103,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentLanguage={currentLanguage}
         datapoints={selectedZone.datapoints || []}
         parameters={parameters}
+        onProjectsChange={onProjectsChange}
       />
     </div>
   );

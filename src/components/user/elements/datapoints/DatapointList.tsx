@@ -6,19 +6,23 @@ import { Datapoint } from '../../../../types/projects';
 import { Edit2, Save, X, Upload, Clock } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../../../../services/media';
+import { fetchProjects } from '../../../../services/projects';
+import { updateDatapoint } from '../../../../services/datapoints';
 
 interface DatapointListProps {
   currentTheme: Theme;
   currentLanguage: Language;
   datapoints: Datapoint[];
   parameters: Parameter[];
+  onProjectsChange: (projects: any[]) => void;
 }
 
 const DatapointList: React.FC<DatapointListProps> = ({
   currentTheme,
   currentLanguage,
   datapoints,
-  parameters
+  parameters,
+  onProjectsChange
 }) => {
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
@@ -43,6 +47,25 @@ const DatapointList: React.FC<DatapointListProps> = ({
       setMediaUrls(urls);
     }
   };
+
+  const handleUpdateDatapoint = async (datapoint: Datapoint) => {
+    if (editingDatapoint === datapoint.id) {
+      // Save changes
+      setEditingDatapoint(null);
+      setEditingName('');
+      setEditingValues({});
+      await updateDatapoint(editingDatapoint, {
+        values: editingValues
+      })
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
+    } else {
+      // Start editing
+      setEditingDatapoint(datapoint.id);
+      setEditingName(datapoint.name || datapoint.sequentialId);
+      setEditingValues(datapoint.values);
+    }
+  }
 
   return (
     <div className="mt-8">
@@ -106,19 +129,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     </div>
                   </div>
                   <button
-                    onClick={() => {
-                      if (editingDatapoint === datapoint.id) {
-                        // Save changes
-                        setEditingDatapoint(null);
-                        setEditingName('');
-                        setEditingValues({});
-                      } else {
-                        // Start editing
-                        setEditingDatapoint(datapoint.id);
-                        setEditingName(datapoint.name || datapoint.sequentialId);
-                        setEditingValues(datapoint.values);
-                      }
-                    }}
+                    onClick={() => handleUpdateDatapoint(datapoint)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     {editingDatapoint === datapoint.id ? (
