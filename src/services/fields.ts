@@ -3,6 +3,10 @@ import { Field, Gate } from '../types/projects';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
 export const createField = async (projectId: string, field: Omit<Field, 'id' | 'hiddenId' | 'gates' | 'zones'>) => {
+  if (!projectId) {
+    throw new Error('Project ID is required');
+  }
+
   // Create the field
   const { data: newField, error } = await supabase
     .from('fields')
@@ -20,17 +24,27 @@ export const createField = async (projectId: string, field: Omit<Field, 'id' | '
     console.error('Error creating field:', error);
     throw error;
   }
+  
+  // Fetch complete field data after creation
+  const { data: completeField, error: fetchError } = await supabase
+    .from('fields')
+    .select(`
+      *,
+      gates (*),
+      zones (
+        *,
+        datapoints (*)
+      )
+    `)
+    .eq('id', newField.id)
+    .single();
 
-  // Return the new field with empty gates and zones arrays
-  return {
-    id: newField.id,
-    hiddenId: newField.hidden_id,
-    name: newField.name,
-    latitude: newField.latitude || '',
-    longitude: newField.longitude || '',
-    gates: [],
-    zones: []
-  };
+  if (fetchError) {
+    console.error('Error fetching complete field:', fetchError);
+    throw fetchError;
+  }
+
+  return completeField;
 };
 
 export const updateField = async (fieldId: string, field: Partial<Field>) => {

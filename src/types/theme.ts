@@ -19,9 +19,29 @@ export interface Theme {
   colors: ThemeColors;
 }
 
-export type ThemeId = 'tokyo-night' | 'ferra' | 'monokai' | 'nord' | 'dracula';
+export type ThemeId = 'tokyo-night' | 'ferra' | 'monokai' | 'nord' | 'dracula' | 'zimmermann';
 
 export const THEMES: Theme[] = [
+  {
+    id: 'zimmermann',
+    name: 'Zimmermann',
+    colors: {
+      background: '#FFFFFF',
+      surface: '#F5F7FA',
+      border: '#E5E9F0',
+      text: {
+        primary: '#0A1A35',
+        secondary: '#64748B',
+        accent: '#FFFFFF'
+      },
+      accent: {
+        primary: '#0A1A35',
+        hover: '#0A1A35',
+        active: '#B5BD00',
+        text: '#FFFFFF'
+      }
+    }
+  },
   {
     id: 'tokyo-night',
     name: 'Tokyo Night',

@@ -30,7 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
       }
       
       // Check if this is an admin login attempt
-      const adminLevel = user?.user_metadata?.admin_level;
+      const adminLevel = user?.user_metadata?.admin_level || 'user';
       if (loginType === 'admin' && (!adminLevel || adminLevel === 'user')) {
         throw new Error('Invalid admin credentials');
       }

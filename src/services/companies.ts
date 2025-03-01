@@ -1,7 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { Company } from "../types/companies";
 import { toCase } from "../utils/cases";
-
 export const fetchCompanies = async (): Promise<Company[]> => {
   try {
     const { data, error } = await supabase
@@ -16,7 +15,6 @@ export const fetchCompanies = async (): Promise<Company[]> => {
         phone,
         vat_id,
         registration_number,
-        place_id,
         ceo_id,
         contact_person_id
       `

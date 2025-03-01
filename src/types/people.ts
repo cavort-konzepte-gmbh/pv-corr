@@ -7,10 +7,6 @@ export interface Person {
   lastName: string;
   email: string;
   phone?: string;
-  addresses: {
-    private?: string;
-    business?: string;
-  };
 }
 
 export interface PersonField {
@@ -59,18 +55,6 @@ export const PERSON_FIELDS: PersonField[] = [
     id: 'phone',
     label: 'company.phone',
     type: 'tel',
-    required: false
-  },
-  {
-    id: 'privateAddress',
-    label: 'people.private_address',
-    type: 'address',
-    required: false
-  },
-  {
-    id: 'businessAddress',
-    label: 'people.private_business',
-    type: 'address',
     required: false
   }
 ];
