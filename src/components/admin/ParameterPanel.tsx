@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Language, useTranslation } from "../../types/language";
 import { Theme } from "../../types/theme";
 import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from "../../services/parameters";
-import { Edit2, Plus, Save, Trash2, X } from "lucide-react";
+import { Edit2, Plus, Save, X } from "lucide-react";
+import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
 
 interface ParameterPanelProps {
   currentTheme: Theme;
@@ -17,6 +18,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewParameter, setIsNewParameter] = useState<boolean>(false);
   const [newParameter, setNewParameter] = useState<Record<string, string>>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const load = async () => {
@@ -67,9 +72,21 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   };
 
   const handleDeleteParameter = async (parameterId: string) => {
+    // Get parameter name for confirmation
+    const parameter = parameters.find(p => p.id === parameterId);
+    if (!parameter) return;
+
+    // Only proceed if name matches
+    if (deleteConfirmName !== parameter.name) {
+      setError('Parameter name does not match');
+      return;
+    }
+
     await deleteParameter(parameterId);
     const updatedParameters = await fetchParameters();
     setParameters(updatedParameters);
+    setDeleteConfirm(null);
+    setDeleteConfirmName('');
   };
 
   const handleOpenParameter = () => {
@@ -78,12 +95,21 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   };
 
   const handleAddNewParameter = async () => {
-    const newParam = await createParameter(newParameter);
-    const updatedParameters = await fetchParameters();
-    setParameters(updatedParameters);
-    resetValues();
-    setNewParameter({});
-    setIsNewParameter(false);
+    try {
+      if (!newParameter.rangeType) {
+        setError('Range type is required');
+        return;
+      }
+
+      const newParam = await createParameter(newParameter);
+      const updatedParameters = await fetchParameters();
+      setParameters(updatedParameters);
+      resetValues();
+      setNewParameter({});
+      setIsNewParameter(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleCancelNewParameter = () => {
@@ -142,33 +168,64 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                   <tr key={parameter.id}>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <input
+                        <FormHandler
+                          isEditing={true}
+                          onSave={() => handleUpdateSaveParameter(parameter)}
+                        >
+                        <FormInput
                           type="text"
                           name="name"
                           value={editingValues.name || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
+                        </FormHandler>
                       ) : (
                         parameter.name
                       )}
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <input
+                        <FormInput
                           type="text"
-                          name="unit"
-                          value={editingValues.unit || ''}
+                          name="shortName"
+                          value={editingValues.shortName || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                       ) : (
-                        parameter.unit
+                        parameter.shortName || '-'
                       )}
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <input
+                        <FormSelect
+                          name="unit"
+                          value={editingValues.unit || ''}
+                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        >
+                          <option value="">No unit</option>
+                          <option value="Ohm.m">Ohm.m</option>
+                          <option value="Ohm.cm">Ohm.cm</option>
+                          <option value="mmol/kg">mmol/kg</option>
+                          <option value="mg/kg">mg/kg</option>
+                          <option value="g/mol">g/mol</option>
+                          <option value="mg/mmol">mg/mmol</option>
+                          <option value="%">%</option>
+                          <option value="ppm">ppm</option>
+                          <option value="V">V</option>
+                          <option value="mV">mV</option>
+                          <option value="A">A</option>
+                          <option value="mA">mA</option>
+                        </FormSelect>
+                      ) : (
+                        parameter.unit || '-'
+                      )}
+                    </td>
+                    <td className="p-2 border border-theme">
+                      {editingParameter === parameter.id ? (
+                        <FormInput
                           type="text"
                           name="rangeType"
                           value={editingValues.rangeType || ''}
@@ -181,7 +238,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <input
+                        <FormInput
                           type="text"
                           name="rangeValue"
                           value={editingValues.rangeValue || ''}
@@ -190,19 +247,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       ) : (
                         parameter.rangeValue
-                      )}
-                    </td>
-                    <td className="p-2 border border-theme">
-                      {editingParameter === parameter.id ? (
-                        <input
-                          type="text"
-                          name="shortName"
-                          value={editingValues.shortName || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        />
-                      ) : (
-                        parameter.shortName
                       )}
                     </td>
                     <td className="p-2 border border-theme">
@@ -217,9 +261,17 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <Edit2 size={14} />
                           )}
                         </button>
-                        <button onClick={() => handleDeleteParameter(parameter.id)}>
-                          <Trash2 className="text-secondary" size={14} />
-                        </button>
+                        {!editingParameter && (
+                          <button 
+                            onClick={() => {
+                              setDeleteConfirm(parameter.id);
+                              setDeleteConfirmName('');
+                            }}
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -227,49 +279,85 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 {isNewParameter && (
                   <tr>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="name"
-                        value={newParameter.name || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      <FormHandler
+                        isEditing={true}
+                        onSave={handleAddNewParameter}
+                      >
+                      {isNewParameter ? (
+                        <FormInput
+                          type="text"
+                          name="name"
+                          value={newParameter.name || ''}
+                          onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        />
+                      ) : null}
+                      </FormHandler>
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="unit"
-                        value={newParameter.unit || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      {isNewParameter ? (
+                        <FormInput
+                          type="text"
+                          name="shortName"
+                          value={newParameter.shortName || ''}
+                          onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        />
+                      ) : null}
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="rangeType"
-                        value={newParameter.rangeType || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      {isNewParameter ? (
+                        <FormSelect
+                          name="unit"
+                          value={newParameter.unit || ''}
+                          onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        >
+                          <option value="">No unit</option>
+                          <option value="Ohm.m">Ohm.m</option>
+                          <option value="Ohm.cm">Ohm.cm</option>
+                          <option value="mmol/kg">mmol/kg</option>
+                          <option value="mg/kg">mg/kg</option>
+                          <option value="g/mol">g/mol</option>
+                          <option value="mg/mmol">mg/mmol</option>
+                          <option value="%">%</option>
+                          <option value="ppm">ppm</option>
+                          <option value="V">V</option>
+                          <option value="mV">mV</option>
+                          <option value="A">A</option>
+                          <option value="mA">mA</option>
+                        </FormSelect>
+                      ) : null}
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="rangeValue"
-                        value={newParameter.rangeValue || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      {isNewParameter ? (
+                        <FormSelect
+                          value={newParameter.rangeType || ''}
+                          onChange={(e) => handleChangeParameter('rangeType', e.target.value)}
+                          required
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        >
+                          <option value="">Select Range Type</option>
+                          <option value="range">Range</option>
+                          <option value="selection">Selection</option>
+                          <option value="open">Open</option>
+                          <option value="greater">Greater Than</option>
+                          <option value="less">Less Than</option>
+                          <option value="greaterEqual">Greater Than or Equal</option>
+                          <option value="lessEqual">Less Than or Equal</option>
+                        </FormSelect>
+                      ) : null}
                     </td>
                     <td className="p-2 border border-theme">
-                      <input
-                        type="text"
-                        name="shortName"
-                        value={newParameter.shortName || ''}
-                        onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
+                      {isNewParameter ? (
+                        <FormInput
+                          type="text"
+                          name="rangeValue"
+                          value={newParameter.rangeValue || ''}
+                          onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        />
+                      ) : null}
                     </td>
                     <td className="p-2 border border-theme">
                       <div className="flex items-center justify-center gap-2">
@@ -288,6 +376,18 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
           </div>
         </div>
       )}
+
+      <DeleteConfirmDialog
+        isOpen={!!deleteConfirm}
+        itemName="Parameter"
+        confirmName={deleteConfirmName}
+        onConfirmChange={setDeleteConfirmName}
+        onConfirm={() => handleDeleteParameter(deleteConfirm!)}
+        onCancel={() => {
+          setDeleteConfirm(null);
+          setDeleteConfirmName('');
+        }}
+      />
     </div>
   );
 };

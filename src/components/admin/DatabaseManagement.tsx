@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { Theme } from '../../types/theme';
-import { Database, Settings, Table, ArrowLeft, Palette, ClipboardList } from 'lucide-react';
+import { Database, Table, ArrowLeft, ClipboardList, Wrench, Ruler, FlaskRound as Flask, Building2, GraduationCap } from 'lucide-react';
 import SubstructuresManagement from './SubstructuresManagement';
-import ThemeManagement from './ThemeManagement';
-import  {ParameterPanel } from './ParameterPanel';
+import NeighboringStructuresManagement from './NeighboringStructuresManagement';
+import FoundationsManagement from './FoundationsManagement';
+import ExpertsManagement from './ExpertsManagement';
+import { ParameterPanel } from './ParameterPanel';
+import { MaterialsPanel } from './MaterialsPanel';
+import { NormsPanel } from './NormsPanel';
+import DatabaseOverview from './DatabaseOverview';
 
 
 
 interface DatabaseManagementProps {
   currentTheme: Theme;
   onBack: () => void;
+  currentLanguage: Language;
 }
 
-const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, onBack }) => {
-  const [activeView, setActiveView] = useState<'overview' | 'parameters' | 'themes' | 'substructures' | 'standards'>('overview');
+const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, onBack, currentLanguage }) => {
+  const [activeView, setActiveView] = useState<'overview' | 'parameters' | 'substructures' | 'norms' | 'constants' | 'materials' | 'foundations' | 'neighboring' | 'experts' | 'norms'>('overview');
   const [standards, setStandards] = useState([]);
 
   return (
@@ -33,17 +39,17 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <button
           onClick={() => setActiveView('overview')}
-          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
+          className="p-6 rounded-lg bg-surface"
           style={{ 
-            border: `1px solid ${activeView === 'overview' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+            border: `1px solid ${currentTheme.colors.border}`
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
             >
-              <Database size={20} style={{ color: currentTheme.colors.accent.primary }} />
+              <Database className="text-accent-primary" size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium text-primary">
@@ -58,12 +64,12 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('parameters')}
-          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
+          className="p-6 rounded-lg bg-surface"
           style={{ 
-            border: `1px solid ${activeView === 'parameters' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+            border: `1px solid ${currentTheme.colors.border}`
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
@@ -82,13 +88,13 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         </button>
 
         <button
-          onClick={() => setActiveView('standards')}
-          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
+          onClick={() => setActiveView('norms')}
+          className="p-6 rounded-lg bg-surface"
           style={{ 
-            border: `1px solid ${activeView === 'standards' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+            border: `1px solid ${currentTheme.colors.border}`
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
@@ -97,10 +103,135 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
             </div>
             <div className="text-left">
               <h3 className="font-medium text-primary">
-                Standards
+                Norms
               </h3>
               <p className="text-sm text-secondary">
-                Manage standards
+                Manage norms
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('constants')}
+          className="p-6 rounded-lg bg-surface"
+          style={{ 
+            border: `1px solid ${currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <Ruler className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Physical Constants
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage physical constants
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('materials')}
+          className="p-6 rounded-lg bg-surface"
+          style={{ 
+            border: `1px solid ${currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <Flask className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Materials
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage materials
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('foundations')}
+          className="p-6 rounded-lg bg-surface"
+          style={{ 
+            border: `1px solid ${currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <Building2 className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Foundations
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage foundations
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('experts')}
+          className="p-6 rounded-lg bg-surface"
+          style={{ 
+            border: `1px solid ${currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <GraduationCap className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Experts
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage experts
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setActiveView('neighboring')}
+          className="p-6 rounded-lg bg-surface"
+          style={{ 
+            border: `1px solid ${currentTheme.colors.border}`
+          }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+            >
+              <Building2 className="text-accent-primary" size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="font-medium text-primary">
+                Neighboring Structures
+              </h3>
+              <p className="text-sm text-secondary">
+                Manage neighboring structures
               </p>
             </div>
           </div>
@@ -108,17 +239,17 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('substructures')}
-          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
+          className="p-6 rounded-lg bg-surface"
           style={{ 
-            border: `1px solid ${activeView === 'substructures' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
+            border: `1px solid ${currentTheme.colors.border}`
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
             >
-              <Settings className="text-accent-primary" size={20} />
+              <Wrench className="text-accent-primary" size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium text-primary">
@@ -130,57 +261,13 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
             </div>
           </div>
         </button>
-
-        <button
-          onClick={() => setActiveView('themes')}
-          className="p-6 rounded-lg transition-all hover:translate-y-[-2px] bg-surface"
-          style={{ 
-            border: `1px solid ${activeView === 'themes' ? currentTheme.colors.accent.primary : currentTheme.colors.border}`
-          }}
-        >
-          <div className="flex items-center gap-4">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-            >
-              <Palette className="text-accent-primary" size={20} />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium text-primary">
-                Themes
-              </h3>
-              <p className="text-sm text-secondary">
-                Manage themes
-              </p>
-            </div>
-          </div>
-        </button>
-
-        <button className="p-6 rounded-lg transition-all hover:translate-y-[-2px] border-theme border-solid bg-surface">
-          <div className="flex items-center gap-4">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-            >
-              <Settings className="text-accent-primary" size={20} />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium text-primary">
-                Configuration
-              </h3>
-              <p className="text-sm text-secondary">
-                Database settings
-              </p>
-            </div>
-          </div>
-        </button>
       </div>
 
       <div className="rounded-lg bg-surface">
         {activeView === 'parameters' && (
           <ParameterPanel
             currentTheme={currentTheme}
-            currentLanguage="en"
+            currentLanguage={currentLanguage}
           />
         )}
         {activeView === 'substructures' && (
@@ -189,32 +276,72 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
             onBack={() => setActiveView('overview')}
           />
         )}
-        {activeView === 'themes' && (
-          <ThemeManagement
+        {activeView === 'overview' && (
+          <div className="p-6">
+            <DatabaseOverview currentTheme={currentTheme} />
+          </div>
+        )}
+        {activeView === 'norms' && (
+          <div className="p-6">
+            <h3 
+              className="text-lg font-medium mb-4"
+              style={{ color: currentTheme.colors.text.primary }}
+            >
+              Norms Management
+            </h3>
+            {/* Add norms management content here */}
+          </div>
+        )}
+        {activeView === 'constants' && (
+          <div className="p-6">
+            <h3 
+              className="text-lg font-medium mb-4"
+              style={{ color: currentTheme.colors.text.primary }}
+            >
+              Physical Constants Management
+            </h3>
+            {/* Add physical constants management content here */}
+          </div>
+        )}
+        {activeView === 'materials' && (
+          <MaterialsPanel
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
+          />
+        )}
+        {activeView === 'norms' && (
+          <NormsPanel
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
+          />
+        )}
+        {activeView === 'experts' && (
+          <ExpertsManagement
             currentTheme={currentTheme}
             onBack={() => setActiveView('overview')}
           />
         )}
-        {activeView === 'overview' && (
-          <div className="p-6">
-            <h3 
-              className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
-              Database Overview
-            </h3>
-            {/* Add overview content here */}
-          </div>
+        {activeView === 'foundations' && (
+          <FoundationsManagement
+            currentTheme={currentTheme}
+            onBack={() => setActiveView('overview')}
+          />
         )}
-        {activeView === 'standards' && (
+        {activeView === 'neighboring' && (
+          <NeighboringStructuresManagement
+            currentTheme={currentTheme}
+            onBack={() => setActiveView('overview')}
+          />
+        )}
+        {activeView === 'foundations' && (
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
               style={{ color: currentTheme.colors.text.primary }}
             >
-              Standards Management
+              Foundations Management
             </h3>
-            {/* Add standards management content here */}
+            {/* Add foundations management content here */}
           </div>
         )}
       </div>

@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Theme } from '../types/theme';
 import { PERSON_FIELDS } from '../types/people';
-import { User, Plus, ChevronRight, MapPin } from 'lucide-react';
+import { User, Plus, ChevronRight } from 'lucide-react';
 import { generateHiddenId } from '../utils/generateHiddenId';
-import { SavedPlace } from './PlacesPanel';
 import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
 import { toCase } from '../utils/cases';
@@ -12,47 +11,24 @@ import { toCase } from '../utils/cases';
 interface PeoplePanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
-  savedPlaces: SavedPlace[];
-  savedPeople: SavedPerson[];
-  onSavePeople: (people: SavedPerson[]) => void;
-}
-
-interface SavedPerson {
-  id: string;
-  hiddenId: string;
-  values: {
-    salutation: string;
-    title?: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-  };
-  addresses: {
-    private?: string | null;
-    business?: string;
-  };
+  savedPeople: Person[];
+  onSavePeople: (people: Person[]) => void;
+  onCreateCustomer?: (personId: string, name: string) => void;
 }
 
 const PeoplePanel: React.FC<PeoplePanelProps> = ({ 
   currentTheme,
   currentLanguage,
-  savedPlaces, 
   savedPeople,
-  onSavePeople 
+  onSavePeople,
+  onCreateCustomer 
 }) => {
   const [showNewPersonForm, setShowNewPersonForm] = useState(false);
-  const [editingPerson, setEditingPerson] = useState<SavedPerson | null>(null);
+  const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAddresses, setSelectedAddresses] = useState<{
-    private?: string ;
-    business?: string;
-  }>({});
-  const [showAddressSelect, setShowAddressSelect] = useState<'private' | 'business' | null>(null);
   const translation = useTranslation(currentLanguage);
-
 
   useEffect(() => {
     fetchPeople();
@@ -69,52 +45,45 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
           first_name,
           last_name,
           email,
-          phone,
-          private_address_id,
-          business_address_id
+          phone
         `)
         .order('created_at', { ascending: true });
-      if (error) throw error;
+
+      if (error) {
+        console.error('Error fetching people:', error);
+        throw error;
+      }
 
       const formattedPeople = data.map(person => ({
         id: person.id,
         hiddenId: person.hidden_id,
-        values: {
-          salutation: person.salutation,
-          title: person.title || '',
-          firstName: person.first_name,
-          lastName: person.last_name,
-          email: person.email,
-          phone: person.phone || ''
-        },
-        addresses: {
-          private: person.private_address_id || null,
-          business: person.business_address_id
-        }
+        salutation: person.salutation,
+        title: person.title,
+        firstName: person.first_name,
+        lastName: person.last_name,
+        email: person.email,
+        phone: person.phone
       }));
 
       onSavePeople(formattedPeople);
     } catch (err) {
-      console.error('Error fetching people:', err);
-      setError('Failed to load people');
+      console.error('Error in fetchPeople:', err);
+      setError('Failed to fetch people');
     } finally {
       setLoading(false);
     }
   };
-
-
    
-  const handleEditPerson = (person: SavedPerson) => {
+  const handleEditPerson = (person: Person) => {
     setEditingPerson(person);
     setFormValues({
-      salutation: person.values.salutation || '',
-      title: person.values.title || '',
-      firstName: person.values.firstName || '',
-      lastName: person.values.lastName || '',
-      email: person.values.email || '',
-      phone: person.values.phone || ''
+      salutation: person.salutation,
+      title: person.title || '',
+      firstName: person.firstName,
+      lastName: person.lastName,
+      email: person.email,
+      phone: person.phone || ''
     });
-    setSelectedAddresses(person.addresses);
     setShowNewPersonForm(true);
   };
 
@@ -136,9 +105,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
     try {
       const personData = {
-        ...toCase(formValues, "snakeCase"),
-        private_address_id: selectedAddresses.private || null,
-        business_address_id: selectedAddresses.business || null
+        ...toCase(formValues, "snakeCase")
       };
 
       if (editingPerson) {
@@ -163,7 +130,6 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       setShowNewPersonForm(false);
       setEditingPerson(null);
       setFormValues({});
-      setSelectedAddresses({});
     } catch (err) {
       console.error('Error saving person:', err);
       setError(err instanceof Error ? err.message : 'Failed to save person');
@@ -202,14 +168,6 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     );
   };
 
-  const handleAddressSelect = (type: 'private' | 'business', addressId: string) => {
-    setSelectedAddresses(prev => ({
-      ...prev,
-      [type === 'private' ? 'private' : 'business']: addressId
-    }));
-    setShowAddressSelect(null);
-  };
-
   return (
     <div className="p-6">
       {error && (
@@ -241,27 +199,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                     {translation(field.label as any)}
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
-                  {field.type === 'address' ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowAddressSelect(field.id === 'privateAddress' ? 'private' : 'business')}
-                      className="w-full p-2 rounded text-sm text-left flex items-center justify-between text-primary border-theme border-solid bg-surface"                      
-                    >
-                      <span className="flex items-center gap-2">
-                        <MapPin size={16} />
-                        {(() => {
-                          const addressType = field.id === 'privateAddress' ? 'private' : 'business';
-                          const selectedId = addressType === 'private' ? selectedAddresses.private : selectedAddresses.business;
-                          if (selectedId) {
-                            const place = savedPlaces.find(p => p.id === selectedId);
-                            return place ? place.name : `Select ${field.label}`;
-                          }
-                          return `Select ${field.label}`;
-                        })()}
-                      </span>
-                      <ChevronRight size={16} />
-                    </button>
-                  ) : field.type === 'select' ? (
+                  {field.type === 'select' ? (
                     <select
                       value={formValues[field.id] || ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -294,7 +232,6 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   setShowNewPersonForm(false);
                   setFormValues({});
                   setEditingPerson(null);
-                  setSelectedAddresses({});
                 }}
                 className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
@@ -316,81 +253,43 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
               key={person.id}
               className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
               onClick={() => handleEditPerson(person)}              
-            >
+            > 
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <User className="text-accent-primary" size={16} />
                   <span className="font-medium">
-                    {person.values.salutation} 
-                    {person.values.title ? ` ${person.values.title}` : ''} 
-                    {` ${person.values.firstName} ${person.values.lastName}`}
+                    {person.salutation} 
+                    {person.title ? ` ${person.title}` : ''} 
+                    {` ${person.firstName} ${person.lastName}`}
                   </span>
                 </div>
-                <ChevronRight className="text-secondary" size={16} />
+                <div className="flex items-center gap-4">
+                  {onCreateCustomer && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateCustomer(
+                          person.id,
+                          `${person.firstName} ${person.lastName}`
+                        );
+                      }}
+                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
+                      style={{ 
+                        backgroundColor: currentTheme.colors.accent.primary,
+                        color: 'white'
+                      }}
+                    >
+                      Make Customer
+                    </button>
+                  )}
+                  <ChevronRight className="text-secondary" size={16} />
+                </div>
               </div>
               <div className="text-sm flex flex-col gap-1 text-secondary">
-                <div>{person.values.email} • {person.values.phone || 'No phone'}</div>
-                {(person.addresses.private || person.addresses.business) && (
-                  <div className="flex flex-col gap-2 mt-2">
-                    {person.addresses.private && (
-                      <div className="flex items-center gap-1 text-xs text-secondary">
-                        <MapPin size={12} />
-                        <span>Private: {
-                          savedPlaces?.find(p => p.id === person.addresses.private)?.name || 'Address not found'
-                        }</span>
-                      </div>
-                    )}
-                    {person.addresses.business && (
-                      <div className="flex items-center gap-1 text-xs text-secondary">
-                        <MapPin size={12} />
-                        <span>Business: {
-                          savedPlaces?.find(p => p.id === person.addresses.business)?.name || 'Address not found'
-                        }</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div>{person.email} • {person.phone || 'No phone'}</div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {showAddressSelect && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-            <h3 className="text-lg font-mono mb-4 text-primary">
-              Select {showAddressSelect === 'private' ? 'Private' : 'Business'} Address
-            </h3>
-            <div className="space-y-2">
-            {savedPlaces.map(place => {
-                return (
-                  <button
-                    key={place.id}
-                    onClick={() => handleAddressSelect(showAddressSelect, place.id)}
-                    className="w-full p-4 rounded text-left hover:translate-x-1 transition-transform flex flex-col gap-1 text-primary bg-border"                    
-                  >
-                    <div className="font-medium">{place?.name || 'Unnamed Place'}</div>
-                    <div className="text-sm mt-1" style={{ color: currentTheme.colors.text.secondary }}>
-                      {[
-                        place?.street_name,
-                        place?.house_number,
-                        place?.postal_code,
-                        place?.city,
-                        place?.state
-                      ].filter(Boolean).join(', ')}
-                    </div>
-                  </button>
-                );
-              })}
-              <button
-                onClick={() => setShowAddressSelect(null)}
-                className="w-full mt-4 p-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
-              >
-                {translation("actions.cancel")}
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>

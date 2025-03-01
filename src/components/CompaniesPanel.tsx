@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Theme } from '../types/theme';
 import { Company, COMPANY_FIELDS } from '../types/companies';
-import { Building2, Plus, ChevronRight, Trash2, MapPin, User } from 'lucide-react';
-import { SavedPlace } from './PlacesPanel';
+import { Building2, Plus, ChevronRight, Trash2, User } from 'lucide-react';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { Person } from '../types/people';
 import { fetchPeople } from '../services/people';
@@ -14,27 +13,26 @@ import { toCase } from '../utils/cases';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
-  currentLanguage: Language
-  savedPlaces: SavedPlace[];
+  currentLanguage: Language;
   savedPeople: Person[];
   savedCompanies: Company[];
   onSaveCompanies: (companies: Company[]) => void;
+  onCreateCustomer?: (companyId: string, name: string) => void;
 }
 
 const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   currentTheme,
   currentLanguage,
-  savedPlaces,
   savedPeople,
   savedCompanies,
-  onSaveCompanies
+  onSaveCompanies,
+  onCreateCustomer
 }) => {
   const [showNewCompanyForm, setShowNewCompanyForm] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('');
   const [selectedCeoId, setSelectedCeoId] = useState<string>('');
   const [selectedContactId, setSelectedContactId] = useState<string>('');
   const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
@@ -76,7 +74,6 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
     try {
       const companyData = { 
         ...toCase(formValues, "snakeCase"),
-        place_id: selectedPlaceId || null,
         ceo_id: selectedCeoId || null,
         contact_person_id: selectedContactId || null
       }
@@ -103,7 +100,6 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
       setShowNewCompanyForm(false);
       setEditingCompany(null);
       setFormValues({});
-      setSelectedPlaceId('');
       setSelectedCeoId('');
       setSelectedContactId('');
     } catch (err) {
@@ -142,7 +138,6 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
       vatId: company.vatId || '',
       registrationNumber: company.registrationNumber || ''
     });
-    setSelectedPlaceId(company.placeId || '');
     setSelectedCeoId(company.ceoId || '');
     setSelectedContactId(company.contactPersonId || '');
     setShowNewCompanyForm(true);
@@ -202,23 +197,6 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
             ))}
             <div>
               <label className="block text-sm mb-1 text-secondary">
-                {translation("company.address")}
-              </label>
-              <select
-                value={selectedPlaceId}
-                onChange={(e) => setSelectedPlaceId(e.target.value)}
-                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                
-              >
-                <option value="">Select project site</option>
-                {savedPlaces?.map(place => (
-                  <option key={place.id} value={place.id}>
-                    {place.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm mb-1 text-secondary">
                 CEO
               </label>
               <div className="relative">
@@ -272,7 +250,8 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   setShowNewCompanyForm(false);
                   setEditingCompany(null);
                   setFormValues({});
-                  setSelectedPlaceId('');
+                  setSelectedCeoId('');
+                  setSelectedContactId('');
                 }}
                 className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
@@ -298,35 +277,27 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 <div className="flex items-center gap-2">
                   <Building2 className="text-accent-primary" size={16} />
                   <span className="font-medium">{company.name}</span>
-                  {company.placeId && (
-                    <div className="flex items-center gap-1 text-xs text-secondary">
-                      <MapPin size={12} />
-                      {savedPlaces?.find(p => p.id === company.placeId)?.name || 'Unknown location'}
-                    </div>
-                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(company)}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(company.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                <div className="flex items-center gap-4">
+                  {onCreateCustomer && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateCustomer(company.id, company.name);
+                      }}
+                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
+                      style={{ 
+                        backgroundColor: currentTheme.colors.accent.primary,
+                        color: 'white'
+                      }}
+                    >
+                      Make Customer
+                    </button>
+                  )}
+                  <ChevronRight className="text-secondary" size={16} />
                 </div>
               </div>
               <div className="text-sm space-y-2 text-secondary">
-                {company.placeId && (
-                  <div className="flex items-center gap-2">
-                    <MapPin size={14} />
-                    {savedPlaces?.find(p => p.id === company.placeId)?.name || 'Unknown location'}
-                  </div>
-                )}
                 {company.ceoId && (
                   <div className="flex items-center gap-2">
                     <User size={14} />
