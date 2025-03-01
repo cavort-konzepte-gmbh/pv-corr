@@ -150,6 +150,8 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           name: zone.name,
           latitude: zone.latitude,
           longitude: zone.longitude,
+          substructureId: zone.substructure_id,
+          foundationId: zone.foundation_id,
           datapoints: (zone.datapoints || []).map(dp => ({
             id: dp.id,
             hiddenId: dp.hidden_id,

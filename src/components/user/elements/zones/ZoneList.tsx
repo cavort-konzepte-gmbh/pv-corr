@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Zone } from '../../../../types/projects';
-import { ChevronRight, Edit2, Save, X } from 'lucide-react';
+import { ChevronRight, Edit2, Save, X, Building2, Wrench } from 'lucide-react';
 import { updateZone, deleteZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
+import { useEffect } from 'react';
+import { supabase } from '../../../../lib/supabase';
 
 interface ZoneListProps {
   currentTheme: Theme;
@@ -21,24 +23,58 @@ const ZoneList: React.FC<ZoneListProps> = ({
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
+  const [substructures, setSubstructures] = useState<any[]>([]);
+  const [foundations, setFoundations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [{ data: subData }, { data: foundData }] = await Promise.all([
+          supabase.from('substructures_view').select('*'),
+          supabase.from('foundations').select('*')
+        ]);
+
+        setSubstructures(subData || []);
+        setFoundations(foundData || []);
+      } catch (err) {
+        console.error('Error loading data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleUpdateZone = async (zoneId: string, values: Record<string, string>) => {
     if (updatingZone) return;
     try {
       setUpdatingZone(true);
-      await updateZone(zoneId, {
+      
+      // Prepare update data
+      const updateData = {
         name: values.name,
-        latitude: values.latitude,
-        longitude: values.longitude
-      });
+        latitude: values.latitude || null,
+        longitude: values.longitude || null,
+        substructureId: values.substructureId || null,
+        foundationId: values.foundationId || null
+      };
+
+      await updateZone(zoneId, updateData);
+      
+      // Wait a moment before refreshing to ensure DB update is complete
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       const updatedProjects = await fetchProjects();
       if (updatedProjects) {
         onProjectsChange(updatedProjects);
       }
-
+      
+      // Reset editing state
       setEditingZoneId(null);
       setEditingValues({});
+
     } catch (err) {
       console.error('Error updating zone:', err);
     } finally {
@@ -72,6 +108,12 @@ const ZoneList: React.FC<ZoneListProps> = ({
             <th className="p-2 text-left border font-normal border-theme">
               Location
             </th>
+            <th className="p-2 text-left border font-normal border-theme">
+              Substructure
+            </th>
+            <th className="p-2 text-left border font-normal border-theme">
+              Foundation
+            </th>
             <th className="p-2 text-center border font-normal border-theme">
               Actions
             </th>
@@ -83,10 +125,12 @@ const ZoneList: React.FC<ZoneListProps> = ({
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <input
+                    name="name"
                     type="text"
                     value={editingValues.name || zone.name}
                     onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    required
                   />
                 ) : (
                   zone.name
@@ -98,20 +142,24 @@ const ZoneList: React.FC<ZoneListProps> = ({
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={editingValues.latitude || zone.latitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                      placeholder="Latitude"
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                    <input
-                      type="text"
-                      value={editingValues.longitude || zone.longitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                      placeholder="Longitude"
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={editingValues.latitude || zone.latitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
+                        placeholder="Latitude"
+                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={editingValues.longitude || zone.longitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
+                        placeholder="Longitude"
+                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      />
+                    </div>
                   </div>
                 ) : zone.latitude && zone.longitude ? (
                   <button
@@ -125,12 +173,77 @@ const ZoneList: React.FC<ZoneListProps> = ({
                 )}
               </td>
               <td className="p-2 border border-theme">
+                {editingZoneId === zone.id ? (
+                  <select
+                    value={editingValues.substructureId || zone.substructureId || ''}
+                    onChange={(e) => setEditingValues({ ...editingValues, substructureId: e.target.value })}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  >
+                    <option value="">Select Substructure</option>
+                    {substructures.map(sub => (
+                      <option key={sub.id} value={sub.id}>
+                        {sub.manufacturer} - {sub.system} ({sub.version})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Wrench size={14} className="text-secondary" />
+                    {(() => {
+                      const sub = substructures.find(s => s.id === zone.substructureId);
+                      return sub ? (
+                        <span>{sub.manufacturer} - {sub.system}</span>
+                      ) : (
+                        <span className="text-secondary">Not set</span>
+                      );
+                    })()}
+                  </div>
+                )}
+              </td>
+              <td className="p-2 border border-theme">
+                {editingZoneId === zone.id ? (
+                  <select
+                    value={editingValues.foundationId || zone.foundationId || ''}
+                    onChange={(e) => setEditingValues({ ...editingValues, foundationId: e.target.value })}
+                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  >
+                    <option value="">Select Foundation</option>
+                    {foundations.map(foundation => (
+                      <option key={foundation.id} value={foundation.id}>
+                        {foundation.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Building2 size={14} className="text-secondary" />
+                    {(() => {
+                      const foundation = foundations.find(f => f.id === zone.foundationId);
+                      return foundation ? (
+                        <span>{foundation.name}</span>
+                      ) : (
+                        <span className="text-secondary">Not set</span>
+                      );
+                    })()}
+                  </div>
+                )}
+              </td>
+              <td className="p-2 border border-theme">
                 <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => editingZoneId === zone.id ? (
                       handleUpdateZone(zone.id, editingValues)
                     ) : (
-                      setEditingZoneId(zone.id)
+                      (() => {
+                        setEditingZoneId(zone.id);
+                        setEditingValues({
+                          name: zone.name,
+                          latitude: zone.latitude || '',
+                          longitude: zone.longitude || '',
+                          substructureId: zone.substructureId || '',
+                          foundationId: zone.foundationId || ''
+                        });
+                      })()
                     )}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     disabled={updatingZone}

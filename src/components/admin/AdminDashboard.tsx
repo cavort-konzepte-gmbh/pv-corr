@@ -1,9 +1,10 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
-import { Users, Database, Settings, Shield, LogOut } from 'lucide-react';
+import { Users, Database, Settings, LogOut, BellRing } from 'lucide-react';
 import DatabaseManagement from './DatabaseManagement';
 import UserManagement from './UserManagement';
 import AdminSettings from './AdminSettings';
+import NotificationsPanel from './notifications/NotificationsPanel';
 import { supabase } from '../../lib/supabase';
 
 interface AdminDashboardProps {
@@ -12,7 +13,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
-  const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'security' | 'settings'>('overview');
+  const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'notifications' | 'settings'>('overview');
   
   const handleSignOut = async () => {
     try {
@@ -38,6 +39,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         />
       ) : activeView === 'settings' ? (
         <AdminSettings
+          currentTheme={currentTheme}
+          onBack={() => setActiveView('overview')}
+        />
+      ) : activeView === 'notifications' ? (
+        <NotificationsPanel
           currentTheme={currentTheme}
           onBack={() => setActiveView('overview')}
         />
@@ -106,9 +112,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             </div>
           </div>
 
-          {/* Security Settings */}
+          {/* Notifications Management */}
           <div 
-            onClick={() => setActiveView('security')}
+            onClick={() => setActiveView('notifications')}
             className="p-6 rounded-lg bg-surface"
           >
             <div className="flex items-center gap-4 mb-4">
@@ -116,14 +122,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
               >
-                <Shield className="text-accent-primary" size={20} />
+                <BellRing className="text-accent-primary" size={20} />
               </div>
               <div>
                 <h3 className="font-medium text-primary">
-                  Security
+                  Notifications
                 </h3>
                 <p className="text-sm text-secondary">
-                  Security settings
+                  Manage notifications
                 </p>
               </div>
             </div>

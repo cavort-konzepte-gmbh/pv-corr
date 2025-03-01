@@ -60,70 +60,39 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
   }
   
   try {
-    // Prepare update data - only include fields that are provided
-    const updateData: Record<string, any> = {};
-    if (zone.name !== undefined) updateData.name = zone.name;
-    if (zone.latitude !== undefined) updateData.latitude = zone.latitude;
-    if (zone.longitude !== undefined) updateData.longitude = zone.longitude;
+    // Prepare update data - ensure name is preserved
+    const updateData: Record<string, any> = {
+      name: zone.name,
+      name: zone.name,
+      latitude: zone.latitude || null,
+      longitude: zone.longitude || null,
+      substructure_id: zone.substructureId || null,
+      foundation_id: zone.foundationId || null
+    };
 
-    // Update the zone
+    // Update zone
     const { data, error } = await supabase
       .from('zones')
       .update(updateData)
-      .eq('id', zoneId)
-      .select()
-      .single();
+      .eq('id', zoneId);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    if (!data) {
-      throw new Error('Zone not found');
-    }
-
-    // Fetch complete zone data after update
-    const { data: completeZone, error: fetchError } = await supabase
+    // Fetch updated zone data
+    const { data: updatedZone, error: fetchError } = await supabase
       .from('zones')
-      .select(`
-        *,
-        datapoints (*)
-      `)
+      .select('*')
       .eq('id', zoneId)
       .single();
 
-    if (fetchError) {
-      throw new Error('Failed to fetch updated zone data');
-    }
-    
-    if (!completeZone) {
-      throw new Error('Failed to retrieve updated zone data');
-    }
+    if (fetchError) throw fetchError;
+    if (!updatedZone) throw new Error('Zone not found');
 
-    return completeZone;
-  } catch (error) {
-    console.error('Error updating zone:', error);
-    throw error instanceof Error 
-      ? error 
-      : new Error('An unexpected error occurred while updating the zone');
+    return updatedZone;
+  } catch (err) {
+    console.error('Error updating zone:', err);
+    throw err;
   }
-  const { data, error } = await supabase
-    .from('zones')
-    .update({
-      name: zone.name,
-      latitude: zone.latitude,
-      longitude: zone.longitude
-    })
-    .eq('id', zoneId)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating zone:', error);
-    throw error;
-  }
-
-  return data;
 };
 
 export const deleteZone = async (zoneId: string) => {
