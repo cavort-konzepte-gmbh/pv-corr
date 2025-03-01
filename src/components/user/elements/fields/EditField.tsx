@@ -47,23 +47,25 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
       <div className="p-6 rounded-lg max-w-md w-full bg-surface">
         <h3 className="flex gap-2 text-lg mb-4 text-primary">
           <Folder className="text-accent-primary" />
-          Add New Field
+          { isEditingCoordinates ? "Edit Coordinates" : "Edit Field"}
         </h3>
         <form onSubmit={handleSubmit}>
-          <label
-            className="block text-sm mb-1 text-secondary"
-            htmlFor="new-field"
-          >
-            Field Name
-            <input
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-              type="text"
-              name="name"
-              required
-              value={fields.name}
-              onChange={handleChange}
-            />
-          </label>
+          {!isEditingCoordinates && (
+            <label
+              className="block text-sm mb-1 text-secondary"
+              htmlFor="new-field"
+            >
+              Field Name
+              <input
+                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                type="text"
+                name="name"
+                required
+                value={fields.name}
+                onChange={handleChange}
+              />
+            </label>
+          )}
           <label className="block text-sm mb-1 text-secondary">
             Latitude
             <input
@@ -84,18 +86,20 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
               onChange={handleChange}
             />
           </label>
-          <div className="block text-sm mb-1 text-secondary">
-            <label>Has Fence</label>
-            <select
-              name="has_fence"
-              value={fields.has_fence}
-              onChange={handleChange}
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-            >
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
-            </select>
-          </div>
+          {!isEditingCoordinates && (
+            <div className="block text-sm mb-1 text-secondary">
+              <label>Has Fence</label>
+              <select
+                name="has_fence"
+                value={fields.has_fence}
+                onChange={handleChange}
+                className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+              >
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+          )}
           <div className="w-full mt-6 flex items-center justify-end gap-x-2">
             <button
               className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"

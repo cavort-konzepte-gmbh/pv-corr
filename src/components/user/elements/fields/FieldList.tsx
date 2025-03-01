@@ -21,6 +21,7 @@ const FieldList: React.FC<FieldListProps> = ({
   onProjectsChange
 }) => {
   const [showForm, setShowForm] = useState(false);
+  const [isEditingCoordinates, setIsEditingCoordinates] = useState(false);
   const [fieldData, setFieldData] = useState({
     id: '',
     name: '',
@@ -32,7 +33,6 @@ const FieldList: React.FC<FieldListProps> = ({
   const handleSelectField = (event: React.MouseEvent, field: Field) => {
     event.stopPropagation();
     setShowForm(true);
-    console.log(field)
     setFieldData(field);
   }
 
@@ -46,6 +46,13 @@ const FieldList: React.FC<FieldListProps> = ({
     await deleteField(field.id);
     const updatedProjects = await fetchProjects();
     onProjectsChange(updatedProjects)
+  }
+
+  const handleEditCoordinates = (event: React.MouseEvent, field: Field) => {
+    event.stopPropagation();
+    setShowForm(true);
+    setFieldData(field);
+    setIsEditingCoordinates(true);
   }
 
   return (
@@ -74,7 +81,7 @@ const FieldList: React.FC<FieldListProps> = ({
                   </li>
                   <li 
                     className="w-full py-2 px-4 flex items-center justify-between gap-x-2"
-                    onClick={(event) => handleRemoveField(event, field)}
+                    onClick={event => handleRemoveField(event, field)}
                   >
                     Remove <X size={14} />
                   </li>
@@ -93,16 +100,13 @@ const FieldList: React.FC<FieldListProps> = ({
             {field.latitude && field.longitude && (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => handleOpenGoogleMaps(e, field.latitude, field.longitude)}
+                  onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
                   className="text-sm hover:underline text-accent-primary"
                 >
                   View on map
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Handle edit coordinates
-                  }}
+                  onClick={event => handleEditCoordinates(event, field)}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <Edit2 size={14} />
@@ -116,7 +120,8 @@ const FieldList: React.FC<FieldListProps> = ({
         <EditField 
           field={fieldData} 
           setShowForm={setShowForm} 
-          onProjectsChange={onProjectsChange} 
+          onProjectsChange={onProjectsChange}
+          isEditingCoordinates={isEditingCoordinates}
         />
       )}
     </div>
