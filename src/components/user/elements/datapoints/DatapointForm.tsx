@@ -4,19 +4,22 @@ import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { Plus } from 'lucide-react';
 import { createDatapoint } from '../../../../services/datapoints';
+import { fetchProjects } from '../../../../services/projects';
 
 interface DatapointFormProps {
   currentTheme: Theme;
   currentLanguage: Language;
   parameters: Parameter[];
   zoneId: string;
+  onProjectsChange: (projects: any[]) => void;
 }
 
 const DatapointForm: React.FC<DatapointFormProps> = ({
   currentTheme,
   currentLanguage,
   parameters,
-  zoneId
+  zoneId,
+  onProjectsChange
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
@@ -47,6 +50,8 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
       setName('');
       setValues({});
       setError(null);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
     } catch (err) {
       console.error('Error creating datapoint:', err);
       setError('Failed to create datapoint');
