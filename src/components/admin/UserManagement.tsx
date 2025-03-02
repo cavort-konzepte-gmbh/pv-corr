@@ -133,10 +133,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface"
-          style={{ borderWidth: '1px' }}
-        >
+        <div className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface">
           {error}
           <button 
             onClick={() => setError(null)} 
