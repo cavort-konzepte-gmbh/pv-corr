@@ -6,20 +6,24 @@ import { Company } from '../../../../types/companies';
 import { Building2, MapPin, User, Mail, Phone, DoorOpen, Maximize2, Upload } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../../../../services/media';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ProjectSummaryProps {
   project: Project;
   manager?: Person;
   company?: Company;
   currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   project,
   manager,
   company,
-  currentTheme
+  currentTheme,
+  currentLanguage
 }) => {
+  const translation = useTranslation(currentLanguage);
   const [showFullscreenImage, setShowFullscreenImage] = useState(false);
   const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -46,24 +50,24 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
     <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <Building2 className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <Building2 className="w-5 h-5 text-accent-primary" />
           <span className="font-semibold">{project.name}</span>
         </div>
         {project.location && (
           <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" style={{ color: currentTheme.primary }} />
+            <MapPin className="w-5 h-5 text-accent-primary" />
             <span>{project.location}</span>
           </div>
         )}
         {manager && (
           <div className="flex items-center gap-2">
-            <User className="w-5 h-5" style={{ color: currentTheme.primary }} />
+            <User className="w-5 h-5 text-accent-primary" />
             <span>{manager.name}</span>
           </div>
         )}
         {manager?.email && (
           <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5" style={{ color: currentTheme.primary }} />
+            <Mail className="w-5 h-5 text-accent-primary" />
             <a href={`mailto:${manager.email}`} className="hover:underline">
               {manager.email}
             </a>
@@ -71,7 +75,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         )}
         {manager?.phone && (
           <div className="flex items-center gap-2">
-            <Phone className="w-5 h-5" style={{ color: currentTheme.primary }} />
+            <Phone className="w-5 h-5 text-accent-primary" />
             <a href={`tel:${manager.phone}`} className="hover:underline">
               {manager.phone}
             </a>
@@ -79,29 +83,27 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         )}
         {company && (
           <div className="flex items-center gap-2">
-            <DoorOpen className="w-5 h-5" style={{ color: currentTheme.primary }} />
+            <DoorOpen className="w-5 h-5 text-accent-primary" />
             <span>{company.name}</span>
           </div>
         )}
         <div className="flex items-center gap-2">
           <Upload
-            className="w-5 h-5 cursor-pointer"
-            style={{ color: currentTheme.primary }}
+            className="w-5 h-5 cursor-pointer text-accent-primary"
             onClick={() => handleShowMediaDialog(0, project.id)}
           />
           <span className="cursor-pointer" onClick={() => handleShowMediaDialog(0, project.id)}>
-            Upload Media
+            {translation("media.upload")}
           </span>
         </div>
         {mediaUrls.length > 0 && (
           <div className="flex items-center gap-2">
             <Maximize2
-              className="w-5 h-5 cursor-pointer"
-              style={{ color: currentTheme.primary }}
+              className="w-5 h-5 cursor-pointer text-accent-primary"
               onClick={() => setShowFullscreenImage(true)}
             />
             <span className="cursor-pointer" onClick={() => setShowFullscreenImage(true)}>
-              View Media
+              {translation("media.view")}
             </span>
           </div>
         )}

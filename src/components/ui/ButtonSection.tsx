@@ -16,7 +16,7 @@ export const ButtonSection = ({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary bg-transparent ${className}`}
+      className={`w-max flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary bg-transparent ${className}`}
     >
       {children}
     </button>

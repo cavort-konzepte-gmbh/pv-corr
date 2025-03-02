@@ -2,6 +2,7 @@ import { Folder } from "lucide-react";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { updateField } from "../../../../services/fields";
 import { fetchProjects } from "../../../../services/projects";
+import { Language, useTranslation } from "../../../../types/language";
 
 interface EditFieldProps {
   field: {
@@ -14,10 +15,18 @@ interface EditFieldProps {
   isEditingCoordinates: boolean;
   setShowForm: Dispatch<SetStateAction<boolean>>;
   onProjectsChange: (projects: any[]) => void;
+  currentLanguage: Language
 }
 
-export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjectsChange }: EditFieldProps) => {
+export const EditField = ({ 
+  field, 
+  isEditingCoordinates, 
+  setShowForm, 
+  onProjectsChange,
+  currentLanguage,
+}: EditFieldProps) => {
   const [fields, setFields] = useState(field);
+  const translation = useTranslation(currentLanguage);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -55,7 +64,7 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
               className="block text-sm mb-1 text-secondary"
               htmlFor="new-field"
             >
-              Field Name
+              {translation("field.name")}
               <input
                 className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 type="text"
@@ -67,7 +76,7 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
             </label>
           )}
           <label className="block text-sm mb-1 text-secondary">
-            Latitude
+            {translation("project.latitude")}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               type="text"
@@ -77,7 +86,7 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
             />
           </label>
           <label className="block text-sm mb-1 text-secondary">
-            Longitude
+            {translation("project.longitude")}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               type="text"
@@ -88,15 +97,15 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
           </label>
           {!isEditingCoordinates && (
             <div className="block text-sm mb-1 text-secondary">
-              <label>Has Fence</label>
+              <label>{translation("field.has_fence")}</label>
               <select
                 name="has_fence"
                 value={fields.has_fence}
                 onChange={handleChange}
                 className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               >
-                <option value="no">No</option>
-                <option value="yes">Yes</option>
+                <option value="no">{translation("field.has_fence.no")}</option>
+                <option value="yes">{translation("field.has_fence.yes")}</option>
               </select>
             </div>
           )}
@@ -106,13 +115,13 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
               type="button"
               onClick={() => setShowForm(false)}
             >
-              Cancel
+              {translation("actions.cancel")}
             </button>
             <button
               className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
               type="submit"
             >
-              Save
+              {translation("actions.save")}
             </button>
           </div>
         </form>

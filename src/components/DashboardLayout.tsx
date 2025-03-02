@@ -154,6 +154,7 @@ const DashboardLayout = () => {
               setView('fields');
               setSelectedProjectId(projectId);
             }}
+            currentLanguage={currentLanguage}
           />
         );
       case 'fields':
@@ -171,7 +172,7 @@ const DashboardLayout = () => {
               setSelectedFieldId(fieldId);
             }}
             people={savedPeople}
-            companies={savedCompanies}
+            companies={savedCompanies}        
           />
         );
       case 'zones':
@@ -213,19 +214,19 @@ const DashboardLayout = () => {
           />
         ) : (
           <div className="p-6 text-center text-secondary">
-            Please select a zone to view its datapoints
+            {t("datapoint.please_select_zone")}
           </div>
         );
       case 'evaluation':
         return (
           <div className="p-6 text-center text-secondary">
-            Evaluation panel coming soon
+            {t("evaluation.panel_coming_soon")}
           </div>
         );
       case 'output':
         return (
           <div className="p-6 text-center text-secondary">
-            Output panel coming soon
+            {t("output.panel_coming_soon")}
           </div>
         );
       case 'settings':
@@ -266,47 +267,47 @@ const DashboardLayout = () => {
                 className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
               >
                 <ArrowLeft size={18} />
-                <span>Back</span>
+                <span>{t("nav.back")}</span>
               </button>
               <div className="h-6 w-px bg-border mx-2" />
               <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
-                <span>General</span>
+                <span>{t("settings.general")}</span>
               </ButtonSection>
               <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
-                <span>Theme</span>
+                <span>{t("settings.theme")}</span>
               </ButtonSection>
               <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
-                <span>Companies</span>
+                <span>{t("settings.companies")}</span>
               </ButtonSection>
               <ButtonSection view={settingsView} match="people" onClick={() => setSettingsView('people')}>
-                <span>People</span>
+                <span>{t("settings.people")}</span>
               </ButtonSection>
             </>
           ) : (
             <>
               <ButtonSection view={view} match="projects" onClick={() => setView('projects')}>
                 <FolderOpen size={18} />
-                <span>Projects</span>
+                <span>{t("nav.projects")}</span>
               </ButtonSection>
               <ButtonSection view={view} match="fields" onClick={() => setView('fields')}>
                 <Grid size={18} />
-                <span>Fields</span>
+                <span>{t("nav.fields")}</span>
               </ButtonSection>         
               <ButtonSection view={view} match="zones" onClick={() => setView('zones')}>
                 <Map size={18} />
-                <span>Zones</span>
+                <span>{t("nav.zones")}</span>
               </ButtonSection>
               <ButtonSection view={view} match="datapoints" onClick={() => setView('datapoints')}>
                 <Database size={18} />
-                <span>Datapoints</span>
+                <span>{t("nav.datapoints")}</span>
               </ButtonSection>
               <ButtonSection view={view} match="evaluation" onClick={() => setView('evaluation')}>
                 <Database size={18} />
-                <span>Evaluation</span>
+                <span>{t("nav.evaluation")}</span>
               </ButtonSection>
               <ButtonSection view={view} match="output" onClick={() => setView('output')}>
                 <Database size={18} />
-                <span>Output</span>
+                <span>{t("nav.output")}</span>
               </ButtonSection>
             </>
           )}
@@ -315,18 +316,18 @@ const DashboardLayout = () => {
           {view !== 'settings' && (
             <ButtonSection view={settingsView} match="settinngs" onClick={() => setView('settings')}>
               <SettingsIcon size={18} />
-              <span>Settings</span>
+              <span>{t("nav.settings")}</span>
             </ButtonSection>
           )}
           {isAdmin && (
             <ButtonSection view={settingsView} match="admin" onClick={toggleViewMode}>
               <LayoutDashboard size={18} />
-              <span>Administration</span>
+              <span>{t("nav.administration")}</span>
             </ButtonSection>
           )}
           <ButtonSection view={settingsView} match="signout" onClick={handleSignOut}>
             <LogOut size={18} />
-            <span>Sign Out</span>
+            <span>{t("nav.signout")}</span>
           </ButtonSection>
         </div>
       </div>
