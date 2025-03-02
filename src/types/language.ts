@@ -58,6 +58,21 @@ export const TRANSLATIONS = {
     fr: 'Enregistrer les modifications',
     ar: 'حفظ التغييرات'
   },
+  'general.view_on_map': {
+    en: 'View on Map',
+    de: 'Auf Karte anzeigen',
+    es: 'Ver en el mapa',
+    fr: 'Voir sur la carte',
+    ar: 'عرض على الخريطة'
+  },
+  'general.location_not_set': {
+    en: 'No location set',
+    de: 'Kein Standort festgelegt',
+    es: 'Ubicación no establecida',
+    fr: 'Aucun emplacement défini',
+    ar: 'لم يتم تحديد الموقع'
+  },
+
 
   // Navigation
   'nav.projects': {
@@ -95,6 +110,62 @@ export const TRANSLATIONS = {
     fr: 'Quitter le mode admin',
     ar: 'الخروج من وضع المسؤول'
   },
+  'nav.administration': {
+    en: 'Administration',
+    de: 'Verwaltung',
+    es: 'Administración',
+    fr: 'Administration',
+    ar: 'الإدارة'
+  },
+  'nav.signout': {
+    en: 'Sign Out',
+    de: 'Abmelden',
+    es: 'Cerrar sesión',
+    fr: 'Déconnexion',
+    ar: 'تسجيل الخروج'
+  },
+  'nav.evaluation': {
+    en: 'Evaluation',
+    de: 'Bewertung',
+    es: 'Evaluación',
+    fr: 'Évaluation',
+    ar: 'التقييم'
+  },
+  'nav.output': {
+    en: 'Output',
+    de: 'Ausgabe',
+    es: 'Salida',
+    fr: 'Sortie',
+    ar: 'الناتج'
+  },
+  'nav.fields': {
+    en: 'Fields',
+    de: 'Felder',
+    es: 'Campos',
+    fr: 'Champs',
+    ar: 'الحقول'
+  },
+  'nav.zones': {
+    en: 'Zones',
+    de: 'Zonen',
+    es: 'Zonas',
+    fr: 'Zones',
+    ar: 'المناطق'
+  },
+  'nav.datapoints': {
+    en: 'Datapoints',
+    de: 'Datenpunkte',
+    es: 'Puntos de datos',
+    fr: 'Points de données',
+    ar: 'نقاط البيانات'
+  },
+  'nav.back': {
+    en: 'Back',
+    de: 'Zurück',
+    es: 'Atrás',
+    fr: 'Retour',
+    ar: 'رجوع'
+  },
 
   // Settings
   'settings.general': {
@@ -117,6 +188,13 @@ export const TRANSLATIONS = {
     es: 'Empresas',
     fr: 'Entreprises',
     ar: 'الشركات'
+  },
+  'settings.people': {
+    en: 'People',
+    de: 'Personen',
+    es: 'Personas',
+    fr: 'Personnes',
+    ar: 'الأشخاص'
   },
   'settings.sample_data.companies.description': {
     en: '5 sample companies with addresses and contacts',
@@ -349,6 +427,13 @@ export const TRANSLATIONS = {
     fr: 'Veuillez entrer un nom standard',
     ar: 'يرجى إدخال اسم المعيار'
   },
+  'actions': {
+    en: 'Actions',
+    de: 'Aktionen',
+    es: 'Acciones',
+    fr: 'Actions',
+    ar: 'الإجراءات'
+  },
   'actions.cancel': {
     en: 'Cancel',
     de: 'Abbrechen',
@@ -384,6 +469,13 @@ export const TRANSLATIONS = {
     fr: 'Fermer',
     ar: 'إغلاق'
   },
+  'actions.delete': {
+    en: 'Delete',
+    de: 'Löschen',
+    es: 'Eliminar',
+    fr: 'Supprimer',
+    ar: 'حذف'
+  },
   'datapoint.history': {
     en: 'Change History',
     de: 'Änderungsverlauf',
@@ -405,12 +497,54 @@ export const TRANSLATIONS = {
     fr: 'Chargement des paramètres et des normes...',
     ar: 'تحميل المعلمات والمعايير...'
   },
+  'datapoint.please_select_zone': {
+    en: 'Please select a zone to view its datapoints',
+    de: 'Bitte wählen Sie eine Zone aus, um ihre Datenpunkte anzuzeigen',
+    es: 'Por favor, seleccione una zona para ver sus puntos de datos',
+    fr: 'Veuillez sélectionner une zone pour voir ses points de données',
+    ar: 'يرجى تحديد منطقة لعرض نقاط بياناتها'
+  },
+  'datapoint.loading_parameters': {
+    en: 'Loading parameters...',
+    de: 'Laden von Parametern...',
+    es: 'Cargando parámetros...',
+    fr: 'Chargement des paramètres...',
+    ar: 'تحميل المعلمات...'
+  },
+  'datapoint.zone_details': {
+    en: 'Zone Details',
+    de: 'Zonendetails',
+    es: 'Detalles de la Zona',
+    fr: 'Détails de la Zone',
+    ar: 'تفاصيل المنطقة'
+  },
+  'datapoint.add_new': {
+    en: 'Add New Datapoint',
+    de: 'Neuen Datenpunkt hinzufügen',
+    es: 'Añadir Nuevo Punto de Datos',
+    fr: 'Ajouter un Nouveau Point de Données',
+    ar: 'إضافة نقطة بيانات جديدة'
+  },
+  'datapoint.short_name': {
+    en: 'Name',
+    de: 'Name',
+    es: 'Nombre',
+    fr: 'Nom',
+    ar: 'الاسم'
+  },
   'actions.select_value': {
     en: 'Select value',
     de: 'Wert auswählen',
     es: 'Seleccionar valor',
     fr: 'Sélectionner une valeur',
     ar: 'اختر قيمة'
+  },
+  'project.add': {
+    en: 'Add Project',
+    de: 'Projekt hinzufügen',
+    es: 'Añadir Proyecto',
+    fr: 'Ajouter un Projet',
+    ar: 'إضافة مشروع'
   },
   'project.new': {
     en: 'New Project',
@@ -426,27 +560,6 @@ export const TRANSLATIONS = {
     fr: 'Nom du Projet',
     ar: 'اسم المشروع'
   },
-  'project.fields': {
-    en: 'Fields',
-    de: 'Felder',
-    es: 'Campos',
-    fr: 'Champs',
-    ar: 'الحقول'
-  },
-  'project.zones': {
-    en: 'Zones',
-    de: 'Zonen',
-    es: 'Zonas',
-    fr: 'Zones',
-    ar: 'المناطق'
-  },
-  'project.datapoints': {
-    en: 'Datapoints',
-    de: 'Datenpunkte',
-    es: 'Puntos de datos',
-    fr: 'Points de données',
-    ar: 'نقاط البيانات'
-  },
   'project.not_found': {
     en: 'Project data not available',
     de: 'Projektdaten nicht verfügbar',
@@ -454,12 +567,152 @@ export const TRANSLATIONS = {
     fr: 'Données du projet non disponibles',
     ar: 'بيانات المشروع غير متوفرة'
   },
-  'field.new': {
-    en: 'New Field',
-    de: 'Neues Feld',
-    es: 'Nuevo Campo',
-    fr: 'Nouveau Champ',
-    ar: 'حقل جديد'
+  'project.manager': {
+    en: 'Project Manager',
+    de: 'Projektleiter',
+    es: 'Gerente de Proyecto',
+    fr: 'Chef de Projet',
+    ar: 'مدير المشروع'
+  },
+  'project.manager.not_assigned': {
+    en: 'No manager assigned',
+    de: 'Kein Manager zugewiesen',
+    es: 'No hay gerente asignado',
+    fr: 'Aucun chef de projet assigné',
+    ar: 'لا يوجد مدير معين'
+  },
+  'project.type': {
+    en: 'Project Type',
+    de: 'Projekttyp',
+    es: 'Tipo de Proyecto',
+    fr: 'Type de Projet',
+    ar: 'نوع المشروع'
+  },
+  'project.type.field': {
+    en: 'Field',
+    de: 'Feld',
+    es: 'Campo',
+    fr: 'Champ',
+    ar: 'حقل'
+  },
+  'project.type.roof': {
+    en: 'Roof',
+    de: 'Dach',
+    es: 'Techo',
+    fr: 'Toit',
+    ar: 'سطح'
+  },
+  'project.client_ref': {
+    en: 'Client Reference',
+    de: 'Kundenreferenz',
+    es: 'Referencia del Cliente',
+    fr: 'Référence Client',
+    ar: 'مرجع العميل'
+  },
+  'project.latitude': {
+    en: 'Latitude',
+    de: 'Breitengrad',
+    es: 'Latitud',
+    fr: 'Latitude',
+    ar: 'خط العرض'
+  },
+  'project.longitude': {
+    en: 'Longitude',
+    de: 'Längengrad',
+    es: 'Longitud',
+    fr: 'Longitude',
+    ar: 'خط الطول'
+  },
+  'project.image_url': {
+    en: 'Project Image URL',
+    de: 'Projektbild-URL',
+    es: 'URL de la Imagen del Proyecto',
+    fr: 'URL de l\'Image du Projet',
+    ar: 'عنوان URL لصورة المشروع'
+  },
+  'project.create': {
+    en: 'Create Project',
+    de: 'Projekt erstellen',
+    es: 'Crear Proyecto',
+    fr: 'Créer un Projet',
+    ar: 'إنشاء مشروع'
+  },
+  'fields': {
+    en: 'Fields',
+    de: 'Felder',
+    es: 'Campos',
+    fr: 'Champs',
+    ar: 'الحقول'
+  },
+  'zones': {
+    en: 'Zones',
+    de: 'Zonen',
+    es: 'Zonas',
+    fr: 'Zones',
+    ar: 'المناطق'
+  },
+  'zones.please_select_field': {
+    en: 'Please select a field to view its zones',
+    de: 'Bitte wählen Sie ein Feld aus, um seine Zonen anzuzeigen',
+    es: 'Por favor, seleccione un campo para ver sus zonas',
+    fr: 'Veuillez sélectionner un champ pour voir ses zones',
+    ar: 'يرجى تحديد حقل لعرض مناطقه'
+  },
+  'zones.add': {
+    en: 'Add Zone',
+    de: 'Zone hinzufügen',
+    es: 'Añadir Zona',
+    fr: 'Ajouter une Zone',
+    ar: 'إضافة منطقة'
+  },
+  'zones.add_new': {
+    en: 'Add New Zone',
+    de: 'Neue Zone hinzufügen',
+    es: 'Añadir Nueva Zona',
+    fr: 'Ajouter une Nouvelle Zone',
+    ar: 'إضافة منطقة جديدة'
+  },
+  'zones.name': {
+    en: 'Zone Name',
+    de: 'Zonenname',
+    es: 'Nombre de la Zona',
+    fr: 'Nom de la Zone',
+    ar: 'اسم المنطقة'
+  },
+  'zones.short_name': {
+    en: 'Name',
+    de: 'Name',
+    es: 'Nombre',
+    fr: 'Nom',
+    ar: 'الاسم'
+  },
+  'zones.location': {
+    en: 'Location',
+    de: 'Standort',
+    es: 'Ubicación',
+    fr: 'Emplacement',
+    ar: 'الموقع'
+  },
+  'zones.actions': {
+    en: 'Actions',
+    de: 'Aktionen',
+    es: 'Acciones',
+    fr: 'Actions',
+    ar: 'الإجراءات'
+  },
+  'datapoints': {
+    en: 'Datapoints',
+    de: 'Datenpunkte',
+    es: 'Puntos de datos',
+    fr: 'Points de données',
+    ar: 'نقاط البيانات'
+  },
+  'field.select_project': {
+    en: 'Please select a project to view its fields',
+    de: 'Bitte wählen Sie ein Projekt aus, um seine Felder anzuzeigen',
+    es: 'Por favor, seleccione un proyecto para ver sus campos',
+    fr: 'Veuillez sélectionner un projet pour voir ses champs',
+    ar: 'يرجى تحديد مشروع لعرض حقوله'
   },
   'field.name': {
     en: 'Field Name',
@@ -467,6 +720,41 @@ export const TRANSLATIONS = {
     es: 'Nombre del Campo',
     fr: 'Nom du Champ',
     ar: 'اسم الحقل'
+  },
+  'field.add': {
+    en: 'Add Field',
+    de: 'Feld hinzufügen',
+    es: 'Añadir Campo',
+    fr: 'Ajouter un Champ',
+    ar: 'إضافة حقل'
+  },
+  'field.add_new': {
+    en: 'Add New Field',
+    de: 'Neues Feld hinzufügen',
+    es: 'Añadir Nuevo Campo',
+    fr: 'Ajouter un Nouveau Champ',
+    ar: 'إضافة حقل جديد'
+  },
+  'field.has_fence': {
+    en: 'Has Fence',
+    de: 'Hat Zaun',
+    es: 'Tiene Cerca',
+    fr: 'A une Clôture',
+    ar: 'لديه سياج'
+  },
+  'field.has_fence.yes': {
+    en: 'Yes',
+    de: 'Ja',
+    es: 'Sí',
+    fr: 'Oui',
+    ar: 'نعم'
+  },
+  'field.has_fence.no': {
+    en: 'No',
+    de: 'Nein',
+    es: 'No',
+    fr: 'Non',
+    ar: 'لا'
   },
   'zone.new': {
     en: 'New Zone',
@@ -825,13 +1113,34 @@ export const TRANSLATIONS = {
     fr: 'Modifier la personne',
     ar: 'تعديل الشخص'
   },
-  'utils': {
-    en: '',
-    de: '',
-    es: '',
-    fr: '',
-    ar: ''
+  'media.upload': {
+    en: 'Upload Media',
+    de: 'Medien hochladen',
+    es: 'Subir medios',
+    fr: 'Télécharger des médias',
+    ar: 'تحميل الوسائط'
   },
+  'media.view': {
+    en: 'View Media',
+    de: 'Medien anzeigen',
+    es: 'Ver medios',
+    fr: 'Voir les médias',
+    ar: 'عرض الوسائط'
+  },
+  'evaluation.panel_coming_soon': {
+    en: 'Evaluation panel coming soon',
+    de: 'Bewertungspanel demnächst verfügbar',
+    es: 'Panel de evaluación próximamente',
+    fr: 'Panneau d\'évaluation bientôt disponible',
+    ar: 'لوحة التقييم قريباً'
+  },
+  'output.panel_coming_soon': {
+    en: 'Output panel coming soon',
+    de: 'Ausgabepanel demnächst verfügbar',
+    es: 'Panel de salida próximamente',
+    fr: 'Panneau de sortie bientôt disponible',
+    ar: 'لوحة الإخراج قريباً'
+  }
 } satisfies Translation;
 
 export const useTranslation = (currentLanguage: Language) => {

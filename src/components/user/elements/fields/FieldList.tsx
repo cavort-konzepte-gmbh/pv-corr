@@ -6,19 +6,22 @@ import { googleMaps } from "../../../../utils/google-maps"
 import { EditField } from './EditField';
 import { deleteField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface FieldListProps {
   currentTheme: Theme;
   fields: Field[];
   onSelectField: (fieldId: string) => void;
   onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language
 }
 
 const FieldList: React.FC<FieldListProps> = ({
   currentTheme,
   fields,
   onSelectField,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage,
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [isEditingCoordinates, setIsEditingCoordinates] = useState(false);
@@ -29,6 +32,7 @@ const FieldList: React.FC<FieldListProps> = ({
     longitude: '',
     has_fence: 'no'
   });
+  const translation = useTranslation(currentLanguage);
 
   const handleSelectField = (event: React.MouseEvent, field: Field) => {
     event.stopPropagation();
@@ -77,13 +81,13 @@ const FieldList: React.FC<FieldListProps> = ({
                     className="w-full py-2 px-4 flex items-center justify-between gap-x-2 border-b-theme"
                     onClick={(event) => handleSelectField(event, field)}
                   >
-                    Edit <Edit2 size={14} />
+                    {translation("general.edit")} <Edit2 size={14} />
                   </li>
                   <li 
                     className="w-full py-2 px-4 flex items-center justify-between gap-x-2"
                     onClick={event => handleRemoveField(event, field)}
                   >
-                    Remove <X size={14} />
+                    {translation("general.delete")} <X size={14} />
                   </li>
                 </ul>
               </div>
@@ -94,7 +98,7 @@ const FieldList: React.FC<FieldListProps> = ({
             <span className="text-sm text-secondary">
               {field.zones.length} zones • {
                 field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)
-              } datapoints
+              } {translation("datapoints").toLowerCase()}
               {field.has_fence && ' • Fenced'}
             </span>
             {field.latitude && field.longitude && (
@@ -103,7 +107,7 @@ const FieldList: React.FC<FieldListProps> = ({
                   onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
                   className="text-sm hover:underline text-accent-primary"
                 >
-                  View on map
+                  {translation("general.view_on_map")}
                 </button>
                 <button
                   onClick={event => handleEditCoordinates(event, field)}
@@ -122,6 +126,7 @@ const FieldList: React.FC<FieldListProps> = ({
           setShowForm={setShowForm} 
           onProjectsChange={onProjectsChange}
           isEditingCoordinates={isEditingCoordinates}
+          currentLanguage={currentLanguage}
         />
       )}
     </div>

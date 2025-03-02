@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
-import { Language } from '../../../../types/language';
+import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { Datapoint } from '../../../../types/projects';
 import { Edit2, Save, X, Upload, Clock } from 'lucide-react';
@@ -30,6 +30,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("datapoints");
+  const translation = useTranslation(currentLanguage);
 
   const handleShowMediaDialog = async (datapointId: string) => {
     setShowMediaDialog(datapointId);
@@ -72,13 +73,13 @@ const DatapointList: React.FC<DatapointListProps> = ({
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            <th className="text-left p-2 text-secondary">Name</th>
+            <th className="text-left p-2 text-secondary">{translation("datapoint.short_name")}</th>
             {parameters.map(param => (
               <th key={param.id} className="text-center p-2 text-secondary w-32">
                 {param.shortName || param.name}
               </th>
             ))}
-            <th className="text-center p-2 text-secondary">Actions</th>
+            <th className="text-center p-2 text-secondary">{translation("actions")}</th>
           </tr>
         </thead>
         <tbody>
