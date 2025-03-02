@@ -5,7 +5,7 @@ import { Parameter } from '../../../../types/parameters';
 import { Datapoint } from '../../../../types/projects';
 import { Edit2, Save, X, Upload, Clock } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
-import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../../../../services/media';
+import { useSupabaseMedia } from '../../../../services/media';
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -24,25 +24,6 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingName, setEditingName] = useState<string>('');
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
-  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
-  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("datapoints");
-
-  const handleShowMediaDialog = async (datapointId: string) => {
-    setShowMediaDialog(datapointId);
-    const urls = await fetchMediaUrlsByEntityId(datapointId);
-    setMediaUrls(urls);
-  };
-
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!showMediaDialog) return;
-    
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      await uploadMedia(file, showMediaDialog);
-      const urls = await fetchMediaUrlsByEntityId(showMediaDialog);
-      setMediaUrls(urls);
-    }
-  };
 
   return (
     <div className="mt-8">
@@ -128,7 +109,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     )}
                   </button>
                   <button
-                    onClick={() => handleShowMediaDialog(datapoint.id)}
+                    onClick={() => setShowMediaDialog(datapoint.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Upload size={14} />
@@ -144,8 +125,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
         <MediaDialog
           isOpen={true}
           onClose={() => setShowMediaDialog(null)}
-          onFileChange={handleFileChange}
-          mediaUrls={mediaUrls}
+          entityId={showMediaDialog}
           currentTheme={currentTheme}
         />
       )}
