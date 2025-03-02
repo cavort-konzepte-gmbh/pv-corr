@@ -16,15 +16,11 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
+          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
-        >
+        <h2 className="text-2xl font-bold text-primary">
           System Configuration
         </h2>
       </div>
