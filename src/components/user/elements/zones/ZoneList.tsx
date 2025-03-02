@@ -271,8 +271,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   )}
                   <button
                     onClick={() => onSelectZone(zone.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                   >
                     <ChevronRight size={14} />
                   </button>

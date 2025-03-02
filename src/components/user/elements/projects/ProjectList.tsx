@@ -43,11 +43,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                   e.stopPropagation();
                   setShowMoveMenu(showMoveMenu === project.id ? null : project.id);
                 }}
-                className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                style={{ 
-                  backgroundColor: currentTheme.colors.accent.primary,
-                  color: 'white'
-                }}
+                className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"                
               >
                 Move
               </button>
@@ -74,11 +70,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     onMoveProject(project.id, null);
                     setShowMoveMenu(null);
                   }}
-                  className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
-                  style={{ 
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary
-                  }}
+                  className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm text-primary bg-theme"                  
                 >
                   Move to No Customer
                 </button>

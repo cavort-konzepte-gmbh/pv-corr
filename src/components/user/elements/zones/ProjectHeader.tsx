@@ -18,7 +18,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   currentTheme
 }) => {
   return (
-    <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
+    <div className="h-14 flex items-center px-4 border-b-theme bg-surface">
       <div className="flex-1 flex items-center gap-2">
         <span className="text-primary font-medium">{project.name}</span>
         {project.typeProject && (

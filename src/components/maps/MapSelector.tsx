@@ -133,22 +133,15 @@ const MapSelector: React.FC<MapSelectorProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div 
-        className="p-6 rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col"
-        style={{ backgroundColor: currentTheme.colors.surface }}
-      >
+      <div className="p-6 rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col bg-surface">
         <div className="flex items-center justify-between mb-4">
-          <h3 
-            className="text-lg flex items-center gap-2"
-            style={{ color: currentTheme.colors.text.primary }}
-          >
-            <MapPin size={20} style={{ color: currentTheme.colors.accent.primary }} />
+          <h3 className="text-lg flex items-center gap-2 text-primary">
+            <MapPin className="text-accent-primary" size={20} />
             Select Location
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-opacity-80"
-            style={{ color: currentTheme.colors.text.secondary }}
+            className="p-1 rounded hover:bg-opacity-80 text-secondary"
           >
             <X size={20} />
           </button>
@@ -156,34 +149,24 @@ const MapSelector: React.FC<MapSelectorProps> = ({
 
         <div 
           ref={mapRef} 
-          className="w-full h-[500px] rounded mb-4"
-          style={{ border: `1px solid ${currentTheme.colors.border}` }}
+          className="w-full h-[500px] rounded mb-4 border-theme border-solid"
         />
 
         {selectedPosition && (
           <div className="flex items-center justify-between">
-            <div style={{ color: currentTheme.colors.text.secondary }}>
+            <div className="text-secondary">
               Selected: {selectedPosition.lat.toFixed(6)}, {selectedPosition.lng.toFixed(6)}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={onClose}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: currentTheme.colors.text.secondary,
-                  border: `1px solid ${currentTheme.colors.border}`
-                }}
+                className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent"                
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                className="px-4 py-2 rounded text-sm"
-                style={{
-                  backgroundColor: currentTheme.colors.accent.primary,
-                  color: 'white'
-                }}
+                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
               >
                 Confirm Location
               </button>

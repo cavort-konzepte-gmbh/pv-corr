@@ -41,10 +41,7 @@ const Zones: React.FC<ZonesProps> = ({
 
   if (!selectedProject || !selectedField) {
     return (
-      <div 
-        className="p-6 text-center"
-        style={{ color: currentTheme.colors.text.secondary }}
-      >
+      <div className="p-6 text-center text-secondary">
         Please select a field to view its zones
       </div>
     );

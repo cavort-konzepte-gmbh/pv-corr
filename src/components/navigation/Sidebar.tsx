@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     }}
                   >
                     {expandedItems.has(project.id) ? (
-                      <ChevronDown 
+                      <ChevronDown
                         size={14}
                         style={{ color: currentTheme.colors.text.secondary }} 
                       />

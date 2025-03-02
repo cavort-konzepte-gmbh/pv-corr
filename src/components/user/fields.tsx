@@ -36,10 +36,7 @@ const Fields: React.FC<FieldsProps> = ({
 
   if (!selectedProject) {
     return (
-      <div 
-        className="p-6 text-center"
-        style={{ color: currentTheme.colors.text.secondary }}
-      >
+      <div className="p-6 text-center text-secondary">
         Please select a project to view its fields
       </div>
     );

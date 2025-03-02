@@ -39,10 +39,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <button
           onClick={() => setActiveView('overview')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -64,10 +61,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('parameters')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -89,10 +83,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('norms')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -114,10 +105,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('constants')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -139,10 +127,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('materials')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -164,10 +149,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('foundations')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -189,10 +171,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('experts')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -214,10 +193,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('neighboring')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -239,10 +215,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('substructures')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg bg-surface border-theme border-solid"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
@@ -283,10 +256,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         )}
         {activeView === 'norms' && (
           <div className="p-6">
-            <h3 
-              className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+            <h3 className="text-lg font-medium mb-4 text-primary">
               Norms Management
             </h3>
             {/* Add norms management content here */}
@@ -294,10 +264,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         )}
         {activeView === 'constants' && (
           <div className="p-6">
-            <h3 
-              className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+            <h3 className="text-lg font-medium mb-4 text-primary">
               Physical Constants Management
             </h3>
             {/* Add physical constants management content here */}
@@ -335,10 +302,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         )}
         {activeView === 'foundations' && (
           <div className="p-6">
-            <h3 
-              className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+            <h3 className="text-lg font-medium mb-4 text-primary">
               Foundations Management
             </h3>
             {/* Add foundations management content here */}

@@ -285,11 +285,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                         e.stopPropagation();
                         onCreateCustomer(company.id, company.name);
                       }}
-                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                      style={{ 
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
+                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white text-accent-primary"                      
                     >
                       Make Customer
                     </button>

@@ -45,48 +45,47 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   return (
     <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Building2 className="w-5 h-5" style={{ color: currentTheme.primary }} />
+        <div className="flex items-center gap-2 text-accent-primary">
+          <Building2 className="w-5 h-5" />
           <span className="font-semibold">{project.name}</span>
         </div>
         {project.location && (
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <div className="flex items-center gap-2 text-accent-primary">
+            <MapPin className="w-5 h-5" />
             <span>{project.location}</span>
           </div>
         )}
         {manager && (
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <div className="flex items-center gap-2 text-accent-primary">
+            <User className="w-5 h-5" />
             <span>{manager.name}</span>
           </div>
         )}
         {manager?.email && (
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <div className="flex items-center gap-2 text-accent-primary">
+            <Mail className="w-5 h-5" />
             <a href={`mailto:${manager.email}`} className="hover:underline">
               {manager.email}
             </a>
           </div>
         )}
         {manager?.phone && (
-          <div className="flex items-center gap-2">
-            <Phone className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <div className="flex items-center gap-2 text-accent-primary">
+            <Phone className="w-5 h-5" />
             <a href={`tel:${manager.phone}`} className="hover:underline">
               {manager.phone}
             </a>
           </div>
         )}
         {company && (
-          <div className="flex items-center gap-2">
-            <DoorOpen className="w-5 h-5" style={{ color: currentTheme.primary }} />
+          <div className="flex items-center gap-2 text-accent-primary">
+            <DoorOpen className="w-5 h-5" />
             <span>{company.name}</span>
           </div>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-accent-primary">
           <Upload
             className="w-5 h-5 cursor-pointer"
-            style={{ color: currentTheme.primary }}
             onClick={() => handleShowMediaDialog(0, project.id)}
           />
           <span className="cursor-pointer" onClick={() => handleShowMediaDialog(0, project.id)}>

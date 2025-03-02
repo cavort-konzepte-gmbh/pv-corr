@@ -107,39 +107,24 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
+          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
-        >
+        <h2 className="text-2xl font-bold text-primary">
           Substructures Management
         </h2>
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       <button
         onClick={() => setShowNewForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         Add New Substructure
@@ -147,94 +132,56 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
 
       {showNewForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div 
-            className="p-6 rounded-lg max-w-md w-full"
-            style={{ backgroundColor: currentTheme.colors.surface }}
-          >
-            <h3 
-              className="text-lg mb-6"
-              style={{ color: currentTheme.colors.text.primary }}
-            >
+          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+            <h3 className="text-lg mb-6 text-primary">
               {editingId ? 'Edit Substructure' : 'New Substructure'}
             </h3>
 
             <div className="space-y-4">
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Manufacturer
                 </label>
                 <input
                   type="text"
                   value={formValues.manufacturer || ''}
                   onChange={(e) => setFormValues({ ...formValues, manufacturer: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 />
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   System
                 </label>
                 <input
                   type="text"
                   value={formValues.system || ''}
                   onChange={(e) => setFormValues({ ...formValues, system: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme"                  
                 />
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Version
                 </label>
                 <input
                   type="text"
                   value={formValues.version || ''}
                   onChange={(e) => setFormValues({ ...formValues, version: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme"                  
                 />
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Type
                 </label>
                 <select
                   value={formValues.type || ''}
                   onChange={(e) => setFormValues({ ...formValues, type: e.target.value as 'roof' | 'field' })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 >
                   <option value="">Select type</option>
                   <option value="roof">Roof</option>
@@ -243,62 +190,38 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Link
                 </label>
                 <input
                   type="url"
                   value={formValues.link || ''}
                   onChange={(e) => setFormValues({ ...formValues, link: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 />
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Schematic URL
                 </label>
                 <input
                   type="url"
                   value={formValues.schematic || ''}
                   onChange={(e) => setFormValues({ ...formValues, schematic: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"                  
                 />
               </div>
 
               <div>
-                <label 
-                  className="block text-sm mb-1"
-                  style={{ color: currentTheme.colors.text.secondary }}
-                >
+                <label className="block text-sm mb-1 text-secondary">
                   Example URL
                 </label>
                 <input
                   type="url"
                   value={formValues.example || ''}
                   onChange={(e) => setFormValues({ ...formValues, example: e.target.value })}
-                  className="w-full p-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
                 />
               </div>
 
@@ -309,22 +232,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setEditingId(null);
                     setFormValues({});
                   }}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: currentTheme.colors.text.secondary,
-                    border: `1px solid ${currentTheme.colors.border}`
-                  }}
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="px-4 py-2 rounded text-sm"
-                  style={{
-                    backgroundColor: currentTheme.colors.accent.primary,
-                    color: 'white'
-                  }}
+                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
                 >
                   {editingId ? 'Save Changes' : 'Create Substructure'}
                 </button>
@@ -338,23 +252,18 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         {substructures.map(substructure => (
           <div
             key={substructure.id}
-            className="p-4 rounded-lg"
-            style={{ 
-              backgroundColor: currentTheme.colors.surface,
-              border: `1px solid ${currentTheme.colors.border}`
-            }}
+            className="p-4 rounded-lg border-theme border-solid bg-surface"            
           >
             <div className="flex items-center justify-between mb-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <span style={{ color: currentTheme.colors.text.primary }}>
+                  <span className="text-primary">
                     {substructure.manufacturer} - {substructure.system} ({substructure.version})
                   </span>
                   <span 
-                    className="text-xs px-2 py-1 rounded"
+                    className="text-xs px-2 py-1 rounded text-accent-primary"
                     style={{ 
                       backgroundColor: `${currentTheme.colors.accent.primary}20`,
-                      color: currentTheme.colors.accent.primary
                     }}
                   >
                     {substructure.type}
@@ -368,15 +277,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setFormValues(substructure);
                     setShowNewForm(true);
                   }}
-                  className="p-1 rounded hover:bg-opacity-80"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <Edit2 size={14} />
                 </button>
                 <button
                   onClick={() => handleDelete(substructure.id)}
-                  className="p-1 rounded hover:bg-opacity-80"
-                  style={{ color: currentTheme.colors.text.secondary }}
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <X size={14} />
                 </button>
@@ -388,8 +295,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   href={substructure.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm flex items-center gap-1"
-                  style={{ color: currentTheme.colors.accent.primary }}
+                  className="text-sm flex items-center gap-1 text-accent-primary"
                 >
                   <Link size={12} />
                   Website
@@ -400,8 +306,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   href={substructure.schematic}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm flex items-center gap-1"
-                  style={{ color: currentTheme.colors.accent.primary }}
+                  className="text-sm flex items-center gap-1 text-accent-primary"
                 >
                   <Image size={12} />
                   Schematic
@@ -412,8 +317,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                   href={substructure.example}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm flex items-center gap-1"
-                  style={{ color: currentTheme.colors.accent.primary }}
+                  className="text-sm flex items-center gap-1 text-accent-primary"
                 >
                   <Image size={12} />
                   Example

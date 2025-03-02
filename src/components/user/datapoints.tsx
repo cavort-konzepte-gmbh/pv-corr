@@ -51,7 +51,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
 
   if (!project || !field || !selectedZone) {
     return (
-      <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+      <div className="p-6 text-center text-secondary">
         Please select a zone to view its datapoints
       </div>
     );
@@ -59,7 +59,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
 
   if (loading) {
     return (
-      <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+      <div className="p-6 text-center text-secondary">
         Loading parameters...
       </div>
     );

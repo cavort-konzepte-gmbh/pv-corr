@@ -162,39 +162,24 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
+          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
           <ArrowLeft size={20} />
         </button>
-        <h2 
-          className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
-        >
+        <h2 className="text-2xl font-bold text-pretty">
           Experts Management
         </h2>
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
-        >
+        <div className="p-4 mb-4 rounded text-primary border-accent-primary border-solid bg-surface">
           {error}
         </div>
       )}
 
       <button
         onClick={() => setIsNewExpert(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         Add New Expert

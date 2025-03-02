@@ -273,11 +273,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                           `${person.firstName} ${person.lastName}`
                         );
                       }}
-                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                      style={{ 
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
+                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"                      
                     >
                       Make Customer
                     </button>
