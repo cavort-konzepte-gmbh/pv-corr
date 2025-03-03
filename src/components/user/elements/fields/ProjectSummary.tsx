@@ -5,7 +5,6 @@ import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
 import { Building2, MapPin, User, Mail, Phone, DoorOpen, Maximize2, Upload } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
-import { useSupabaseMedia, fetchMediaUrlsByEntityId } from '../../../../services/media';
 import { Language, useTranslation } from '../../../../types/language';
 
 interface ProjectSummaryProps {
@@ -23,28 +22,14 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   currentTheme,
   currentLanguage
 }) => {
+
+
   const translation = useTranslation(currentLanguage);
-  const [showFullscreenImage, setShowFullscreenImage] = useState(false);
-  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
-  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
-  const { mediaUrl, uploadMedia, loading: isUploading } = useSupabaseMedia("projects-fields");
-  const [preview, setPreview] = useState<string | null>(null);
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
 
-  const handleShowMediaDialog = async (index: number, projectId: string) => {
-    setShowMediaDialog(0);
-    const mediatwo = await fetchMediaUrlsByEntityId(projectId);
-    setMediaUrls(mediatwo);
-  };
 
-  const handleFileChangeInDialog = async (event: React.ChangeEvent<HTMLInputElement>, projectId: string) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setPreview(URL.createObjectURL(file));
-      await uploadMedia(file, projectId);
-      const mediatwo = await fetchMediaUrlsByEntityId(projectId);
-      setMediaUrls(mediatwo);
-    }
-  };
+
+
 
   return (
     <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
@@ -89,33 +74,23 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         )}
         <div className="flex items-center gap-2">
           <Upload
-            className="w-5 h-5 cursor-pointer text-accent-primary"
-            onClick={() => handleShowMediaDialog(0, project.id)}
+            className="w-5 h-5 cursor-pointer"
+            style={{ color: currentTheme.primary }}
+            onClick={() => setShowMediaDialog(project.id) }
           />
-          <span className="cursor-pointer" onClick={() => handleShowMediaDialog(0, project.id)}>
-            {translation("media.upload")}
+          <span className="cursor-pointer" onClick={() => setShowMediaDialog(project.id)}>
+          Media management 
           </span>
         </div>
-        {mediaUrls.length > 0 && (
-          <div className="flex items-center gap-2">
-            <Maximize2
-              className="w-5 h-5 cursor-pointer text-accent-primary"
-              onClick={() => setShowFullscreenImage(true)}
-            />
-            <span className="cursor-pointer" onClick={() => setShowFullscreenImage(true)}>
-              {translation("media.view")}
-            </span>
-          </div>
-        )}
+       
+
       </div>
-      {showMediaDialog !== null && (
+      {showMediaDialog && (
         <MediaDialog
-          show={showMediaDialog !== null}
+          isOpen={true}
           onClose={() => setShowMediaDialog(null)}
-          mediaUrls={mediaUrls}
-          onFileChange={(e) => handleFileChangeInDialog(e, project.id)}
-          preview={preview}
-          isUploading={isUploading}
+          entityId={showMediaDialog}
+          currentTheme={currentTheme}
         />
       )}
     </div>
