@@ -16,8 +16,8 @@ import Fields from './user/fields';
 import Zones from './user/zones';
 import Datapoints from './user/datapoints';
 import Settings from './user/settings';
-import { useKeyAction } from '../hooks/useKeyAction';
 import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard } from 'lucide-react';
+import { ButtonSection } from './ui/ButtonSection';
 
 const DashboardLayout = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>();
@@ -154,6 +154,7 @@ const DashboardLayout = () => {
               setView('fields');
               setSelectedProjectId(projectId);
             }}
+            currentLanguage={currentLanguage}
           />
         );
       case 'fields':
@@ -171,7 +172,7 @@ const DashboardLayout = () => {
               setSelectedFieldId(fieldId);
             }}
             people={savedPeople}
-            companies={savedCompanies}
+            companies={savedCompanies}        
           />
         );
       case 'zones':
@@ -209,22 +210,23 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
               setSelectedZone(undefined);
             }}
+            onProjectsChange={setProjects}
           />
         ) : (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-            Please select a zone to view its datapoints
+          <div className="p-6 text-center text-secondary">
+            {t("datapoint.please_select_zone")}
           </div>
         );
       case 'evaluation':
         return (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-            Evaluation panel coming soon
+          <div className="p-6 text-center text-secondary">
+            {t("evaluation.panel_coming_soon")}
           </div>
         );
       case 'output':
         return (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-            Output panel coming soon
+          <div className="p-6 text-center text-secondary">
+            {t("output.panel_coming_soon")}
           </div>
         );
       case 'settings':
@@ -265,151 +267,68 @@ const DashboardLayout = () => {
                 className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
               >
                 <ArrowLeft size={18} />
-                <span>Back</span>
+                <span>{t("nav.back")}</span>
               </button>
               <div className="h-6 w-px bg-border mx-2" />
-              <button
-                onClick={() => setSettingsView('general')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: settingsView === 'general' ? currentTheme.colors.background : 'transparent',
-                  color: settingsView === 'general' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
-                <span>General</span>
-              </button>
-              <button
-                onClick={() => setSettingsView('theme')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: settingsView === 'theme' ? currentTheme.colors.background : 'transparent',
-                  color: settingsView === 'theme' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
-                <span>Theme</span>
-              </button>
-              <button
-                onClick={() => setSettingsView('companies')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: settingsView === 'companies' ? currentTheme.colors.background : 'transparent',
-                  color: settingsView === 'companies' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
-                <span>Companies</span>
-              </button>
-              <button
-                onClick={() => setSettingsView('people')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: settingsView === 'people' ? currentTheme.colors.background : 'transparent',
-                  color: settingsView === 'people' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
-                <span>People</span>
-              </button>
+              <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
+                <span>{t("settings.general")}</span>
+              </ButtonSection>
+              <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
+                <span>{t("settings.theme")}</span>
+              </ButtonSection>
+              <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
+                <span>{t("settings.companies")}</span>
+              </ButtonSection>
+              <ButtonSection view={settingsView} match="people" onClick={() => setSettingsView('people')}>
+                <span>{t("settings.people")}</span>
+              </ButtonSection>
             </>
           ) : (
             <>
-              <button
-                onClick={() => setView('projects')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'projects' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'projects' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+              <ButtonSection view={view} match="projects" onClick={() => setView('projects')}>
                 <FolderOpen size={18} />
-                <span>Projects</span>
-              </button>
-              <button
-                onClick={() => setView('fields')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'fields' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'fields' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+                <span>{t("nav.projects")}</span>
+              </ButtonSection>
+              <ButtonSection view={view} match="fields" onClick={() => setView('fields')}>
                 <Grid size={18} />
-                <span>Fields</span>
-              </button>
-              <button
-                onClick={() => setView('zones')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'zones' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'zones' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+                <span>{t("nav.fields")}</span>
+              </ButtonSection>         
+              <ButtonSection view={view} match="zones" onClick={() => setView('zones')}>
                 <Map size={18} />
-                <span>Zones</span>
-              </button>
-              <button
-                onClick={() => setView('datapoints')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'datapoints' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'datapoints' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+                <span>{t("nav.zones")}</span>
+              </ButtonSection>
+              <ButtonSection view={view} match="datapoints" onClick={() => setView('datapoints')}>
                 <Database size={18} />
-                <span>Datapoints</span>
-              </button>
-              <button
-                onClick={() => setView('evaluation')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'evaluation' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'evaluation' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+                <span>{t("nav.datapoints")}</span>
+              </ButtonSection>
+              <ButtonSection view={view} match="evaluation" onClick={() => setView('evaluation')}>
                 <Database size={18} />
-                <span>Evaluation</span>
-              </button>
-              <button
-                onClick={() => setView('output')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-                style={{
-                  backgroundColor: view === 'output' ? currentTheme.colors.background : 'transparent',
-                  color: view === 'output' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-                }}
-              >
+                <span>{t("nav.evaluation")}</span>
+              </ButtonSection>
+              <ButtonSection view={view} match="output" onClick={() => setView('output')}>
                 <Database size={18} />
-                <span>Output</span>
-              </button>
+                <span>{t("nav.output")}</span>
+              </ButtonSection>
             </>
           )}
         </div>
         <div className="flex items-center gap-4">
           {view !== 'settings' && (
-            <button
-              onClick={() => setView('settings')}
-              className="flex items-center gap-2 px-3 py-2 rounded transition-colors"
-              style={{
-                backgroundColor: view === 'settings' ? currentTheme.colors.background : 'transparent',
-                color: view === 'settings' ? currentTheme.colors.text.primary : currentTheme.colors.text.secondary
-              }}
-            >
+            <ButtonSection view={settingsView} match="settinngs" onClick={() => setView('settings')}>
               <SettingsIcon size={18} />
-              <span>Settings</span>
-            </button>
+              <span>{t("nav.settings")}</span>
+            </ButtonSection>
           )}
           {isAdmin && (
-            <button
-              onClick={toggleViewMode}
-              className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
-            >
+            <ButtonSection view={settingsView} match="admin" onClick={toggleViewMode}>
               <LayoutDashboard size={18} />
-              <span>Administration</span>
-            </button>
+              <span>{t("nav.administration")}</span>
+            </ButtonSection>
           )}
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
-          >
+          <ButtonSection view={settingsView} match="signout" onClick={handleSignOut}>
             <LogOut size={18} />
-            <span>Sign Out</span>
-          </button>
+            <span>{t("nav.signout")}</span>
+          </ButtonSection>
         </div>
       </div>
 

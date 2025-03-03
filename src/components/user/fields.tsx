@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
-import { Language } from '../../types/language';
+import { Language, useTranslation } from '../../types/language';
 import { Project } from '../../types/projects';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
@@ -28,19 +28,18 @@ const Fields: React.FC<FieldsProps> = ({
   onSelectField,
   people,
   companies,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage
 }) => {
+  const translation = useTranslation(currentLanguage);
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
     : null;
 
   if (!selectedProject) {
     return (
-      <div 
-        className="p-6 text-center"
-        style={{ color: currentTheme.colors.text.secondary }}
-      >
-        Please select a project to view its fields
+      <div className="p-6 text-center text-secondary">
+        {translation("field.select_project")}
       </div>
     );
   }
@@ -55,18 +54,22 @@ const Fields: React.FC<FieldsProps> = ({
         manager={manager}
         company={company}
         currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
       />
       
       <FieldForm
         currentTheme={currentTheme}
         selectedProjectId={selectedProject.id}
         onProjectsChange={onProjectsChange}
+        currentLanguage={currentLanguage}
       />
 
       <FieldList
         currentTheme={currentTheme}
         fields={selectedProject.fields}
         onSelectField={(fieldId) => onSelectField(selectedProject.id, fieldId)}
+        onProjectsChange={onProjectsChange}
+        currentLanguage={currentLanguage}
       />
     </div>
   );
