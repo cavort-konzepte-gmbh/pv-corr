@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, X, Edit3, Eye } from 'lucide-react';
 import { Theme } from '../../types/theme';
-import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia } from '../../services/media';
+import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia, deleteMedia } from '../../services/media';
+import { DeleteConfirmDialog } from './FormHandler';
 
 interface MediaDialogProps {
   isOpen: boolean;
@@ -24,6 +25,8 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
   const [preview, setPreview] = useState<string | null>(null);
   const [newMediaFile, setNewMediaFile] = useState<File | null>(null);
   const [mediaData, setMediaData] = useState<{ url: string, title: string, description: string }[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const { uploadMedia } = useSupabaseMedia("datapoints");
 
   useEffect(() => {
@@ -43,6 +46,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
       );
       setMediaData(updatedMediaData);
       setRenamingMedia(null);
+      setNewMediaName('');
     }
   };
 
@@ -84,6 +88,13 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
     setMediaNotes({});
   };
 
+  const handleDeleteMedia = async (url: string) => {
+    await deleteMedia(url);
+    const updatedMediaData = mediaData.filter(media => media.url !== url);
+    setMediaData(updatedMediaData);
+    setDeleteConfirm(null);
+  };
+
   const renderMediaBox = (media: { url: string, title: string, description: string }, index: number) => {
     return (
       <div key={index} className="relative p-2 border rounded shadow-sm bg-surface text-white">
@@ -93,18 +104,21 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
               <input
                 type="text"
                 className="w-full p-2 border rounded mb-2 border-theme bg-surface text-white"
-                value={newMediaName || ''}
+                value={newMediaName || media.title}
                 onChange={(e) => setNewMediaName(e.target.value)}
               />
               <button
                 className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => handleRename(media.url, newMediaName, mediaNotes[media.url] || '')}
+                onClick={() => handleRename(media.url, newMediaName || media.title, mediaNotes[media.url] || media.description)}
               >
                 Save
               </button>
               <button
                 className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => setRenamingMedia(null)}
+                onClick={() => {
+                  setRenamingMedia(null);
+                  setNewMediaName('');
+                }}
               >
                 Cancel
               </button>
@@ -114,7 +128,10 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
               <span className="text-sm font-semibold">{media.title}</span>
               <button
                 className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => setRenamingMedia(media.url)}
+                onClick={() => {
+                  setRenamingMedia(media.url);
+                  setNewMediaName(media.title);
+                }}
               >
                 <Edit3 size={16} />
               </button>
@@ -126,11 +143,17 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
           >
             <Eye size={16} />
           </button>
+          <button
+            className="p-1 rounded hover:bg-opacity-80 text-secondary text-white"
+            onClick={() => setDeleteConfirm(media.url)}
+          >
+            <X size={16} />
+          </button>
         </div>
         {renamingMedia === media.url ? (
           <textarea
             className="w-full p-2 border rounded mb-2 border-theme bg-surface text-white break-words"
-            value={mediaNotes[media.url] || ''}
+            value={mediaNotes[media.url] || media.description}
             onChange={(e) => setMediaNotes({ ...mediaNotes, [media.url]: e.target.value })}
             rows={4}
           />
@@ -274,6 +297,19 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
             <X size={24} />
           </button>
         </div>
+      )}
+      {deleteConfirm && (
+        <DeleteConfirmDialog
+          isOpen={!!deleteConfirm}
+          itemName="Media"
+          confirmName={deleteConfirmName}
+          onConfirmChange={setDeleteConfirmName}
+          onConfirm={() => handleDeleteMedia(deleteConfirm!)}
+          onCancel={() => {
+            setDeleteConfirm(null);
+            setDeleteConfirmName('');
+          }}
+        />
       )}
     </div>
   );

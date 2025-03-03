@@ -4,23 +4,27 @@ import { Zone } from '../../../../types/projects';
 import { ChevronRight, Edit2, Save, X } from 'lucide-react';
 import { updateZone, deleteZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ZoneListProps {
   currentTheme: Theme;
   zones: Zone[];
   onSelectZone: (zoneId: string) => void;
   onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language;
 }
 
 const ZoneList: React.FC<ZoneListProps> = ({
   currentTheme,
   zones,
   onSelectZone,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage,
 }) => {
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
+  const translation = useTranslation(currentLanguage);
 
   const handleUpdateZone = async (zoneId: string, values: Record<string, string>) => {
     if (updatingZone) return;
@@ -64,16 +68,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
         <thead>
           <tr>
             <th className="p-2 text-left border font-normal border-theme">
-              Name
+              {translation("zones.short_name")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              Datapoints
+              {translation("datapoints")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              Location
+              {translation("zones.location")}
             </th>
             <th className="p-2 text-center border font-normal border-theme">
-              Actions
+              {translation("zones.actions")}
             </th>
           </tr>
         </thead>
@@ -118,10 +122,10 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
                     className="text-sm hover:underline text-accent-primary"
                   >
-                    View on map
+                    {translation("general.view_on_map")}
                   </button>
                 ) : (
-                  <span className="text-secondary">No location set</span>
+                  <span className="text-secondary">{translation("general.location_not_set")}</span>
                 )}
               </td>
               <td className="p-2 border border-theme">
@@ -143,7 +147,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         onClick={() => handleDeleteZone(zone.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
-                        Delete
+                        {translation("actions.delete")}
                       </button>
                       <button
                         onClick={() => {
@@ -158,8 +162,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   )}
                   <button
                     onClick={() => onSelectZone(zone.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                   >
                     <ChevronRight size={14} />
                   </button>

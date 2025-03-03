@@ -84,7 +84,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
       }
     } else {
       setEditingFoundation(foundation.id);
-      setEditingValues(foundation);
+      setEditingValues(foundation as any);
       setNewFoundation({});
       setIsNewFoundation(false);
     }

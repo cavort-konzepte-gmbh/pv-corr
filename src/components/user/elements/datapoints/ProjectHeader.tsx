@@ -26,8 +26,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
     <div className="flex items-center gap-4 mb-8">
       <button
         onClick={onBack}
-        className="p-2 rounded hover:bg-opacity-80"
-        style={{ color: currentTheme.colors.text.secondary }}
+        className="p-2 rounded hover:bg-opacity-80 text-secondary"
       >
         <ArrowLeft size={20} />
       </button>

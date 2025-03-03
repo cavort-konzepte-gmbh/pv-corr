@@ -1,19 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Field } from '../../../../types/projects';
-import { ChevronRight, Edit2 } from 'lucide-react';
+import { ChevronRight, Edit2, X, MoreVertical } from 'lucide-react';
+import { googleMaps } from "../../../../utils/google-maps"
+import { EditField } from './EditField';
+import { deleteField } from '../../../../services/fields';
+import { fetchProjects } from '../../../../services/projects';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface FieldListProps {
   currentTheme: Theme;
   fields: Field[];
   onSelectField: (fieldId: string) => void;
+  onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language
 }
 
 const FieldList: React.FC<FieldListProps> = ({
   currentTheme,
   fields,
-  onSelectField
+  onSelectField,
+  onProjectsChange,
+  currentLanguage,
 }) => {
+  const [showForm, setShowForm] = useState(false);
+  const [isEditingCoordinates, setIsEditingCoordinates] = useState(false);
+  const [fieldData, setFieldData] = useState({
+    id: '',
+    name: '',
+    latitude: '',
+    longitude: '',
+    has_fence: 'no'
+  });
+  const translation = useTranslation(currentLanguage);
+
+  const handleSelectField = (event: React.MouseEvent, field: Field) => {
+    event.stopPropagation();
+    setShowForm(true);
+    setFieldData(field);
+  }
+
+  const handleOpenGoogleMaps = (event: React.MouseEvent, latitude: number, longitude: number) => {
+    event.stopPropagation();
+    googleMaps(latitude, longitude);
+  }
+
+  const handleRemoveField = async (event: React.MouseEvent, field: Field) => {
+    event.stopPropagation();
+    await deleteField(field.id);
+    const updatedProjects = await fetchProjects();
+    onProjectsChange(updatedProjects)
+  }
+
+  const handleEditCoordinates = (event: React.MouseEvent, field: Field) => {
+    event.stopPropagation();
+    setShowForm(true);
+    setFieldData(field);
+    setIsEditingCoordinates(true);
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {fields.map(field => (
@@ -28,31 +73,44 @@ const FieldList: React.FC<FieldListProps> = ({
                 <span>{field.name}</span>
               </div>
             </h3>
-            <ChevronRight className="text-secondary" size={16} />
+            <div className="text-secondary flex items-center gap-2">
+              <div className="relative group">
+                <MoreVertical size={14} />
+                <ul className="hidden rounded border-theme border-solid absolute top-0 right-4 transition-all duration-1000 bg-theme group-hover:block">
+                  <li 
+                    className="w-full py-2 px-4 flex items-center justify-between gap-x-2 border-b-theme"
+                    onClick={(event) => handleSelectField(event, field)}
+                  >
+                    {translation("general.edit")} <Edit2 size={14} />
+                  </li>
+                  <li 
+                    className="w-full py-2 px-4 flex items-center justify-between gap-x-2"
+                    onClick={event => handleRemoveField(event, field)}
+                  >
+                    {translation("general.delete")} <X size={14} />
+                  </li>
+                </ul>
+              </div>
+              <ChevronRight size={16} />
+            </div>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-secondary">
               {field.zones.length} zones • {
                 field.zones.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0)
-              } datapoints
+              } {translation("datapoints").toLowerCase()}
               {field.has_fence && ' • Fenced'}
             </span>
             {field.latitude && field.longitude && (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, '_blank');
-                  }}
+                  onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
                   className="text-sm hover:underline text-accent-primary"
                 >
-                  View on map
+                  {translation("general.view_on_map")}
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Handle edit coordinates
-                  }}
+                  onClick={event => handleEditCoordinates(event, field)}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <Edit2 size={14} />
@@ -62,6 +120,15 @@ const FieldList: React.FC<FieldListProps> = ({
           </div>
         </div>
       ))}
+      {showForm && (
+        <EditField 
+          field={fieldData} 
+          setShowForm={setShowForm} 
+          onProjectsChange={onProjectsChange}
+          isEditingCoordinates={isEditingCoordinates}
+          currentLanguage={currentLanguage}
+        />
+      )}
     </div>
   );
 };

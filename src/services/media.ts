@@ -6,7 +6,6 @@ export const useSupabaseMedia = (id: string) => {
   const [loading, setLoading] = useState(false);
 
   const uploadMedia = async (file: File, entity_id: string , name: string , description : string) => {
-  
     setLoading(true);
     const filePath = `${id}/${Date.now()}-${file.name}`;
     const { data, error } = await supabase.storage
@@ -86,4 +85,46 @@ export const updateMedia = async (mediaId: string, newTitle: string, newDescript
   }
 
   return data;
+};
+
+export const deleteMedia = async (url: string) => {
+  const { data: mediaData, error: mediaError } = await supabase
+    .from('media_assets')
+    .select('id')
+    .eq('url', url)
+    .single();
+
+  if (mediaError || !mediaData) {
+    throw new Error('Failed to fetch media asset');
+  }
+
+  const { error: deleteLinkError } = await supabase
+    .from('media_links')
+    .delete()
+    .eq('media_id', mediaData.id);
+
+  if (deleteLinkError) {
+    throw new Error('Failed to delete media link');
+  }
+
+  const { error: deleteAssetError } = await supabase
+    .from('media_assets')
+    .delete()
+    .eq('id', mediaData.id);
+
+  if (deleteAssetError) {
+    throw new Error('Failed to delete media asset');
+  }
+
+  const filePath = url.split('/').pop();
+  if (!filePath) {
+    throw new Error('Invalid file path');
+  }
+  const { error: deleteFileError } = await supabase.storage
+    .from('media')
+    .remove([filePath]);
+
+  if (deleteFileError) {
+    throw new Error('Failed to delete media file');
+  }
 };

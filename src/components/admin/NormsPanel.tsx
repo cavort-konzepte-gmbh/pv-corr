@@ -116,7 +116,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
       }
     } else {
       setEditingNorm(norm.id);
-      setEditingValues(norm);
+      setEditingValues(norm as any);
       setNewNorm({});
       setIsNewNorm(false);
     }
