@@ -1,6 +1,12 @@
 name: Copy to cvrt-jh
 on:
   workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Branch to copy from cavort-konzepte-gmbh/pv-corr'
+        required: true
+        default: 'main'
+        type: string
 jobs:
   copy-to-cvrt-jh:
     runs-on: ubuntu-latest
@@ -13,7 +19,7 @@ jobs:
       
       - name: Clone source repository (cavort-konzepte-gmbh)
         run: |
-          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
+          git clone -b ${{ github.event.inputs.source_branch }} --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
       
       - name: Clone destination repository (cvrt-jh)
         run: |
@@ -41,7 +47,7 @@ jobs:
           cd dest-repo
           # Stage all changes
           git add .
-          git commit -m "Update from cavort-konzepte-gmbh/pv-corr as of $(date +'%Y-%m-%d %H:%M')"
+          git commit -m "Update from cavort-konzepte-gmbh/pv-corr branch: ${{ github.event.inputs.source_branch }} as of $(date +'%Y-%m-%d %H:%M')"
           git push https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git main
       
       - name: Cleanup
