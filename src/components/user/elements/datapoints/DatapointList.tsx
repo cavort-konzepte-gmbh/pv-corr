@@ -140,6 +140,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
           isOpen={true}
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
+          entityType='zone-data-points'
           currentTheme={currentTheme}
         />
       )}

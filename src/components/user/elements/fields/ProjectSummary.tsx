@@ -83,6 +83,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
           isOpen={true}
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
+          entityType='project-fields'
           currentTheme={currentTheme}
         />
       )}
