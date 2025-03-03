@@ -6,6 +6,7 @@ import { Company } from '../../../../types/companies';
 import { Building2, MapPin, User, Mail, Phone, DoorOpen, Maximize2, Upload } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { Language, useTranslation } from '../../../../types/language';
+
 interface ProjectSummaryProps {
   project: Project;
   manager?: Person;
@@ -23,7 +24,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
 }) => {
 
 
-  const [showMediaDialog, setShowMediaDialog] = useState<number | null>(null);
+  const translation = useTranslation(currentLanguage);
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
 
 
 

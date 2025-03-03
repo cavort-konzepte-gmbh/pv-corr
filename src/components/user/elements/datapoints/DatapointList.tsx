@@ -30,6 +30,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
 
+
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
     if (editingDatapoint === datapoint.id) {
       // Save changes
