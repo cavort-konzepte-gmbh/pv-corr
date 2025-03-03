@@ -1,48 +1,35 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
-import { Zone } from '../../../../types/projects';
-<<<<<<< HEAD
+import { Project, Zone } from '../../../../types/projects';
 import { ChevronRight, Edit2, Save, X, Building2, Wrench } from 'lucide-react';
 import { updateZone, deleteZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
 import { useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
-=======
-import { ChevronRight, Edit2, Save, X } from 'lucide-react';
-import { updateZone, deleteZone } from '../../../../services/zones';
-import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
->>>>>>> 6837f07
 
 interface ZoneListProps {
   currentTheme: Theme;
   zones: Zone[];
   onSelectZone: (zoneId: string) => void;
   onProjectsChange: (projects: Project[]) => void;
-<<<<<<< HEAD
-=======
   currentLanguage: Language;
->>>>>>> 6837f07
 }
 
 const ZoneList: React.FC<ZoneListProps> = ({
   currentTheme,
   zones,
   onSelectZone,
-<<<<<<< HEAD
-  onProjectsChange
-=======
   onProjectsChange,
   currentLanguage,
->>>>>>> 6837f07
 }) => {
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
-<<<<<<< HEAD
   const [substructures, setSubstructures] = useState<any[]>([]);
   const [foundations, setFoundations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,15 +50,11 @@ const ZoneList: React.FC<ZoneListProps> = ({
 
     loadData();
   }, []);
-=======
-  const translation = useTranslation(currentLanguage);
->>>>>>> 6837f07
 
   const handleUpdateZone = async (zoneId: string, values: Record<string, string>) => {
     if (updatingZone) return;
     try {
       setUpdatingZone(true);
-<<<<<<< HEAD
       
       // Prepare update data
       const updateData = {
@@ -86,29 +69,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
       
       // Wait a moment before refreshing to ensure DB update is complete
       await new Promise(resolve => setTimeout(resolve, 500));
-=======
-      await updateZone(zoneId, {
-        name: values.name,
-        latitude: values.latitude,
-        longitude: values.longitude
-      });
->>>>>>> 6837f07
       
       const updatedProjects = await fetchProjects();
       if (updatedProjects) {
         onProjectsChange(updatedProjects);
       }
-<<<<<<< HEAD
       
       // Reset editing state
       setEditingZoneId(null);
       setEditingValues({});
 
-=======
-
-      setEditingZoneId(null);
-      setEditingValues({});
->>>>>>> 6837f07
     } catch (err) {
       console.error('Error updating zone:', err);
     } finally {
@@ -134,24 +104,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
         <thead>
           <tr>
             <th className="p-2 text-left border font-normal border-theme">
-<<<<<<< HEAD
-              Name
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Datapoints
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Location
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Substructure
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Foundation
-            </th>
-            <th className="p-2 text-center border font-normal border-theme">
-              Actions
-=======
               {translation("zones.short_name")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
@@ -162,7 +114,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
             </th>
             <th className="p-2 text-center border font-normal border-theme">
               {translation("zones.actions")}
->>>>>>> 6837f07
             </th>
           </tr>
         </thead>
@@ -172,18 +123,12 @@ const ZoneList: React.FC<ZoneListProps> = ({
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <input
-<<<<<<< HEAD
                     name="name"
-=======
->>>>>>> 6837f07
                     type="text"
                     value={editingValues.name || zone.name}
                     onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-<<<<<<< HEAD
                     required
-=======
->>>>>>> 6837f07
                   />
                 ) : (
                   zone.name
@@ -195,26 +140,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <div className="flex gap-2">
-<<<<<<< HEAD
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={editingValues.latitude || zone.latitude || ''}
-                        onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                        placeholder="Latitude"
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={editingValues.longitude || zone.longitude || ''}
-                        onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                        placeholder="Longitude"
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
-                    </div>
-=======
                     <input
                       type="text"
                       value={editingValues.latitude || zone.latitude || ''}
@@ -229,14 +154,12 @@ const ZoneList: React.FC<ZoneListProps> = ({
                       placeholder="Longitude"
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     />
->>>>>>> 6837f07
                   </div>
                 ) : zone.latitude && zone.longitude ? (
                   <button
                     onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
                     className="text-sm hover:underline text-accent-primary"
                   >
-<<<<<<< HEAD
                     View on map
                   </button>
                 ) : (
@@ -297,12 +220,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
                       );
                     })()}
                   </div>
-=======
-                    {translation("general.view_on_map")}
-                  </button>
-                ) : (
-                  <span className="text-secondary">{translation("general.location_not_set")}</span>
->>>>>>> 6837f07
                 )}
               </td>
               <td className="p-2 border border-theme">
@@ -311,7 +228,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     onClick={() => editingZoneId === zone.id ? (
                       handleUpdateZone(zone.id, editingValues)
                     ) : (
-<<<<<<< HEAD
                       (() => {
                         setEditingZoneId(zone.id);
                         setEditingValues({
@@ -322,9 +238,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
                           foundationId: zone.foundationId || ''
                         });
                       })()
-=======
-                      setEditingZoneId(zone.id)
->>>>>>> 6837f07
                     )}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     disabled={updatingZone}
@@ -337,11 +250,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         onClick={() => handleDeleteZone(zone.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
-<<<<<<< HEAD
-                        Delete
-=======
                         {translation("actions.delete")}
->>>>>>> 6837f07
                       </button>
                       <button
                         onClick={() => {
@@ -356,12 +265,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   )}
                   <button
                     onClick={() => onSelectZone(zone.id)}
-<<<<<<< HEAD
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    style={{ color: currentTheme.colors.accent.primary }}
-=======
                     className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
->>>>>>> 6837f07
                   >
                     <ChevronRight size={14} />
                   </button>
