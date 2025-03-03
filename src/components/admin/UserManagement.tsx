@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import { AdminUser, createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
+import { supabaseAdmin } from '../../lib/supabase';
 
 interface UserManagementProps {
   currentTheme: Theme;

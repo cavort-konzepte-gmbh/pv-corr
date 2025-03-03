@@ -2,7 +2,8 @@ import React from 'react';
 import { Theme } from '../../types/theme';
 import { Customer } from '../../types/customers';
 import CustomerList from './elements/customers/CustomerList';
-import { Plus } from 'lucide-react';
+import { Person } from '../../types/people';
+import { Company } from '../../types/companies';
 
 interface CustomersProps {
   currentTheme: Theme;

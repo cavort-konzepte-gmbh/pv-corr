@@ -67,6 +67,7 @@ const Zones: React.FC<ZonesProps> = ({
 
       <div className="p-6">
         <FieldSummary
+          // @ts-ignore
           field={selectedField}
           currentTheme={currentTheme}
           onProjectsChange={onProjectsChange}

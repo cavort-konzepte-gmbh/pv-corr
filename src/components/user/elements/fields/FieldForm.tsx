@@ -4,6 +4,7 @@ import { Plus, Folder } from 'lucide-react';
 import { createField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
+import { Project } from '../../../../types/projects';
 
 const initialState = {
   name: '',
@@ -26,20 +27,15 @@ const FieldForm: React.FC<FieldFormProps> = ({
   currentLanguage,
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [newField, setNewField] = useState({
-    name: '',
-    latitude: '',
-    longitude: '',
-    has_fence: false
-  });
+  const [newField, setNewField] = useState(initialState);
   const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = event.target;
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
     setNewField(previous => ({
       ...previous,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 

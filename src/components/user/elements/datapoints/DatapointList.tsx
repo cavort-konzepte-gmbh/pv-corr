@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
-import { Language } from '../../../../types/language';
+import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { Datapoint } from '../../../../types/projects';
 import { Edit2, Save, X, Upload, Clock } from 'lucide-react';

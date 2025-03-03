@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Language, LANGUAGES } from '../../../../types/language';
-import { supabase } from '../../../../lib/supabase';
 import { useTranslation } from '../../../../types/language';
 import { updateUserSettings } from '../../../../services/userSettings';
 

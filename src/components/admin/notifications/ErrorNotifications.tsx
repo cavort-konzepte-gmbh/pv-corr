@@ -41,11 +41,7 @@ const ErrorNotifications: React.FC<ErrorNotificationsProps> = ({ currentTheme })
     <div className="p-6">
       <button
         onClick={() => setShowForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: '#ef4444', // Red color for errors
-          color: 'white'
-        }}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-[#ef4444]"        
       >
         <Plus size={16} />
         Add Error Notification

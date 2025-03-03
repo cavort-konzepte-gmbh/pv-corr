@@ -13,12 +13,7 @@ interface DatapointsSettingsProps {
   onStandardsChange: (standards: Standard[]) => void;
 }
 
-const DatapointsSettings: React.FC<DatapointsSettingsProps> = ({
-  currentTheme,
-  currentLanguage,
-  standards,
-  onStandardsChange
-}) => {
+const DatapointsSettings: React.FC<DatapointsSettingsProps> = () => {
   const [parameters, setParameters] = React.useState<Parameter[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
