@@ -1,6 +1,12 @@
 import { supabase } from '../lib/supabase';
 import { Language } from '../types/language';
 import { ThemeId } from '../types/theme';
+export interface UserSettings {
+  language: Language;
+  decimalSeparator: ',' | '.';
+  showHiddenIds: boolean;
+  theme_id: ThemeId;
+}
 
 export const fetchUserSettings = async (): Promise<UserSettings | null> => {
   const { data: { session } } = await supabase.auth.getSession();

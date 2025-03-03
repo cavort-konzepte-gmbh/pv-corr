@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
-import { Zone } from '../../../../types/projects';
+import { Project, Zone } from '../../../../types/projects';
 import { ChevronRight, Edit2, Save, X, Building2, Wrench } from 'lucide-react';
 import { updateZone, deleteZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
 import { useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ZoneListProps {
   currentTheme: Theme;
   zones: Zone[];
   onSelectZone: (zoneId: string) => void;
   onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language;
 }
 
 const ZoneList: React.FC<ZoneListProps> = ({
   currentTheme,
   zones,
   onSelectZone,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage,
 }) => {
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
@@ -26,6 +29,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
   const [substructures, setSubstructures] = useState<any[]>([]);
   const [foundations, setFoundations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadData = async () => {
@@ -100,22 +104,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
         <thead>
           <tr>
             <th className="p-2 text-left border font-normal border-theme">
-              Name
+              {translation("zones.short_name")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              Datapoints
+              {translation("datapoints")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              Location
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Substructure
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              Foundation
+              {translation("zones.location")}
             </th>
             <th className="p-2 text-center border font-normal border-theme">
-              Actions
+              {translation("zones.actions")}
             </th>
           </tr>
         </thead>
@@ -142,24 +140,20 @@ const ZoneList: React.FC<ZoneListProps> = ({
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <div className="flex gap-2">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={editingValues.latitude || zone.latitude || ''}
-                        onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                        placeholder="Latitude"
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={editingValues.longitude || zone.longitude || ''}
-                        onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                        placeholder="Longitude"
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={editingValues.latitude || zone.latitude || ''}
+                      onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
+                      placeholder="Latitude"
+                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    />
+                    <input
+                      type="text"
+                      value={editingValues.longitude || zone.longitude || ''}
+                      onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
+                      placeholder="Longitude"
+                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    />
                   </div>
                 ) : zone.latitude && zone.longitude ? (
                   <button
@@ -256,7 +250,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         onClick={() => handleDeleteZone(zone.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
-                        Delete
+                        {translation("actions.delete")}
                       </button>
                       <button
                         onClick={() => {
@@ -271,8 +265,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   )}
                   <button
                     onClick={() => onSelectZone(zone.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    style={{ color: currentTheme.colors.accent.primary }}
+                    className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                   >
                     <ChevronRight size={14} />
                   </button>

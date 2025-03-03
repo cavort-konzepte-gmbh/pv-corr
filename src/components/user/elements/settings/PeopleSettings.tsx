@@ -2,6 +2,7 @@ import React from 'react';
 import { Theme } from '../../../../types/theme';
 import { Language } from '../../../../types/language';
 import PeoplePanel from '../../../PeoplePanel';
+import { Person } from '../../../../types/people';
 
 interface PeopleSettingsProps {
   currentTheme: Theme;

@@ -6,6 +6,7 @@ import UserManagement from './UserManagement';
 import AdminSettings from './AdminSettings';
 import NotificationsPanel from './notifications/NotificationsPanel';
 import { supabase } from '../../lib/supabase';
+import { Language } from '../../types/language';
 
 interface AdminDashboardProps {
   currentTheme: Theme;

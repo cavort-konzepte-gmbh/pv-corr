@@ -3,8 +3,9 @@ import { supabase } from '../../lib/supabase';
 import { Theme } from '../../types/theme';
 import LoginForm from './LoginForm';
 import LandingPage from './LandingPage';
-import { fetchUserSettings } from '../../services/userSettings';
 import AdminDashboard from '../admin/AdminDashboard';
+import { Language } from '../../types/language';
+import { Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: any;

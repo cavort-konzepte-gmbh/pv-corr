@@ -4,19 +4,22 @@ import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { Plus } from 'lucide-react';
 import { createDatapoint } from '../../../../services/datapoints';
+import { fetchProjects } from '../../../../services/projects';
 
 interface DatapointFormProps {
   currentTheme: Theme;
   currentLanguage: Language;
   parameters: Parameter[];
   zoneId: string;
+  onProjectsChange: (projects: any[]) => void;
 }
 
 const DatapointForm: React.FC<DatapointFormProps> = ({
   currentTheme,
   currentLanguage,
   parameters,
-  zoneId
+  zoneId,
+  onProjectsChange
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
@@ -47,6 +50,8 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
       setName('');
       setValues({});
       setError(null);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
     } catch (err) {
       console.error('Error creating datapoint:', err);
       setError('Failed to create datapoint');
@@ -60,19 +65,19 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
-        Add New Datapoint
+        {t("datapoint.add_new")}
       </button>
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-4xl w-full bg-surface">
             <h3 className="text-lg mb-4 text-primary">
-              Add New Datapoint
+              {t("datapoint.add_new")}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Name
+                  {t("datapoint.short_name")}
                   <span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
@@ -120,13 +125,13 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
-                  Cancel
+                  {t("actions.cancel")}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                 >
-                  Save Datapoint
+                  {t("actions.save")}
                 </button>
               </div>
             </form>

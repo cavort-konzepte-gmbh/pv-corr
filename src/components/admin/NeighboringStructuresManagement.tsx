@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save, Link } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
 import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
@@ -338,7 +338,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           <FormSelect
                             value={editingValues.coating_material_id || ''}
                             onChange={(e) => handleChangeEditingValues('coating_material_id', e.target.value)}
-                            className="flex-1 p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="flex-1 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                           >
                             <option value="">Select coating material</option>
                             {materials.map(material => (
@@ -351,7 +351,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                             type="number"
                             value={editingValues.coating_thickness || ''}
                             onChange={(e) => handleChangeEditingValues('coating_thickness', e.target.value)}
-                            className="w-24 p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                             min="0"
                             step="0.1"
                             placeholder="Thickness"
@@ -359,7 +359,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           <FormSelect
                             value={editingValues.coating_thickness_unit || 'mm'}
                             onChange={(e) => handleChangeEditingValues('coating_thickness_unit', e.target.value)}
-                            className="w-20 p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-20 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>

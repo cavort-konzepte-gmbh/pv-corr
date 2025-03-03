@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
-import { Language } from '../../types/language';
+import { Language, useTranslation } from '../../types/language';
 import { Project } from '../../types/projects';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
@@ -29,8 +29,11 @@ const Zones: React.FC<ZonesProps> = ({
   onSelectZone,
   people,
   companies,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage,
 }) => {
+  const transition = useTranslation(currentLanguage)
+
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
     : null;
@@ -45,7 +48,7 @@ const Zones: React.FC<ZonesProps> = ({
         className="p-6 text-center"
         style={{ color: currentTheme.colors.text.secondary }}
       >
-        Please select a field to view its zones
+        {transition("zones.please_select_field")}
       </div>
     );
   }
@@ -64,6 +67,7 @@ const Zones: React.FC<ZonesProps> = ({
 
       <div className="p-6">
         <FieldSummary
+          // @ts-ignore
           field={selectedField}
           currentTheme={currentTheme}
           onProjectsChange={onProjectsChange}
@@ -73,6 +77,7 @@ const Zones: React.FC<ZonesProps> = ({
           currentTheme={currentTheme}
           selectedFieldId={selectedField.id}
           onProjectsChange={onProjectsChange}
+          currentLanguage={currentLanguage}
         />
 
         <ZoneList
@@ -80,6 +85,7 @@ const Zones: React.FC<ZonesProps> = ({
           zones={selectedField.zones}
           onSelectZone={onSelectZone}
           onProjectsChange={onProjectsChange}
+          currentLanguage={currentLanguage}
         />
       </div>
     </div>

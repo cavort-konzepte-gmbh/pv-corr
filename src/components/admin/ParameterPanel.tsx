@@ -101,7 +101,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         return;
       }
 
-      const newParam = await createParameter(newParameter);
+      const newParam = await createParameter(newParameter as any);
       const updatedParameters = await fetchParameters();
       setParameters(updatedParameters);
       resetValues();

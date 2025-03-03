@@ -7,6 +7,7 @@ import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectList from './elements/projects/ProjectList';
 import ProjectForm from './elements/projects/ProjectForm';
+import { Language } from '../../types/language';
 
 interface ProjectsProps {
   currentTheme: Theme;
@@ -17,6 +18,7 @@ interface ProjectsProps {
   selectedCustomerId: string | null;
   onMoveProject: (projectId: string, customerId: string | null) => void;
   onSelectProject: (projectId: string) => void;
+  currentLanguage: Language
 }
 
 const Projects: React.FC<ProjectsProps> = ({
@@ -27,7 +29,8 @@ const Projects: React.FC<ProjectsProps> = ({
   customers,
   selectedCustomerId,
   onMoveProject,
-  onSelectProject
+  onSelectProject,
+  currentLanguage,
 }) => {
   return (
     <div className="p-6">
@@ -35,6 +38,7 @@ const Projects: React.FC<ProjectsProps> = ({
         currentTheme={currentTheme}
         savedPeople={savedPeople}
         savedCompanies={savedCompanies}
+        currentLanguage={currentLanguage}
       />
       <ProjectList
         currentTheme={currentTheme}
@@ -43,6 +47,7 @@ const Projects: React.FC<ProjectsProps> = ({
         selectedCustomerId={selectedCustomerId}
         onMoveProject={onMoveProject}
         onSelectProject={onSelectProject}
+        currentLanguage={currentLanguage}
       />
     </div>
   );
