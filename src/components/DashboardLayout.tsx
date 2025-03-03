@@ -210,8 +210,6 @@ const DashboardLayout = () => {
             customers={customers}
             savedPeople={savedPeople}
             savedCompanies={savedCompanies}
-            savedPeople={savedPeople}
-            savedCompanies={savedCompanies}
             onSelectCustomer={(customerId) => {
               setSelectedCustomerId(customerId);
               setView('projects');
@@ -360,7 +358,7 @@ const DashboardLayout = () => {
             onCreateCustomer={handleCreateCustomer}
             standards={standards}
             onStandardsChange={setStandards}
-            onCreateCustomer={handleCreateCustomer} />
+           />
         );
       default:
         return null;

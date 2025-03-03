@@ -63,7 +63,6 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
     // Prepare update data - ensure name is preserved
     const updateData: Record<string, any> = {
       name: zone.name,
-      name: zone.name,
       latitude: zone.latitude || null,
       longitude: zone.longitude || null,
       substructure_id: zone.substructureId || null,
