@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
 import { Customer } from '../../../../types/customers';
 import { Folder, MapPin, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ProjectListProps {
   currentTheme: Theme;
@@ -12,6 +12,7 @@ interface ProjectListProps {
   selectedCustomerId: string | null;
   onMoveProject: (projectId: string, customerId: string | null) => void;
   onSelectProject: (projectId: string) => void;
+  currentLanguage: Language;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({
@@ -20,9 +21,11 @@ const ProjectList: React.FC<ProjectListProps> = ({
   customers,
   selectedCustomerId,
   onMoveProject,
-  onSelectProject
+  onSelectProject,
+  currentLanguage
 }) => {
   const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   return (
     <div className="space-y-4">

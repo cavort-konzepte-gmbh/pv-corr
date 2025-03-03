@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
 import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
-import { createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
+import { AdminUser, createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
 
 interface UserManagementProps {
   currentTheme: Theme;
@@ -133,10 +132,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </div>
 
       {error && (
-        <div 
-          className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface"
-          style={{ borderWidth: '1px' }}
-        >
+        <div className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface">
           {error}
           <button 
             onClick={() => setError(null)} 

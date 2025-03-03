@@ -5,17 +5,20 @@ import { Company } from '../../../../types/companies';
 import { Plus } from 'lucide-react';
 import { createProject } from '../../../../services/projects';
 import { generateHiddenId } from '../../../../utils/generateHiddenId';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ProjectFormProps {
   currentTheme: Theme;
   savedPeople: Person[];
   savedCompanies: Company[];
+  currentLanguage: Language
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({
   currentTheme,
   savedPeople,
-  savedCompanies
+  savedCompanies,
+  currentLanguage
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [projectName, setProjectName] = useState('');
@@ -26,6 +29,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
   const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
   const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,17 +72,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
-        Add New Project
+        {translation("project.add")}
       </button>
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-            <h3 className="text-lg mb-6 text-primary">New Project</h3>
+            <h3 className="text-lg mb-6 text-primary">{translation("project.new")}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Project Name
+                  {translation("project.name")}
                   <span className="text-red-500 ml-1">*</span>
                 </label>
                 <input
@@ -93,14 +97,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Project Manager
+                  {translation("project.manager")}
                 </label>
                 <select
                   value={selectedManagerId || ''}
                   onChange={(e) => setSelectedManagerId(e.target.value || null)}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  <option value="">No manager assigned</option>
+                  <option value="">{translation("project.manager.not_assigned")}</option>
                   {savedPeople.map(person => (
                     <option key={person.id} value={person.id}>
                       {person.title ? `${person.title} ` : ''}
@@ -112,21 +116,21 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Project Type
+                  {translation("project.type")}
                 </label>
                 <select
                   value={typeProject}
                   onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  <option value="field">Field</option>
-                  <option value="roof">Roof</option>
+                  <option value="field">{translation("project.type.field")}</option>
+                  <option value="roof">{translation("project.type.roof")}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Client Reference
+                  {translation("project.client_ref")}
                 </label>
                 <input
                   type="text"
@@ -139,7 +143,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Latitude
+                  {translation("project.latitude")}
                 </label>
                 <input
                   type="text"
@@ -152,7 +156,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Longitude
+                  {translation("project.longitude")}
                 </label>
                 <input
                   type="text"
@@ -165,7 +169,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <div>
                 <label className="block text-sm mb-1 text-secondary">
-                  Project Image URL
+                  {translation("project.image_url")}
                 </label>
                 <input
                   type="url"
@@ -191,13 +195,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"
                 >
-                  Cancel
+                  {translation("actions.cancel")}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                 >
-                  Create Project
+                  {translation("project.create")}
                 </button>
               </div>
             </form>

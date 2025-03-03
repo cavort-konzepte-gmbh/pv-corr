@@ -100,7 +100,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       }
     } else {
       setEditingMaterial(material.id);
-      setEditingValues(material);
+      setEditingValues(material as any);
       setNewMaterial({});
       setIsNewMaterial(false);
     }

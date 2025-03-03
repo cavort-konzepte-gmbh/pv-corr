@@ -8,6 +8,7 @@ import ThemeSettings from './elements/settings/ThemeSettings';
 import CompaniesSettings from './elements/settings/CompaniesSettings';
 import PeopleSettings from './elements/settings/PeopleSettings';
 import DatapointsSettings from './elements/settings/DatapointsSettings';
+import { Person } from '../../types/people';
 
 interface SettingsProps {
   view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints';
@@ -27,9 +28,7 @@ interface SettingsProps {
   onSaveCompanies: (companies: Company[]) => void;
   savedPeople: Person[];
   onSavePeople: (people: Person[]) => void;
-  savedPeople: Person[];
-  onSavePeople: (people: Person[]) => void;
-  onCreateCustomer
+  onCreateCustomer: (...args: any) => void
 }
 
 const Settings: React.FC<SettingsProps> = ({

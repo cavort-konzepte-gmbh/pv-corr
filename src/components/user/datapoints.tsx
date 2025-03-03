@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
-import { Language } from '../../types/language';
+import { Language, useTranslation } from '../../types/language';
 import { Project, Zone } from '../../types/projects';
 import { Parameter } from '../../types/parameters';
 import ProjectHeader from './elements/datapoints/ProjectHeader';
@@ -20,6 +20,7 @@ interface DatapointsProps {
   };
   selectedZone?: Zone;
   onBack: () => void;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
 const Datapoints: React.FC<DatapointsProps> = ({
@@ -29,10 +30,12 @@ const Datapoints: React.FC<DatapointsProps> = ({
   field,
   selectedZone,
   onBack,
+  onProjectsChange
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadParameters = async () => {
@@ -51,16 +54,16 @@ const Datapoints: React.FC<DatapointsProps> = ({
 
   if (!project || !field || !selectedZone) {
     return (
-      <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-        Please select a zone to view its datapoints
+      <div className="p-6 text-center text-secondary">
+        {translation("datapoint.please_select_zone")}
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-        Loading parameters...
+      <div className="p-6 text-center text-secondary">
+        {translation("datapoint.loading_parameters")}
       </div>
     );
   }
@@ -86,6 +89,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
       <ZoneSummary
         zone={selectedZone}
         currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
       />
 
       <DatapointForm
@@ -93,6 +97,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentLanguage={currentLanguage}
         parameters={parameters}
         zoneId={selectedZone.id}
+        onProjectsChange={onProjectsChange}
       />
 
       <DatapointList
@@ -100,6 +105,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentLanguage={currentLanguage}
         datapoints={selectedZone.datapoints || []}
         parameters={parameters}
+        onProjectsChange={onProjectsChange}
       />
     </div>
   );

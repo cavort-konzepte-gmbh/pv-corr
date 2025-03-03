@@ -3,17 +3,20 @@ import { Theme } from '../../../../types/theme';
 import { Plus } from 'lucide-react';
 import { createZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
+import { Language, useTranslation } from '../../../../types/language';
 
 interface ZoneFormProps {
   currentTheme: Theme;
   selectedFieldId: string;
   onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language
 }
 
 const ZoneForm: React.FC<ZoneFormProps> = ({
   currentTheme,
   selectedFieldId,
-  onProjectsChange
+  onProjectsChange,
+  currentLanguage
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [newZone, setNewZone] = useState({
@@ -22,6 +25,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
     longitude: ''
   });
   const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -63,18 +67,18 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
         onClick={() => setShowForm(true)}
       >
         <Plus className="size-4 text-primary" />
-        Add Zone
+        {translation("zones.add")}
       </button>
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
             <h3 className="text-lg mb-4 text-primary">
-              Add New Zone
+              {translation("zones.add_new")}
             </h3>
             <form onSubmit={handleSubmit}>
               <label className="block text-sm mb-1 text-secondary">
-                Zone Name
+                {translation("zones.name")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -85,7 +89,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                 />
               </label>
               <label className="block text-sm mb-1 text-secondary">
-                Latitude
+                {translation("project.latitude")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -95,7 +99,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                 />
               </label>
               <label className="block text-sm mb-1 text-secondary">
-                Longitude
+                {translation("project.longitude")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -110,13 +114,13 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                   type="button"
                   onClick={handleReset}
                 >
-                  Cancel
+                  {translation("actions.cancel")}
                 </button>
                 <button
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   type="submit"
                 >
-                  Save
+                  {translation("actions.save")}
                 </button>
               </div>
             </form>

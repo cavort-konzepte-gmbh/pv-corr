@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Theme } from '../types/theme';
-import { PERSON_FIELDS } from '../types/people';
+import { Person, PERSON_FIELDS } from '../types/people';
 import { User, Plus, ChevronRight } from 'lucide-react';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { Language, useTranslation } from '../types/language';
