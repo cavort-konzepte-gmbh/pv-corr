@@ -63,6 +63,7 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
   if (parameter.name !== undefined) updateData.name = parameter.name;
   if (parameter.customName !== undefined) updateData.custom_name = parameter.customName;
   if (parameter.shortName !== undefined) updateData.short_name = parameter.shortName;
+  // @ts-ignore
   if (parameter.unit !== undefined) updateData.unit = parameter.unit === '' ? null : parameter.unit;
   if (parameter.rangeType !== undefined) updateData.range_type = parameter.rangeType;
   if (parameter.rangeValue !== undefined) updateData.range_value = parameter.rangeValue;

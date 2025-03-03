@@ -86,8 +86,11 @@ export const getUsersByMetadata = async (key: keyof UserMetadata, value: any): P
 };
 
 export const getAdminUsers = async (): Promise<UserProfile[]> => {
-  return getUsersByMetadata('admin_level', 'admin')
-    .then(admins => admins.concat(await getUsersByMetadata('admin_level', 'super_admin')));
+  const [admin, superAdmin] = await Promise.all([
+    getUsersByMetadata('admin_level', 'admin'), 
+    getUsersByMetadata('admin_level', 'super_admin')
+  ]);
+  return admin.concat(superAdmin);
 };
 
 export const updateUserProfile = async (

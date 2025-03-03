@@ -44,8 +44,9 @@ export const createStandard = async (standard: Omit<Standard, 'id' | 'hiddenId'>
     throw standardError;
   }
 
+
   // Then create the parameter associations
-  if (standard.parameters && standard.parameters.length > 0) {
+  if (standard.parameters && standard.parameters.length > 0) {    
     const { error: paramsError } = await supabase
       .from('standard_parameters')
       .insert(

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
 import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import { createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
 
