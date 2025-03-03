@@ -107,23 +107,6 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       ? error 
       : new Error('An unexpected error occurred while updating the zone');
   }
-  const { data, error } = await supabase
-    .from('zones')
-    .update({
-      name: zone.name,
-      latitude: zone.latitude,
-      longitude: zone.longitude
-    })
-    .eq('id', zoneId)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating zone:', error);
-    throw error;
-  }
-
-  return data;
 };
 
 export const deleteZone = async (zoneId: string) => {

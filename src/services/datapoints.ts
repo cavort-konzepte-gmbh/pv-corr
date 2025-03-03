@@ -52,12 +52,6 @@ export const updateDatapoint = async (datapointId: string, data: {
   }
 };
 
-interface DatapointData {
-  type: string;
-  values: Record<string, string>;
-  ratings: Record<string, number>;
-}
-
 export const createDatapoint = async (zoneId: string, data: {
   type: string;
   values: Record<string, string>;
