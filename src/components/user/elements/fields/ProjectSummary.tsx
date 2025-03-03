@@ -3,16 +3,21 @@ import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
 import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
-import { Building2, MapPin, User, Mail, Phone, DoorOpen, Maximize2, Upload } from 'lucide-react';
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { Language, useTranslation } from '../../../../types/language';
+import { updateProject, fetchProjects } from '../../../../services/projects';
 
 interface ProjectSummaryProps {
   project: Project;
   manager?: Person;
   company?: Company;
   currentTheme: Theme;
-  currentLanguage: Language;
+  currentLanguage: Language; 
+  savedPeople: Person[];
+  onProjectsChange: (projects: Project[]) => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
@@ -20,70 +25,199 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   manager,
   company,
   currentTheme,
-  currentLanguage
+  currentLanguage,
+  savedPeople,
+  onProjectsChange,
+  isExpanded = true,
+  onToggle
 }) => {
   const translation = useTranslation(currentLanguage);
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValues, setEditValues] = useState({
+    managerId: project.managerId || '',
+    typeProject: project.typeProject || 'field',
+    latitude: project.latitude || '',
+    longitude: project.longitude || ''
+  });
+
+  const handleSave = async () => {
+    try {
+      const updatedProject = await updateProject({
+        ...project,
+        managerId: editValues.managerId,
+        typeProject: editValues.typeProject,
+        latitude: editValues.latitude,
+        longitude: editValues.longitude
+      });
+      
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating project:', err);
+    }
+  };
 
 
   return (
-    <div className="p-6 rounded-lg mb-8 border-theme border-solid bg-surface">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-accent-primary" />
-          <span className="font-semibold">{project.name}</span>
-        </div>
-        {project.location && (
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-accent-primary" />
-            <span>{project.location}</span>
-          </div>
-        )}
-        {manager && (
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-accent-primary" />
-            <span>{manager.name}</span>
-          </div>
-        )}
-        {manager?.email && (
-          <div className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-accent-primary" />
-            <a href={`mailto:${manager.email}`} className="hover:underline">
-              {manager.email}
-            </a>
-          </div>
-        )}
-        {manager?.phone && (
-          <div className="flex items-center gap-2">
-            <Phone className="w-5 h-5 text-accent-primary" />
-            <a href={`tel:${manager.phone}`} className="hover:underline">
-              {manager.phone}
-            </a>
-          </div>
-        )}
-        {company && (
-          <div className="flex items-center gap-2">
-            <DoorOpen className="w-5 h-5 text-accent-primary" />
-            <span>{company.name}</span>
-          </div>
-        )}
-        <div className="flex items-center gap-2">
-          <Upload
-            className="w-5 h-5 cursor-pointer text-accent-primary"
-            onClick={() => setShowMediaDialog(project.id)}
-          />
-          <span className="cursor-pointer" onClick={() => setShowMediaDialog(project.id)}>
-            {translation("media.upload")}
-          </span>
-        </div>
-      
-      </div>
+    <div className="mb-8">
+      <table className="w-full border-collapse rounded-lg border transition-all text-primary border-theme bg-surface">
+        <thead>
+          <tr>
+            <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={onToggle}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building2 className="text-accent-primary" size={16} />
+                  <div className="flex items-center gap-4">
+                    <span>{project.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                        {project.fields.length} {translation("fields")}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                        {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                        {project.fields.reduce((acc, field) => 
+                          acc + field.zones.reduce((zAcc, zone) => 
+                            zAcc + (zone.datapoints?.length || 0), 0
+                          ), 0
+                        )} {translation("datapoints")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {isEditing ? (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSave();
+                        }}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <Save size={14} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditing(false);
+                        }}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <X size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsEditing(true);
+                      }}
+                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                  )}
+                  {isExpanded ? (
+                    <ChevronDown className="text-secondary" size={16} />
+                  ) : (
+                    <ChevronRight className="text-secondary" size={16} />
+                  )}
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody className={isExpanded ? '' : 'hidden'}>
+          <tr>
+            <td className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+              {translation("project.type")}
+            </td>
+            <td className="p-2 border-b border-theme">
+              {isEditing ? (
+                <select
+                  value={editValues.typeProject}
+                  onChange={(e) => setEditingValues({ ...editValues, typeProject: e.target.value })}
+                  className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                >
+                  <option value="field">{translation("project.type.field")}</option>
+                  <option value="roof">{translation("project.type.roof")}</option>
+                </select>
+              ) : (
+                translation(project.typeProject === 'field' ? "project.type.field" : "project.type.roof")
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+              {translation("project.manager")}
+            </td>
+            <td className="p-2 border-b border-theme">
+              {isEditing ? (
+                <select
+                  value={editValues.managerId}
+                  onChange={(e) => setEditValues({ ...editValues, managerId: e.target.value })}
+                  className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                >
+                  <option value="">{translation("project.manager.not_assigned")}</option>
+                  {savedPeople.map(person => (
+                    <option key={person.id} value={person.id}>
+                      {person.firstName} {person.lastName}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                manager ? `${manager.firstName} ${manager.lastName}` : translation("project.manager.not_assigned")
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td className="p-2 border-r border-theme w-1/6 text-secondary">
+              {translation("zones.location")}
+            </td>
+            <td className="p-2 border-theme">
+              {isEditing ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={editValues.latitude}
+                    onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
+                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder={translation("project.latitude")}
+                  />
+                  <input
+                    type="text"
+                    value={editValues.longitude}
+                    onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
+                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder={translation("project.longitude")}
+                  />
+                </div>
+              ) : project.latitude && project.longitude ? (
+                <div className="flex items-center justify-between">
+                  <span>{project.latitude}, {project.longitude}</span>
+                  <button
+                    onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank')}
+                    className="text-sm hover:underline text-accent-primary"
+                  >
+                    {translation("general.view_on_map")}
+                  </button>
+                </div>
+              ) : (
+                <span className="text-secondary">{translation("general.location_not_set")}</span>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
       {showMediaDialog && (
         <MediaDialog
           isOpen={true}
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
-          entityType='project-fields'
           currentTheme={currentTheme}
         />
       )}

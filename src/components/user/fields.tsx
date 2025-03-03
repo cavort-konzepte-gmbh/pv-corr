@@ -54,20 +54,21 @@ const Fields: React.FC<FieldsProps> = ({
         manager={manager}
         company={company}
         currentTheme={currentTheme}
-        currentLanguage={currentLanguage}
-      />
-      
-      <FieldForm
-        currentTheme={currentTheme}
-        selectedProjectId={selectedProject.id}
+        savedPeople={people}
         onProjectsChange={onProjectsChange}
-        currentLanguage={currentLanguage}
       />
 
       <FieldList
         currentTheme={currentTheme}
         fields={selectedProject.fields}
         onSelectField={(fieldId) => onSelectField(selectedProject.id, fieldId)}
+        onProjectsChange={onProjectsChange}
+        currentLanguage={currentLanguage}
+      />
+      
+      <FieldForm
+        currentTheme={currentTheme}
+        selectedProjectId={selectedProject.id}
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}
       />

@@ -23,9 +23,23 @@ import Datapoints from './user/datapoints';
 import Settings from './user/settings';
 import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2 } from 'lucide-react';
 import { ButtonSection } from './ui/ButtonSection';
+import { useAppNavigation } from '../hooks/useAppNavigation';
 
 const DashboardLayout = () => {
-  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>();
+  const {
+    view,
+    selectedProjectId,
+    selectedFieldId,
+    selectedZoneId,
+    selectedCustomerId,
+    setView,
+    setSelectedProjectId,
+    setSelectedFieldId,
+    setSelectedZoneId,
+    setSelectedCustomerId,
+    resetNavigation
+  } = useAppNavigation();
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -35,13 +49,9 @@ const DashboardLayout = () => {
   const [savedCompanies, setCompanies] = useState<Company[]>([]);
   const [currentTheme, setCurrentTheme] = useState<Theme>(THEMES.find(theme => theme.id === 'ferra') || THEMES[0]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<'customers' | 'projects' | 'fields' | 'zones' | 'datapoints' | 'analyze' | 'evaluation' | 'output' | 'settings'>('customers');
   const [settingsView, setSettingsView] = useState<'general' | 'theme' | 'companies' | 'people' | 'datapoints'>('general');
-  const [selectedFieldId, setSelectedFieldId] = useState<string | undefined>();
-  const [selectedZoneId, setSelectedZoneId] = useState<string | undefined>();
   const [selectedZone, setSelectedZone] = useState<Zone | undefined>();
   const [error, setError] = useState<string | null>(null);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [standards, setStandards] = useState<Standard[]>(STANDARDS);
   const t = useTranslation(currentLanguage);
 
@@ -94,12 +104,12 @@ const DashboardLayout = () => {
     }
   };
 
-  const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth();
-
   const handleLanguageChange = (language: Language) => {
     if (!language || !LANGUAGES.find(l => l.id === language)) return;
     setCurrentLanguage(language);
   };
+
+  const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth();
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -116,7 +126,6 @@ const DashboardLayout = () => {
         setSavedPeople(people);
         setCompanies(companies);
         setCustomers(fetchedCustomers);
-        setView('customers'); // Start at customers view
 
         // Load uncategorized projects
         const uncategorizedProjects = await fetchProjects(null);
@@ -213,6 +222,9 @@ const DashboardLayout = () => {
             onSelectCustomer={(customerId) => {
               setSelectedCustomerId(customerId);
               setView('projects');
+              setSelectedProjectId(undefined);
+              setSelectedFieldId(undefined);
+              setSelectedZoneId(undefined);
               // Load projects for selected customer
               const loadCustomerProjects = async () => {
                 try {
@@ -228,6 +240,9 @@ const DashboardLayout = () => {
             onSelectUncategorized={() => {
               setSelectedCustomerId(null);
               setView('projects');
+              setSelectedProjectId(undefined);
+              setSelectedFieldId(undefined);
+              setSelectedZoneId(undefined);
               const loadUncategorizedProjects = async () => {
                 try {
                   const projects = await fetchProjects(null);
@@ -255,6 +270,8 @@ const DashboardLayout = () => {
             onSelectProject={(projectId) => {
               setView('fields');
               setSelectedProjectId(projectId);
+              setSelectedFieldId(undefined);
+              setSelectedZoneId(undefined);
             }}
             currentLanguage={currentLanguage}
           />
@@ -272,6 +289,7 @@ const DashboardLayout = () => {
               setView('zones');
               setSelectedProjectId(projectId);
               setSelectedFieldId(fieldId);
+              setSelectedZoneId(undefined);
             }}
             people={savedPeople}
             companies={savedCompanies}        
@@ -395,19 +413,60 @@ const DashboardLayout = () => {
             </>
           ) : (
             <>
-              <ButtonSection view={view} match="projects" onClick={() => setView('projects')}>
+              <ButtonSection view={view} match="customers" onClick={() => setView('customers')}>
+                <Building2 size={18} />
+                <span>{t("nav.customers")}</span>
+              </ButtonSection>
+              <ButtonSection view={view} match="projects" onClick={() => {
+                if (selectedCustomerId === null) {
+                  const loadUncategorizedProjects = async () => {
+                    try {
+                      const projects = await fetchProjects(null);
+                      setProjects(projects);
+                    } catch (err) {
+                      console.error('Error loading uncategorized projects:', err);
+                      setError('Failed to load uncategorized projects');
+                    }
+                  };
+                  loadUncategorizedProjects();
+                } else if (selectedCustomerId) {
+                  const loadCustomerProjects = async () => {
+                    try {
+                      const customerProjects = await fetchProjects(selectedCustomerId);
+                      setProjects(customerProjects);
+                    } catch (err) {
+                      console.error('Error loading customer projects:', err);
+                      setError('Failed to load customer projects');
+                    }
+                  };
+                  loadCustomerProjects();
+                }
+                setView('projects');
+              }}>
                 <FolderOpen size={18} />
                 <span>{t("nav.projects")}</span>
               </ButtonSection>
-              <ButtonSection view={view} match="fields" onClick={() => setView('fields')}>
+              <ButtonSection view={view} match="fields" onClick={() => {
+                if (selectedProjectId) {
+                  setView('fields');
+                }
+              }}>
                 <Grid size={18} />
                 <span>{t("nav.fields")}</span>
               </ButtonSection>         
-              <ButtonSection view={view} match="zones" onClick={() => setView('zones')}>
+              <ButtonSection view={view} match="zones" onClick={() => {
+                if (selectedProjectId && selectedFieldId) {
+                  setView('zones');
+                }
+              }}>
                 <Map size={18} />
                 <span>{t("nav.zones")}</span>
               </ButtonSection>
-              <ButtonSection view={view} match="datapoints" onClick={() => setView('datapoints')}>
+              <ButtonSection view={view} match="datapoints" onClick={() => {
+                if (selectedProjectId && selectedFieldId && selectedZoneId) {
+                  setView('datapoints');
+                }
+              }}>
                 <Database size={18} />
                 <span>{t("nav.datapoints")}</span>
               </ButtonSection>

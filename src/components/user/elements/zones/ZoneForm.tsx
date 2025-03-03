@@ -63,7 +63,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
   return (
     <>
       <button 
-        className="w-full py-3 px-4 mb-8 flex items-center justify-center gap-x-2 text-sm text-primary rounded border-accent-primary border-solid bg-accent-primary"
+        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
         onClick={() => setShowForm(true)}
       >
         <Plus className="size-4 text-primary" />

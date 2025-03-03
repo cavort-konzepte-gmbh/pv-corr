@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
-import { Plus } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
 import { createDatapoint } from '../../../../services/datapoints';
 import { fetchProjects } from '../../../../services/projects';
+import { FormHandler } from '../../../shared/FormHandler';
 
 interface DatapointFormProps {
   currentTheme: Theme;
@@ -21,14 +22,13 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
   zoneId,
   onProjectsChange
 }) => {
-  const [showForm, setShowForm] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const t = useTranslation(currentLanguage);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!name.trim()) {
       setError('Datapoint name is required');
       return;
@@ -46,7 +46,7 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
         ratings: {}
       });
 
-      setShowForm(false);
+      setIsAdding(false);
       setName('');
       setValues({});
       setError(null);
@@ -61,81 +61,96 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
   return (
     <>
       <button
-        onClick={() => setShowForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
+        onClick={() => setIsAdding(true)}
+        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
       >
         <Plus size={16} />
         {t("datapoint.add_new")}
       </button>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="p-6 rounded-lg max-w-4xl w-full bg-surface">
-            <h3 className="text-lg mb-4 text-primary">
-              {t("datapoint.add_new")}
-            </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  {t("datapoint.short_name")}
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-                  placeholder="Enter datapoint name"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                {parameters.map(param => (
-                  <div key={param.id}>
-                    <label className="block text-sm mb-1 text-secondary">
+      {isAdding && (
+        <div className="mt-4">
+          <FormHandler
+            isEditing={true}
+            onSave={handleSubmit}
+            onCancel={() => {
+              setIsAdding(false);
+              setName('');
+              setValues({});
+            }}
+          >
+            <table className="w-full border-collapse border-theme text-primary">
+              <thead>
+                <tr>
+                  <th className="p-2 text-left border font-normal border-theme">
+                    {t("datapoint.short_name")}
+                  </th>
+                  {parameters.map(param => (
+                    <th key={param.id} className="p-2 text-left border font-normal border-theme">
                       {param.shortName || param.name}
                       {param.unit && <span className="ml-1 text-xs">({param.unit})</span>}
-                    </label>
+                    </th>
+                  ))}
+                  <th className="p-2 text-center border font-normal border-theme w-24">
+                    {t("actions")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="p-2 border border-theme">
                     <input
                       type="text"
-                      value={values[param.id] || ''}
-                      onChange={(e) => setValues(prev => ({
-                        ...prev,
-                        [param.id]: e.target.value
-                      }))}
-                      className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder={`Enter ${param.name}`}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      placeholder="Enter name"
                     />
-                  </div>
-                ))}
-              </div>
+                  </td>
+                  {parameters.map(param => (
+                    <td key={param.id} className="p-2 border border-theme">
+                      <input
+                        type="text"
+                        value={values[param.id] || ''}
+                        onChange={(e) => setValues(prev => ({
+                          ...prev,
+                          [param.id]: e.target.value
+                        }))}
+                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+                        placeholder={`Enter ${param.name}`}
+                      />
+                    </td>
+                  ))}
+                  <td className="p-2 border border-theme">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={handleSubmit}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <Save size={14} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsAdding(false);
+                          setName('');
+                          setValues({});
+                        }}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </FormHandler>
 
-              {error && (
-                <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setValues({});
-                  }}
-                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
-                >
-                  {t("actions.cancel")}
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                >
-                  {t("actions.save")}
-                </button>
-              </div>
-            </form>
-          </div>
+          {error && (
+            <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
+              {error}
+            </div>
+          )}
         </div>
       )}
     </>

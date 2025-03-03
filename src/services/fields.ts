@@ -53,11 +53,22 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
   }
   
   try {
-    // Prepare update data - only include fields that are provided
-    const updateData: Record<string, any> = {};
-    if (field.name !== undefined) updateData.name = field.name;
-    if (field.latitude !== undefined) updateData.latitude = field.latitude;
-    if (field.longitude !== undefined) updateData.longitude = field.longitude;
+    // Prepare update data while preserving existing data
+    const { data: existingField, error: fetchError } = await supabase
+      .from('fields')
+      .select('*')
+      .eq('id', fieldId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const updateData = {
+      ...existingField,
+      name: field.name ?? existingField.name,
+      latitude: field.latitude ?? existingField.latitude,
+      longitude: field.longitude ?? existingField.longitude,
+      has_fence: field.has_fence !== undefined ? field.has_fence : existingField.has_fence
+    };
 
     // Update the field
     const { data, error } = await supabase
@@ -76,7 +87,7 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
     }
 
     // Fetch complete field data after update
-    const { data: completeField, error: fetchError } = await supabase
+    const { data: completeField, error: refreshError } = await supabase
       .from('fields')
       .select(`
         *,
@@ -89,7 +100,7 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
       .eq('id', fieldId)
       .single();
 
-    if (fetchError) {
+    if (refreshError) {
       throw new Error('Failed to fetch updated field data');
     }
     

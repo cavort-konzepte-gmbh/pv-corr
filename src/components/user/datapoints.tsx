@@ -3,11 +3,11 @@ import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
 import { Project, Zone } from '../../types/projects';
 import { Parameter } from '../../types/parameters';
-import ProjectHeader from './elements/datapoints/ProjectHeader';
 import ZoneSummary from './elements/datapoints/ZoneSummary';
 import DatapointList from './elements/datapoints/DatapointList';
-import DatapointForm from './elements/datapoints/DatapointForm';
 import { fetchParameters } from '../../services/parameters';
+import ProjectSummary from './elements/fields/ProjectSummary';
+import FieldSummary from './elements/zones/FieldSummary';
 
 interface DatapointsProps {
   currentTheme: Theme;
@@ -21,6 +21,7 @@ interface DatapointsProps {
   selectedZone?: Zone;
   onBack: () => void;
   onProjectsChange: (projects: Project[]) => void;
+  savedPeople?: Person[];
 }
 
 const Datapoints: React.FC<DatapointsProps> = ({
@@ -30,9 +31,12 @@ const Datapoints: React.FC<DatapointsProps> = ({
   field,
   selectedZone,
   onBack,
-  onProjectsChange
+  onProjectsChange,
+  savedPeople = []
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
+  const [showProjectSummary, setShowProjectSummary] = useState(false);
+  const [showFieldSummary, setShowFieldSummary] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage)
@@ -78,31 +82,40 @@ const Datapoints: React.FC<DatapointsProps> = ({
 
   return (
     <div className="p-6">
-      <ProjectHeader
+      <ProjectSummary
+        isExpanded={showProjectSummary}
+        onToggle={() => setShowProjectSummary(!showProjectSummary)}
         project={project}
-        field={field}
-        zone={selectedZone}
-        onBack={onBack}
+        manager={savedPeople?.find(p => p.id === project.managerId)}
+        company={undefined}
+        savedPeople={savedPeople || []}
         currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
+        onProjectsChange={onProjectsChange}
+      />
+
+      <FieldSummary
+        isExpanded={showFieldSummary}
+        onToggle={() => setShowFieldSummary(!showFieldSummary)}
+        field={field}
+        onProjectsChange={onProjectsChange}
+        currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
       />
 
       <ZoneSummary
         zone={selectedZone}
+        project={project}
+        field={field}
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
-      />
-
-      <DatapointForm
-        currentTheme={currentTheme}
-        currentLanguage={currentLanguage}
-        parameters={parameters}
-        zoneId={selectedZone.id}
         onProjectsChange={onProjectsChange}
       />
 
       <DatapointList
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
+        zoneId={selectedZone.id}
         datapoints={selectedZone.datapoints || []}
         parameters={parameters}
         onProjectsChange={onProjectsChange}

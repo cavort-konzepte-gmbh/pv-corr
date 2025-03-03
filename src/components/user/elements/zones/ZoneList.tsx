@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Project, Zone } from '../../../../types/projects';
-import { ChevronRight, Edit2, Save, X, Building2, Wrench } from 'lucide-react';
+import { ChevronRight, Edit2, Save, X, Building2, Wrench, Plus } from 'lucide-react';
 import { updateZone, deleteZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
 import { useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { Language, useTranslation } from '../../../../types/language';
+import { FormHandler } from '../../../shared/FormHandler';
+import { createZone } from '../../../../services/zones';
 
 interface ZoneListProps {
   currentTheme: Theme;
@@ -14,6 +16,7 @@ interface ZoneListProps {
   onSelectZone: (zoneId: string) => void;
   onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
+  selectedFieldId: string;
 }
 
 const ZoneList: React.FC<ZoneListProps> = ({
@@ -22,13 +25,23 @@ const ZoneList: React.FC<ZoneListProps> = ({
   onSelectZone,
   onProjectsChange,
   currentLanguage,
+  selectedFieldId
 }) => {
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newValues, setNewValues] = useState({
+    name: '',
+    latitude: '',
+    longitude: '',
+    substructureId: '',
+    foundationId: ''
+  });
   const [substructures, setSubstructures] = useState<any[]>([]);
   const [foundations, setFoundations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
@@ -98,8 +111,50 @@ const ZoneList: React.FC<ZoneListProps> = ({
     }
   };
 
+  const handleAddZone = async () => {
+    if (!newValues.name?.trim()) {
+      setError('Zone name is required');
+      return;
+    }
+
+    try {
+      await createZone(selectedFieldId, {
+        name: newValues.name.trim(),
+        latitude: newValues.latitude || undefined,
+        longitude: newValues.longitude || undefined,
+        substructureId: newValues.substructureId || undefined,
+        foundationId: newValues.foundationId || undefined
+      });
+
+      const updatedProjects = await fetchProjects();
+      if (updatedProjects) {
+        onProjectsChange(updatedProjects);
+      }
+
+      setIsAdding(false);
+      setNewValues({
+        name: '',
+        latitude: '',
+        longitude: '',
+        substructureId: '',
+        foundationId: ''
+      });
+    } catch (err) {
+      console.error('Error creating zone:', err);
+      setError('Failed to create zone');
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
+      <button
+        onClick={() => setIsAdding(true)}
+        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+      >
+        <Plus size={16} />
+        {translation("zones.add")}
+      </button>
+
       <table className="w-full border-collapse border-theme text-primary">
         <thead>
           <tr>
@@ -107,10 +162,13 @@ const ZoneList: React.FC<ZoneListProps> = ({
               {translation("zones.short_name")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              {translation("datapoints")}
+              {translation("zones.location")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              {translation("zones.location")}
+              Substructure
+            </th>
+            <th className="p-2 text-left border font-normal border-theme">
+              Foundation
             </th>
             <th className="p-2 text-center border font-normal border-theme">
               {translation("zones.actions")}
@@ -118,6 +176,105 @@ const ZoneList: React.FC<ZoneListProps> = ({
           </tr>
         </thead>
         <tbody>
+          {isAdding && (
+            <tr>
+              <td className="p-2 border border-theme">
+                <FormHandler
+                  isEditing={true}
+                  onSave={handleAddZone}
+                  onCancel={() => {
+                    setIsAdding(false);
+                    setNewValues({
+                      name: '',
+                      latitude: '',
+                      longitude: '',
+                      substructureId: '',
+                      foundationId: ''
+                    });
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={newValues.name}
+                    onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
+                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder="Enter zone name"
+                  />
+                </FormHandler>
+              </td>
+              <td className="p-2 border border-theme">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newValues.latitude}
+                    onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
+                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder="Latitude"
+                  />
+                  <input
+                    type="text"
+                    value={newValues.longitude}
+                    onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
+                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder="Longitude"
+                  />
+                </div>
+              </td>
+              <td className="p-2 border border-theme">
+                <select
+                  value={newValues.substructureId}
+                  onChange={(e) => setNewValues({ ...newValues, substructureId: e.target.value })}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                >
+                  <option value="">Select Substructure</option>
+                  {substructures.map(sub => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.manufacturer} - {sub.system} ({sub.version})
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td className="p-2 border border-theme">
+                <select
+                  value={newValues.foundationId}
+                  onChange={(e) => setNewValues({ ...newValues, foundationId: e.target.value })}
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                >
+                  <option value="">Select Foundation</option>
+                  {foundations.map(foundation => (
+                    <option key={foundation.id} value={foundation.id}>
+                      {foundation.name}
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td className="p-2 border border-theme">
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={handleAddZone}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  >
+                    <Save size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAdding(false);
+                      setNewValues({
+                        name: '',
+                        latitude: '',
+                        longitude: '',
+                        substructureId: '',
+                        foundationId: ''
+                      });
+                    }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          )}
           {zones.map(zone => (
             <tr key={zone.id} className="hover:bg-opacity-50">
               <td className="p-2 border border-theme">
@@ -133,9 +290,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
                 ) : (
                   zone.name
                 )}
-              </td>
-              <td className="p-2 border border-theme">
-                {zone.datapoints?.length || 0} datapoints
               </td>
               <td className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (

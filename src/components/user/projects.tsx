@@ -2,7 +2,6 @@ import React from 'react';
 import { Theme } from '../../types/theme';
 import { Project } from '../../types/projects';
 import { Customer } from '../../types/customers';
-import { SavedPlace } from '../PlacesPanel';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectList from './elements/projects/ProjectList';
@@ -34,19 +33,20 @@ const Projects: React.FC<ProjectsProps> = ({
 }) => {
   return (
     <div className="p-6">
-      <ProjectForm
-        currentTheme={currentTheme}
-        savedPeople={savedPeople}
-        savedCompanies={savedCompanies}
-        currentLanguage={currentLanguage}
-      />
       <ProjectList
         currentTheme={currentTheme}
         projects={projects}
+        savedPeople={savedPeople}
         customers={customers}
         selectedCustomerId={selectedCustomerId}
         onMoveProject={onMoveProject}
         onSelectProject={onSelectProject}
+        currentLanguage={currentLanguage}
+      />
+      <ProjectForm
+        currentTheme={currentTheme}
+        savedPeople={savedPeople}
+        savedCompanies={savedCompanies}
         currentLanguage={currentLanguage}
       />
     </div>

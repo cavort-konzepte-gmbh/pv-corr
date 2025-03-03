@@ -24,26 +24,75 @@ export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => 
 };
 
 export const updateProject = async (project: Project) => {
-  // Prepare update data with explicit imageUrl
-  const updateDataToSnakeCase = toCase(project, "snakeCase");
+  // Extract only the fields that belong to the projects table
+  const updateData = {
+    name: project.name,
+    client_ref: project.clientRef || null,
+    latitude: project.latitude,
+    longitude: project.longitude,
+    image_url: project.imageUrl || null,
+    company_id: project.companyId || null,
+    manager_id: project.managerId || null,
+    type_project: project.typeProject || 'field',
+    customer_id: project.customerId || null
+  };
   
-  // If customerId is null, ensure it's properly set to null
-  if (project.customerId === null) {
-    updateDataToSnakeCase.customer_id = null;
-  }
-
-  const { data, error } = await supabase
+  // First update the project
+  const { error: updateError } = await supabase
     .from('projects')
-    .update(updateDataToSnakeCase)
+    .update(updateData)
     .eq('id', project.id)
     .select()
     .single();
 
-  if (error) {
-    console.error('Error updating project:', error);
-    throw error;
+  if (updateError) {
+    console.error('Error updating project:', updateError);
+    throw updateError;
   }
-  return toCase<Project>(data, "camelCase"); 
+  
+  // Fetch the complete project data after update
+  const { data: completeProject, error: fetchError } = await supabase
+    .from('user_projects')
+    .select(`
+      project:projects (
+        id,
+        hidden_id,
+        name,
+        client_ref,
+        latitude,
+        longitude,
+        image_url,
+        company_id,
+        manager_id,
+        type_project,
+        customer_id,
+        fields:fields (
+        id,
+        hidden_id,
+        name,
+        latitude,
+        longitude,
+        has_fence,
+        gates:gates (*),
+        zones:zones (
+          id,
+          hidden_id,
+          name,
+          latitude,
+          longitude,
+          datapoints:datapoints (*)
+        )
+        )
+      )`)
+    .eq('project.id', project.id)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching updated project:', fetchError);
+    throw fetchError;
+  }
+
+  return toCase<Project>(completeProject.project, "camelCase");
 };
 
 export const moveProject = async (projectId: string, customerId: string | null) => {
@@ -89,21 +138,21 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           type_project,
           customer_id,
           fields:fields (
+          id,
+          hidden_id,
+          name,
+          latitude,
+          longitude,
+          has_fence,
+          gates:gates (*),
+          zones:zones (
             id,
             hidden_id,
             name,
             latitude,
             longitude,
-            has_fence,
-            gates:gates (*),
-            zones:zones (
-              id,
-              hidden_id,
-              name,
-              latitude,
-              longitude,
-              datapoints:datapoints (*)
-            )
+            datapoints:datapoints (*)
+          )
           )
         )`)
       .order('created_at', { ascending: true });

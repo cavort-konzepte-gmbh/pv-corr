@@ -4,10 +4,11 @@ import { Language, useTranslation } from '../../types/language';
 import { Project } from '../../types/projects';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
-import ProjectHeader from './elements/zones/ProjectHeader';
+import { useState } from 'react';
 import FieldSummary from './elements/zones/FieldSummary';
 import ZoneList from './elements/zones/ZoneList';
 import ZoneForm from './elements/zones/ZoneForm';
+import ProjectSummary from './elements/fields/ProjectSummary';
 
 interface ZonesProps {
   currentTheme: Theme;
@@ -56,38 +57,36 @@ const Zones: React.FC<ZonesProps> = ({
   const manager = people.find(person => person.id === selectedProject.managerId);
   const company = companies.find(company => company.id === selectedProject.companyId);
 
+  const [showProjectSummary, setShowProjectSummary] = useState(false);
+
   return (
-    <div className="min-h-screen bg-theme">
-      <ProjectHeader
+    <div className="p-6">
+      <ProjectSummary
         project={selectedProject}
         manager={manager}
         company={company}
         currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
+        savedPeople={people}
+        isExpanded={showProjectSummary}
+        onToggle={() => setShowProjectSummary(!showProjectSummary)}
       />
 
-      <div className="p-6">
-        <FieldSummary
-          // @ts-ignore
-          field={selectedField}
-          currentTheme={currentTheme}
-          onProjectsChange={onProjectsChange}
-        />
+      <FieldSummary
+        field={selectedField}
+        currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
+        onProjectsChange={onProjectsChange}
+      />
 
-        <ZoneForm
-          currentTheme={currentTheme}
-          selectedFieldId={selectedField.id}
-          onProjectsChange={onProjectsChange}
-          currentLanguage={currentLanguage}
-        />
-
-        <ZoneList
-          currentTheme={currentTheme}
-          zones={selectedField.zones}
-          onSelectZone={onSelectZone}
-          onProjectsChange={onProjectsChange}
-          currentLanguage={currentLanguage}
-        />
-      </div>
+      <ZoneList
+        currentTheme={currentTheme}
+        zones={selectedField.zones}
+        selectedFieldId={selectedField.id}
+        onSelectZone={onSelectZone}
+        onProjectsChange={onProjectsChange}
+        currentLanguage={currentLanguage}
+      />
     </div>
   );
 };

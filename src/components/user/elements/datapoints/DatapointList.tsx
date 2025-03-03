@@ -3,10 +3,12 @@ import { Theme } from '../../../../types/theme';
 import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { Datapoint } from '../../../../types/projects';
-import { Edit2, Save, X, Upload, Clock } from 'lucide-react';
+import { Edit2, Save, X, Upload, Clock, Plus } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { fetchProjects } from '../../../../services/projects';
 import { updateDatapoint } from '../../../../services/datapoints';
+import { FormHandler } from '../../../shared/FormHandler';
+import { createDatapoint } from '../../../../services/datapoints';
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -28,9 +30,42 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newValues, setNewValues] = useState<Record<string, string>>({});
+  const [newName, setNewName] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
 
 
+  const handleAddDatapoint = async () => {
+    if (!newName.trim()) {
+      setError('Datapoint name is required');
+      return;
+    }
+    if (Object.keys(newValues).length === 0) {
+      setError('Please enter at least one value');
+      return;
+    }
+
+    try {
+      await createDatapoint(zoneId, {
+        type: 'measurement',
+        name: newName.trim(),
+        values: newValues,
+        ratings: {}
+      });
+
+      setIsAdding(false);
+      setNewName('');
+      setNewValues({});
+      setError(null);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
+    } catch (err) {
+      console.error('Error creating datapoint:', err);
+      setError('Failed to create datapoint');
+    }
+  };
 
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
     if (editingDatapoint === datapoint.id) {
@@ -52,7 +87,15 @@ const DatapointList: React.FC<DatapointListProps> = ({
   }
 
   return (
-    <div className="mt-8">
+    <div>
+      <button
+        onClick={() => setIsAdding(true)}
+        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+      >
+        <Plus size={16} />
+        {translation("datapoint.add_new")}
+      </button>
+
       <table className="w-full border-collapse">
         <thead>
           <tr>
@@ -66,6 +109,63 @@ const DatapointList: React.FC<DatapointListProps> = ({
           </tr>
         </thead>
         <tbody>
+          {isAdding && (
+            <tr>
+              <td className="p-2 border-t border-theme">
+                <FormHandler
+                  isEditing={true}
+                  onSave={handleAddDatapoint}
+                  onCancel={() => {
+                    setIsAdding(false);
+                    setNewName('');
+                    setNewValues({});
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder="Enter name"
+                  />
+                </FormHandler>
+              </td>
+              {parameters.map(param => (
+                <td key={param.id} className="p-2 border-t border-theme text-center">
+                  <input
+                    type="text"
+                    value={newValues[param.id] || ''}
+                    onChange={(e) => setNewValues(prev => ({
+                      ...prev,
+                      [param.id]: e.target.value
+                    }))}
+                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+                    placeholder={`Enter ${param.name}`}
+                  />
+                </td>
+              ))}
+              <td className="p-2 border-t border-theme">
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={handleAddDatapoint}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  >
+                    <Save size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsAdding(false);
+                      setNewName('');
+                      setNewValues({});
+                    }}
+                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          )}
           {datapoints.map(datapoint => (
             <tr key={datapoint.id} className="border-t border-theme">
               <td className="p-2">
@@ -134,13 +234,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
           ))}
         </tbody>
       </table>
+      
+      {error && (
+        <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
+          {error}
+        </div>
+      )}
 
       {showMediaDialog && (
         <MediaDialog
           isOpen={true}
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
-          entityType='zone-data-points'
           currentTheme={currentTheme}
         />
       )}

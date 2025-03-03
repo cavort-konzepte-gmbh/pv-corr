@@ -68,8 +68,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   return (
     <>
       <button
+        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
         onClick={() => setShowForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
         {translation("project.add")}

@@ -9,15 +9,13 @@ interface MediaDialogProps {
   onClose: () => void;
   entityId: string;
   currentTheme: Theme;
-  entityType:  string; 
 }
 
 const MediaDialog: React.FC<MediaDialogProps> = ({
   isOpen,
   onClose,
   entityId,
-  currentTheme,
-  entityType 
+  currentTheme
 }) => {
   const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null);
   const [mediaNotes, setMediaNotes] = useState<{ [key: string]: string }>({});
@@ -29,9 +27,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
   const [mediaData, setMediaData] = useState<{ url: string, title: string, description: string }[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const { uploadMedia } = useSupabaseMedia(entityType); 
+  const { uploadMedia } = useSupabaseMedia("datapoints");
 
   useEffect(() => {
     if (isOpen) {
@@ -75,11 +71,6 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
 
   const handleUpload = async () => {
     if (newMediaFile && entityId) {
-      if (!newMediaName.trim()) {
-        setError('Media name is required and cannot be empty or whitespace.');
-        return;
-      }
-      setIsUploading(true);
       const note = preview ? mediaNotes[preview] || '' : '';
       await uploadMedia(newMediaFile, entityId, newMediaName, note);
       const data = await fetchMediaUrlsByEntityId(entityId);
@@ -87,9 +78,6 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
       setPreview(null);
       setNewMediaFile(null);
       setMediaNotes({});
-      setNewMediaName('');
-      setError(null);
-      setIsUploading(false);
     }
   };
 
@@ -98,7 +86,6 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
     setNewMediaFile(null);
     setNewMediaName('');
     setMediaNotes({});
-    setError(null);
   };
 
   const handleDeleteMedia = async (url: string) => {
@@ -243,7 +230,6 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
                 onChange={(e) => setNewMediaName(e.target.value)} 
                 className="border p-2 rounded mb-2 w-full border-theme border-solid bg-surface text-primary"
               />
-              {error && <p className="text-red-500 text-sm">{error}</p>}
               <input
                 type="text"
                 className="w-full p-2 border rounded mb-2 border-theme border-solid bg-surface text-primary"
@@ -252,12 +238,8 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
                 onChange={(e) => preview && setMediaNotes({ ...mediaNotes, [preview]: e.target.value })}
               />
               <div className="flex gap-2">
-                <button onClick={handleUpload} className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary" disabled={isUploading}>
-                  {isUploading ? 'Uploading...' : 'Upload'}
-                </button>
-                <button onClick={handleCancelUpload} className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary" disabled={isUploading}>
-                  Cancel
-                </button>
+                <button onClick={handleUpload} className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary">Upload</button>
+                <button onClick={handleCancelUpload} className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary">Cancel</button>
               </div>
             </div>
           )}
@@ -319,8 +301,8 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
       {deleteConfirm && (
         <DeleteConfirmDialog
           isOpen={!!deleteConfirm}
-          itemName="media"
-         confirmName={deleteConfirmName}
+          itemName="Media"
+          confirmName={deleteConfirmName}
           onConfirmChange={setDeleteConfirmName}
           onConfirm={() => handleDeleteMedia(deleteConfirm!)}
           onCancel={() => {

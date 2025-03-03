@@ -82,6 +82,13 @@ export const TRANSLATIONS = {
     fr: 'Projets',
     ar: 'المشاريع'
   },
+  'nav.customers': {
+    en: 'Customers',
+    de: 'Kunden',
+    es: 'Clientes',
+    fr: 'Clients',
+    ar: 'العملاء'
+  },
   'nav.settings': {
     en: 'Settings',
     de: 'Einstellungen',
@@ -567,6 +574,13 @@ export const TRANSLATIONS = {
     fr: 'Données du projet non disponibles',
     ar: 'بيانات المشروع غير متوفرة'
   },
+  'project.statistics': {
+    en: 'Statistics',
+    de: 'Statistiken',
+    es: 'Estadísticas',
+    fr: 'Statistiques',
+    ar: 'إحصائيات'
+  },
   'project.manager': {
     en: 'Project Manager',
     de: 'Projektleiter',
@@ -1042,6 +1056,13 @@ export const TRANSLATIONS = {
     es: 'Persona de contacto',
     fr: 'Personne de contact',
     ar: 'شخص الاتصال'
+  },
+  'company.contact': {
+    en: 'Contact',
+    de: 'Kontakt',
+    es: 'Contacto',
+    fr: 'Contact',
+    ar: 'جهة الاتصال'
   },
   'people.loading': {
     en: 'Loading People...',

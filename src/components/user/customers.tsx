@@ -1,6 +1,7 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
 import { Customer } from '../../types/customers';
+import { ChevronRight } from 'lucide-react';
 import CustomerList from './elements/customers/CustomerList';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
@@ -24,16 +25,29 @@ const Customers: React.FC<CustomersProps> = ({
 }) => {
   return (
     <div className="p-6">
-      <div 
-        className="p-4 mb-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
+      <table
+        className="w-full border-collapse rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer mb-4"
         onClick={onSelectUncategorized}
       >
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">No Customer</span>
-          </div>
-        </div>
-      </div>
+        <thead>
+          <tr>
+            <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span>No Customer</span>
+                </div>
+                <ChevronRight className="text-secondary" size={16} />
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td className="p-2 border-r border-theme w-1/4 text-secondary">Projects</td>
+            <td className="p-2 border-theme">Uncategorized projects</td>
+          </tr>
+        </tbody>
+      </table>
 
       <CustomerList
         currentTheme={currentTheme}
