@@ -23,7 +23,7 @@ export const useSupabaseMedia = (id: string) => {
       setLoading(false);
       return;
     }
-    console.log('file', name , description);
+
   
     const { data: mediaAssetData, error: mediaAssetError } = await supabase
       .from("media_assets")

@@ -15,6 +15,7 @@ interface DatapointListProps {
   currentLanguage: Language;
   datapoints: Datapoint[];
   parameters: Parameter[];
+  zoneId: string
   onProjectsChange: (projects: any[]) => void;
 }
 
@@ -23,6 +24,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   currentLanguage,
   datapoints,
   parameters,
+  zoneId,
   onProjectsChange
 }) => {
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
@@ -247,6 +249,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
           currentTheme={currentTheme}
+          entityType='datapoint'
         />
       )}
     </div>
