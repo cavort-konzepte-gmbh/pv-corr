@@ -20,23 +20,22 @@ export const deleteDatapoint = async (datapointId: string) => {
 
 export const updateDatapoint = async (datapointId: string, data: {
   values: Record<string, string>;
-  sequential_id?: string;
+  name?: string;
 }) => {
   try {
+    if (!data.name?.trim()) {
+      throw new Error('Name is required');
+    }
+
+    const updateData = {
+      values: data.values,
+      name: data.name.trim(),
+      updated_at: new Date().toISOString()
+    };
+
     const { data: updatedDatapoint, error } = await supabase
       .from('datapoints')
-      .update(
-        data.sequential_id
-          ? {
-              values: data.values,
-              sequential_id: data.sequential_id,
-              updated_at: new Date().toISOString()
-            }
-          : {
-              values: data.values,
-              updated_at: new Date().toISOString()
-            }
-      )
+      .update(updateData)
       .eq('id', datapointId)
       .select()
       .single();
@@ -54,9 +53,9 @@ export const updateDatapoint = async (datapointId: string, data: {
 
 export const createDatapoint = async (zoneId: string, data: {
   type: string;
+  name: string;
   values: Record<string, string>;
   ratings: Record<string, number>;
-  sequentialId?: string;
 }) => {
   try {
     // First verify the zone exists
@@ -75,7 +74,7 @@ export const createDatapoint = async (zoneId: string, data: {
       .insert({
         zone_id: zoneId,
         hidden_id: generateHiddenId(),
-        sequential_id: data.sequentialId || await generateSequentialId(zoneId),
+        name: data.name.trim(),
         type: data.type,
         values: data.values,
         ratings: data.ratings,
@@ -95,28 +94,6 @@ export const createDatapoint = async (zoneId: string, data: {
     throw err;
   }
 };
-
-// Helper function to generate sequential ID
-async function generateSequentialId(zoneId: string): Promise<string> {
-  const { data, error } = await supabase
-    .from('datapoints')
-    .select('sequential_id')
-    .eq('zone_id', zoneId)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  if (error) {
-    console.error('Error getting last sequential ID:', error);
-    throw error;
-  }
-
-  const lastId = data?.[0]?.sequential_id;
-  if (!lastId) return 'DP001';
-
-  const numStr = lastId.replace('DP', '');
-  const nextNum = parseInt(numStr, 10) + 1;
-  return `DP${String(nextNum).padStart(3, '0')}`;
-}
 
 
  export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {

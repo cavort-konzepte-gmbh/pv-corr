@@ -9,6 +9,7 @@ import { fetchProjects } from '../../../../services/projects';
 import { updateDatapoint } from '../../../../services/datapoints';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createDatapoint } from '../../../../services/datapoints';
+import { deleteDatapoint } from '../../../../services/datapoints';
 import { ParameterInput } from '../../../DatapointForm';
 
 interface DatapointListProps {
@@ -82,21 +83,45 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
     if (editingDatapoint === datapoint.id) {
       // Save changes
+      if (!editingName?.trim()) {
+        setError('Name is required');
+        return;
+      }
+
+      const updateData = {
+        values: editingValues,
+        name: editingName.trim()
+      };
+      
       setEditingDatapoint(null);
       setEditingName('');
       setEditingValues({});
-      await updateDatapoint(editingDatapoint, {
-        values: editingValues
-      })
-      const projects = await fetchProjects();
-      onProjectsChange(projects);
+      try {
+        await updateDatapoint(editingDatapoint, updateData);
+        const projects = await fetchProjects();
+        onProjectsChange(projects);
+      } catch (err) {
+        console.error('Error updating datapoint:', err);
+        setError('Failed to update datapoint');
+      }
     } else {
       // Start editing
       setEditingDatapoint(datapoint.id);
-      setEditingName(datapoint.name || datapoint.sequentialId);
+      setEditingName(datapoint.name);
       setEditingValues(datapoint.values);
     }
-  }
+  };
+
+  const handleDeleteDatapoint = async (datapointId: string) => {
+    try {
+      await deleteDatapoint(datapointId);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
+    } catch (err) {
+      console.error('Error deleting datapoint:', err);
+      setError('Failed to delete datapoint');
+    }
+  };
 
   return (
     <div>
@@ -138,7 +163,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter name"
+                    placeholder="Enter custom name (optional)"
                   />
                 </FormHandler>
               </td>
@@ -186,13 +211,14 @@ const DatapointList: React.FC<DatapointListProps> = ({
                 {editingDatapoint === datapoint.id ? (
                   <input
                     type="text"
-                    value={editingName}
+                    value={editingName || ''}
                     onChange={(e) => setEditingName(e.target.value)}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    placeholder="Enter name"
                   />
                 ) : (
                   <span className="text-primary">
-                    {datapoint.name || datapoint.sequentialId}
+                    {datapoint.name}
                   </span>
                 )}
               </td>
@@ -241,6 +267,14 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       <Edit2 size={14} />
                     )}
                   </button>
+                  {editingDatapoint === datapoint.id && (
+                    <button
+                      onClick={() => handleDeleteDatapoint(datapoint.id)}
+                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
                   <button
                     onClick={() => setShowMediaDialog(datapoint.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"

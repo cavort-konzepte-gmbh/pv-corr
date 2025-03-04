@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { FileText, Info, ChevronDown, ChevronRight, AlertCircle } from 'lucide-react';
+import { FileText, Info, ChevronDown, ChevronRight } from 'lucide-react';
 import { Datapoint } from '../../types/projects';
 import { Standard } from '../../types/standards';
 import { supabase } from '../../lib/supabase';
@@ -26,55 +26,28 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [norm, setNorm] = useState<any>(null);
 
   useEffect(() => {
     const loadParameters = async () => {
       try {
         setLoading(true);
-        const { data: normData, error: normError } = await supabase
-          .from('norms')
-          .select(`
-            *,
-            output_config,
-            norm_parameters!inner (
-              parameter_id,
-              parameter:parameters!inner (
-                id,
-                name,
-                short_name,
-                unit,
-                rating_logic_code,
-                order_number
-              )
-            )
-          `)
-          .eq('id', selectedStandard.id)
-          .single();
+        const { data, error } = await supabase
+          .from('parameters')
+          .select('*')
+          .order('created_at', { ascending: true });
 
-        if (normError) throw normError;
-        
-        // Extract parameters from norm data
-        const params = normData.norm_parameters
-          .map(np => np.parameter)
-          .sort((a, b) => {
-            const aOrder = typeof a.order_number === 'number' ? a.order_number : parseFloat(a.order_number as string) || 0;
-            const bOrder = typeof b.order_number === 'number' ? b.order_number : parseFloat(b.order_number as string) || 0;
-            return aOrder - bOrder;
-          });
-
-        setParameters(params);
-        setNorm(normData);
+        if (error) throw error;
+        setParameters(data || []);
       } catch (err) {
         console.error('Error loading parameters:', err);
-        setError('Failed to load analysis data');
+        setError('Failed to load parameters');
       } finally {
         setLoading(false);
       }
     };
 
     loadParameters();
-  }, [selectedStandard.id]);
+  }, []);
 
   const toggleDatapoint = (id: string) => {
     setExpandedDatapoints(prev => {
@@ -88,48 +61,50 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
     });
   };
 
-  const calculateOutputs = (datapoint: Datapoint) => {
-    if (!norm?.output_config) return {};
-
-    const outputs: Record<string, number> = {};
-    const values = datapoint.ratings;
-
-    norm.output_config.forEach((output: any) => {
-      try {
-        // Create a function from the formula with error handling
-        const calcFunc = new Function('values', `
-          try {
-            return ${output.formula};
-          } catch (err) {
-            console.error('Error in formula:', err);
-            return 0;
-          }
-        `);
-        const result = calcFunc(values);
-        outputs[output.name] = typeof result === 'number' ? result : 0;
-      } catch (err) {
-        console.error(`Error calculating ${output.name}:`, err);
-        outputs[output.name] = 0;
-      }
-    });
-
-    return outputs;
-  };
-
   // Calculate results for each datapoint
   const results = selectedDatapoints.map(datapoint => {
-    const outputs = calculateOutputs(datapoint);
+    // Calculate ratings for each parameter
+    const parameterRatings = Object.entries(datapoint.values).reduce((acc, [paramId, value]) => {
+      const parameter = parameters.find(p => p.id === paramId);
+      if (!parameter || !parameter.rating_logic_code) return acc;
+
+      try {
+        // Create a function from the rating logic code
+        const ratingFunc = new Function('value', parameter.rating_logic_code);
+        const rating = ratingFunc(value);
+
+        acc[parameter.short_name || parameter.name] = {
+          value,
+          rating,
+          unit: parameter.unit
+        };
+      } catch (err) {
+        console.error(`Error calculating rating for parameter ${parameter.short_name}:`, err);
+      }
+      return acc;
+    }, {} as Record<string, { value: string; rating: number; unit?: string }>);
+
+    // Calculate B0 (sum of Z1-Z10 ratings)
+    const b0 = Object.entries(parameterRatings)
+      .filter(([code]) => /^z[1-9]|10$/i.test(code))
+      .reduce((sum, [_, { rating }]) => sum + rating, 0);
+
+    // Calculate B1 (B0 + sum of Z11-Z15 ratings)
+    const b1 = b0 + Object.entries(parameterRatings)
+      .filter(([code]) => /^z1[1-5]$/i.test(code))
+      .reduce((sum, [_, { rating }]) => sum + rating, 0);
 
     // Classify results
-    const b0 = outputs.B0 || 0;
-    const classification = b0 >= 0 ? { class: 'Ia', stress: 'Very low' } :
-                         b0 >= -4 ? { class: 'Ib', stress: 'Low' } :
-                         b0 >= -10 ? { class: 'II', stress: 'Medium' } :
-                         { class: 'III', stress: 'High' };
+    const classification = b0 >= 0 ? { class: 'Ia', stress: 'Sehr niedrig' } :
+                         b0 >= -4 ? { class: 'Ib', stress: 'Niedrig' } :
+                         b0 >= -10 ? { class: 'II', stress: 'Mittel' } :
+                         { class: 'III', stress: 'Hoch' };
 
     return {
       datapoint,
-      outputs,
+      parameterRatings,
+      b0,
+      b1,
       classification
     };
   });
@@ -137,29 +112,15 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   if (loading) {
     return (
       <div className="text-center p-4 text-secondary">
-        <div className="animate-pulse">Loading analysis data...</div>
+        {t("analysis.loading")}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 rounded bg-surface border border-theme">
-        <div className="flex items-center gap-2 text-secondary">
-          <AlertCircle size={16} />
-          <span>{error}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!norm?.output_config?.length) {
-    return (
-      <div className="p-4 rounded bg-surface border border-theme text-primary">
-        <div className="flex items-center gap-2 text-secondary">
-          <AlertCircle size={16} />
-          <span>This standard has no output configuration. Please configure outputs in the admin panel first.</span>
-        </div>
+      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        {error}
       </div>
     );
   }
@@ -171,7 +132,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       </h3>
 
       <div className="space-y-4">
-        {results.map(({ datapoint, outputs, classification }) => (
+        {results.map(({ datapoint, parameterRatings, b0, b1, classification }) => (
           <div 
             key={datapoint.id}
             className="p-4 rounded-lg border border-theme bg-surface"
@@ -197,16 +158,12 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                {norm.output_config.map((output: any) => (
-                  <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border">
-                    {output.name}: {outputs[output.name]?.toFixed(2)}
-                    {output.name === 'B0' && (
-                      <span className="ml-2">
-                        ({classification.class} - {classification.stress})
-                      </span>
-                    )}
-                  </div>
-                ))}
+                <div className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border">
+                  B0: {b0} ({classification.class} - {classification.stress})
+                </div>
+                <div className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border">
+                  B1: {b1}
+                </div>
               </div>
 
               {expandedDatapoints.has(datapoint.id) && (
@@ -219,19 +176,15 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(datapoint.values).map(([paramId, value]) => {
-                      const parameter = parameters.find(p => p.id === paramId);
-                      if (!parameter) return null;
-                      const rating = datapoint.ratings[paramId];
-                      return (
-                      <tr key={paramId} className="border-t border-theme">
-                        <td className="p-2 text-primary">{parameter.shortName || parameter.name}</td>
+                    {Object.entries(parameterRatings).map(([code, { value, rating, unit }]) => (
+                      <tr key={code} className="border-t border-theme">
+                        <td className="p-2 text-primary">{code.toUpperCase()}</td>
                         <td className="p-2 text-primary">
-                          {value} {parameter.unit && <span className="text-secondary">({parameter.unit})</span>}
+                          {value} {unit && <span className="text-secondary">({unit})</span>}
                         </td>
                         <td className="p-2 text-primary">{rating}</td>
                       </tr>
-                    )})}
+                    ))}
                   </tbody>
                 </table>
               )}

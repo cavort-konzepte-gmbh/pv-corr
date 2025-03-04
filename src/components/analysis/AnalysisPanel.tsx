@@ -37,8 +37,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [selectedNorm, setSelectedNorm] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const t = useTranslation(currentLanguage);
   const { user } = useAuth();
 
@@ -50,7 +48,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       }
 
       try {
-        setLoading(true);
         const { data, error } = await supabase
           .from('norms')
           .select(`
@@ -68,9 +65,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         setSelectedNorm(data);
       } catch (err) {
         console.error('Error loading norm:', err);
-        setError('Failed to load norm');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -79,7 +73,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
   const handleSaveAnalysis = async () => {
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
-      setError('Missing required data for analysis');
       return;
     }
 
@@ -124,7 +117,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       setShowReport(true);
     } catch (err) {
       console.error('Error saving analysis:', err);
-      setError('Failed to save analysis');
     }
   };
 
@@ -140,7 +132,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   useEffect(() => {
     const loadAnalysisData = async () => {
       try {
-        setLoading(true);
         const { data, error } = await supabase
           .from('analysis_parameters')
           .select('*')
@@ -150,9 +141,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         setParameters(data || []);
       } catch (err) {
         console.error('Error loading analysis data:', err);
-        setError('Failed to load analysis data');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -188,7 +176,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   if (!selectedZone) {
     return (
       <div className="p-6 text-center text-secondary">
-        {t("analysis.select_zone_first")}
+        {t("datapoint.please_select_zone")}
       </div>
     );
   }
@@ -232,12 +220,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             selectedStandard={standards.find(s => s.id === selectedStandardId)!}
             onGenerateReport={handleSaveAnalysis}
           />
-        )}
-
-        {error && (
-          <div className="mt-4 p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-            {error}
-          </div>
         )}
       </div>
     </div>

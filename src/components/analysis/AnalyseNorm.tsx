@@ -5,7 +5,6 @@ import { Standard } from '../../types/standards';
 import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Parameter } from '../../types/parameters';
 
 interface AnalyseNormProps {
   currentTheme: Theme;
@@ -15,17 +14,6 @@ interface AnalyseNormProps {
   onSelectStandard: (id: string) => void;
 }
 
-interface NormWithParameters {
-  id: string;
-  name: string;
-  description?: string;
-  version?: string;
-  output_config: any[];
-  norm_parameters: {
-    parameter_id: string;
-    parameter: Parameter;
-  }[];
-}
 const AnalyseNorm: React.FC<AnalyseNormProps> = ({
   currentTheme,
   currentLanguage,
@@ -35,7 +23,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [norms, setNorms] = useState<NormWithParameters[]>([]);
+  const [norms, setNorms] = useState<any[]>([]);
   const t = useTranslation(currentLanguage);
 
   useEffect(() => {
@@ -46,16 +34,10 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
           .from('norms')
           .select(`
             *,
-            output_config,
-            norm_parameters!inner (
+            parameters:norm_parameters (
               parameter_id,
-              parameter:parameters!inner (
-                id,
-                name,
-                short_name,
-                unit,
-                rating_logic_code
-              )
+              parameter_code,
+              rating_ranges
             )
           `)
           .order('created_at', { ascending: true });
@@ -64,7 +46,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
         setNorms(data || []);
       } catch (err) {
         console.error('Error loading norms:', err);
-        setError('Failed to load standards');
+        setError('Failed to load norms');
       } finally {
         setLoading(false);
       }

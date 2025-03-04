@@ -12,7 +12,6 @@ export interface Datapoint {
   id: string;
   hiddenId: string;
   name?: string;
-  sequentialId: string;
   type: string;
   values: Record<string, string>;
   ratings: Record<string, number>;

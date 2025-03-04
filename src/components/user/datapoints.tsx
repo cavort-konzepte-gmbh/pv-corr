@@ -4,6 +4,7 @@ import { Language, useTranslation } from '../../types/language';
 import { Project, Zone } from '../../types/projects';
 import { Parameter } from '../../types/parameters';
 import ZoneSummary from './elements/datapoints/ZoneSummary';
+import ParameterFilter from './elements/datapoints/ParameterFilter';
 import DatapointList from './elements/datapoints/DatapointList';
 import { fetchParameters } from '../../services/parameters';
 import ProjectSummary from './elements/fields/ProjectSummary';
@@ -35,6 +36,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   savedPeople = []
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
+  const [filteredParameters, setFilteredParameters] = useState<Parameter[]>([]);
   const [showProjectSummary, setShowProjectSummary] = useState(false);
   const [showFieldSummary, setShowFieldSummary] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -46,6 +48,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
       try {
         const fetchedParams = await fetchParameters();
         setParameters(fetchedParams);
+        setFilteredParameters(fetchedParams);
       } catch (err) {
         console.error('Error loading parameters:', err);
         setError('Failed to load parameters');
@@ -112,12 +115,19 @@ const Datapoints: React.FC<DatapointsProps> = ({
         onProjectsChange={onProjectsChange}
       />
 
+      <ParameterFilter
+        currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
+        parameters={parameters}
+        onParametersChange={setFilteredParameters}
+      />
+
       <DatapointList
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         zoneId={selectedZone.id}
         datapoints={selectedZone.datapoints || []}
-        parameters={parameters}
+        parameters={filteredParameters}
         onProjectsChange={onProjectsChange}
       />
     </div>
