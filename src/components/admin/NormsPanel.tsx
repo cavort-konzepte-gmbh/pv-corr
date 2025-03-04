@@ -2,9 +2,126 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Save, X, Info } from 'lucide-react';
+import { Plus, Edit2, Save, X, Info, Code } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 import { Parameter } from '../../types/parameters';
+
+interface OutputConfig {
+  id: string;
+  name: string;
+  formula: string;
+  description: string;
+}
+
+interface OutputConfigDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentTheme: Theme;
+  normId: string;
+  initialOutputs: OutputConfig[];
+  onSave: (outputs: OutputConfig[]) => void;
+}
+
+const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
+  isOpen,
+  onClose,
+  currentTheme,
+  normId,
+  initialOutputs,
+  onSave
+}) => {
+  const [outputs, setOutputs] = useState<OutputConfig[]>(initialOutputs);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAddOutput = () => {
+    setOutputs([...outputs, {
+      id: generateHiddenId(),
+      name: '',
+      formula: '',
+      description: ''
+    }]);
+  };
+
+  const handleRemoveOutput = (id: string) => {
+    setOutputs(outputs.filter(o => o.id !== id));
+  };
+
+  const handleUpdateOutput = (id: string, field: keyof OutputConfig, value: string) => {
+    setOutputs(outputs.map(o => 
+      o.id === id ? { ...o, [field]: value } : o
+    ));
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-surface">
+        <h3 className="text-lg mb-6 text-primary">Configure Output Values</h3>
+        
+        <div className="space-y-4">
+          {outputs.map(output => (
+            <div key={output.id} className="p-4 rounded border border-theme">
+              <div className="flex items-center justify-between mb-4">
+                <input
+                  type="text"
+                  value={output.name}
+                  onChange={(e) => handleUpdateOutput(output.id, 'name', e.target.value)}
+                  className="p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
+                  placeholder="Output name (e.g. B0, B1)"
+                />
+                <button
+                  onClick={() => handleRemoveOutput(output.id)}
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                <textarea
+                  value={output.formula}
+                  onChange={(e) => handleUpdateOutput(output.id, 'formula', e.target.value)}
+                  className="w-full h-24 p-2 font-mono text-sm rounded text-primary border-theme border-solid bg-theme"
+                  placeholder="Enter JavaScript formula (e.g. values.Z1 + values.Z2)"
+                />
+                <textarea
+                  value={output.description}
+                  onChange={(e) => handleUpdateOutput(output.id, 'description', e.target.value)}
+                  className="w-full p-2 text-sm rounded text-primary border-theme border-solid bg-theme"
+                  placeholder="Description of this output value"
+                  rows={2}
+                />
+              </div>
+            </div>
+          ))}
+
+          <button
+            onClick={handleAddOutput}
+            className="w-full py-2 rounded text-sm text-white bg-accent-primary"
+          >
+            Add Output
+          </button>
+
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onSave(outputs)}
+              className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface NormsPanelProps {
   currentTheme: Theme;
@@ -46,6 +163,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewNorm, setIsNewNorm] = useState(false);
   const [newNorm, setNewNorm] = useState<Record<string, string>>({});
+  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>('user');
+  const [showNewNormForm, setShowNewNormForm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [editingOutputs, setEditingOutputs] = useState<string | null>(null);
   const t = useTranslation(currentLanguage);
 
   useEffect(() => {
@@ -345,7 +466,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-secondary">
                       <button
                         onClick={() => handleUpdateSaveNorm(norm)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
@@ -362,57 +483,155 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                       >
                         <X size={14} />
                       </button>
+                      <button
+                        onClick={() => setEditingOutputs(norm.id)}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        title="Configure Output Values"
+                      >
+                        <Code size={14} />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2 text-secondary">
-                      {t("standards.select_parameter")}
-                    </h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {parameters.map(param => {
-                        const isSelected = normParameters.some(
-                          np => np.norm_id === norm.id && np.parameter_id === param.id
-                        );
-                        return (
-                          <div
-                            key={param.id}
-                            className="flex items-center gap-2 p-2 rounded border border-theme"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
-                              className="rounded border-theme"
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-1">
-                                <span className="text-sm text-primary">
-                                  {param.shortName || param.name}
-                                </span>
-                                {param.unit && (
-                                  <span className="text-xs text-secondary">
-                                    ({param.unit})
+                  {editingNorm === norm.id ? (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2 text-secondary">
+                        {t("standards.select_parameter")}
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {parameters.map(param => {
+                          const isSelected = normParameters.some(
+                            np => np.norm_id === norm.id && np.parameter_id === param.id
+                          );
+                          return (
+                            <div
+                              key={param.id}
+                              className="flex items-center gap-2 p-2 rounded border border-theme"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
+                                className="rounded border-theme"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-1">
+                                  <span className="text-sm text-primary">
+                                    {param.shortName || param.name}
                                   </span>
-                                )}
-                                <div className="relative group">
-                                  <Info size={12} className="text-secondary cursor-help" />
-                                  <div className="absolute left-full ml-2 p-2 rounded bg-surface border border-theme invisible group-hover:visible min-w-[200px] z-10">
-                                    <p className="text-xs text-primary">{param.name}</p>
+                                  {param.unit && (
+                                    <span className="text-xs text-secondary">
+                                      ({param.unit})
+                                    </span>
+                                  )}
+                                  <div className="relative group">
+                                    <Info size={12} className="text-secondary cursor-help" />
+                                    <div className="absolute left-full ml-2 p-2 rounded bg-surface border border-theme invisible group-hover:visible min-w-[200px] z-10">
+                                      <p className="text-xs text-primary">{param.name}</p>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2 text-secondary">
+                        Selected Parameters
+                      </h4>
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr>
+                            <th className="text-left p-2 text-sm font-normal text-secondary">Name</th>
+                            <th className="text-left p-2 text-sm font-normal text-secondary">Parameter Code</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {parameters
+                            .filter(param => normParameters.some(
+                              np => np.norm_id === norm.id && np.parameter_id === param.id
+                            ))
+                            .sort((a, b) => {
+                              const aOrder = typeof a.orderNumber === 'number' ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
+                              const bOrder = typeof b.orderNumber === 'number' ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
+                              return aOrder - bOrder;
+                            })
+                            .map(param => (
+                              <tr key={param.id} className="border-t border-theme">
+                                <td className="p-2 text-sm text-primary">
+                                  {param.shortName || param.name}
+                                </td>
+                                <td className="p-2 text-sm text-secondary">
+                                  <div className="flex items-center gap-2">
+                                    <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigator.clipboard.writeText(param.id);
+                                        // Show temporary success indicator
+                                        const button = e.currentTarget;
+                                        button.innerHTML = '✓';
+                                        setTimeout(() => {
+                                          button.innerHTML = 'Copy';
+                                        }, 1000);
+                                      }}
+                                      className="text-xs px-2 py-1 rounded hover:bg-theme text-secondary"
+                                    >
+                                      Copy
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
+      )}
+      
+      {editingOutputs && (
+        <OutputConfigDialog
+          isOpen={true}
+          onClose={() => setEditingOutputs(null)}
+          currentTheme={currentTheme}
+          normId={editingOutputs}
+          initialOutputs={(() => {
+            const norm = norms.find(n => n.id === editingOutputs);
+            return norm?.output_config || [];
+          })()}
+          onSave={async (outputs) => {
+            try {
+              const { error } = await supabase
+                .from('norms')
+                .update({ output_config: outputs })
+                .eq('id', editingOutputs);
+
+              if (error) throw error;
+              
+              // Refresh norms data
+              const { data: updatedNorms, error: loadError } = await supabase
+                .from('norms')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+              if (loadError) throw loadError;
+              setNorms(updatedNorms || []);
+              setEditingOutputs(null);
+            } catch (err) {
+              console.error('Error updating outputs:', err);
+              setError('Failed to update outputs');
+            }
+          }}
+        />
       )}
     </div>
   );

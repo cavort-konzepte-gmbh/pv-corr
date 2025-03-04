@@ -22,6 +22,9 @@ export interface Parameter {
   unit?: ParameterUnit;
   rangeType: 'range' | 'selection' | 'open' | 'greater' | 'less' | 'greaterEqual' | 'lessEqual';
   rangeValue: string;
+  orderNumber: number | string;
+  rating_logic_code?: string;
+  rating_logic_test_cases?: any;
   created_at?: string;
   updated_at?: string;
 }

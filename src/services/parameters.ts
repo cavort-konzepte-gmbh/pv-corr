@@ -3,19 +3,44 @@ import { Parameter } from '../types/parameters';
 import { toCase } from '../utils/cases';
 import { generateHiddenId } from '../utils/generateHiddenId';
 
+interface ParameterResponse {
+  id: string;
+  hidden_id: string;
+  name: string;
+  description: string;
+  custom_name?: string;
+  short_name?: string;
+  unit?: string;
+  range_type: string;
+  range_value: string;
+  rating_logic_code?: string;
+  rating_logic_test_cases?: any;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type { Parameter }
 
 export const fetchParameters = async (): Promise<Parameter[]> => {
   const { data, error } = await supabase
     .from('parameters')
     .select('*')
-    .order('created_at', { ascending: true });
+    .order('order_number', { ascending: true });
 
   if (error) {
     console.error('Error fetching parameters:', error);
     throw error;
   }
-  return data.map(param => toCase(param, "camelCase"))
+  
+  return data.map((param: ParameterResponse) => {
+    const camelCased = toCase(param, "camelCase");
+    return {
+      ...camelCased,
+      orderNumber: param.order_number || 0,
+      rating_logic_code: param.rating_logic_code || '',
+      rating_logic_test_cases: param.rating_logic_test_cases || []
+    };
+  });
 };
 
 export const createParameter = async (parameter: Omit<Parameter, 'id' | 'hiddenId'>) => {
@@ -67,11 +92,12 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
   if (parameter.unit !== undefined) updateData.unit = parameter.unit === '' ? null : parameter.unit;
   if (parameter.rangeType !== undefined) updateData.range_type = parameter.rangeType;
   if (parameter.rangeValue !== undefined) updateData.range_value = parameter.rangeValue;
+  if (parameter.orderNumber !== undefined) updateData.order_number = parameter.orderNumber;
 
   const { data, error } = await supabase
     .from('parameters')
     .update(updateData)
-    .eq('id', id)
+    .eq('id', id.toString())
     .select()
     .single();
 
@@ -79,7 +105,11 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
     throw error;
   }
 
-  return data;
+  return {
+    ...toCase(data, "camelCase"),
+    rating_logic_code: data.rating_logic_code,
+    rating_logic_test_cases: data.rating_logic_test_cases
+  };
 };
 
 export const deleteParameter = async (id: string) => {

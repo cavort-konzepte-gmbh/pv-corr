@@ -1,10 +1,11 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { Standard } from '../../types/standards';
-import { Check, Info } from 'lucide-react';
+import { Standard } from '../../types/standards'; 
+import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Parameter } from '../../types/parameters';
 
 interface AnalyseNormProps {
   currentTheme: Theme;
@@ -14,6 +15,17 @@ interface AnalyseNormProps {
   onSelectStandard: (id: string) => void;
 }
 
+interface NormWithParameters {
+  id: string;
+  name: string;
+  description?: string;
+  version?: string;
+  output_config: any[];
+  norm_parameters: {
+    parameter_id: string;
+    parameter: Parameter;
+  }[];
+}
 const AnalyseNorm: React.FC<AnalyseNormProps> = ({
   currentTheme,
   currentLanguage,
@@ -23,7 +35,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [norms, setNorms] = useState<any[]>([]);
+  const [norms, setNorms] = useState<NormWithParameters[]>([]);
   const t = useTranslation(currentLanguage);
 
   useEffect(() => {
@@ -34,10 +46,16 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
           .from('norms')
           .select(`
             *,
-            parameters:norm_parameters (
+            output_config,
+            norm_parameters!inner (
               parameter_id,
-              parameter_code,
-              rating_ranges
+              parameter:parameters!inner (
+                id,
+                name,
+                short_name,
+                unit,
+                rating_logic_code
+              )
             )
           `)
           .order('created_at', { ascending: true });
@@ -46,7 +64,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
         setNorms(data || []);
       } catch (err) {
         console.error('Error loading norms:', err);
-        setError('Failed to load norms');
+        setError('Failed to load standards');
       } finally {
         setLoading(false);
       }
@@ -76,12 +94,12 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
       <h3 className="text-lg font-medium text-primary mb-4">
         {t("analysis.select_standard")}
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {norms.map(norm => (
           <button
             key={norm.id}
             onClick={() => onSelectStandard(norm.id)}
-            className={`p-4 rounded-lg border transition-all hover:translate-x-1 text-left ${
+            className={`p-2 rounded border transition-all hover:translate-x-1 text-left ${
               selectedStandardId === norm.id 
               ? 'border-accent-primary bg-opacity-10'
               : 'border-theme'
@@ -89,19 +107,10 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
           >
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-primary">{norm.name}</div>
-                <div className="text-sm text-secondary">
-                  {norm.description || t("analysis.no_description")}
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Info size={14} className="text-secondary" />
-                  <span className="text-xs text-secondary">
-                    {norm.parameters?.length || 0} parameters
-                  </span>
-                </div>
+                <div className="text-sm text-primary">{norm.name}</div>
               </div>
               {selectedStandardId === norm.id && (
-                <Check size={16} className="text-accent-primary" />
+                <Check size={12} className="text-accent-primary" />
               )}
             </div>
           </button>
