@@ -1,6 +1,6 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
-import { Shield, Database, Users, BarChart } from 'lucide-react';
+import { Zap, BaselineIcon as PipelineIcon, Train, Cylinder, Radio, ShieldAlert } from 'lucide-react';
 
 interface LandingPageProps {
   currentTheme: Theme;
@@ -9,8 +9,8 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-theme">
-      <div className="max-w-4xl w-full text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 landing-page">
+      <div className="w-[80vw] text-center">
         <h1 className="text-4xl font-bold mb-12 text-primary">
           PV-Corr Project Management
         </h1>
@@ -19,72 +19,88 @@ const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) =
           Comprehensive soil analysis and corrosion assessment platform for managing multiple project sites with advanced data collection and analysis capabilities.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          <div className="p-6 rounded-lg bg-surface">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
             <div className="flex justify-center mb-4">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-              >
-                <Shield className="text-accent-primary" size={24} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <Zap size={24} />
               </div>
             </div>
             <h3 className="text-lg font-medium mb-2 text-primary">
-              Secure Access
+              Transformer Station
             </h3>
             <p className="text-secondary">
-              Role-based access control and data encryption for project security
+              High-voltage power distribution and transformation facilities
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-surface">
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
             <div className="flex justify-center mb-4">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-              >
-                <Database className="text-accent-primary" size={24} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <PipelineIcon size={24} />
               </div>
             </div>
             <h3 className="text-lg font-medium mb-2 text-primary">
-              Data Management
+              Pipelines
             </h3>
             <p className="text-secondary">
-              Centralized storage for all project data and measurements
+              Underground and surface pipeline infrastructure networks
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-surface">
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
             <div className="flex justify-center mb-4">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-              >
-                <Users className="text-accent-primary" size={24} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <Train size={24} />
               </div>
             </div>
             <h3 className="text-lg font-medium mb-2 text-primary">
-              Team Collaboration
+              Railroad Tracks
             </h3>
             <p className="text-secondary">
-              Multi-user access and real-time project updates
+              Rail infrastructure and track maintenance systems
             </p>
           </div>
 
-          <div className="p-6 rounded-lg bg-surface">
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
             <div className="flex justify-center mb-4">
-              <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-              >
-                <BarChart className="text-accent-primary" size={24} />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <Cylinder size={24} />
               </div>
             </div>
             <h3 className="text-lg font-medium mb-2 text-primary">
-              Analysis Tools
+              Tank or Pumping Stations
             </h3>
             <p className="text-secondary">
-              Advanced soil analysis and corrosion assessment tools
+              Storage and distribution facilities for liquids and gases
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
+            <div className="flex justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <Radio size={24} />
+              </div>
+            </div>
+            <h3 className="text-lg font-medium mb-2 text-primary">
+              High-voltage Power Lines
+            </h3>
+            <p className="text-secondary">
+              Electrical transmission and distribution networks
+            </p>
+          </div>
+
+          <div className="p-6 rounded-lg bg-white bg-opacity-90">
+            <div className="flex justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <ShieldAlert size={24} />
+              </div>
+            </div>
+            <h3 className="text-lg font-medium mb-2 text-primary">
+              Protected Areas
+            </h3>
+            <p className="text-secondary">
+              Environmentally sensitive and restricted access zones
             </p>
           </div>
         </div>

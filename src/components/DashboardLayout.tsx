@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme, THEMES } from '../types/theme';
 import { Language, LANGUAGES, useTranslation } from '../types/language';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { generateHiddenId } from '../utils/generateHiddenId';
 import { Project, Zone } from '../types/projects';
@@ -145,8 +146,6 @@ const DashboardLayout = () => {
       loadInitialData();
     }
   }, [user]);
-
-  
 
   useEffect(() => {
     // Listen for user settings loaded event
@@ -390,151 +389,153 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-theme">
-      {/* Top Navigation Bar */}
-      <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
-        <div className="flex-1 flex items-center gap-6">
-          {view === 'settings' ? (
-            <>
-              <button
-                onClick={() => setView('projects')}
-                className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
-              >
-                <ArrowLeft size={18} />
-                <span>{t("nav.back")}</span>
-              </button>
-              <div className="h-6 w-px bg-border mx-2" />
-              <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
-                <span>{t("settings.general")}</span>
-              </ButtonSection>
-              <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
-                <span>{t("settings.theme")}</span>
-              </ButtonSection>
-              <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
-                <span>{t("settings.companies")}</span>
-              </ButtonSection>
-              <ButtonSection view={settingsView} match="people" onClick={() => setSettingsView('people')}>
-                <span>{t("settings.people")}</span>
-              </ButtonSection>
-            </>
-          ) : (
-            <>
-              <ButtonSection view={view} match="customers" onClick={() => setView('customers')}>
-                <Building2 size={18} />
-                <span>{t("nav.customers")}</span>
-              </ButtonSection>
-              <ButtonSection view={view} match="projects" onClick={() => {
-                if (selectedCustomerId === null) {
-                  const loadUncategorizedProjects = async () => {
-                    try {
-                      const projects = await fetchProjects(null);
-                      setProjects(projects);
-                    } catch (err) {
-                      console.error('Error loading uncategorized projects:', err);
-                      setError('Failed to load uncategorized projects');
-                    }
-                  };
-                  loadUncategorizedProjects();
-                } else if (selectedCustomerId) {
-                  const loadCustomerProjects = async () => {
-                    try {
-                      const customerProjects = await fetchProjects(selectedCustomerId);
-                      setProjects(customerProjects);
-                    } catch (err) {
-                      console.error('Error loading customer projects:', err);
-                      setError('Failed to load customer projects');
-                    }
-                  };
-                  loadCustomerProjects();
-                }
-                setView('projects');
-              }}>
-                <FolderOpen size={18} />
-                <span>{t("nav.projects")}</span>
-              </ButtonSection>
-              <ButtonSection view={view} match="fields" onClick={() => {
-                if (selectedProjectId) {
-                  setView('fields');
-                }
-              }}>
-                <Grid size={18} />
-                <span>{t("nav.fields")}</span>
-              </ButtonSection>         
-              <ButtonSection view={view} match="zones" onClick={() => {
-                if (selectedProjectId && selectedFieldId) {
-                  setView('zones');
-                }
-              }}>
-                <Map size={18} />
-                <span>{t("nav.zones")}</span>
-              </ButtonSection>
-              <ButtonSection view={view} match="datapoints" onClick={() => {
-                if (selectedProjectId && selectedFieldId && selectedZoneId) {
-                  setView('datapoints');
-                  // Find and set the selected zone
-                  const project = projects.find(p => p.id === selectedProjectId);
-                  const field = project?.fields.find(f => f.id === selectedFieldId);
-                  const zone = field?.zones.find(z => z.id === selectedZoneId);
-                  if (zone) {
-                    setSelectedZone(zone);
+    <Router>
+      <div className="min-h-screen flex flex-col bg-theme">
+        {/* Top Navigation Bar */}
+        <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
+          <div className="flex-1 flex items-center gap-6">
+            {view === 'settings' ? (
+              <>
+                <button
+                  onClick={() => setView('projects')}
+                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
+                >
+                  <ArrowLeft size={18} />
+                  <span>{t("nav.back")}</span>
+                </button>
+                <div className="h-6 w-px bg-border mx-2" />
+                <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
+                  <span>{t("settings.general")}</span>
+                </ButtonSection>
+                <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
+                  <span>{t("settings.theme")}</span>
+                </ButtonSection>
+                <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
+                  <span>{t("settings.companies")}</span>
+                </ButtonSection>
+                <ButtonSection view={settingsView} match="people" onClick={() => setSettingsView('people')}>
+                  <span>{t("settings.people")}</span>
+                </ButtonSection>
+              </>
+            ) : (
+              <>
+                <ButtonSection view={view} match="customers" onClick={() => setView('customers')}>
+                  <Building2 size={18} />
+                  <span>{t("nav.customers")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="projects" onClick={() => {
+                  if (selectedCustomerId === null) {
+                    const loadUncategorizedProjects = async () => {
+                      try {
+                        const projects = await fetchProjects(null);
+                        setProjects(projects);
+                      } catch (err) {
+                        console.error('Error loading uncategorized projects:', err);
+                        setError('Failed to load uncategorized projects');
+                      }
+                    };
+                    loadUncategorizedProjects();
+                  } else if (selectedCustomerId) {
+                    const loadCustomerProjects = async () => {
+                      try {
+                        const customerProjects = await fetchProjects(selectedCustomerId);
+                        setProjects(customerProjects);
+                      } catch (err) {
+                        console.error('Error loading customer projects:', err);
+                        setError('Failed to load customer projects');
+                      }
+                    };
+                    loadCustomerProjects();
                   }
-                }
-              }}>
-                <Database size={18} />
-                <span>{t("nav.datapoints")}</span>
-              </ButtonSection>
-              <ButtonSection view={view} match="analyse" onClick={() => {
-                if (selectedProjectId && selectedFieldId && selectedZoneId) {
-                  setView('analyse');
-                  // Find and set the selected zone
-                  const project = projects.find(p => p.id === selectedProjectId);
-                  const field = project?.fields.find(f => f.id === selectedFieldId);
-                  const zone = field?.zones.find(z => z.id === selectedZoneId);
-                  if (zone) {
-                    setSelectedZone(zone);
+                  setView('projects');
+                }}>
+                  <FolderOpen size={18} />
+                  <span>{t("nav.projects")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="fields" onClick={() => {
+                  if (selectedProjectId) {
+                    setView('fields');
                   }
-                }
-              }}>
-                <FileText size={18} />
-                <span>{t("nav.analyse")}</span>
-              </ButtonSection>
-              <ButtonSection view={view} match="output" onClick={() => setView('output')}>
-                <Database size={18} />
-                <span>{t("nav.output")}</span>
-              </ButtonSection>
-            </>
-          )}
-        </div>
-        <div className="flex items-center gap-4">
-          {view !== 'settings' && (
-            <ButtonSection view={settingsView} match="settinngs" onClick={() => setView('settings')}>
-              <SettingsIcon size={18} />
-              <span>{t("nav.settings")}</span>
-            </ButtonSection>
-          )}
-          {isAdmin && (
-            <ButtonSection view={settingsView} match="admin" onClick={toggleViewMode}>
-              <LayoutDashboard size={18} />
-              <span>{t("nav.administration")}</span>
-            </ButtonSection>
-          )}
-          <ButtonSection view={settingsView} match="signout" onClick={handleSignOut}>
-            <LogOut size={18} />
-            <span>{t("nav.signout")}</span>
-          </ButtonSection>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1">
-        {error && (
-          <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-accent-primary border-accent-primary border-solid bg-surface">
-            {error}
+                }}>
+                  <Grid size={18} />
+                  <span>{t("nav.fields")}</span>
+                </ButtonSection>         
+                <ButtonSection view={view} match="zones" onClick={() => {
+                  if (selectedProjectId && selectedFieldId) {
+                    setView('zones');
+                  }
+                }}>
+                  <Map size={18} />
+                  <span>{t("nav.zones")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="datapoints" onClick={() => {
+                  if (selectedProjectId && selectedFieldId && selectedZoneId) {
+                    setView('datapoints');
+                    // Find and set the selected zone
+                    const project = projects.find(p => p.id === selectedProjectId);
+                    const field = project?.fields.find(f => f.id === selectedFieldId);
+                    const zone = field?.zones.find(z => z.id === selectedZoneId);
+                    if (zone) {
+                      setSelectedZone(zone);
+                    }
+                  }
+                }}>
+                  <Database size={18} />
+                  <span>{t("nav.datapoints")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="analyse" onClick={() => {
+                  if (selectedProjectId && selectedFieldId && selectedZoneId) {
+                    setView('analyse');
+                    // Find and set the selected zone
+                    const project = projects.find(p => p.id === selectedProjectId);
+                    const field = project?.fields.find(f => f.id === selectedFieldId);
+                    const zone = field?.zones.find(z => z.id === selectedZoneId);
+                    if (zone) {
+                      setSelectedZone(zone);
+                    }
+                  }
+                }}>
+                  <FileText size={18} />
+                  <span>{t("nav.analyse")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="output" onClick={() => setView('output')}>
+                  <Database size={18} />
+                  <span>{t("nav.output")}</span>
+                </ButtonSection>
+              </>
+            )}
           </div>
-        )}
-        {renderContent()}
+          <div className="flex items-center gap-4">
+            {view !== 'settings' && (
+              <ButtonSection view={settingsView} match="settinngs" onClick={() => setView('settings')}>
+                <SettingsIcon size={18} />
+                <span>{t("nav.settings")}</span>
+              </ButtonSection>
+            )}
+            {isAdmin && (
+              <ButtonSection view={settingsView} match="admin" onClick={toggleViewMode}>
+                <LayoutDashboard size={18} />
+                <span>{t("nav.administration")}</span>
+              </ButtonSection>
+            )}
+            <ButtonSection view={settingsView} match="signout" onClick={handleSignOut}>
+              <LogOut size={18} />
+              <span>{t("nav.signout")}</span>
+            </ButtonSection>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          {error && (
+            <div className="fixed top-4 right-4 p-4 rounded shadow-lg max-w-md text-accent-primary border-accent-primary border-solid bg-surface">
+              {error}
+            </div>
+          )}
+          {renderContent()}
+        </div>
       </div>
-    </div>
+    </Router>
   );
 };
 

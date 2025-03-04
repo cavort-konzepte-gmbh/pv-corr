@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
 import { Project, Zone } from '../../types/projects';
-import { Standard } from '../../types/standards';
 import { FileText } from 'lucide-react';
 import AnalysisReport from './AnalysisReport';
 import { supabase } from '../../lib/supabase';
@@ -16,7 +15,6 @@ interface AnalysisPanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
   projects: Project[];
-  standards: Standard[];
   selectedProjectId?: string;
   selectedFieldId?: string;
   selectedZoneId?: string;
@@ -27,13 +25,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   currentTheme,
   currentLanguage,
   projects,
-  standards,
   selectedProjectId,
   selectedFieldId,
   selectedZoneId,
   onBack
 }) => {
-  const [selectedStandardId, setSelectedStandardId] = useState<string | null>(null);
+  const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([]);
   const [showReport, setShowReport] = useState(false);
   const [selectedNorm, setSelectedNorm] = useState<any>(null);
@@ -42,7 +39,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
   useEffect(() => {
     const loadNorm = async () => {
-      if (!selectedStandardId) {
+      if (!selectedNormId) {
         setSelectedNorm(null);
         return;
       }
@@ -58,7 +55,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
               rating_ranges
             )
           `)
-          .eq('id', selectedStandardId)
+          .eq('id', selectedNormId)
           .single();
 
         if (error) throw error;
@@ -69,22 +66,27 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
     };
 
     loadNorm();
-  }, [selectedStandardId]);
+  }, [selectedNormId]);
 
   const handleSaveAnalysis = async () => {
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
+      console.error('Missing required data for analysis');
       return;
     }
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { data: output, error: outputError } = await supabase
         .from('analysis_outputs')
         .insert({
           hidden_id: generateHiddenId(),
           project_id: selectedProject.id,
           zone_id: selectedZone.id,
-          standard_id: selectedNorm.id,
-          analyst_id: (await supabase.auth.getUser()).data.user?.id
+          norm_id: selectedNorm.id,
+          analyst_id: user.id
         })
         .select()
         .single();
@@ -109,7 +111,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           total_rating: totalRating,
           classification: totalRating > 0 ? 'Good' : 'Poor',
           recommendations: 'Based on the analysis results...',
-          created_by: (await supabase.auth.getUser()).data.user?.id
+          created_by: user.id
         });
 
       if (versionError) throw versionError;
@@ -117,6 +119,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       setShowReport(true);
     } catch (err) {
       console.error('Error saving analysis:', err);
+      // TODO: Show error to user
     }
   };
 
@@ -155,14 +158,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
     );
   };
 
-  if (showReport && selectedProject && selectedZone && selectedStandard) {
+  if (showReport && selectedProject && selectedZone && selectedNorm) {
     return (
       <AnalysisReport
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         project={selectedProject}
         zone={selectedZone}
-        standard={selectedNorm}
+        norm={selectedNorm}
         analyst={user ? {
           name: user.user_metadata?.display_name || user.email || '',
           title: user.user_metadata?.title || '',
@@ -206,19 +209,19 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         <AnalyseNorm
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
-          standards={standards}
-          selectedStandardId={selectedStandardId}
-          onSelectStandard={setSelectedStandardId}
+          selectedNormId={selectedNormId}
+          onSelectNorm={setSelectedNormId}
         />
 
         {/* Analysis Result */}
-        {selectedDatapoints.length > 0 && selectedStandardId && (
+        {selectedDatapoints.length > 0 && selectedNormId && (
           <AnalyseResult
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             selectedDatapoints={selectedZone.datapoints.filter(dp => selectedDatapoints.includes(dp.id))}
-            selectedStandard={standards.find(s => s.id === selectedStandardId)!}
-            onGenerateReport={handleSaveAnalysis}
+            selectedNorm={selectedNorm}
+            project={selectedProject}
+            zone={selectedZone}
           />
         )}
       </div>

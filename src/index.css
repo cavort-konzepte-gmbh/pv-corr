@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.landing-page {
+  background-image: url('./media/index-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 * {

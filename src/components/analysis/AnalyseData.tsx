@@ -27,6 +27,11 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
+  // Get name from datapoint, falling back to id if not available
+  const getDatapointName = (datapoint: Datapoint) => {
+    return datapoint.name || datapoint.id;
+  };
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -38,10 +43,10 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
 
   const sortedDatapoints = [...datapoints].sort((a, b) => {
     const aValue = sortField === 'name' 
-      ? a.name.toLowerCase()
+      ? getDatapointName(a).toLowerCase()
       : a.timestamp;
     const bValue = sortField === 'name'
-      ? b.name.toLowerCase()
+      ? getDatapointName(b).toLowerCase()
       : b.timestamp;
     
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
@@ -92,9 +97,8 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-primary">
-                    {datapoint.name || datapoint.sequentialId}
+                    {getDatapointName(datapoint)}
                   </div>
-                  {datapoint.name}
                 </div>
                 {selectedDatapoints.includes(datapoint.id) && (
                   <Check size={12} className="text-accent-primary" />

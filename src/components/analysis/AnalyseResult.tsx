@@ -2,30 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
 import { FileText, Info, ChevronDown, ChevronRight } from 'lucide-react';
-import { Datapoint } from '../../types/projects';
-import { Standard } from '../../types/standards';
+import { Datapoint, Project, Zone } from '../../types/projects';
 import { supabase } from '../../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface AnalyseResultProps {
   currentTheme: Theme;
   currentLanguage: Language;
   selectedDatapoints: Datapoint[];
-  selectedStandard: Standard;
-  onGenerateReport: () => void;
+  selectedNorm: any;
+  project: Project;
+  zone: Zone;
 }
 
 const AnalyseResult: React.FC<AnalyseResultProps> = ({
   currentTheme,
   currentLanguage,
   selectedDatapoints,
-  selectedStandard,
-  onGenerateReport
+  selectedNorm,
+  project,
+  zone
 }) => {
   const t = useTranslation(currentLanguage);
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadParameters = async () => {
@@ -33,11 +37,25 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         setLoading(true);
         const { data, error } = await supabase
           .from('parameters')
-          .select('*')
+          .select(`
+            id,
+            name,
+            short_name,
+            unit,
+            rating_logic_code
+          `)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
         setParameters(data || []);
+        
+        // Create parameter map for easier lookup
+        const map = data.reduce((acc: Record<string, any>, param: any) => {
+          acc[param.id] = param;
+          return acc;
+        }, {});
+        setParameterMap(map);
+
       } catch (err) {
         console.error('Error loading parameters:', err);
         setError('Failed to load parameters');
@@ -64,34 +82,40 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   // Calculate results for each datapoint
   const results = selectedDatapoints.map(datapoint => {
     // Calculate ratings for each parameter
-    const parameterRatings = Object.entries(datapoint.values).reduce((acc, [paramId, value]) => {
-      const parameter = parameters.find(p => p.id === paramId);
-      if (!parameter || !parameter.rating_logic_code) return acc;
+    const parameterRatings = Object.entries(datapoint.values).reduce((acc, [paramId, value]) => {      
+      const parameter = parameterMap[paramId];
+      if (!parameter) return acc;
 
-      try {
-        // Create a function from the rating logic code
-        const ratingFunc = new Function('value', parameter.rating_logic_code);
-        const rating = ratingFunc(value);
-
-        acc[parameter.short_name || parameter.name] = {
-          value,
-          rating,
-          unit: parameter.unit
-        };
-      } catch (err) {
-        console.error(`Error calculating rating for parameter ${parameter.short_name}:`, err);
+      // Execute rating logic code if available
+      let rating = 0;
+      if (parameter.rating_logic_code) {
+        try {
+          // Create a function from the rating logic code
+          const calculateRating = new Function('value', parameter.rating_logic_code);
+          rating = calculateRating(value);
+        } catch (err) {
+          console.error(`Error calculating rating for parameter ${parameter.short_name}:`, err);
+        }
       }
+
+      const paramName = parameter.short_name || parameter.name;      
+      acc[paramName] = {
+        value,
+        rating,
+        unit: parameter.unit
+      };
+      
       return acc;
     }, {} as Record<string, { value: string; rating: number; unit?: string }>);
 
     // Calculate B0 (sum of Z1-Z10 ratings)
     const b0 = Object.entries(parameterRatings)
-      .filter(([code]) => /^z[1-9]|10$/i.test(code))
+      .filter(([code]) => /^Z[1-9]|10$/i.test(code))
       .reduce((sum, [_, { rating }]) => sum + rating, 0);
 
     // Calculate B1 (B0 + sum of Z11-Z15 ratings)
     const b1 = b0 + Object.entries(parameterRatings)
-      .filter(([code]) => /^z1[1-5]$/i.test(code))
+      .filter(([code]) => /^Z1[1-5]$/i.test(code))
       .reduce((sum, [_, { rating }]) => sum + rating, 0);
 
     // Classify results
@@ -142,7 +166,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
               onClick={() => toggleDatapoint(datapoint.id)}
             >
               <div className="font-medium text-primary">
-                {datapoint.name || datapoint.sequentialId}
+                {datapoint.name}
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-sm text-secondary">
@@ -195,7 +219,10 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
       <div className="flex justify-end mt-6">
         <button
-          onClick={onGenerateReport}
+          onClick={() => {
+            // Navigate to output with preview params
+            navigate(`/output?preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+          }}
           className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
         >
           <FileText size={16} />
