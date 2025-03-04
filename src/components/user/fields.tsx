@@ -18,6 +18,7 @@ interface FieldsProps {
   onSelectField: (projectId: string, fieldId: string) => void;
   people: Person[];
   companies: Company[];
+  selectedCustomerId: string | null
 }
 
 const Fields: React.FC<FieldsProps> = ({
@@ -29,7 +30,8 @@ const Fields: React.FC<FieldsProps> = ({
   people,
   companies,
   onProjectsChange,
-  currentLanguage
+  currentLanguage,
+  selectedCustomerId
 }) => {
   const translation = useTranslation(currentLanguage);
   const selectedProject = selectedProjectId 
@@ -58,6 +60,8 @@ const Fields: React.FC<FieldsProps> = ({
         currentLanguage={currentLanguage}
         savedPeople={people}
         onProjectsChange={onProjectsChange}
+        selectedCustomerId={selectedCustomerId}
+        currentLanguage={currentLanguage}
       />
 
       <FieldList
@@ -67,7 +71,7 @@ const Fields: React.FC<FieldsProps> = ({
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}
         selectedProjectId={selectedProject.id}
-        selectedProjectId={selectedProject.id}
+        selectedCustomerId={selectedCustomerId}
       />
     </div>
   );

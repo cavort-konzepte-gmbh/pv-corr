@@ -70,6 +70,8 @@ const Zones: React.FC<ZonesProps> = ({
         savedPeople={people}
         isExpanded={showProjectSummary}
         onToggle={() => setShowProjectSummary(!showProjectSummary)}
+        onProjectsChange={onProjectsChange}
+        selectedCustomerId={selectedProject.companyId}
       />
 
       <FieldSummary

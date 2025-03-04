@@ -279,6 +279,7 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
             }}
             currentLanguage={currentLanguage}
+            onProjectsChange={setProjects}
           />
         );
       case 'fields':
@@ -297,7 +298,8 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
             }}
             people={savedPeople}
-            companies={savedCompanies}        
+            companies={savedCompanies}
+            selectedCustomerId={selectedCustomerId} 
           />
         );
       case 'zones':
@@ -336,6 +338,7 @@ const DashboardLayout = () => {
               setSelectedZone(undefined);
             }}
             onProjectsChange={setProjects}
+            selectedCustomerId={selectedCustomerId}
           />
         ) : (
           <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>

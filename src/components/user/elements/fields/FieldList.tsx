@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
-import { Field } from '../../../../types/projects';
-import { ChevronRight, Edit2, Save, X, Plus } from 'lucide-react';
+import { Field, Project } from '../../../../types/projects';
+import { ChevronRight, Edit2, X, MoreVertical, Save } from 'lucide-react';
 import { googleMaps } from "../../../../utils/google-maps";
 import { deleteField, updateField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
@@ -16,6 +16,7 @@ interface FieldListProps {
   onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
   selectedProjectId: string;
+  selectedCustomerId: string | null
 }
 
 const FieldList: React.FC<FieldListProps> = ({
@@ -24,7 +25,8 @@ const FieldList: React.FC<FieldListProps> = ({
   onSelectField,
   onProjectsChange,
   currentLanguage,
-  selectedProjectId
+  selectedProjectId,
+  selectedCustomerId
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
@@ -41,14 +43,23 @@ const FieldList: React.FC<FieldListProps> = ({
   const translation = useTranslation(currentLanguage);
 
   const handleSave = async (field: Field) => {
-    if (updatingField) return;
+    if (updatingField && !field.id) return;
     try {
       setUpdatingField(true);
       setError(null);
 
       // Get the current has_fence value
       const hasFence = editingValues.has_fence ?? field.has_fence ?? null;
+      
+      // Update local state immediately for better UX
+      const updatedField = {
+        ...editingValues,
+      };
 
+      setLocalFields(prevFields => 
+        prevFields.map(f => f.id === field.id ? updatedField : f)
+      );
+      
       // Send update to server
       await updateField(field.id, {
         name: editingValues.name || field.name,
@@ -247,7 +258,7 @@ const FieldList: React.FC<FieldListProps> = ({
               <td className="p-2 border border-theme">
                 {editingId === field.id ? (
                   <select
-                    value={editingValues.has_fence ?? field.has_fence ?? ''}
+                    value={editingValues.has_fence}
                     onChange={(e) => setEditingValues(prev => ({
                       ...prev,
                       has_fence: e.target.value
@@ -298,11 +309,12 @@ const FieldList: React.FC<FieldListProps> = ({
               <td className="p-2 border border-theme">
                 <div className="flex items-center justify-center gap-2">
                   <button
-                    onClick={(event) => {
+                    onClick={async (event) => {
                       event.stopPropagation();
                       if (editingId === field.id) {
                         handleSave(field);
                       } else {
+                        console.log("Setting editing ID:", field);
                         setEditingId(field.id);
                         setEditingValues({
                           name: field.name,

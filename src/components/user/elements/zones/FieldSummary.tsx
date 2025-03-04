@@ -35,12 +35,12 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
     name: field.name || '',
     latitude: field.latitude || '',
     longitude: field.longitude || '',
-    has_fence: field.has_fence || 'no'
+    has_fence: field.has_fence ? 'yes' : 'no'
   });
 
   const handleSave = async () => {
     if (!field.id) return;
-    
+
     try {
       await updateField(field.id, editValues);
       const updatedProjects = await fetchProjects();
@@ -157,15 +157,15 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
             <td className="p-2 border-theme">
               {isEditing ? (
                 <select
-                  value={editValues.has_fence}
                   onChange={(e) => setEditValues({ ...editValues, has_fence: e.target.value })}
                   className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  defaultValue={editValues.has_fence}
                 >
                   <option value="no">{translation("field.has_fence.no")}</option>
                   <option value="yes">{translation("field.has_fence.yes")}</option>
                 </select>
               ) : (
-                field.has_fence === 'yes' ? translation("field.has_fence.yes") : translation("field.has_fence.no")
+                field.has_fence ? translation("field.has_fence.yes") : translation("field.has_fence.no")
               )}
             </td>
           </tr>

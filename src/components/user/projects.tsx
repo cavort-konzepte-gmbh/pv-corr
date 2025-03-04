@@ -6,7 +6,7 @@ import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectList from './elements/projects/ProjectList';
 import ProjectForm from './elements/projects/ProjectForm';
-import { Language, useTranslation } from '../../types/language';
+import { Language } from '../../types/language';
 
 interface ProjectsProps {
   currentTheme: Theme;
@@ -18,7 +18,6 @@ interface ProjectsProps {
   onMoveProject: (projectId: string, customerId: string | null) => void;
   onSelectProject: (projectId: string) => void;
   currentLanguage: Language;
-  onProjectsChange: (projects: Project[]) => void;
   onProjectsChange: (projects: Project[]) => void;
 }
 
@@ -34,7 +33,6 @@ const Projects: React.FC<ProjectsProps> = ({
   currentLanguage,
   onProjectsChange
 }) => {
-  const translation = useTranslation(currentLanguage);
 
   return (
     <div className="p-6">
