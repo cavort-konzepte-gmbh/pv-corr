@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
@@ -9,6 +9,7 @@ import { fetchProjects } from '../../../../services/projects';
 import { updateDatapoint } from '../../../../services/datapoints';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createDatapoint } from '../../../../services/datapoints';
+import { ParameterInput } from '../../../DatapointForm';
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -30,6 +31,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({});
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
   const [isAdding, setIsAdding] = useState(false);
@@ -37,6 +39,14 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [newName, setNewName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Create a map of parameter id to parameter object for easier lookup
+    const map = parameters.reduce((acc, param) => {
+      acc[param.id] = param;
+      return acc;
+    }, {} as Record<string, Parameter>);
+    setParameterMap(map);
+  }, [parameters]);
 
 
   const handleAddDatapoint = async () => {
@@ -113,7 +123,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
         <tbody>
           {isAdding && (
             <tr>
-              <td className="p-2 border-t border-theme">
+              <td className="p-2 border border-theme">
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddDatapoint}
@@ -133,16 +143,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
                 </FormHandler>
               </td>
               {parameters.map(param => (
-                <td key={param.id} className="p-2 border-t border-theme text-center">
-                  <input
-                    type="text"
+                <td key={param.id} className="p-2 border border-theme text-center">
+                  <ParameterInput
+                    parameter={{
+                      ...param,
+                      parameterCode: param.shortName || param.name
+                    }}
                     value={newValues[param.id] || ''}
-                    onChange={(e) => setNewValues(prev => ({
+                    onChange={(value) => setNewValues(prev => ({
                       ...prev,
-                      [param.id]: e.target.value
+                      [param.id]: value
                     }))}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
-                    placeholder={`Enter ${param.name}`}
+                    currentTheme={currentTheme}
                   />
                 </td>
               ))}
@@ -187,14 +199,19 @@ const DatapointList: React.FC<DatapointListProps> = ({
               {parameters.map(param => (
                 <td key={param.id} className="p-2 text-center w-32">
                   {editingDatapoint === datapoint.id ? (
-                    <input
-                      type="text"
+                    <ParameterInput
+                      parameter={{
+                        ...param,
+                        parameterCode: param.shortName || param.name,
+                        rangeType: param.rangeType,
+                        rangeValue: param.rangeValue
+                      }}
                       value={editingValues[param.id] || datapoint.values[param.id] || ''}
-                      onChange={(e) => setEditingValues(prev => ({
+                      onChange={(value) => setEditingValues(prev => ({
                         ...prev,
-                        [param.id]: e.target.value
+                        [param.id]: value
                       }))}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+                      currentTheme={currentTheme}
                     />
                   ) : (
                     <span className="text-primary">

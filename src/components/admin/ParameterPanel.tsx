@@ -144,7 +144,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
               <thead>
                 <tr>
                   <th className="p-2 text-left border font-normal border-theme">
-                    Name
+                    Parameter Name
+                  </th>
+                  <th className="p-2 text-left border font-normal border-theme">
+                    Short Name
                   </th>
                   <th className="p-2 text-left border font-normal border-theme">
                     Unit
@@ -154,9 +157,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                   </th>
                   <th className="p-2 text-left border font-normal border-theme">
                     Range Value
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Short Name
                   </th>
                   <th className="p-2 text-center border font-normal border-theme">
                     Actions
@@ -176,7 +176,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           type="text"
                           name="name"
                           value={editingValues.name || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          onChange={(e) => handleChangeEditingValues('name', e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                         </FormHandler>
@@ -190,7 +190,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           type="text"
                           name="shortName"
                           value={editingValues.shortName || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          onChange={(e) => handleChangeEditingValues('shortName', e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                       ) : (
@@ -199,39 +199,34 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <FormSelect
+                        <FormInput
+                          type="text"
                           name="unit"
                           value={editingValues.unit || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          onChange={(e) => handleChangeEditingValues('unit', e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        >
-                          <option value="">No unit</option>
-                          <option value="Ohm.m">Ohm.m</option>
-                          <option value="Ohm.cm">Ohm.cm</option>
-                          <option value="mmol/kg">mmol/kg</option>
-                          <option value="mg/kg">mg/kg</option>
-                          <option value="g/mol">g/mol</option>
-                          <option value="mg/mmol">mg/mmol</option>
-                          <option value="%">%</option>
-                          <option value="ppm">ppm</option>
-                          <option value="V">V</option>
-                          <option value="mV">mV</option>
-                          <option value="A">A</option>
-                          <option value="mA">mA</option>
-                        </FormSelect>
+                        />
                       ) : (
                         parameter.unit || '-'
                       )}
                     </td>
                     <td className="p-2 border border-theme">
                       {editingParameter === parameter.id ? (
-                        <FormInput
-                          type="text"
+                        <FormSelect
                           name="rangeType"
                           value={editingValues.rangeType || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          onChange={(e) => handleChangeEditingValues('rangeType', e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        />
+                        >
+                          <option value="">Select Range Type</option>
+                          <option value="range">Range</option>
+                          <option value="selection">Selection</option>
+                          <option value="open">Open</option>
+                          <option value="greater">Greater Than</option>
+                          <option value="less">Less Than</option>
+                          <option value="greaterEqual">Greater Than or Equal</option>
+                          <option value="lessEqual">Less Than or Equal</option>
+                        </FormSelect>
                       ) : (
                         parameter.rangeType
                       )}
@@ -242,11 +237,11 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           type="text"
                           name="rangeValue"
                           value={editingValues.rangeValue || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          onChange={(e) => handleChangeEditingValues('rangeValue', e.target.value)}
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                       ) : (
-                        parameter.rangeValue
+                        parameter.rangeValue || '-'
                       )}
                     </td>
                     <td className="p-2 border border-theme">
