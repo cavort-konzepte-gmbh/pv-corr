@@ -65,29 +65,23 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       name: zone.name,
       latitude: zone.latitude || null,
       longitude: zone.longitude || null,
-      substructure_id: zone.substructureId || null,
-      foundation_id: zone.foundationId || null
+      substructure_id: zone.substructureId === '' ? null : zone.substructureId || null,
+      foundation_id: zone.foundationId === '' ? null : zone.foundationId || null
     };
 
     // Update zone
     const { data, error } = await supabase
       .from('zones')
       .update(updateData)
-      .eq('id', zoneId);
-
-    if (error) throw error;
-
-    // Fetch updated zone data
-    const { data: updatedZone, error: fetchError } = await supabase
-      .from('zones')
-      .select('*')
       .eq('id', zoneId)
+      .select(`
+        *,
+        datapoints (*)
+      `)
       .single();
 
-    if (fetchError) throw fetchError;
-    if (!updatedZone) throw new Error('Zone not found');
-
-    return updatedZone;
+    if (error) throw error;
+    return data;
   } catch (err) {
     console.error('Error updating zone:', err);
     throw err;

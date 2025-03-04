@@ -11,8 +11,8 @@ import DatapointsSettings from './elements/settings/DatapointsSettings';
 import { Person } from '../../types/people';
 
 interface SettingsProps {
-  view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints';
-  onViewChange: (view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints') => void;
+  view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations';
+  onViewChange: (view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations') => void;
   showHiddenIds: boolean;
   currentLanguage: Language;
   onLanguageChange: (language: Language) => void;
@@ -99,6 +99,13 @@ const Settings: React.FC<SettingsProps> = ({
             currentLanguage={currentLanguage}
             standards={standards}
             onStandardsChange={onStandardsChange}
+          />
+        )}
+
+        {view === 'translations' && (
+          <TranslationsPanel
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
           />
         )}
       </div>

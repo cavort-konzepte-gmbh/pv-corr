@@ -10,7 +10,7 @@ const initialState = {
   name: '',
   latitude: '',
   longitude: '',
-  has_fence: 'no'
+  has_fence: ''
 }
 
 interface FieldFormProps {
@@ -118,6 +118,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                   onChange={handleChange}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
+                  <option value="">Select fence option</option>
                   <option value="no">{translation("field.has_fence.no")}</option>
                   <option value="yes">{translation("field.has_fence.yes")}</option>
                 </select>

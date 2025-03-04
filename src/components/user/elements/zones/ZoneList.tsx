@@ -30,6 +30,9 @@ const ZoneList: React.FC<ZoneListProps> = ({
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedSubstructure, setSelectedSubstructure] = useState<any>(null);
+  const [selectedFoundation, setSelectedFoundation] = useState<any>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [newValues, setNewValues] = useState({
     name: '',
@@ -41,7 +44,6 @@ const ZoneList: React.FC<ZoneListProps> = ({
   const [substructures, setSubstructures] = useState<any[]>([]);
   const [foundations, setFoundations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
@@ -67,6 +69,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
   const handleUpdateZone = async (zoneId: string, values: Record<string, string>) => {
     if (updatingZone) return;
     try {
+      setError(null);
       setUpdatingZone(true);
       
       // Prepare update data
@@ -74,8 +77,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
         name: values.name,
         latitude: values.latitude || null,
         longitude: values.longitude || null,
-        substructureId: values.substructureId || null,
-        foundationId: values.foundationId || null
+        substructureId: values.substructureId === '' ? null : values.substructureId,
+        foundationId: values.foundationId === '' ? null : values.foundationId
       };
 
       await updateZone(zoneId, updateData);
@@ -84,16 +87,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
+      onProjectsChange(updatedProjects);
       
       // Reset editing state
       setEditingZoneId(null);
       setEditingValues({});
+      setError(null);
 
     } catch (err) {
       console.error('Error updating zone:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update zone');
     } finally {
       setUpdatingZone(false);
     }
@@ -317,7 +320,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     View on map
                   </button>
                 ) : (
-                  <span className="text-secondary">No location set</span>
+                  <span className="text-secondary">{translation("general.location_not_set")}</span>
                 )}
               </td>
               <td className="p-2 border border-theme">
@@ -337,14 +340,18 @@ const ZoneList: React.FC<ZoneListProps> = ({
                 ) : (
                   <div className="flex items-center gap-2">
                     <Wrench size={14} className="text-secondary" />
-                    {(() => {
-                      const sub = substructures.find(s => s.id === zone.substructureId);
-                      return sub ? (
-                        <span>{sub.manufacturer} - {sub.system}</span>
-                      ) : (
-                        <span className="text-secondary">Not set</span>
-                      );
-                    })()}
+                    {zone.substructureId ? (
+                      (() => {
+                        const sub = substructures.find(s => s.id === zone.substructureId);
+                        return sub ? (
+                          <span>{sub.manufacturer} - {sub.system}</span>
+                        ) : (
+                          <span className="text-secondary">Not set</span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-secondary">Not set</span>
+                    )}
                   </div>
                 )}
               </td>
@@ -365,14 +372,18 @@ const ZoneList: React.FC<ZoneListProps> = ({
                 ) : (
                   <div className="flex items-center gap-2">
                     <Building2 size={14} className="text-secondary" />
-                    {(() => {
-                      const foundation = foundations.find(f => f.id === zone.foundationId);
-                      return foundation ? (
-                        <span>{foundation.name}</span>
-                      ) : (
-                        <span className="text-secondary">Not set</span>
-                      );
-                    })()}
+                    {zone.foundationId ? (
+                      (() => {
+                        const foundation = foundations.find(f => f.id === zone.foundationId);
+                        return foundation ? (
+                          <span>{foundation.name}</span>
+                        ) : (
+                          <span className="text-secondary">Not set</span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-secondary">Not set</span>
+                    )}
                   </div>
                 )}
               </td>

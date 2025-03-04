@@ -21,7 +21,9 @@ import Fields from './user/fields';
 import Zones from './user/zones';
 import Datapoints from './user/datapoints';
 import Settings from './user/settings';
+import AnalysisPanel from './analysis/AnalysisPanel';
 import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { ButtonSection } from './ui/ButtonSection';
 import { useAppNavigation } from '../hooks/useAppNavigation';
 
@@ -340,17 +342,18 @@ const DashboardLayout = () => {
             {t("datapoint.please_select_zone")}
           </div>
         );
-      case 'analyze':
+      case 'analyse':
         return (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
-            Analysis panel coming soon
-          </div>
-        );
-      case 'evaluation':
-        return (
-          <div className="p-6 text-center text-secondary">
-            {t("evaluation.panel_coming_soon")}
-          </div>
+          <AnalysisPanel
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
+            projects={projects}
+            standards={standards}
+            selectedProjectId={selectedProjectId}
+            selectedFieldId={selectedFieldId}
+            selectedZoneId={selectedZoneId}
+            onBack={() => setView('projects')}
+          />
         );
       case 'output':
         return (
@@ -468,14 +471,32 @@ const DashboardLayout = () => {
               <ButtonSection view={view} match="datapoints" onClick={() => {
                 if (selectedProjectId && selectedFieldId && selectedZoneId) {
                   setView('datapoints');
+                  // Find and set the selected zone
+                  const project = projects.find(p => p.id === selectedProjectId);
+                  const field = project?.fields.find(f => f.id === selectedFieldId);
+                  const zone = field?.zones.find(z => z.id === selectedZoneId);
+                  if (zone) {
+                    setSelectedZone(zone);
+                  }
                 }
               }}>
                 <Database size={18} />
                 <span>{t("nav.datapoints")}</span>
               </ButtonSection>
-              <ButtonSection view={view} match="evaluation" onClick={() => setView('evaluation')}>
-                <Database size={18} />
-                <span>{t("nav.evaluation")}</span>
+              <ButtonSection view={view} match="analyse" onClick={() => {
+                if (selectedProjectId && selectedFieldId && selectedZoneId) {
+                  setView('analyse');
+                  // Find and set the selected zone
+                  const project = projects.find(p => p.id === selectedProjectId);
+                  const field = project?.fields.find(f => f.id === selectedFieldId);
+                  const zone = field?.zones.find(z => z.id === selectedZoneId);
+                  if (zone) {
+                    setSelectedZone(zone);
+                  }
+                }
+              }}>
+                <FileText size={18} />
+                <span>{t("nav.analyse")}</span>
               </ButtonSection>
               <ButtonSection view={view} match="output" onClick={() => setView('output')}>
                 <Database size={18} />

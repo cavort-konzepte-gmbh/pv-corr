@@ -15,7 +15,8 @@ export const createField = async (projectId: string, field: Omit<Field, 'id' | '
       hidden_id: generateHiddenId(),
       name: field.name,
       latitude: field.latitude,
-      longitude: field.longitude
+      longitude: field.longitude,
+      has_fence: field.has_fence === '' ? null : field.has_fence === 'yes' ? 'yes' : field.has_fence === 'no' ? 'no' : null
     })
     .select()
     .single();
@@ -51,7 +52,6 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
   if (!fieldId) {
     throw new Error('Field ID is required for update');
   }
-  
   try {
     // Prepare update data while preserving existing data
     const { data: existingField, error: fetchError } = await supabase
@@ -63,11 +63,10 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
     if (fetchError) throw fetchError;
 
     const updateData = {
-      ...existingField,
       name: field.name ?? existingField.name,
       latitude: field.latitude ?? existingField.latitude,
       longitude: field.longitude ?? existingField.longitude,
-      has_fence: field.has_fence !== undefined ? field.has_fence : existingField.has_fence
+      has_fence: field.has_fence === '' || field.has_fence === undefined ? null : field.has_fence
     };
 
     // Update the field
@@ -79,36 +78,11 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
       .single();
 
     if (error) {
+      console.error('Update error:', error);
       throw error;
     }
 
-    if (!data) {
-      throw new Error('Field not found');
-    }
-
-    // Fetch complete field data after update
-    const { data: completeField, error: refreshError } = await supabase
-      .from('fields')
-      .select(`
-        *,
-        gates (*),
-        zones (
-          *,
-          datapoints (*)
-        )
-      `)
-      .eq('id', fieldId)
-      .single();
-
-    if (refreshError) {
-      throw new Error('Failed to fetch updated field data');
-    }
-    
-    if (!completeField) {
-      throw new Error('Failed to retrieve updated field data');
-    }
-
-    return completeField;
+    return data;
   } catch (error) {
     console.error('Error updating field:', error);
     throw error instanceof Error 
@@ -150,8 +124,8 @@ export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hidde
         field_id: fieldId,
         hidden_id: generateHiddenId(),
         name: gate.name,
-        latitude: gate.latitude,
-        longitude: gate.longitude
+        latitude: gate.latitude || null,
+        longitude: gate.longitude || null
       })
       .select()
       .single();

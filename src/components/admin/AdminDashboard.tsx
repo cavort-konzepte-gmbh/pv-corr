@@ -5,8 +5,9 @@ import DatabaseManagement from './DatabaseManagement';
 import UserManagement from './UserManagement';
 import AdminSettings from './AdminSettings';
 import NotificationsPanel from './notifications/NotificationsPanel';
-import { supabase } from '../../lib/supabase';
+import TranslationsPanel from './settings/TranslationsPanel';
 import { Language } from '../../types/language';
+import { supabase } from '../../lib/supabase';
 
 interface AdminDashboardProps {
   currentTheme: Theme;
@@ -14,7 +15,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
-  const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'notifications' | 'settings'>('overview');
+  const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'notifications' | 'settings' | 'translations'>('overview');
   
   const handleSignOut = async () => {
     try {
@@ -47,6 +48,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         <NotificationsPanel
           currentTheme={currentTheme}
           onBack={() => setActiveView('overview')}
+        />
+      ) : activeView === 'translations' ? (
+        <TranslationsPanel
+          currentTheme={currentTheme}
+          currentLanguage={currentLanguage}
         />
       ) : (
         <div className="p-8">

@@ -4,7 +4,8 @@ import { Theme } from '../../types/theme';
 import LoginForm from './LoginForm';
 import LandingPage from './LandingPage';
 import AdminDashboard from '../admin/AdminDashboard';
-import { Language } from '../../types/language';
+import { Language, setTranslations } from '../../types/language';
+import { fetchTranslations } from '../../services/translations';
 import { Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -40,6 +41,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   const [loginType, setLoginType] = useState<'user' | 'admin' | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewMode, setViewMode] = useState<'user' | 'admin'>('user');
+
+  useEffect(() => {
+    // Load translations when language changes
+    const loadTranslations = async () => {
+      const translations = await fetchTranslations(currentLanguage);
+      setTranslations(translations);
+    };
+    loadTranslations();
+  }, [currentLanguage]);
 
   useEffect(() => {
     // Check active sessions and sets the user

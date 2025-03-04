@@ -222,23 +222,13 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
   try {
     const { data, error } = await supabase
       .from('projects')
-      .select(`
-        *,
-        fields!inner (
-          id,
-          hidden_id,
-          name,
-          latitude,
-          longitude,
-          has_fence,
-          gates:gates (*),
-          zones!inner (
-            id,
-            hidden_id,
-            name,
-            latitude,
-            longitude,
-            datapoints:datapoints (*)
+      .select(`*,
+        fields (
+          id, hidden_id, name, latitude, longitude, has_fence,
+          gates (*),
+          zones (
+            id, hidden_id, name, latitude, longitude,
+            datapoints (*)
           )
         )`)
       .order('created_at', { ascending: true });

@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface NavigationState {
-  view: 'customers' | 'projects' | 'fields' | 'zones' | 'datapoints' | 'analyze' | 'evaluation' | 'output' | 'settings';
+  view: 'customers' | 'projects' | 'fields' | 'zones' | 'datapoints' | 'analyse' | 'evaluation' | 'output' | 'settings';
   selectedProjectId: string | undefined;
   selectedFieldId: string | undefined;
   selectedZoneId: string | undefined;

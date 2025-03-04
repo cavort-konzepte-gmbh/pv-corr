@@ -73,6 +73,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                     <span>{project.name}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                        {project.typeProject === 'field' ? translation("project.type.field") : translation("project.type.roof")}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
                         {project.fields.length} {translation("fields")}
                       </span>
                       <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { Project } from '../../types/projects';
+import { Project, Field } from '../../types/projects';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectSummary from './elements/fields/ProjectSummary';
@@ -54,23 +54,20 @@ const Fields: React.FC<FieldsProps> = ({
         manager={manager}
         company={company}
         currentTheme={currentTheme}
+        currentLanguage={currentLanguage}
+        currentLanguage={currentLanguage}
         savedPeople={people}
         onProjectsChange={onProjectsChange}
       />
 
       <FieldList
         currentTheme={currentTheme}
-        fields={selectedProject.fields}
+        fields={selectedProject.fields || []}
         onSelectField={(fieldId) => onSelectField(selectedProject.id, fieldId)}
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}
-      />
-      
-      <FieldForm
-        currentTheme={currentTheme}
         selectedProjectId={selectedProject.id}
-        onProjectsChange={onProjectsChange}
-        currentLanguage={currentLanguage}
+        selectedProjectId={selectedProject.id}
       />
     </div>
   );
