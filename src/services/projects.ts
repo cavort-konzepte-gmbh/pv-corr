@@ -227,7 +227,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           id, hidden_id, name, latitude, longitude, has_fence,
           gates (*),
           zones (
-            id, hidden_id, name, latitude, longitude,
+            id, hidden_id, name, latitude, longitude, substructure_id, foundation_id,
             datapoints (*)
           )
         )`)
@@ -241,7 +241,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     if (!data) {
       return [];
     }
-    
+
     // Filter projects based on customerId after fetching
     const projects = data.map(project => ({
       id: project.id,

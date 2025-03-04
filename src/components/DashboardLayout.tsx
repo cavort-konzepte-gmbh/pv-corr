@@ -94,7 +94,6 @@ const DashboardLayout = () => {
         .eq('id', projectId);
 
       if (error) throw error;
-        console.log('Project moved successfully' , selectedCustomerId);
       // Refresh projects list
       const updatedProjects = await fetchProjects(selectedCustomerId);
 
@@ -132,7 +131,7 @@ const DashboardLayout = () => {
         setCustomers(fetchedCustomers);
 
         // Load uncategorized projects
-        const uncategorizedProjects = await fetchProjects(selectedCustomerId);
+        const uncategorizedProjects = await fetchProjects();
         setProjects(uncategorizedProjects);
       } catch (error) {
         console.error('Error loading initial data:', error);
@@ -278,6 +277,7 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
             }}
             currentLanguage={currentLanguage}
+            onProjectsChange={setProjects}
           />
         );
       case 'fields':
@@ -296,7 +296,8 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
             }}
             people={savedPeople}
-            companies={savedCompanies}        
+            companies={savedCompanies}
+            selectedCustomerId={selectedCustomerId} 
           />
         );
       case 'zones':
@@ -335,6 +336,7 @@ const DashboardLayout = () => {
               setSelectedZone(undefined);
             }}
             onProjectsChange={setProjects}
+            selectedCustomerId={selectedCustomerId}
           />
         ) : (
           <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>

@@ -9,6 +9,7 @@ import DatapointList from './elements/datapoints/DatapointList';
 import { fetchParameters } from '../../services/parameters';
 import ProjectSummary from './elements/fields/ProjectSummary';
 import FieldSummary from './elements/zones/FieldSummary';
+import { Person } from '../../types/people';
 
 interface DatapointsProps {
   currentTheme: Theme;
@@ -23,6 +24,7 @@ interface DatapointsProps {
   onBack: () => void;
   onProjectsChange: (projects: Project[]) => void;
   savedPeople?: Person[];
+  selectedCustomerId: string | null;
 }
 
 const Datapoints: React.FC<DatapointsProps> = ({
@@ -33,7 +35,8 @@ const Datapoints: React.FC<DatapointsProps> = ({
   selectedZone,
   onBack,
   onProjectsChange,
-  savedPeople = []
+  savedPeople = [],
+  selectedCustomerId
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
   const [filteredParameters, setFilteredParameters] = useState<Parameter[]>([]);
@@ -95,6 +98,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         onProjectsChange={onProjectsChange}
+        selectedCustomerId={selectedCustomerId}
       />
 
       <FieldSummary

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
-import { ChevronRight, Edit2, Save, X, Building2, Trash2 } from 'lucide-react';
+import { ChevronRight, Edit2, Save, Trash2 } from 'lucide-react';
 import { Language, useTranslation } from '../../../../types/language';
 import { Customer } from '../../../../types/customers';
-import { Folder, MapPin, User } from 'lucide-react';
+import { Folder } from 'lucide-react';
 import { Person } from '../../../../types/people';
 import { updateProject, deleteProject, fetchProjects } from '../../../../services/projects';
 
@@ -43,6 +43,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
         ...project,
         ...editingValues
       });
+      const updatedProjects = await fetchProjects(selectedCustomerId as string);
+      onProjectsChange(updatedProjects);
       setEditingProject(null);
       setEditingValues({});
     } catch (err) {
@@ -54,7 +56,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
     try {
       setError(null);
       await deleteProject(projectId);
-      const updatedProjects = await fetchProjects(selectedCustomerId);
+      const updatedProjects = await fetchProjects(selectedCustomerId as string);
       onProjectsChange(updatedProjects);
       setEditingProject(null);
       setEditingValues({});
@@ -64,6 +66,11 @@ const ProjectList: React.FC<ProjectListProps> = ({
       console.error('Error deleting project:', message);
     }
   };
+
+  const handleSelectProject = (projectId: string) => {
+    if (editingProject === projectId) return;
+    onSelectProject(projectId);
+  }
 
   return (
     <div className="space-y-4">
@@ -76,7 +83,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         <div key={project.id} className="relative">
           <table
             className="w-full border-collapse rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
-            onClick={() => onSelectProject(project.id)}
+            onClick={() => handleSelectProject(project.id)}
           >
             <thead>
               <tr>

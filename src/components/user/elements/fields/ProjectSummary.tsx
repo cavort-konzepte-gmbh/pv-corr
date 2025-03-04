@@ -18,6 +18,7 @@ interface ProjectSummaryProps {
   onProjectsChange: (projects: Project[]) => void;
   isExpanded?: boolean;
   onToggle?: () => void;
+  selectedCustomerId: string | null;
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
@@ -29,7 +30,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   savedPeople,
   onProjectsChange,
   isExpanded = true,
-  onToggle
+  onToggle,
+  selectedCustomerId
 }) => {
   const translation = useTranslation(currentLanguage);
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
@@ -154,7 +156,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               {isEditing ? (
                 <select
                   value={editValues.typeProject}
-                  onChange={(e) => setEditingValues({ ...editValues, typeProject: e.target.value })}
+                  onChange={(e) => setEditValues({ ...editValues, typeProject: e.target.value })}
                   className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="field">{translation("project.type.field")}</option>

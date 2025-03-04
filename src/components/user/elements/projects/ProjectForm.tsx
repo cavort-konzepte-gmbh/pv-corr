@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react';
 import { createProject } from '../../../../services/projects';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
+import { Project } from '../../../../types/projects';
 
 interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
@@ -65,7 +66,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       });
 
       // Update projects list with new project
-      const updatedProjects = await fetchProjects(selectedCustomerId);
+      const updatedProjects = await fetchProjects(selectedCustomerId as string);
       onProjectsChange(updatedProjects);
 
       setShowForm(false);

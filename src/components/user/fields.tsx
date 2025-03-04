@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { Project, Field } from '../../types/projects';
+import { Project } from '../../types/projects';
 import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectSummary from './elements/fields/ProjectSummary';
 import FieldList from './elements/fields/FieldList';
-import FieldForm from './elements/fields/FieldForm';
 
 interface FieldsProps {
   currentTheme: Theme;
@@ -18,18 +17,19 @@ interface FieldsProps {
   onSelectField: (projectId: string, fieldId: string) => void;
   people: Person[];
   companies: Company[];
+  selectedCustomerId: string | null
 }
 
 const Fields: React.FC<FieldsProps> = ({
   currentTheme,
   projects,
   selectedProjectId,
-  selectedField,
   onSelectField,
   people,
   companies,
   onProjectsChange,
-  currentLanguage
+  currentLanguage,
+  selectedCustomerId
 }) => {
   const translation = useTranslation(currentLanguage);
   const selectedProject = selectedProjectId 
@@ -55,9 +55,9 @@ const Fields: React.FC<FieldsProps> = ({
         company={company}
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
-        currentLanguage={currentLanguage}
         savedPeople={people}
         onProjectsChange={onProjectsChange}
+        selectedCustomerId={selectedCustomerId}
       />
 
       <FieldList
@@ -67,7 +67,7 @@ const Fields: React.FC<FieldsProps> = ({
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}
         selectedProjectId={selectedProject.id}
-        selectedProjectId={selectedProject.id}
+        selectedCustomerId={selectedCustomerId}
       />
     </div>
   );
