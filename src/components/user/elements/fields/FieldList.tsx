@@ -314,7 +314,6 @@ const FieldList: React.FC<FieldListProps> = ({
                       if (editingId === field.id) {
                         handleSave(field);
                       } else {
-                        console.log("Setting editing ID:", field);
                         setEditingId(field.id);
                         setEditingValues({
                           name: field.name,
