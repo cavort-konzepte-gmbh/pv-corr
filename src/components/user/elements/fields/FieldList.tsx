@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Field, Project } from '../../../../types/projects';
-import { ChevronRight, Edit2, X, MoreVertical, Save } from 'lucide-react';
+import { ChevronRight, Edit2, X, MoreVertical, Save, Plus } from 'lucide-react';
 import { googleMaps } from "../../../../utils/google-maps";
 import { deleteField, updateField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';

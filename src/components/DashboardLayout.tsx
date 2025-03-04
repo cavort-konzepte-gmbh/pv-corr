@@ -93,7 +93,6 @@ const DashboardLayout = () => {
         .eq('id', projectId);
 
       if (error) throw error;
-        console.log('Project moved successfully' , selectedCustomerId);
       // Refresh projects list
       const updatedProjects = await fetchProjects(selectedCustomerId);
 
@@ -131,7 +130,7 @@ const DashboardLayout = () => {
         setCustomers(fetchedCustomers);
 
         // Load uncategorized projects
-        const uncategorizedProjects = await fetchProjects(selectedCustomerId);
+        const uncategorizedProjects = await fetchProjects();
         setProjects(uncategorizedProjects);
       } catch (error) {
         console.error('Error loading initial data:', error);
