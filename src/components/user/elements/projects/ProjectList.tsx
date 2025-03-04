@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
-import { Customer } from '../../../../types/customers';
-import { Folder, MapPin, ChevronRight, Edit2, Save, X, User } from 'lucide-react';
+import { ChevronRight, Edit2, Save, X, Building2, Trash2 } from 'lucide-react';
 import { Language, useTranslation } from '../../../../types/language';
+import { Customer } from '../../../../types/customers';
+import { Folder, MapPin, User } from 'lucide-react';
 import { Person } from '../../../../types/people';
-import { updateProject } from '../../../../services/projects';
+import { updateProject, deleteProject, fetchProjects } from '../../../../services/projects';
 
 interface ProjectListProps {
   currentTheme: Theme;
@@ -16,6 +17,7 @@ interface ProjectListProps {
   onMoveProject: (projectId: string, customerId: string | null) => void;
   onSelectProject: (projectId: string) => void;
   currentLanguage: Language;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({
@@ -26,12 +28,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
   selectedCustomerId,
   onMoveProject,
   onSelectProject,
-  currentLanguage
+  currentLanguage,
+  onProjectsChange
 }) => {
   const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null);
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, any>>({});
   const translation = useTranslation(currentLanguage);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSaveProject = async (project: Project) => {
     try {
@@ -46,8 +50,28 @@ const ProjectList: React.FC<ProjectListProps> = ({
     }
   };
 
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      setError(null);
+      await deleteProject(projectId);
+      const updatedProjects = await fetchProjects(selectedCustomerId);
+      onProjectsChange(updatedProjects);
+      setEditingProject(null);
+      setEditingValues({});
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete project';
+      setError(message);
+      console.error('Error deleting project:', message);
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+          {error}
+        </div>
+      )}
       {projects.map(project => (
         <div key={project.id} className="relative">
           <table
@@ -90,19 +114,27 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               e.stopPropagation();
                               handleSaveProject(project);
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                           >
                             <Save size={14} />
                           </button>
                           <button
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation();
-                              setEditingProject(null);
-                              setEditingValues({});
+                              handleDeleteProject(project.id);
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
-                            <X size={14} />
+                            <Trash2 size={14} />
+                          </button>
+                          <button
+                            onClick={e => {
+                              e.stopPropagation();
+                              setShowMoveMenu(showMoveMenu === project.id ? null : project.id);
+                            }}
+                            className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"
+                          >
+                            Move
                           </button>
                         </>
                       ) : (
@@ -120,17 +152,6 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
                           <Edit2 size={14} />
-                        </button>
-                      )}
-                      {editingProject === project.id && (
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            setShowMoveMenu(showMoveMenu === project.id ? null : project.id);
-                          }}
-                          className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"
-                        >
-                          Move
                         </button>
                       )}
                       <ChevronRight className="text-secondary" size={16} />

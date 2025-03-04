@@ -4,21 +4,25 @@ import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
 import { Plus } from 'lucide-react';
 import { createProject } from '../../../../services/projects';
-import { generateHiddenId } from '../../../../utils/generateHiddenId';
+import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
 
-interface ProjectFormProps {
+interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
   savedPeople: Person[];
   savedCompanies: Company[];
+  onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language
+  selectedCustomerId: string | null;
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({
   currentTheme,
   savedPeople,
   savedCompanies,
-  currentLanguage
+  currentLanguage,
+  selectedCustomerId,
+  onProjectsChange
 }) => {
   const [showForm, setShowForm] = useState(false);
   const [projectName, setProjectName] = useState('');
@@ -29,6 +33,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
   const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
   const [error, setError] = useState<string | null>(null);
+  const [createDefaultField, setCreateDefaultField] = useState(true);
+  const [defaultFieldName, setDefaultFieldName] = useState('Field 1');
+  const [createDefaultZone, setCreateDefaultZone] = useState(true);
+  const [defaultZoneName, setDefaultZoneName] = useState('Zone 1');
   const translation = useTranslation(currentLanguage)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,16 +47,26 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     }
 
     try {
-      await createProject({
-        name: projectName,
-        hiddenId: generateHiddenId(),
-        clientRef: clientRef || undefined,
-        latitude: latitude || undefined,
-        longitude: longitude || undefined,
-        imageUrl: imageUrl || undefined,
-        managerId: selectedManagerId || undefined,
-        typeProject
+      setError(null);
+      const newProject = await createProject({
+        name: projectName.trim(),
+        clientRef: clientRef.trim() || undefined,
+        customerId: selectedCustomerId,
+        latitude: latitude.trim() || undefined,
+        longitude: longitude.trim() || undefined,
+        imageUrl: imageUrl.trim() || undefined,
+        managerId: selectedManagerId,
+        typeProject,
+      }, {
+        createDefaultField,
+        defaultFieldName: defaultFieldName.trim(),
+        createDefaultZone,
+        defaultZoneName: defaultZoneName.trim()
       });
+
+      // Update projects list with new project
+      const updatedProjects = await fetchProjects(selectedCustomerId);
+      onProjectsChange(updatedProjects);
 
       setShowForm(false);
       setProjectName('');
@@ -61,7 +79,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       setError(null);
     } catch (err) {
       console.error('Error creating project:', err);
-      setError('Failed to create project');
+      // Keep form open if there's an error
+      setError(err instanceof Error ? err.message : 'Failed to create project');
     }
   };
 
@@ -126,6 +145,60 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   <option value="field">{translation("project.type.field")}</option>
                   <option value="roof">{translation("project.type.roof")}</option>
                 </select>
+              </div>
+
+              <div>
+                <div className="space-y-4 mt-4 p-4 rounded bg-theme">
+                  <h4 className="font-medium text-primary">Default Structure</h4>
+                  
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="createDefaultField"
+                      checked={createDefaultField}
+                      onChange={(e) => setCreateDefaultField(e.target.checked)}
+                      className="rounded border-theme"
+                    />
+                    <label htmlFor="createDefaultField" className="text-sm text-primary">
+                      Create default field
+                    </label>
+                  </div>
+                  
+                  {createDefaultField && (
+                    <div>
+                      <input
+                        type="text"
+                        value={defaultFieldName}
+                        onChange={(e) => setDefaultFieldName(e.target.value)}
+                        className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        placeholder="Field name"
+                      />
+                      
+                      <div className="mt-2 flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="createDefaultZone"
+                          checked={createDefaultZone}
+                          onChange={(e) => setCreateDefaultZone(e.target.checked)}
+                          className="rounded border-theme"
+                        />
+                        <label htmlFor="createDefaultZone" className="text-sm text-primary">
+                          Create default zone
+                        </label>
+                      </div>
+                      
+                      {createDefaultZone && (
+                        <input
+                          type="text"
+                          value={defaultZoneName}
+                          onChange={(e) => setDefaultZoneName(e.target.value)}
+                          className="w-full mt-2 p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          placeholder="Zone name"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>

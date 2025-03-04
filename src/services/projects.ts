@@ -1,26 +1,114 @@
 import { supabase } from '../lib/supabase';
 import { Project } from '../types/projects';
 import { toCase } from '../utils/cases';
+import { generateHiddenId } from '../utils/generateHiddenId';
 
-export const createProject = async (project: Omit<Project, 'id' | 'fields'>) => {
+interface CreateProjectOptions {
+  createDefaultField?: boolean;
+  defaultFieldName?: string;
+  createDefaultZone?: boolean;
+  defaultZoneName?: string;
+}
+
+export const createProject = async (
+  project: Omit<Project, 'id' | 'fields'>, 
+  options: CreateProjectOptions = {
+    createDefaultField: true,
+    defaultFieldName: 'Field 1',
+    createDefaultZone: true,
+    defaultZoneName: 'Zone 1'
+  }
+) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     throw new Error('User not authenticated');
   }
 
-  // Prepare project data with explicit imageUrl
-  const toSnakeCase = toCase<Omit<Project, "id" | "fields">>(project, "snakeCase")
+  try {
+    const { data: projectData, error: projectError } = await supabase
+      .from('projects')
+      .insert([{
+        name: project.name,
+        client_ref: project.clientRef || null,
+        latitude: project.latitude,
+        longitude: project.longitude,
+        image_url: project.imageUrl || null,
+        company_id: project.companyId || null,
+        manager_id: project.managerId || null,
+        type_project: project.typeProject || 'field',
+        customer_id: project.customerId || null,
+        hidden_id: generateHiddenId()
+      }])
+      .select(`
+        *,
+        fields (
+          id,
+          hidden_id,
+          name,
+          latitude,
+          longitude,
+          has_fence,
+          gates (*),
+          zones (
+            id,
+            hidden_id,
+            name,
+            latitude,
+            longitude,
+            datapoints (*)
+          )
+        )
+      `)
+      .single();
 
-  // Use RPC call to handle project creation and user association atomically
-  const { data, error } = await supabase.rpc('create_project_with_owner', {
-    project_data: toSnakeCase
-  });
-  if (error) {
-    console.error('Error creating project:', error);
-    throw error;
+    if (projectError) {
+      console.error('Project creation error:', projectError);
+      throw new Error(projectError.message);
+    }
+    if (!projectData) {
+      throw new Error('No project data returned after creation');
+    }
+
+    // Create default field if requested
+    if (options.createDefaultField) {
+      const { data: fieldData, error: fieldError } = await supabase
+        .from('fields')
+        .insert([{
+          project_id: projectData.id,
+          name: options.defaultFieldName || 'Field 1',
+          hidden_id: generateHiddenId(),
+          has_fence: 'no'
+        }])
+        .select()
+        .single();
+
+      if (fieldError) {
+        console.error('Field creation error:', fieldError);
+        throw new Error(fieldError.message);
+      }
+
+      // Create default zone if requested
+      if (options.createDefaultZone && fieldData) {
+        const { error: zoneError } = await supabase
+          .from('zones')
+          .insert([{
+            field_id: fieldData.id,
+            name: options.defaultZoneName || 'Zone 1',
+            hidden_id: generateHiddenId()
+          }]);
+
+        if (zoneError) {
+          console.error('Zone creation error:', zoneError);
+          throw new Error(zoneError.message);
+        }
+      }
+    }
+
+    return toCase<Project>(projectData, "camelCase");
+  } catch (err) {
+    console.error('Error creating project:', err);
+    throw err instanceof Error ? err : new Error('Failed to create project');
   }
-
-  return toCase<Project>(data, "camelCase");
 };
 
 export const updateProject = async (project: Project) => {
@@ -42,8 +130,7 @@ export const updateProject = async (project: Project) => {
     .from('projects')
     .update(updateData)
     .eq('id', project.id)
-    .select()
-    .single();
+    .select();
 
   if (updateError) {
     console.error('Error updating project:', updateError);
@@ -52,21 +139,10 @@ export const updateProject = async (project: Project) => {
   
   // Fetch the complete project data after update
   const { data: completeProject, error: fetchError } = await supabase
-    .from('user_projects')
+    .from('projects')
     .select(`
-      project:projects (
-        id,
-        hidden_id,
-        name,
-        client_ref,
-        latitude,
-        longitude,
-        image_url,
-        company_id,
-        manager_id,
-        type_project,
-        customer_id,
-        fields:fields (
+      *,
+      fields!inner (
         id,
         hidden_id,
         name,
@@ -74,7 +150,7 @@ export const updateProject = async (project: Project) => {
         longitude,
         has_fence,
         gates:gates (*),
-        zones:zones (
+        zones!inner (
           id,
           hidden_id,
           name,
@@ -82,9 +158,8 @@ export const updateProject = async (project: Project) => {
           longitude,
           datapoints:datapoints (*)
         )
-        )
       )`)
-    .eq('project.id', project.id)
+    .eq('id', project.id)
     .single();
 
   if (fetchError) {
@@ -92,7 +167,7 @@ export const updateProject = async (project: Project) => {
     throw fetchError;
   }
 
-  return toCase<Project>(completeProject.project, "camelCase");
+  return toCase<Project>(completeProject, "camelCase");
 };
 
 export const moveProject = async (projectId: string, customerId: string | null) => {
@@ -109,35 +184,47 @@ export const moveProject = async (projectId: string, customerId: string | null) 
   }
 };
 export const deleteProject = async (projectId: string) => {
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', projectId);
+  try {
+    // Verify project exists before deletion
+    const { data: project, error: fetchError } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('id', projectId)
+      .single();
 
-  if (error) {
-    console.error('Error deleting project:', error);
-    throw error;
+    if (fetchError) {
+      throw new Error('Project not found');
+    }
+
+    if (!project) {
+      throw new Error('Project does not exist');
+    }
+
+    const { error: deleteProjectError } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+
+    if (deleteProjectError) {
+      console.error('Error deleting project:', deleteProjectError);
+      throw new Error(deleteProjectError.message);
+    }
+
+    return true;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to delete project';
+    console.error('Error deleting project:', message);
+    throw new Error(message);
   }
 };
 
 export const fetchProjects = async (customerId?: string): Promise<Project[]> => {
   try {
     const { data, error } = await supabase
-      .from('user_projects')
+      .from('projects')
       .select(`
-        project:projects (
-          id,
-          hidden_id,
-          name,
-          client_ref,
-          latitude,
-          longitude,
-          image_url,
-          company_id,
-          manager_id,
-          type_project,
-          customer_id,
-          fields:fields (
+        *,
+        fields!inner (
           id,
           hidden_id,
           name,
@@ -145,14 +232,13 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           longitude,
           has_fence,
           gates:gates (*),
-          zones:zones (
+          zones!inner (
             id,
             hidden_id,
             name,
             latitude,
             longitude,
             datapoints:datapoints (*)
-          )
           )
         )`)
       .order('created_at', { ascending: true });
@@ -167,7 +253,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     }
     
     // Filter projects based on customerId after fetching
-    const projects = data.map(({ project }) => ({
+    const projects = data.map(project => ({
       id: project.id,
       hiddenId: project.hidden_id,
       name: project.name,

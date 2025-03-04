@@ -6,7 +6,7 @@ import { Person } from '../../types/people';
 import { Company } from '../../types/companies';
 import ProjectList from './elements/projects/ProjectList';
 import ProjectForm from './elements/projects/ProjectForm';
-import { Language } from '../../types/language';
+import { Language, useTranslation } from '../../types/language';
 
 interface ProjectsProps {
   currentTheme: Theme;
@@ -17,7 +17,9 @@ interface ProjectsProps {
   selectedCustomerId: string | null;
   onMoveProject: (projectId: string, customerId: string | null) => void;
   onSelectProject: (projectId: string) => void;
-  currentLanguage: Language
+  currentLanguage: Language;
+  onProjectsChange: (projects: Project[]) => void;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
 const Projects: React.FC<ProjectsProps> = ({
@@ -30,7 +32,10 @@ const Projects: React.FC<ProjectsProps> = ({
   onMoveProject,
   onSelectProject,
   currentLanguage,
+  onProjectsChange
 }) => {
+  const translation = useTranslation(currentLanguage);
+
   return (
     <div className="p-6">
       <ProjectList
@@ -42,12 +47,15 @@ const Projects: React.FC<ProjectsProps> = ({
         onMoveProject={onMoveProject}
         onSelectProject={onSelectProject}
         currentLanguage={currentLanguage}
+        onProjectsChange={onProjectsChange}
       />
       <ProjectForm
         currentTheme={currentTheme}
         savedPeople={savedPeople}
         savedCompanies={savedCompanies}
         currentLanguage={currentLanguage}
+        selectedCustomerId={selectedCustomerId}
+        onProjectsChange={onProjectsChange} 
       />
     </div>
   );
