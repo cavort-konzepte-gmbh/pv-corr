@@ -3,7 +3,7 @@ import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
 import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X } from 'lucide-react';
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { Language, useTranslation } from '../../../../types/language';
 import { updateProject, fetchProjects } from '../../../../services/projects';
@@ -114,15 +114,26 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsEditing(true);
-                      }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    >
-                      <Edit2 size={14} />
-                    </button>
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMediaDialog(project.id);
+                        }}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <Upload size={14} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditing(true);
+                        }}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                    </>
                   )}
                   {isExpanded ? (
                     <ChevronDown className="text-secondary" size={16} />
@@ -222,6 +233,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
           onClose={() => setShowMediaDialog(null)}
           entityId={showMediaDialog}
           currentTheme={currentTheme}
+        />
+      )}
+      {showMediaDialog && (
+        <MediaDialog
+          isOpen={true}
+          onClose={() => setShowMediaDialog(null)}
+          entityId={showMediaDialog}
+          currentTheme={currentTheme}
+          entityType="project"
         />
       )}
     </div>
