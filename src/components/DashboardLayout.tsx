@@ -91,9 +91,10 @@ const DashboardLayout = () => {
         .eq('id', projectId);
 
       if (error) throw error;
-
+        console.log('Project moved successfully' , selectedCustomerId);
       // Refresh projects list
       const updatedProjects = await fetchProjects(selectedCustomerId);
+
       setProjects(updatedProjects);
 
       setError('Project moved successfully');
@@ -128,7 +129,7 @@ const DashboardLayout = () => {
         setCustomers(fetchedCustomers);
 
         // Load uncategorized projects
-        const uncategorizedProjects = await fetchProjects(null);
+        const uncategorizedProjects = await fetchProjects(selectedCustomerId);
         setProjects(uncategorizedProjects);
       } catch (error) {
         console.error('Error loading initial data:', error);
@@ -142,6 +143,8 @@ const DashboardLayout = () => {
       loadInitialData();
     }
   }, [user]);
+
+  
 
   useEffect(() => {
     // Listen for user settings loaded event
