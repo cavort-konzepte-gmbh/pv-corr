@@ -33,7 +33,7 @@ const Zones: React.FC<ZonesProps> = ({
   onProjectsChange,
   currentLanguage,
 }) => {
-  const transition = useTranslation(currentLanguage)
+  const translation = useTranslation(currentLanguage)
 
   const selectedProject = selectedProjectId 
     ? projects.find(p => p.id === selectedProjectId)
@@ -49,7 +49,7 @@ const Zones: React.FC<ZonesProps> = ({
         className="p-6 text-center"
         style={{ color: currentTheme.colors.text.secondary }}
       >
-        {transition("zones.please_select_field")}
+        {translation("zones.please_select_field")}
       </div>
     );
   }
