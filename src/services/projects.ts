@@ -232,6 +232,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           )
         )`)
       .order('created_at', { ascending: true });
+      console.log(data)
 
     if (error) {
       console.error('Error fetching projects:', error);
@@ -281,6 +282,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
             id: dp.id,
             hiddenId: dp.hidden_id,
             sequentialId: dp.sequential_id,
+            name: dp.name,
             type: dp.type,
             values: dp.values || {},
             ratings: dp.ratings || {},

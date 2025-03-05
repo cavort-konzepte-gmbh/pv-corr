@@ -104,7 +104,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
       <div className="flex items-center justify-between p-3 rounded bg-border">
         <div>
           <span className="text-primary">
-            {t('hidden_idssettings.')}
+            {t('settings.hidden_ids')}
           </span>
           <div className="text-xs text-secondary">
             {t('settings.hidden_ids.description')}
