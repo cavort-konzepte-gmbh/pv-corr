@@ -168,11 +168,10 @@ const ZoneList: React.FC<ZoneListProps> = ({
               {translation("zones.location")}
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              {translation("zones.substructure")}
+              Substructure
             </th>
             <th className="p-2 text-left border font-normal border-theme">
-              {translation("zones.foundation")}
-              
+              Foundation
             </th>
             <th className="p-2 text-center border font-normal border-theme">
               {translation("zones.actions")}
@@ -317,10 +316,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   <button
                     onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
                     className="text-sm hover:underline text-accent-primary"
-                  > 
-                  {translation("view.map")}
-
-    
+                  >
+                    View on map
                   </button>
                 ) : (
                   <span className="text-secondary">{translation("general.location_not_set")}</span>

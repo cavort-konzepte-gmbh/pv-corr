@@ -1,16 +1,32 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+type ProgressCallback = (progress: number) => void;
+
 export const useSupabaseMedia = (id: string) => {
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const uploadMedia = async (file: File, entity_id: string , name: string , description : string) => {
+  const uploadMedia = async (
+    file: File, 
+    entity_id: string, 
+    name: string, 
+    description: string,
+    onProgress?: ProgressCallback
+  ) => {
     setLoading(true);
     const filePath = `${id}/${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
+    
+    // Upload with progress tracking
+    const { data, error } = await supabase.storage 
       .from("media")
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        onUploadProgress: (progress) => {
+          const percent = (progress.loaded / progress.total) * 100;
+          onProgress?.(percent);
+        }
+      });
+
     if (error || !data) {
       console.error("Error al subir archivo:", error?.message);
       setLoading(false);

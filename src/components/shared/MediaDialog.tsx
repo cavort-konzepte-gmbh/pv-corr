@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, X, Edit3, Eye } from 'lucide-react';
+import { Upload, X, Edit3, Eye, Image as ImageIcon, FileText, Video } from 'lucide-react';
 import { Theme } from '../../types/theme';
 import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia, deleteMedia } from '../../services/media';
 import { DeleteConfirmDialog } from './FormHandler';
@@ -27,6 +27,9 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
   const [preview, setPreview] = useState<string | null>(null);
   const [newMediaFile, setNewMediaFile] = useState<File | null>(null);
   const [mediaData, setMediaData] = useState<{ url: string, title: string, description: string }[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -57,48 +60,87 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!entityId) return;
 
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      const previewUrl = URL.createObjectURL(file);
-
-      setPreview(previewUrl);
-      setNewMediaFile(file);
-
-      if (fileExtension === 'pdf' || fileExtension === 'mp4' || fileExtension === 'webm' || fileExtension === 'ogg') {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      setSelectedFiles(files);
+      
+      // Create previews for the first file
+      if (files[0]) {
+        const previewUrl = URL.createObjectURL(files[0]);
         setPreview(previewUrl);
-      } else {
-        setPreview(previewUrl);
+        setNewMediaFile(files[0]);
       }
     }
   };
 
-  const handleUpload = async () => {
-    if (newMediaFile && entityId) {
-      if (!newMediaName.trim()) {
-        setError('Media name is required and cannot be empty or whitespace.');
-        return;
+  const handleUpload = async () => { 
+    if (!selectedFiles.length || !entityId) return;
+
+    if (!newMediaName.trim()) {
+      setError('Media name is required');
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const totalFiles = selectedFiles.length;
+      let completedFiles = 0;
+
+      // Upload all selected files
+      for (const file of selectedFiles) {
+        // Initialize progress for this file
+        setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
+
+        // Upload with progress tracking
+        await uploadMedia(
+          file,
+          entityId,
+          `${newMediaName} ${selectedFiles.length > 1 ? `(${selectedFiles.indexOf(file) + 1})` : ''}`,
+          mediaNotes[preview || ''] || '',
+          (progress) => {
+            setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
+          }
+        );
+        // Update completed files count
+        completedFiles++;
+        setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
       }
-      setIsUploading(true);
-      const note = preview ? mediaNotes[preview] || '' : '';
-      await uploadMedia(newMediaFile, entityId, newMediaName, note);
+
+      // Refresh media list
       const data = await fetchMediaUrlsByEntityId(entityId);
       setMediaData(data);
+
+      // Reset states
+      setSelectedFiles([]);
       setPreview(null);
       setNewMediaFile(null);
       setMediaNotes({});
       setNewMediaName('');
-      setError(null);
-      setIsUploading(false);
+      setUploadProgress({});
+    } catch (err) {
+      setError('Failed to upload media');
+      console.error(err);
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleCancelUpload = () => {
     setPreview(null);
     setNewMediaFile(null);
+    setSelectedFiles([]);
     setNewMediaName('');
     setMediaNotes({});
     setError(null);
+  };
+
+  const getMediaIcon = (url: string) => {
+    const ext = url.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return <FileText size={16} />;
+    if (['mp4', 'webm', 'ogg'].includes(ext || '')) return <Video size={16} />;
+    return <ImageIcon size={16} />;
   };
 
   const handleDeleteMedia = async (url: string) => {
@@ -112,56 +154,64 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
     return (
       <div key={index} className="relative p-2 border rounded shadow-sm bg-surface text-white">
         <div className="flex justify-between items-center mb-2">
-          {renamingMedia === media.url ? (
-            <>
+          <div className="flex items-center gap-2">
+            {getMediaIcon(media.url)}
+            {renamingMedia === media.url ? (
               <input
                 type="text"
                 className="w-full p-2 border rounded mb-2 border-theme bg-surface text-white"
                 value={newMediaName || media.title}
                 onChange={(e) => setNewMediaName(e.target.value)}
               />
-              <button
-                className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => handleRename(media.url, newMediaName || media.title, mediaNotes[media.url] || media.description)}
-              >
-                Save
-              </button>
-              <button
-                className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => {
-                  setRenamingMedia(null);
-                  setNewMediaName('');
-                }}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
+            ) : (
               <span className="text-sm font-semibold">{media.title}</span>
-              <button
-                className="p-1 rounded hover:bg-opacity-80 text-white"
-                onClick={() => {
-                  setRenamingMedia(media.url);
-                  setNewMediaName(media.title);
-                }}
-              >
-                <Edit3 size={16} />
-              </button>
-            </>
-          )}
-          <button
-            className="p-1 rounded hover:bg-opacity-80 text-secondary text-white"
-            onClick={() => setFullscreenMedia(media.url)}
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            className="p-1 rounded hover:bg-opacity-80 text-secondary text-white"
-            onClick={() => setDeleteConfirm(media.url)}
-          >
-            <X size={16} />
-          </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {renamingMedia === media.url ? (
+              <>
+                <button
+                  className="p-1 rounded hover:bg-opacity-80 text-white"
+                  onClick={() => handleRename(media.url, newMediaName || media.title, mediaNotes[media.url] || media.description)}
+                >
+                  <Save size={14} />
+                </button>
+                <button
+                  className="p-1 rounded hover:bg-opacity-80 text-white"
+                  onClick={() => {
+                    setRenamingMedia(null);
+                    setNewMediaName('');
+                  }}
+                >
+                  <X size={14} />
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="p-1 rounded hover:bg-opacity-80 text-white"
+                  onClick={() => {
+                    setRenamingMedia(media.url);
+                    setNewMediaName(media.title);
+                  }}
+                >
+                  <Edit3 size={14} />
+                </button>
+                <button
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  onClick={() => setFullscreenMedia(media.url)}
+                >
+                  <Eye size={14} />
+                </button>
+                <button
+                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  onClick={() => setDeleteConfirm(media.url)}
+                >
+                  <X size={14} />
+                </button>
+              </>
+            )}
+          </div>
         </div>
         {renamingMedia === media.url ? (
           <textarea
@@ -194,14 +244,16 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
           Media Management
         </h3>
         
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex justify-end gap-2">
             <label className="cursor-pointer px-4 py-2 rounded text-sm flex items-center gap-x-2 bg-accent-primary text-white">
               <Upload size={16} /> Upload Media
               <input
                 type="file"
+                multiple
                 onChange={handleFileChange}
                 className="hidden"
+                accept="image/*,video/*,.pdf"
               />
             </label>
             <button
@@ -219,6 +271,27 @@ const MediaDialog: React.FC<MediaDialogProps> = ({
           </div>
           {preview && (
             <div className="flex flex-col items-center">
+              <div className="text-sm text-secondary mb-2">
+                Selected {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}
+              </div>
+              {uploading && (
+                <div className="w-full space-y-2 mb-4">
+                  {selectedFiles.map(file => (
+                    <div key={file.name} className="space-y-1">
+                      <div className="flex justify-between text-xs text-secondary">
+                        <span>{file.name}</span>
+                        <span>{Math.round(uploadProgress[file.name] || 0)}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-theme rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-accent-primary transition-all duration-200"
+                          style={{ width: `${uploadProgress[file.name] || 0}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               {newMediaFile?.type === 'application/pdf' ? (
                 <embed 
                   src={preview} 

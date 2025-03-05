@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { Language, useTranslation } from '../../types/language';
-import { FileText, Info, ChevronDown, ChevronRight } from 'lucide-react';
+import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { Datapoint, Project, Zone } from '../../types/projects';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
@@ -27,9 +27,19 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [normParameters, setNormParameters] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
   const navigate = useNavigate();
+  const [navigating, setNavigating] = useState(false);
+
+  useEffect(() => {
+    // Create set of parameter IDs from norm
+    if (selectedNorm?.parameters) {
+      const paramIds = new Set(selectedNorm.parameters.map((p: any) => p.parameter_id));
+      setNormParameters(paramIds);
+    }
+  }, [selectedNorm]);
 
   useEffect(() => {
     const loadParameters = async () => {
@@ -79,10 +89,28 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
     });
   };
 
+  if (loading) {
+    return (
+      <div className="text-center p-4 text-secondary">
+        {t("analysis.loading")}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        {error}
+      </div>
+    );
+  }
+
   // Calculate results for each datapoint
   const results = selectedDatapoints.map(datapoint => {
     // Calculate ratings for each parameter
-    const parameterRatings = Object.entries(datapoint.values).reduce((acc, [paramId, value]) => {      
+    const parameterRatings = Object.entries(datapoint.values)
+      .filter(([paramId]) => normParameters.has(paramId))
+      .reduce((acc, [paramId, value]) => {      
       const parameter = parameterMap[paramId];
       if (!parameter) return acc;
 
@@ -108,46 +136,57 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       return acc;
     }, {} as Record<string, { value: string; rating: number; unit?: string }>);
 
-    // Calculate B0 (sum of Z1-Z10 ratings)
-    const b0 = Object.entries(parameterRatings)
-      .filter(([code]) => /^Z[1-9]|10$/i.test(code))
-      .reduce((sum, [_, { rating }]) => sum + rating, 0);
+    // Calculate B0 and B1 from ratings
+    const outputs: Record<string, number> = { b0: 0, b1: 0 };
+    
+    // Get all ratings for parameters Z1-Z15
+    const zRatings = Object.entries(datapoint.ratings || {}).reduce((acc, [paramId, rating]) => {
+      const param = parameterMap[paramId];
+      if (!param?.short_name) return acc;
+      
+      // Match Z1-Z15 pattern
+      const match = param.short_name.match(/^Z(\d+)$/i);
+      if (!match) return acc;
+      
+      const num = parseInt(match[1]);
+      if (num >= 1 && num <= 15) {
+        acc[num] = rating;
+      }
+      return acc;
+    }, {} as Record<number, number>);
 
-    // Calculate B1 (B0 + sum of Z11-Z15 ratings)
-    const b1 = b0 + Object.entries(parameterRatings)
-      .filter(([code]) => /^Z1[1-5]$/i.test(code))
-      .reduce((sum, [_, { rating }]) => sum + rating, 0);
+    // Calculate B0 (sum of Z1-Z10)
+    outputs.b0 = Object.entries(zRatings).reduce((sum, [num, rating]) => {
+      if (parseInt(num) <= 10) {
+        return sum + rating;
+      }
+      return sum;
+    }, 0);
+
+    // Calculate B1 (B0 + sum of Z11-Z15)
+    outputs.b1 = outputs.b0 + Object.entries(zRatings).reduce((sum, [num, rating]) => {
+      if (parseInt(num) > 10 && parseInt(num) <= 15) {
+        return sum + rating;
+      }
+      return sum;
+    }, 0);
+
+    // Get B0 value for classification
+    const b0 = outputs.b0 || 0;
 
     // Classify results
-    const classification = b0 >= 0 ? { class: 'Ia', stress: 'Sehr niedrig' } :
-                         b0 >= -4 ? { class: 'Ib', stress: 'Niedrig' } :
-                         b0 >= -10 ? { class: 'II', stress: 'Mittel' } :
-                         { class: 'III', stress: 'Hoch' };
+    const classification = b0 >= 0 ? { class: 'Ia', stress: t("analysis.stress.very_low") } :
+                         b0 >= -4 ? { class: 'Ib', stress: t("analysis.stress.low") } :
+                         b0 >= -10 ? { class: 'II', stress: t("analysis.stress.medium") } :
+                         { class: 'III', stress: t("analysis.stress.high") };
 
     return {
       datapoint,
       parameterRatings,
-      b0,
-      b1,
+      outputs,
       classification
     };
   });
-
-  if (loading) {
-    return (
-      <div className="text-center p-4 text-secondary">
-        {t("analysis.loading")}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-        {error}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -156,7 +195,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       </h3>
 
       <div className="space-y-4">
-        {results.map(({ datapoint, parameterRatings, b0, b1, classification }) => (
+        {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
           <div 
             key={datapoint.id}
             className="p-4 rounded-lg border border-theme bg-surface"
@@ -182,12 +221,16 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                <div className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border">
-                  B0: {b0} ({classification.class} - {classification.stress})
-                </div>
-                <div className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border">
-                  B1: {b1}
-                </div>
+                {selectedNorm?.output_config?.map((output: any) => (
+                  <div 
+                    key={output.id}
+                    className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border"
+                    title={output.description}
+                  >
+                    {output.name}: {outputs[output.id] || 0}
+                    {output.id === 'b0' && ` (${classification.class} - ${classification.stress})`}
+                  </div>
+                ))}
               </div>
 
               {expandedDatapoints.has(datapoint.id) && (
@@ -200,7 +243,9 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(parameterRatings).map(([code, { value, rating, unit }]) => (
+                    {Object.entries(parameterRatings)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([code, { value, rating, unit }]) => (
                       <tr key={code} className="border-t border-theme">
                         <td className="p-2 text-primary">{code.toUpperCase()}</td>
                         <td className="p-2 text-primary">
@@ -209,6 +254,13 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                         <td className="p-2 text-primary">{rating}</td>
                       </tr>
                     ))}
+                    <tr className="border-t-2 border-theme">
+                      <td className="p-2 font-bold text-primary">SUM</td>
+                      <td className="p-2 text-primary"></td>
+                      <td className="p-2 font-bold text-primary">
+                        {Object.values(parameterRatings).reduce((sum, { rating }) => sum + rating, 0)}
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               )}
@@ -220,9 +272,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       <div className="flex justify-end mt-6">
         <button
           onClick={() => {
+            if (navigating) return;
+            setNavigating(true);
             // Navigate to output with preview params
-            navigate(`/output?preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+            navigate(`/output?preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`, {
+              replace: true // Use replace to avoid adding to history stack
+            });
           }}
+          disabled={navigating}
           className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
         >
           <FileText size={16} />

@@ -52,21 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   }, [currentLanguage]);
 
   useEffect(() => {
-    const handleLanguageChange = async (event: Event) => {
-      const customEvent = event as CustomEvent<{ language: Language }>;
-      const newLanguage = customEvent.detail.language;
-      const translations = await fetchTranslations(newLanguage);
-      setTranslations(translations);
-    };
-
-    window.addEventListener('languageChange', handleLanguageChange as EventListener);
-
-    return () => {
-      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-    };
-  }, []);
-
-  useEffect(() => {
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       handleSession(session);
