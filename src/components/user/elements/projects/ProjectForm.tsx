@@ -224,7 +224,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-                  placeholder="Enter latitude"
+                  placeholder= "Enter latitude"
                 />
               </div>
 

@@ -274,7 +274,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                       color: currentTheme.colors.text.primary
                     }}
                   >
-                    Move to {customer.name}
+                    {translation('move.to')} {customer.name}
                   </button>
                 ))
               }

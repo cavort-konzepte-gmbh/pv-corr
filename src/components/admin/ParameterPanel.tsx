@@ -116,7 +116,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
+
 
   useEffect(() => {
     const load = async () => {

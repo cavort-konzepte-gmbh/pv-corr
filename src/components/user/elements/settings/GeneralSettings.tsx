@@ -42,6 +42,11 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         throw new Error('Failed to update settings');
       }
 
+      if (key === 'language') {
+        window.dispatchEvent(new CustomEvent('languageChange', { detail: { language: value } }));
+        onLanguageChange(value);
+      }
+
       // Local state will be updated via userSettingsLoaded event
 
     } catch (err) {
@@ -99,7 +104,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
       <div className="flex items-center justify-between p-3 rounded bg-border">
         <div>
           <span className="text-primary">
-            {t('settings.hidden_ids')}
+            {t('hidden_idssettings.')}
           </span>
           <div className="text-xs text-secondary">
             {t('settings.hidden_ids.description')}
