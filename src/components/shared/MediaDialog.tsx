@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, X, Edit3, Eye, Image as ImageIcon, FileText, Video } from 'lucide-react';
+import { Upload, X, Edit3, Eye, Image as ImageIcon, FileText, Video, Save } from 'lucide-react';
 import { Theme } from '../../types/theme';
 import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia, deleteMedia } from '../../services/media';
 import { DeleteConfirmDialog } from './FormHandler';
