@@ -3,6 +3,17 @@ import { Theme } from '../../types/theme';
 import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import { AdminUser, createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
 import { supabaseAdmin } from '../../lib/supabase';
+import { Button } from "@/components/ui/button"
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { DeleteConfirmDialog } from '../shared/FormHandler';
+
+const initialNewUserState = {
+  email: '',
+  password: '',
+  displayName: ''
+}
 
 interface UserManagementProps {
   currentTheme: Theme;
@@ -17,11 +28,8 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>('user');
   const [showNewUserForm, setShowNewUserForm] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: '',
-    password: '',
-    displayName: ''
-  });
+  const [newUser, setNewUser] = useState(initialNewUserState);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -107,7 +115,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
 
       await fetchUsers();
       setShowNewUserForm(false);
-      setNewUser({ email: '', password: '', displayName: '' });
+      setNewUser(initialNewUserState);
     } catch (err) {
       console.error('Error creating user:', err);
       setError(err instanceof Error ? err.message : 'Failed to create user');
@@ -117,6 +125,30 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
   const filteredUsers = users.filter(user => 
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEdit = (user: AdminUser) => {
+    if (loading) return;
+    setEditingUser(user.id);
+    setSelectedRole(user.adminLevel);
+  }
+
+  const handleDelete = (userId: string) => {
+    if (loading) return;
+    handleDeleteUser(userId);
+  }
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setNewUser({
+      ...newUser,
+      [name]: value
+    });
+  }
+
+  const handleCancel = () => {
+    setNewUser(initialNewUserState);
+    setShowNewUserForm(false);
+  }
 
   return (
     <div className="p-8">
@@ -144,24 +176,26 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
         </div>
       )}
 
-      <button
+      <Button
+        className="mb-6"
+        variant="destructive"
         onClick={() => setShowNewUserForm(true)}
-        className="px-4 py-2 mb-6 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
       >
         <Plus size={16} />
         Add New User
-      </button>
+      </Button>
 
-      <div className="flex items-center gap-4 p-4 mb-6 rounded-lg bg-surface">
-        <Search size={20} style={{ color: currentTheme.colors.text.secondary }} />
-        <input
+      <Label className="mb-6 flex items-center gap-x-4 relative">
+        <Search className="text-secondary absolute left-4" size={20} />
+        <Input 
+          className="h-12 indent-10 border-transparent bg-surface"
           type="text"
           placeholder="Search users..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 bg-transparent outline-none text-sm text-primary"
         />
-      </div>
+      </Label>
+      
 
       <div className="rounded-lg overflow-hidden bg-surface">
         {loading && (
@@ -169,115 +203,95 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
             Loading...
           </div>
         )}
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th className="text-left p-4 font-medium text-sm text-secondary">
-                User
-              </th>
-              <th className="text-left p-4 font-medium text-sm text-secondary">
-                Role
-              </th>
-              <th className="text-left p-4 font-medium text-sm text-secondary">
-                Created
-              </th>
-              <th className="text-right p-4 font-medium text-sm text-secondary">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableCaption className="h-8">List of users registered.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>User</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filteredUsers.map(user => (
-              <tr 
-                key={user.id}
-                className="border-theme border-solid"
-              >
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="w-8 h-8 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
-                    >
-                      <User className="text-accent-primary" size={16} />
-                    </div>
-                    <div>
-                      <div className="flex flex-col">
-                        <span className="text-primary">
-                          {user.displayName}
-                        </span>
-                        <span className="text-sm text-secondary">
-                          {user.email}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4">
+              <TableRow key={user.id}>
+                <TableCell className="flex items-center gap-x-4">
+                  <figure 
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+                  >
+                    <User className="text-accent-primary" size={16} />
+                  </figure>
+                  <dl>
+                    <dt className="text-primary">{user.displayName}</dt>
+                    <dd className="text-secondary">{user.email}</dd>
+                  </dl>
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <Shield className="text-accent-primary" size={16} />
-                    <span className="text-sm text-secondary">
-                      {user.adminLevel === 'super_admin' ? 'Super Admin' : 
-                       user.adminLevel === 'admin' ? 'Admin' : 'User'}
+                    <span className="text-secondary">
+                      {user.adminLevel === 'super_admin' 
+                        ? 'Super Admin' 
+                        : user.adminLevel === 'admin' 
+                          ? 'Admin' 
+                          : 'User'
+                      }
                     </span>
                   </div>
-                </td>
-                <td className="p-4 text-sm text-secondary">
+                </TableCell>
+                <TableCell className="text-secondary">
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
-                </td>
-                <td className="p-4 text-right">
+                </TableCell>
+                <TableCell>
                   {editingUser === user.id ? (
                     <div className="flex items-center justify-end gap-2">
-                      <button
+                      <Button
+                        className="text-secondary"
+                        variant="ghost"
                         onClick={() => handleUpdateRole(user.id)}
                         disabled={loading}
-                        className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
-                        style={{ opacity: loading ? 0.5 : 1 }}
                       >
                         <Save size={16} />
-                      </button>
-                      <button
-                        onClick={() => setEditingUser(null)}
+                      </Button>
+                      <Button
+                        className="text-secondary disabled:opacity-50"
+                        variant="ghost"
                         disabled={loading}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                        style={{ opacity: loading ? 0.5 : 1 }}
+                        onClick={() => setEditingUser(null)}
                       >
                         <X size={16} />
-                      </button>
+                      </Button>
                     </div>
                   ) : (
-                   <div className="flex items-center justify-end gap-2">
-                     <button
-                       onClick={() => {
-                         if (loading) return;
-                         setEditingUser(user.id);
-                         setSelectedRole(user.adminLevel);
-                       }}
-                       disabled={loading}
-                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                       style={{ opacity: loading ? 0.5 : 1 }}
-                     >
-                       <Edit2 size={16} />
-                     </button>
-                     {user.adminLevel !== 'super_admin' && (
-                       <button
-                         onClick={() => {
-                           if (loading) return;
-                           handleDeleteUser(user.id);
-                         }}
-                         disabled={loading}
-                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                         style={{ opacity: loading ? 0.5 : 1 }}
-                       >
-                         <Trash2 size={16} />
-                       </button>
-                     )}
-                   </div>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        className="text-secondary disabled:opacity-50"
+                        variant="ghost"
+                        disabled={loading}
+                        onClick={() => handleEdit(user)}
+                      >
+                        <Edit2 size={16} />
+                      </Button>
+                      {user.adminLevel !== 'super_admin' && (
+                        <Button
+                          className="text-accent-primary disabled:opacity-50"
+                          variant="ghost"
+                          disabled={loading}
+                          //onClick={() => handleDelete(user.id)}
+                          onClick={() => setIsDeleting(true)}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      )}
+                    </div>
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>        
       </div>
 
       {showNewUserForm && (
@@ -289,62 +303,52 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
             </h3>
             
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Email Address
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
+              <Label className="block text-secondary">
+                Email Address
+                <span className="text-red-500 ml-1">*</span>
+                <Input 
+                  className="mt-1.5 border-theme border-solid"
                   type="email"
+                  name="email"
                   value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
-                  required
+                  onChange={handleChange}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Password
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
+              </Label>
+              <Label className="block text-secondary">
+                Password
+                <span className="text-red-500 ml-1">*</span>
+                <Input 
+                  className="mt-1.5 border-theme border-solid"
                   type="password"
+                  name="password"
                   value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
-                  required
+                  onChange={handleChange}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Display Name
-                </label>
-                <input
+              </Label>
+              <Label className="block text-secondary">
+                Display Name
+                <Input 
+                  className="mt-1.5 border-theme border-solid"
                   type="text"
+                  name="displayName"
                   value={newUser.displayName}
-                  onChange={(e) => setNewUser({ ...newUser, displayName: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
+                  onChange={handleChange}
                 />
-              </div>
+              </Label>
 
               <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={() => {
-                    setShowNewUserForm(false);
-                    setNewUser({ email: '', password: '', displayName: '' });
-                  }}
-                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+                <Button
+                  className="text-secondary border-theme border-solid bg-transparent"
+                  onClick={handleCancel}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="destructive"
                   onClick={handleCreateUser}
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                 >
                   Create User
-                </button>
+                </Button>
               </div>
             </div>
           </div>
