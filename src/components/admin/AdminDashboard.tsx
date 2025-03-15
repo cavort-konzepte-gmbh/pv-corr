@@ -8,6 +8,7 @@ import NotificationsPanel from './notifications/NotificationsPanel';
 import TranslationsPanel from './settings/TranslationsPanel';
 import { Language } from '../../types/language';
 import { supabase } from '../../lib/supabase';
+import { Button } from '../ui/button';
 
 interface AdminDashboardProps {
   currentTheme: Theme;
@@ -60,7 +61,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           <h1 className="text-2xl font-bold text-primary">
             Admin Dashboard
           </h1>
-          <button
+          <Button
             onClick={handleSignOut}
             className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors text-primary"
             style={{ 
@@ -69,7 +70,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           >
             <LogOut size={16} />
             Sign Out
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

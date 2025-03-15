@@ -4,6 +4,10 @@ import { Theme } from "../../types/theme";
 import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from "../../services/parameters";
 import { Edit2, Plus, Save, X, Code, Check } from 'lucide-react';
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { supabase } from "@/lib/supabase";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 
 interface RatingLogicDialogProps {
   isOpen: boolean;
@@ -50,9 +54,9 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm mb-2 text-secondary">
+            <Label className="block text-sm mb-2 text-secondary">
               Rating Logic Code
-            </label>
+            </Label>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -62,9 +66,9 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm mb-2 text-secondary">
+            <Label className="block text-sm mb-2 text-secondary">
               Test Cases (JSON Array)
-            </label>
+            </Label>
             <textarea
               value={testCases}
               onChange={(e) => setTestCases(e.target.value)}
@@ -80,18 +84,18 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
           )}
 
           <div className="flex justify-end gap-2">
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSave}
               className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
             >
               Save Changes
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -241,49 +245,35 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
             <h3 className="text-lg text-primary">
               Parameters
             </h3>
-            <button
+            <Button
               onClick={handleOpenParameter}
               className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
             >
               <Plus size={14} />
               Add Parameter
-            </button>
+            </Button>
           </div>
-
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left border font-normal border-theme w-16">
-                    #
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Parameter Name
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Short Name
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Unit
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Range Type
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Range Value
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Rating Logic
-                  </th>
-                  <th className="p-2 text-center border font-normal border-theme">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+         <Table>
+         <TableCaption className="h-8">Parameters</TableCaption>
+          <TableHeader>
+            <TableRow>
+            <TableHead>#</TableHead>
+            <TableHead>Parameter Name</TableHead>
+            <TableHead>Short Name</TableHead>
+            <TableHead>Unit</TableHead>
+            <TableHead>Range Type</TableHead>
+            <TableHead>Range Value</TableHead>
+            <TableHead>Rating Logic</TableHead>
+            <TableHead>Actions</TableHead>
+            </TableRow>
+
+          </TableHeader>
+          <TableBody>
+
                 {parameters.map((parameter) => (
-                  <tr key={parameter.id}>
-                    <td className="p-2 border border-theme text-center">
+                  <TableRow key={parameter.id}>
+                    <TableCell className="p-2 border border-theme text-center text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="number"
@@ -297,8 +287,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.orderNumber
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormHandler
                           isEditing={true}
@@ -315,8 +305,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.name
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -328,8 +318,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.shortName || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="unit"
@@ -354,8 +344,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.unit || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="rangeType"
@@ -375,8 +365,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.rangeType
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -388,48 +378,51 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : (
                         parameter.rangeValue || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
-                      <button
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary text-secondary">
+                      <Button
                         onClick={() => setEditingRatingLogic(parameter.id)}
                         className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 text-secondary hover:bg-theme"
+                        variant="ghost"
                       >
                         <Code size={14} />
                         {parameter.rating_logic_code && (
                           <Check size={14} className="text-green-500" />
                         )}
-                      </button>
-                    </td>
-                    <td className="p-2 border border-theme">
+                      </Button>
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Button
                           onClick={() => handleUpdateSaveParameter(parameter)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           {editingParameter === parameter.id ? (
                             <Save size={14} />
                           ) : (
                             <Edit2 size={14} />
                           )}
-                        </button>
+                        </Button>
                         {!editingParameter && (
-                          <button 
+                          <Button 
                             onClick={() => {
                               setDeleteConfirm(parameter.id);
                               setDeleteConfirmName('');
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary" 
+                            variant="ghost"
                           >
                             <X size={14} />
-                          </button>
+                          </Button>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {isNewParameter && (
-                  <tr>
-                    <td className="p-2 border border-theme">
+                  <TableRow>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <FormInput
                         type="number"
                         name="orderNumber"
@@ -439,8 +432,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         min="0"
                         step="0.01"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme">
                       <FormHandler
                         isEditing={true}
                         onSave={handleAddNewParameter}
@@ -455,8 +448,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       ) : null}
                       </FormHandler>
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {isNewParameter ? (
                         <FormInput
                           type="text"
@@ -466,8 +459,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                       ) : null}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {isNewParameter ? (
                         <FormSelect
                           name="unit"
@@ -490,8 +483,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <option value="mA">mA</option>
                         </FormSelect>
                       ) : null}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {isNewParameter ? (
                         <FormSelect
                           value={newParameter.rangeType || ''}
@@ -509,8 +502,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <option value="lessEqual">Less Than or Equal</option>
                         </FormSelect>
                       ) : null}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {isNewParameter ? (
                         <FormInput
                           type="text"
@@ -520,21 +513,21 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         />
                       ) : null}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button onClick={handleAddNewParameter}>
+                        <Button onClick={handleAddNewParameter} variant="ghost">
                           <Save size={14} />
-                        </button>
-                        <button onClick={handleCancelNewParameter}>
+                        </Button>
+                        <Button onClick={handleCancelNewParameter} variant="ghost">
                           <X size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}

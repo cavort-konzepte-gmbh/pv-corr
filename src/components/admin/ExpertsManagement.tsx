@@ -5,6 +5,8 @@ import { ArrowLeft, Plus, Edit2, Save, X } from 'lucide-react';
 import { FormHandler, FormInput } from '../shared/FormHandler';
 import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
 
 interface ExpertsManagementProps {
   currentTheme: Theme;
@@ -160,13 +162,14 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80"
           style={{ color: currentTheme.colors.text.secondary }}
+          variant="ghost"
         >
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <h2 
           className="text-2xl font-bold"
           style={{ color: currentTheme.colors.text.primary }}
@@ -188,7 +191,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
         </div>
       )}
 
-      <button
+      <Button
         onClick={() => setIsNewExpert(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
         style={{ 
@@ -198,25 +201,27 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
       >
         <Plus size={16} />
         Add New Expert
-      </button>
+      </Button>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border-theme text-primary">
-          <thead>
-            <tr>
-              <th className="p-2 text-left border font-normal border-theme">Name</th>
-              <th className="p-2 text-left border font-normal border-theme">Website</th>
-              <th className="p-2 text-left border font-normal border-theme">Email</th>
-              <th className="p-2 text-left border font-normal border-theme">Phone</th>
-              <th className="p-2 text-left border font-normal border-theme">VAT ID</th>
-              <th className="p-2 text-left border font-normal border-theme">Reg. No.</th>
-              <th className="p-2 text-center border font-normal border-theme">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableCaption>Experts</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Website</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>VAT ID</TableHead>
+              <TableHead>Reg. No.</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+
             {experts.map(expert => (
-              <tr key={expert.id}>
-                <td className="p-2 border border-theme">
+              <TableRow key={expert.id}>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormHandler
                       isEditing={true}
@@ -235,8 +240,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.name
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="url"
@@ -247,8 +252,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.website || '-'
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="email"
@@ -259,8 +264,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.email || '-'
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="tel"
@@ -271,8 +276,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.phone || '-'
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="text"
@@ -283,8 +288,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.vat_id || '-'
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="text"
@@ -295,34 +300,36 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   ) : (
                     expert.registration_number || '-'
                   )}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <div className="flex items-center justify-center gap-2">
-                    <button
+                    <Button
                       onClick={() => handleUpdateSaveExpert(expert)}
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      variant="ghost"
                     >
                       {editingExpert === expert.id ? (
                         <Save size={14} />
                       ) : (
                         <Edit2 size={14} />
                       )}
-                    </button>
+                    </Button>
                     {!editingExpert && (
-                      <button
+                      <Button
                         onClick={() => handleDelete(expert.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
             {isNewExpert && (
-              <tr>
-                <td className="p-2 border border-theme">
+              <TableRow>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormHandler
                     isEditing={true}
                     onSave={handleAddNewExpert}
@@ -336,8 +343,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                       placeholder="Enter expert name"
                     />
                   </FormHandler>
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormInput
                     type="url"
                     value={newExpert.website || ''}
@@ -345,8 +352,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Enter website URL"
                   />
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormInput
                     type="email"
                     value={newExpert.email || ''}
@@ -354,8 +361,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Enter email"
                   />
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormInput
                     type="tel"
                     value={newExpert.phone || ''}
@@ -363,8 +370,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Enter phone"
                   />
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormInput
                     type="text"
                     value={newExpert.vat_id || ''}
@@ -372,8 +379,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Enter VAT ID"
                   />
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <FormInput
                     type="text"
                     value={newExpert.registration_number || ''}
@@ -381,21 +388,21 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Enter reg. no."
                   />
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme text-secondary">
                   <div className="flex items-center justify-center gap-2">
-                    <button onClick={handleAddNewExpert}>
+                    <Button onClick={handleAddNewExpert} variant="ghost">
                       <Save size={14} />
-                    </button>
-                    <button onClick={handleCancelNewExpert}>
+                    </Button>
+                    <Button onClick={handleCancelNewExpert} variant="ghost">
                       <X size={14} />
-                    </button>
+                    </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+      </TableBody>
+      </Table>
       </div>
     </div>
   );
