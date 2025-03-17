@@ -3,6 +3,7 @@ import { Theme } from '../../../types/theme';
 import { ArrowLeft, BellRing, AlertTriangle, AlertOctagon, Plus, Edit2, Save, X, Clock } from 'lucide-react';
 import { NotificationDuration, Notification, DURATION_OPTIONS } from '../../../types/security';
 import { createNotification, updateNotification, deleteNotification, getNotificationsByType } from '../../../services/notifications';
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table } from '@/components/ui/table';
 
 interface NotificationsPanelProps {
   currentTheme: Theme;
@@ -231,19 +232,24 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="h-10 px-2 text-left border font-normal border-theme w-1/6">Name</th>
-                  <th className="h-10 px-2 text-left border font-normal border-theme w-2/4">Description</th>
-                  <th className="h-10 px-2 text-left border font-normal border-theme w-1/6">Duration</th>
-                  <th className="h-10 px-2 text-center border font-normal border-theme w-1/6">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableCaption>{selectedType === 'info' ? 'Information' : selectedType === 'warning' ? 'Warnings' : 'Errors'}</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+
+              </TableHeader>
+              <TableBody>
+
+           
+           
                 {isNewRow && (
-                  <tr>
-                    <td className="h-10 px-2 border border-theme">
+                  <TableRow>
+                    <TableCell className="h-10 px-2 border border-theme text-secondary ">
                       <input
                         type="text"
                         value={editingValues.name || ''}
@@ -251,8 +257,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                         className="w-full h-8 px-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                         placeholder="Enter name"
                       />
-                    </td>
-                    <td className="h-10 px-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="h-10 px-2 border border-theme text-secondary">
                       <textarea
                         value={editingValues.description || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, description: e.target.value })}
@@ -272,8 +278,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           target.style.height = `${target.scrollHeight}px`;
                         }}
                       ></textarea>
-                    </td>
-                    <td className="h-10 px-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="h-10 px-2 border border-theme text-secondary">
                       <div className="flex gap-2">
                         <select
                           value={editingValues.duration || 'timed'}
@@ -300,8 +306,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           />
                         )}
                       </div>
-                    </td>
-                    <td className="h-10 px-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="h-10 px-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={handleSave}
@@ -320,14 +326,14 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           <X size={14} />
                         </button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
                 {notifications
                   .filter(n => n.type === selectedType)
                   .map(notification => (
-                    <tr key={notification.id}>
-                      <td className="h-10 px-2 border border-theme">
+                    <TableRow key={notification.id}>
+                      <TableCell className="h-10 px-2 border border-theme text-secondary">
                         {editingId === notification.id ? (
                           <input
                             type="text"
@@ -338,8 +344,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                         ) : (
                           notification.name
                         )}
-                      </td>
-                      <td className="h-10 px-2 border border-theme">
+                      </TableCell>
+                      <TableCell className="h-10 px-2 border border-theme text-secondary">
                         {editingId === notification.id ? (
                           <textarea
                             value={editingValues.description || notification.description}
@@ -359,8 +365,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                             {notification.description}
                           </div>
                         )}
-                      </td>
-                      <td className="h-10 px-2 border border-theme">
+                      </TableCell>
+                      <TableCell className="h-10 px-2 border border-theme text-secondary" >
                         {editingId === notification.id ? (
                           <div className="flex gap-2">
                             <select
@@ -401,8 +407,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                             </span>
                           </div>
                         )}
-                      </td>
-                      <td className="h-10 px-2 border border-theme">
+                      </TableCell>
+                      <TableCell className="h-10 px-2 border border-theme text-secondary">
                         <div className="flex items-center justify-center gap-2">
                           {editingId === notification.id ? (
                             <>
@@ -448,11 +454,11 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                             </>
                           )}
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}

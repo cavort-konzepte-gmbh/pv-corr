@@ -4,6 +4,9 @@ import { Language, useTranslation } from '../../types/language';
 import { supabase } from '../../lib/supabase';
 import { Plus, Edit2, Save, X } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface MaterialsPanelProps {
   currentTheme: Theme;
@@ -178,42 +181,36 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
             <h3 className="text-lg text-primary">
               Materials
             </h3>
-            <button
+            <Button
               onClick={handleOpenMaterial}
               className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
             >
               <Plus size={14} />
               Add Material
-            </button>
+            </Button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Name
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    E-Potential
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Valency
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Molar Mass
-                  </th>
-                  <th className="p-2 text-center border font-normal border-theme">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableCaption>Materials</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>E-Potential</TableHead>
+                  <TableHead>Valency</TableHead>
+                  <TableHead>Molar Mass</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+
+          
+        
                 {materials.map((material) => (
-                  <tr key={material.id}>
-                    <td className="p-2 border border-theme">
+                  <TableRow key={material.id}>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingMaterial === material.id ? (
-                        <input
+                        <Input
                           type="text"
                           name="name"
                           value={editingValues.name || ''}
@@ -223,10 +220,10 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       ) : (
                         material.name
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingMaterial === material.id ? (
-                        <input
+                        <Input
                           type="number"
                           name="e_potential"
                           value={editingValues.e_potential || ''}
@@ -237,10 +234,10 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       ) : (
                         material.e_potential
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingMaterial === material.id ? (
-                        <input
+                        <Input
                           type="number"
                           name="valency"
                           value={editingValues.valency || ''}
@@ -251,10 +248,10 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       ) : (
                         material.valency
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingMaterial === material.id ? (
-                        <input
+                        <Input
                           type="number"
                           name="molar_mass"
                           value={editingValues.molar_mass || ''}
@@ -265,30 +262,31 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       ) : (
                         material.molar_mass
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Button
                           onClick={() => handleUpdateSaveMaterial(material)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           {editingMaterial === material.id ? (
                             <Save size={14} />
                           ) : (
                             <Edit2 size={14} />
                           )}
-                        </button>
-                        <button onClick={() => handleDeleteMaterial(material.id)}>
+                        </Button>
+                        <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
                           <X className="text-secondary" size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {isNewMaterial && (
-                  <tr>
-                    <td className="p-2 border border-theme">
-                      <input
+                  <TableRow>
+                    <TableCell className="p-2 border border-theme text-secondary">
+                      <Input
                         type="text"
                         name="name"
                         value={newMaterial.name || ''}
@@ -296,9 +294,9 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         placeholder="Enter material name"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
-                      <input
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
+                      <Input
                         type="number"
                         name="e_potential"
                         value={newMaterial.e_potential || ''}
@@ -307,9 +305,9 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         placeholder="Enter E-Potential"
                         step="any"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
-                      <input
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
+                      <Input
                         type="number"
                         name="valency"
                         value={newMaterial.valency || ''}
@@ -318,9 +316,9 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         placeholder="Enter Valency"
                         step="any"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
-                      <input
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
+                      <Input
                         type="number"
                         name="molar_mass"
                         value={newMaterial.molar_mass || ''}
@@ -329,27 +327,29 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         placeholder="Enter Molar Mass"
                         step="any"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Button
                           onClick={handleAddNewMaterial}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           <Save size={14} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={handleCancelNewMaterial}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           <X size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
       )}

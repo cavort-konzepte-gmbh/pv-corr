@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save, Link } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Save, Link} from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table} from '../ui/table';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 
 interface SubstructuresManagementProps {
   currentTheme: Theme;
@@ -310,48 +313,34 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border-theme text-primary">
-            <thead>
-              <tr>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Manufacturer
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  System
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Version
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Type
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Link
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Schematic
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Example
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Base Material
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  First Layer
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  Second Layer
-                </th>
-                <th className="p-2 text-center border font-normal border-theme">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+
+          <Table>
+            <TableCaption>Substructures</TableCaption>
+            <TableHeader>
+              <TableRow>
+                 <TableHead>Manufacturer</TableHead>
+                  <TableHead>System</TableHead>
+                  <TableHead>Version</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Link</TableHead>
+                  <TableHead>Schematic</TableHead>
+                  <TableHead>Example</TableHead>
+                  <TableHead>Base Material</TableHead>
+                  <TableHead>First Layer</TableHead>
+                  <TableHead>Second Layer</TableHead>
+                  <TableHead>Actions</TableHead>
+            
+                </TableRow>    
+              </TableHeader> 
+                                     
+            <TableBody>
+       
+
+        
+         
               {substructures.map((substructure) => (
-                <tr key={substructure.id}>
-                  <td className="p-2 border border-theme">
+                <TableRow key={substructure.id}>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={substructure.manufacturer_id}
@@ -367,8 +356,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       manufacturers.find(m => m.id === substructure.manufacturer_id)?.name
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={substructure.system_id}
@@ -387,10 +376,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       systems.find(s => s.id === substructure.system_id)?.name
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary" >
                     {editingSubstructure === substructure.id ? (
-                      <input
+                      <Input
                         type="text"
                         value={editingVersionName}
                         onChange={(e) => setEditingVersionName(e.target.value)}
@@ -399,8 +388,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       versions.find(v => v.id === substructure.version_id)?.name
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell> 
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={editingValues.type || substructure.type}
@@ -413,10 +402,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       substructure.type
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
-                      <input
+                      <Input
                         type="url"
                         value={editingValues.link || substructure.link || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
@@ -435,10 +424,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         </a>
                       )
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
-                      <input
+                      <Input
                         type="url"
                         value={editingValues.schematic || substructure.schematic || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
@@ -448,8 +437,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       substructure.schematic
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <input
                         type="url"
@@ -461,8 +450,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     ) : (
                       substructure.example
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
@@ -478,7 +467,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           ))}
                         </select>
                         <div className="flex gap-2">
-                          <input
+                          <Input
                             type="number"
                             value={editingValues.base_material_thickness || ''}
                             onChange={(e) => setEditingValues({ 
@@ -513,8 +502,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         )}
                       </div>
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
@@ -530,7 +519,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           ))}
                         </select>
                         <div className="flex gap-2">
-                          <input
+                          <Input
                             type="number"
                             value={editingValues.first_layer_thickness || substructure.first_layer_thickness || ''}
                             onChange={(e) => setEditingValues({ 
@@ -565,8 +554,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         )}
                       </div>
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
@@ -582,7 +571,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           ))}
                         </select>
                         <div className="flex gap-2">
-                          <input
+                          <Input
                             type="number"
                             value={editingValues.second_layer_thickness || substructure.second_layer_thickness || ''}
                             onChange={(e) => setEditingValues({ 
@@ -617,10 +606,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         )}
                       </div>
                     )}
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <Button
                         onClick={() => {
                           if (editingSubstructure === substructure.id) {
                             handleSaveSubstructure();
@@ -635,14 +624,15 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           }
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         {editingSubstructure === substructure.id ? (
                           <Save size={14} />
                         ) : (
                           <Edit2 size={14} />
                         )}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           if (editingSubstructure === substructure.id) {
                             setEditingSubstructure(null);
@@ -652,16 +642,17 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           }
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
               {isNewSubstructure && (
-                <tr>
-                  <td className="p-2 border border-theme">
+                <TableRow>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     <select
                       value={selectedManufacturerId}
                       onChange={(e) => {
@@ -678,8 +669,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         </option>
                       ))}
                     </select>
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     <select
                       value={selectedSystemId}
                       onChange={(e) => {
@@ -699,9 +690,9 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         ))
                       }
                     </select>
-                  </td>
-                  <td className="p-2 border border-theme">
-                    <input
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
+                    <Input
                       type="text"
                       value={editingVersionName}
                       onChange={(e) => setEditingVersionName(e.target.value)}
@@ -709,8 +700,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       placeholder="Enter version name"
                       disabled={!selectedSystemId}
                     />
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     <select
                       value={editingValues.type || 'field'}
                       onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
@@ -719,35 +710,35 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <option value="field">Field</option>
                       <option value="roof">Roof</option>
                     </select>
-                  </td>
-                  <td className="p-2 border border-theme">
-                    <input
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
+                    <Input
                       type="url"
                       value={editingValues.link || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder="https://"
                     />
-                  </td>
-                  <td className="p-2 border border-theme">
-                    <input
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
+                    <Input
                       type="url"
                       value={editingValues.schematic || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder="https://"
                     />
-                  </td>
-                  <td className="p-2 border border-theme">
-                    <input
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
+                    <Input
                       type="url"
                       value={editingValues.example || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder="https://"
                     />
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary" >
                     <div className="space-y-2">
                       <select
                         value={editingValues.base_material_id || ''}
@@ -762,7 +753,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         ))}
                       </select>
                       <div className="flex gap-2">
-                        <input
+                        <Input
                           type="number"
                           value={editingValues.base_material_thickness || ''}
                           onChange={(e) => setEditingValues({ 
@@ -787,21 +778,22 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         </select>
                       </div>
                     </div>
-                  </td>
-                  <td className="p-2 border border-theme">
+                  </TableCell>
+                  <TableCell className="p-2 border border-theme text-secondary">
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <Button
                         onClick={handleSaveSubstructure}
                         className={`p-1 rounded hover:bg-opacity-80 ${
                           !selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type
                             ? 'opacity-50 cursor-not-allowed'
                             : ''
                         } text-secondary`}
+                      variant="ghost"
                         disabled={!selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type}
                       >
                         <Save size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           setIsNewSubstructure(false);
                           setSelectedManufacturerId('');
@@ -810,16 +802,17 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           setEditingVersionName('');
                           setEditingValues({});
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary "
+                        variant="ghost"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+               </TableBody>
+               </Table>
         </div>
       </div>
     </div>

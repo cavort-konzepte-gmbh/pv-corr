@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Theme, THEMES } from '../../types/theme';
 import { Palette, Plus, Edit2, X, ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 
 interface ThemeManagementProps {
   currentTheme: Theme;
@@ -113,12 +116,13 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          variant="ghost"
         >
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           Theme Management
         </h2>
@@ -132,13 +136,13 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
         </div>
       )}
 
-      <button
+      <Button
         onClick={handleNewTheme}
         className="mb-6 px-4 py-2 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         Add New Theme
-      </button>
+      </Button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {themes.map(theme => (
@@ -161,19 +165,21 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   onClick={() => handleEditTheme(theme)}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                  variant="ghost"
                 >
                   <Edit2 size={16} />
-                </button>
+                </Button>
                 {theme.id !== currentTheme.id && (
-                  <button
+                  <Button
                     onClick={() => handleDeleteTheme(theme.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    variant="ghost"
                   >
                     <X size={16} />
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -209,10 +215,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   Theme Name
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={themeForm.name}
                   onChange={(e) => setThemeForm({ ...themeForm, name: e.target.value })}
@@ -222,10 +228,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Background Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.background}
                     onChange={(e) => setThemeForm({
@@ -237,10 +243,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Surface Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.surface}
                     onChange={(e) => setThemeForm({
@@ -252,10 +258,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Border Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.border}
                     onChange={(e) => setThemeForm({
@@ -267,10 +273,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Primary Text Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.text.primary}
                     onChange={(e) => setThemeForm({
@@ -285,10 +291,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Secondary Text Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.text.secondary}
                     onChange={(e) => setThemeForm({
@@ -303,10 +309,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Accent Text Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.text.accent}
                     onChange={(e) => setThemeForm({
@@ -321,10 +327,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Primary Accent Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.accent.primary}
                     onChange={(e) => setThemeForm({
@@ -339,10 +345,10 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Hover Accent Color
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="color"
                     value={themeForm.colors.accent.hover}
                     onChange={(e) => setThemeForm({
@@ -358,7 +364,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
               </div>
 
               <div className="flex justify-end gap-2 mt-6">
-                <button
+                <Button
                   onClick={() => {
                     setEditingTheme(null);
                     setShowNewThemeForm(false);
@@ -367,13 +373,13 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleSaveTheme}
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                  
                 >
                   {editingTheme ? 'Save Changes' : 'Create Theme'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
