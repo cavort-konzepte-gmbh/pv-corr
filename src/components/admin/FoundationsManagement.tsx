@@ -3,6 +3,9 @@ import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 
 interface FoundationsManagementProps {
   currentTheme: Theme;
@@ -150,12 +153,13 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
       )}
 
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          variant="ghost"
         >
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           Foundations Management
         </h2>
@@ -171,33 +175,35 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
             <h3 className="text-lg text-primary">
               Foundations
             </h3>
-            <button
+            <Button
               onClick={handleOpenFoundation}
               className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
             >
               <Plus size={14} />
               Add Foundation
-            </button>
+            </Button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Name
-                  </th>
-                  <th className="p-2 text-center border font-normal border-theme">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableCaption>Foundations</TableCaption>
+              <TableHeader>
+                <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Actions</TableHead>
+                </TableRow>
+               
+              </TableHeader>
+              <TableBody>
+
+
+         
+         
                 {foundations.map((foundation) => (
-                  <tr key={foundation.id}>
-                    <td className="p-2 border border-theme">
+                  <TableRow key={foundation.id}>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingFoundation === foundation.id ? (
-                        <input
+                        <Input
                           type="text"
                           name="name"
                           value={editingValues.name || ''}
@@ -207,30 +213,31 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                       ) : (
                         foundation.name
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Button
                           onClick={() => handleUpdateSaveFoundation(foundation)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           {editingFoundation === foundation.id ? (
                             <Save size={14} />
                           ) : (
                             <Edit2 size={14} />
                           )}
-                        </button>
-                        <button onClick={() => handleDeleteFoundation(foundation.id)}>
+                        </Button>
+                        <Button onClick={() => handleDeleteFoundation(foundation.id)} variant="ghost">
                           <X className="text-secondary" size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {isNewFoundation && (
-                  <tr>
-                    <td className="p-2 border border-theme">
-                      <input
+                  <TableRow>
+                    <TableCell className="p-2 border border-theme text-secondary">
+                      <Input
                         type="text"
                         name="name"
                         value={newFoundation.name || ''}
@@ -238,21 +245,22 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                         className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         placeholder="Enter foundation name"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button onClick={handleAddNewFoundation}>
+                        <Button onClick={handleAddNewFoundation} variant="ghost">
                           <Save size={14} />
-                        </button>
-                        <button onClick={handleCancelNewFoundation}>
+                        </Button>
+                        <Button onClick={handleCancelNewFoundation} variant="ghost">
                           <X size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+                 </TableBody>
+
+                 </Table>
           </div>
         </div>
       )}

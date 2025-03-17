@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Save} from 'lucide-react';
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
 import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table} from '../ui/table';
+import { Button } from '../ui/button';
 
 interface NeighboringStructure {
   id: string;
@@ -225,12 +227,13 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
       )}
 
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          variant="ghost"
         >
           <ArrowLeft size={20} />
-        </button>
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           Neighboring Structures Management
         </h2>
@@ -246,43 +249,36 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
             <h3 className="text-lg text-primary">
               Neighboring Structures
             </h3>
-            <button
+            <Button
               onClick={handleOpenNewStructure}
               className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
             >
               <Plus size={14} />
               Add Structure
-            </button>
+            </Button>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Name
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Depth (m)
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Height (m)
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Coating
-                  </th>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    Construction Year
-                  </th>
-                  <th className="p-2 text-center border font-normal border-theme">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+
+            <Table>
+              <TableCaption>Neighboring Structures</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead> 
+                  <TableHead>Depth (m)</TableHead>
+                  <TableHead>Height (m)</TableHead>
+                  <TableHead>Coating</TableHead>
+                  <TableHead>Construction Year</TableHead>
+                  <TableHead>Actions</TableHead>
+
+                </TableRow>
+              </TableHeader>
+               <TableBody>
+
+           
                 {structures.map((structure) => (
-                  <tr key={structure.id}>
-                    <td className="p-2 border border-theme">
+                  <TableRow key={structure.id}>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingStructure === structure.id ? (
                         <FormHandler
                           isEditing={true}
@@ -301,8 +297,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       ) : (
                         structure.name
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingStructure === structure.id ? (
                         <FormInput
                           type="number"
@@ -316,8 +312,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       ) : (
                         structure.depth || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingStructure === structure.id ? (
                         <FormInput
                           type="number"
@@ -331,8 +327,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       ) : (
                         structure.height || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingStructure === structure.id ? (
                         <div className="flex gap-2">
                           <FormSelect
@@ -377,8 +373,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           </div>
                         ) : '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       {editingStructure === structure.id ? (
                         <FormInput
                           type="number"
@@ -392,12 +388,13 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       ) : (
                         structure.construction_year || '-'
                       )}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button
+                        <Button
                           onClick={() => handleUpdateSaveStructure(structure)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          variant="ghost"
                         >
                           {editingStructure === structure.id ? (
                             <Save size={14} />
@@ -408,25 +405,26 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               <Edit2 size={14} />
                             )
                           )}
-                        </button>
+                        </Button>
                         {!editingStructure && (
-                          <button 
+                          <Button 
                             onClick={() => {
                               setDeleteConfirm(structure.id);
                               setDeleteConfirmName('');
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            variant="ghost"
                           >
                             <X size={14} />
-                          </button>
+                          </Button>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
                 {isNewStructure && (
-                  <tr>
-                    <td className="p-2 border border-theme">
+                  <TableRow>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <FormHandler
                         isEditing={true}
                         onSave={handleAddNewStructure}
@@ -440,8 +438,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         placeholder="Enter structure name"
                       />
                       </FormHandler>
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <FormInput
                         type="number"
                         value={newStructure.depth || ''}
@@ -451,8 +449,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         step="0.1"
                         placeholder="Enter depth"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <FormInput
                         type="number"
                         value={newStructure.height || ''}
@@ -462,8 +460,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         step="0.1"
                         placeholder="Enter height"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex gap-2">
                         <FormSelect
                           value={newStructure.coating_material_id || ''}
@@ -495,8 +493,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           <option value="μm">μm</option>
                         </FormSelect>
                       </div>
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <FormInput
                         type="number"
                         value={newStructure.construction_year || ''}
@@ -506,21 +504,21 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         max={new Date().getFullYear()}
                         placeholder="Enter year"
                       />
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
-                        <button onClick={handleAddNewStructure}>
+                        <Button onClick={handleAddNewStructure} variant="ghost">
                           <Save size={14} />
-                        </button>
-                        <button onClick={handleCancelNewStructure}>
+                        </Button>
+                        <Button onClick={handleCancelNewStructure} variant="ghost">
                           <X size={14} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
+                </TableBody>
+            </Table>
           </div>
         </div>
       )}

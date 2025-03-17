@@ -5,6 +5,9 @@ import { supabase } from '../../lib/supabase';
 import { Plus, Edit2, Save, X, Info, Code } from 'lucide-react';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 import { Parameter } from '../../types/parameters';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 
 interface OutputConfig {
   id: string;
@@ -63,19 +66,19 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
           {outputs.map(output => (
             <div key={output.id} className="p-4 rounded border border-theme">
               <div className="flex items-center justify-between mb-4">
-                <input
+                <Input
                   type="text"
                   value={output.name}
                   onChange={(e) => handleUpdateOutput(output.id, 'name', e.target.value)}
                   className="p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
                   placeholder="Output name (e.g. B0, B1)"
                 />
-                <button
+                <Button
                   onClick={() => handleRemoveOutput(output.id)}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <X size={14} />
-                </button>
+                </Button>
               </div>
               
               <div className="space-y-2">
@@ -96,26 +99,26 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
             </div>
           ))}
 
-          <button
+          <Button
             onClick={handleAddOutput}
             className="w-full py-2 rounded text-sm text-white bg-accent-primary"
           >
             Add Output
-          </button>
+          </Button>
 
           <div className="flex justify-end gap-2 mt-4">
-            <button
+            <Button
               onClick={onClose}
               className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onSave(outputs)}
               className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
             >
               Save Changes
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -340,13 +343,13 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
         </div>
       )}
 
-      <button
+      <Button
         onClick={() => setIsNewNorm(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
         {t("standards.add")}
-      </button>
+      </Button>
 
       {loading ? (
         <div className="text-center p-4 text-secondary">
@@ -362,11 +365,11 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
               
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     {t("standards.name")}
                     <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={newNorm.name || ''}
                     onChange={(e) => handleChangeNorm('name', e.target.value)}
@@ -375,9 +378,9 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Description
-                  </label>
+                  </Label>
                   <textarea
                     value={newNorm.description || ''}
                     onChange={(e) => handleChangeNorm('description', e.target.value)}
@@ -387,10 +390,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-secondary">
                     Version
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={newNorm.version || ''}
                     onChange={(e) => handleChangeNorm('version', e.target.value)}
@@ -399,20 +402,20 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <button
+                  <Button
                     type="button"
                     onClick={handleCancelNewNorm}
                     className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                   >
                     {t("actions.cancel")}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={handleAddNewNorm}
                     className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   >
                     {t("actions.save")}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
@@ -427,13 +430,13 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                     <div>
                       {editingNorm === norm.id ? (
                         <div className="space-y-2">
-                          <input
+                          <Input
                             type="text"
                             value={editingValues.name || ''}
                             onChange={(e) => handleChangeEditingValues('name', e.target.value)}
                             className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                           />
-                          <input
+                          <Input
                             type="text"
                             value={editingValues.version || ''}
                             onChange={(e) => handleChangeEditingValues('version', e.target.value)}
@@ -467,29 +470,32 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-secondary">
-                      <button
+                      <Button
                         onClick={() => handleUpdateSaveNorm(norm)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         {editingNorm === norm.id ? (
                           <Save size={14} />
                         ) : (
                           <Edit2 size={14} />
                         )}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => handleDeleteNorm(norm.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         <X size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setEditingOutputs(norm.id)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                         title="Configure Output Values"
                       >
                         <Code size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -508,7 +514,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                               key={param.id}
                               className="flex items-center gap-2 p-2 rounded border border-theme"
                             >
-                              <input
+                              <Input
                                 type="checkbox"
                                 checked={isSelected}
                                 onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
@@ -567,7 +573,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                 <td className="p-2 text-sm text-secondary">
                                   <div className="flex items-center gap-2">
                                     <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
-                                    <button
+                                    <Button
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         navigator.clipboard.writeText(param.id);
@@ -579,9 +585,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                         }, 1000);
                                       }}
                                       className="text-xs px-2 py-1 rounded hover:bg-theme text-secondary"
+                                      variant="ghost"
                                     >
                                       Copy
-                                    </button>
+                                    </Button>
                                   </div>
                                 </td>
                               </tr>
