@@ -34,19 +34,19 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({
           <div className="flex gap-2 mt-3">
             <div 
               className="flex-1 h-1 rounded"
-              style={{ backgroundColor: theme.colors.background }}
+              //style={{ backgroundColor: theme.colors.background }}
             />
             <div 
               className="flex-1 h-1 rounded"
-              style={{ backgroundColor: theme.colors.surface }}
+              //style={{ backgroundColor: theme.colors.surface }}
             />
             <div 
               className="flex-1 h-1 rounded"
-              style={{ backgroundColor: theme.colors.border }}
+              //style={{ backgroundColor: theme.colors.border }}
             />
             <div 
               className="flex-1 h-1 rounded"
-              style={{ backgroundColor: theme.colors.accent.primary }}
+              //style={{ backgroundColor: theme.colors.accent.primary }}
             />
           </div>
         </button>

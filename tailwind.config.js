@@ -5,25 +5,21 @@ export default {
   theme: {
   	extend: {
   		colors: {
-  			surface: 'var(--surface)',
   			primary: {
-				// --primary variable used by shadcn
-  				DEFAULT: 'var(--text-primary)',
+  				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
-				// --secondary variable used by shadcn
-  				DEFAULT: 'var(--text-secondary)',
+  				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			accent: {
-  				DEFAULT: 'var(--text-accent)',
-  				primary: 'var(--accent-primary)',
-  				hover: 'var(--accent-hover)',
+  				DEFAULT: 'hsl(var(--accent))',
+  				primary: 'hsl(var(--accent-primary))',
+  				hover: 'hsl(var(--accent-hover))',
   				foreground: 'hsl(var(--accent-foreground))'
   			},
-			// --background variable used by shadcn
-  			background: 'var(--background)',
+  			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -38,11 +34,10 @@ export default {
   				foreground: 'hsl(var(--muted-foreground))'
   			},
   			destructive: {
-				// --destructive variable used by shadcn
-  				DEFAULT: 'var(--accent-primary)',
+  				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
-  			border: 'var(--border)',
+  			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			chart: {
@@ -52,16 +47,6 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		},
-  		borderWidth: {
-  			theme: '1px'
-  		},
-  		borderColor: {
-  			theme: 'var(--border)'
-  		},
-  		backgroundColor: {
-  			theme: 'var(--background)',
-  			border: 'var(--border)'
   		},
   		boxShadow: {
   			theme: '0 2px 4px var(--border)'
@@ -73,4 +58,5 @@ export default {
   		}
   	}
   },
+    plugins: [require("tailwindcss-animate")]
 };

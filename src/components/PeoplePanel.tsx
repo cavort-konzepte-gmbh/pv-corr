@@ -275,7 +275,6 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       }}
                       className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
                       style={{ 
-                        backgroundColor: currentTheme.colors.accent.primary,
                         color: 'white'
                       }}
                     >

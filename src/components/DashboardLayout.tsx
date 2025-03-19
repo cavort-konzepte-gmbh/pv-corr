@@ -27,6 +27,7 @@ import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, Layo
 import { FileText } from 'lucide-react';
 import { ButtonSection } from './ui/ButtonSection';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { updateUserSettings } from '@/services/userSettings';
 
 const DashboardLayout = () => {
   const {
@@ -160,7 +161,8 @@ const DashboardLayout = () => {
       setShowHiddenIds(!!metadata.show_hidden_ids);
       
       // Update theme
-      const theme = THEMES.find(t => t.id === (metadata.theme_id || 'ferra'));
+      const theme = THEMES.find(t => t.id === (metadata.theme_id || 'default-theme'));
+      console.log("Themes: ", THEMES, ", selected: ", theme, ", metadata: ", metadata);
       if (theme) {
         setCurrentTheme(theme);
         document.documentElement.setAttribute('data-theme', theme.id);
@@ -173,9 +175,11 @@ const DashboardLayout = () => {
     };
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', currentTheme.id);
-  }, [currentTheme]);
+  const handleUpdateTheme = async (theme: Theme) => {
+    setCurrentTheme(theme);
+    await updateUserSettings({ theme_id: theme.id });
+    document.documentElement.setAttribute('data-theme', theme.id);
+  }
 
   const renderContent = () => {
     const selectedProject = selectedProjectId 
@@ -374,7 +378,7 @@ const DashboardLayout = () => {
             onLanguageChange={handleLanguageChange}
             onShowHiddenIdsChange={setShowHiddenIds}
             currentTheme={currentTheme}
-            onThemeChange={setCurrentTheme}
+            onThemeChange={handleUpdateTheme}
             onClose={() => setView('projects')}
             savedCompanies={savedCompanies}
             onSaveCompanies={setCompanies}
@@ -400,7 +404,7 @@ const DashboardLayout = () => {
               <>
                 <button
                   onClick={() => setView('projects')}
-                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
+                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-black"
                 >
                   <ArrowLeft size={18} />
                   <span>{t("nav.back")}</span>
