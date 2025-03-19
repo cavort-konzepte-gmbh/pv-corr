@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
 import { Language, LANGUAGES } from '../../../../types/language';
 import { useTranslation } from '../../../../types/language';
 import { updateUserSettings } from '../../../../services/userSettings';
@@ -11,7 +10,8 @@ interface GeneralSettingsProps {
   onDecimalSeparatorChange: (separator: ',' | '.') => void;
   showHiddenIds: boolean;
   onShowHiddenIdsChange: (show: boolean) => void;
-  currentTheme: Theme;
+  currentTheme: any;
+  onThemeChange: (theme: string) => void
 }
 
 const GeneralSettings: React.FC<GeneralSettingsProps> = ({
@@ -21,7 +21,8 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   onDecimalSeparatorChange,
   showHiddenIds,
   onShowHiddenIdsChange,
-  currentTheme
+  currentTheme,
+  onThemeChange
 }) => {
   const t = useTranslation(currentLanguage);
   const [updating, setUpdating] = useState(false);
@@ -50,6 +51,11 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
       setUpdating(false);
     }
   };
+
+  const handleChangeTheme = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onThemeChange(event.target.value)
+    handleSettingChange("theme_id", event.target.value)
+  }
 
   return (
     <div className="space-y-4">
@@ -114,6 +120,23 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         >
           {showHiddenIds ? t('settings.enabled') : t('settings.not_enabled')}
         </button>
+      </div>
+      <div className="p-3 flex items-center justify-between rounded bg-primary">
+        <div className="text-primary-foreground">
+          <span>Theme</span>
+          <span className="text-xs block">Select the theme</span>
+        </div>
+        <select
+          onChange={handleChangeTheme}
+          disabled={updating}
+          className="px-3 py-1 rounded text-sm text-accent-foreground bg-accent"
+          value={currentTheme}
+        >
+          <option value="zinc">Zinc Light</option>
+          <option value="zinc.dark">Zinc Dark</option>
+          <option value="green">Green Light</option>
+          <option value="green.dark">Green Dark</option>
+        </select>
       </div>
     </div>
   );

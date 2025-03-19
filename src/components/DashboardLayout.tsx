@@ -161,11 +161,9 @@ const DashboardLayout = () => {
       setShowHiddenIds(!!metadata.show_hidden_ids);
       
       // Update theme
-      const theme = THEMES.find(t => t.id === (metadata.theme_id || 'default-theme'));
-      console.log("Themes: ", THEMES, ", selected: ", theme, ", metadata: ", metadata);
+      const theme = THEMES.find(t => t === (metadata.theme_id || 'zinc'));
       if (theme) {
         setCurrentTheme(theme);
-        document.documentElement.setAttribute('data-theme', theme.id);
       }
     };
 
@@ -176,9 +174,14 @@ const DashboardLayout = () => {
   }, []);
 
   const handleUpdateTheme = async (theme: Theme) => {
-    setCurrentTheme(theme);
-    await updateUserSettings({ theme_id: theme.id });
-    document.documentElement.setAttribute('data-theme', theme.id);
+    const split = theme.split(".")
+    document.documentElement.setAttribute('data-theme', split[0]);
+    if(split[1]) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+    setCurrentTheme(theme)
   }
 
   const renderContent = () => {
@@ -412,9 +415,6 @@ const DashboardLayout = () => {
                 <div className="h-6 w-px bg-border mx-2" />
                 <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
                   <span>{t("settings.general")}</span>
-                </ButtonSection>
-                <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
-                  <span>{t("settings.theme")}</span>
                 </ButtonSection>
                 <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
                   <span>{t("settings.companies")}</span>
