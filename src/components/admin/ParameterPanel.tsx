@@ -273,7 +273,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
 
                 {parameters.map((parameter) => (
                   <TableRow key={parameter.id}>
-                    <TableCell >
+
+                    <TableCell className="p-2 border border-theme text-center text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="number"
@@ -288,7 +290,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.orderNumber
                       )}
                     </TableCell>
-                    <TableCell >
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormHandler
                           isEditing={true}
@@ -306,7 +310,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.name
                       )}
                     </TableCell>
-                    <TableCell>
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -319,7 +325,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.shortName || '-'
                       )}
                     </TableCell>
-                    <TableCell >
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="unit"
@@ -345,7 +353,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.unit || '-'
                       )}
                     </TableCell>
-                    <TableCell  className="text-primary" >
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="rangeType"
@@ -366,7 +376,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.rangeType
                       )}
                     </TableCell>
-                    <TableCell  className="text-primary" >
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -379,10 +391,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.rangeValue || '-'
                       )}
                     </TableCell>
+
                     <TableCell  className="text-primary" >
                       <Button
                         onClick={() => setEditingRatingLogic(parameter.id)}
                         className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 "
+
                         variant="ghost"
                       >
                         <Code size={14}  />
@@ -391,13 +405,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </Button>
                     </TableCell>
-                    <TableCell  className="text-primary">
+
+                    <TableCell className="p-2 border border-theme text-secondary">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={() => handleUpdateSaveParameter(parameter)}
-                          className="p-1 rounded hover:bg-opacity-80"
+                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           variant="ghost"
-                        > 
+                        >
                           {editingParameter === parameter.id ? (
                             <Save size={14} />
                           ) : (
@@ -410,7 +425,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                               setDeleteConfirm(parameter.id);
                               setDeleteConfirmName('');
                             }}
+
                             className="p-1 rounded hover:bg-opacity-80 " 
+
                             variant="ghost"
                           >
                             <X size={14} />
@@ -422,7 +439,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 ))}
                 {isNewParameter && (
                   <TableRow>
-                    <TableCell className="p-2 border border-theme ">
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       <FormInput
                         type="number"
                         name="orderNumber"
@@ -449,7 +468,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : null}
                       </FormHandler>
                     </TableCell>
-                    <TableCell className="p-2 border border-theme ">
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {isNewParameter ? (
                         <FormInput
                           type="text"
@@ -460,7 +481,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       ) : null}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme ">
+
+                    <TableCell className="p-2 border border-theme text-secondary">
+
                       {isNewParameter ? (
                         <FormSelect
                           name="unit"
@@ -484,7 +507,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </FormSelect>
                       ) : null}
                     </TableCell>
+
                     <TableCell className="p-2 border border-theme ">
+
                       {isNewParameter ? (
                         <FormSelect
                           value={newParameter.rangeType || ''}
@@ -503,7 +528,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </FormSelect>
                       ) : null}
                     </TableCell>
+
                     <TableCell className="p-2 border border-theme ">
+
                       {isNewParameter ? (
                         <FormInput
                           type="text"
@@ -514,7 +541,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       ) : null}
                     </TableCell>
+
                     <TableCell className="p-2 border border-theme ">
+
                       <div className="flex items-center justify-center gap-2">
                         <Button onClick={handleAddNewParameter} variant="ghost">
                           <Save size={14} />
