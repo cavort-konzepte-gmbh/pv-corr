@@ -346,7 +346,7 @@ const DashboardLayout = () => {
             selectedCustomerId={selectedCustomerId}
           />
         ) : (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+          <div className="p-6 text-center" >
             {t("datapoint.please_select_zone")}
           </div>
         );

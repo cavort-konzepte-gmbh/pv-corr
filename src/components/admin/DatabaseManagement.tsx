@@ -45,7 +45,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+       
             >
               <Database className="text-accent-primary" size={20} />
             </div>
@@ -67,7 +67,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+          
             >
               <Table className="text-accent-primary" size={20} />
             </div>
@@ -89,7 +89,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+         
             >
               <ClipboardList className="text-accent-primary" size={20} />
             </div>
@@ -111,7 +111,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+  
             >
               <Ruler className="text-accent-primary" size={20} />
             </div>
@@ -133,7 +133,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+      
             >
               <Flask className="text-accent-primary" size={20} />
             </div>
@@ -155,7 +155,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+     
             >
               <Building2 className="text-accent-primary" size={20} />
             </div>
@@ -173,14 +173,12 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         <button
           onClick={() => setActiveView('experts')}
           className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+      
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
             >
               <GraduationCap className="text-accent-primary" size={20} />
             </div>
@@ -198,14 +196,12 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         <button
           onClick={() => setActiveView('neighboring')}
           className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+   
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+         
             >
               <Building2 className="text-accent-primary" size={20} />
             </div>
@@ -227,7 +223,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
             >
               <Wrench className="text-accent-primary" size={20} />
             </div>
@@ -265,7 +261,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+ 
             >
               Norms Management
             </h3>
@@ -276,7 +272,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+       
             >
               Physical Constants Management
             </h3>
@@ -317,7 +313,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+             
             >
               Foundations Management
             </h3>

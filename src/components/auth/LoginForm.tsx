@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Theme } from '../../types/theme';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 
 interface LoginFormProps {
   currentTheme: Theme;
@@ -56,20 +58,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
           <button
             onClick={() => setLoginType('user')}
             className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-            style={{ 
-              backgroundColor: loginType === 'user' ? currentTheme.colors.accent.primary : 'transparent',
-              color: loginType === 'user' ? 'white' : currentTheme.colors.text.secondary,
-            }}
+        
           >
             User
           </button>
           <button
             onClick={() => setLoginType('admin')}
             className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-            style={{ 
-              backgroundColor: loginType === 'admin' ? currentTheme.colors.accent.primary : 'transparent',
-              color: loginType === 'admin' ? 'white' : currentTheme.colors.text.secondary,
-            }}
+       
           >
             Admin
           </button>
@@ -78,9 +74,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
         {error && (
           <div 
             className="p-4 mb-4 rounded text-sm text-primary"
-            style={{ 
-              backgroundColor: `${currentTheme.colors.accent.primary}20`,
-            }}
+      
           >
             {error}
           </div>
@@ -91,7 +85,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             <label className="block text-sm font-medium mb-2 text-secondary">
               Email
             </label>
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -105,7 +99,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             <label className="block text-sm font-medium mb-2 text-secondary">
               Password
             </label>
-            <input
+            <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -115,13 +109,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full p-2 rounded font-medium transition-opacity disabled:opacity-50 text-sm text-white bg-accent-primary"            
+            className="w-full p-2 rounded font-medium " 
+                       
           >
             {loading ? 'Signing in...' : 'Continue'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

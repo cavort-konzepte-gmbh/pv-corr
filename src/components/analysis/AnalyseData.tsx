@@ -4,6 +4,7 @@ import { Language, useTranslation } from '../../types/language';
 import { Datapoint } from '../../types/projects';
 import { Check, ArrowUpDown } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '../ui/button';
 
 interface AnalyseDataProps {
   currentTheme: Theme;
@@ -61,7 +62,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
           {t("analysis.select_datapoints")}
         </h3>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => handleSort('name')}
             className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${
               sortField === 'name' ? 'text-accent-primary bg-theme' : 'text-secondary'
@@ -69,7 +70,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
           >
             Name
             <ArrowUpDown size={12} />
-          </button>
+          </Button>
           <button
             onClick={() => handleSort('timestamp')}
             className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${
@@ -85,7 +86,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {sortedDatapoints.map(datapoint => {
           return (
-            <button
+            <Button
               key={datapoint.id}
               onClick={() => onToggleDatapoint(datapoint.id)}
               className={`p-2 rounded border transition-all hover:translate-x-1 text-left ${
@@ -104,7 +105,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
                   <Check size={12} className="text-accent-primary" />
                 )}
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>

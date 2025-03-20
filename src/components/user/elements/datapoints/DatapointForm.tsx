@@ -6,6 +6,9 @@ import { Plus, Save, X } from 'lucide-react';
 import { createDatapoint } from '../../../../services/datapoints';
 import { fetchProjects } from '../../../../services/projects';
 import { FormHandler } from '../../../shared/FormHandler';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface DatapointFormProps {
   currentTheme: Theme;
@@ -79,37 +82,36 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
               setValues({});
             }}
           >
-            <table className="w-full border-collapse border-theme text-primary">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left border font-normal border-theme">
-                    {t("datapoint.short_name")}
-                  </th>
+            <Table>
+              <TableCaption></TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>         {t("datapoint.short_name")}</TableHead>
                   {parameters.map(param => (
                     <th key={param.id} className="p-2 text-left border font-normal border-theme">
                       {param.shortName || param.name}
                       {param.unit && <span className="ml-1 text-xs">({param.unit})</span>}
                     </th>
                   ))}
-                  <th className="p-2 text-center border font-normal border-theme w-24">
+                  <TableHead className="w-24 text-center">
                     {t("actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="p-2 border border-theme">
-                    <input
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="p-2 border border-theme">
+                    <Input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder="Enter name"
                     />
-                  </td>
+                  </TableCell>
                   {parameters.map(param => (
-                    <td key={param.id} className="p-2 border border-theme">
-                      <input
+                    <TableCell key={param.id} className="p-2 border border-theme">
+                      <Input
                         type="text"
                         value={values[param.id] || ''}
                         onChange={(e) => setValues(prev => ({
@@ -119,17 +121,17 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                         className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
                         placeholder={`Enter ${param.name}`}
                       />
-                    </td>
+                    </TableCell>
                   ))}
-                  <td className="p-2 border border-theme">
+                  <TableCell className="p-2 border border-theme">
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <Button
                         onClick={handleSubmit}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <Save size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           setIsAdding(false);
                           setName('');
@@ -138,12 +140,13 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </TableCell>
+                </TableRow>
+                </TableBody>
+            </Table>
+                
           </FormHandler>
 
           {error && (
