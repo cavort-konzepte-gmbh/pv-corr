@@ -63,10 +63,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           </h1>
           <Button
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors text-primary"
-            style={{ 
-              backgroundColor: `${currentTheme.colors.accent.primary}20`,
-            }}
+            className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors"
+        
           >
             <LogOut size={16} />
             Sign Out
@@ -82,15 +80,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+               
               >
                 <Users className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-medium text-primary">
+                <h3 className="font-medium ">
                   User Management
                 </h3>
-                <p className="text-sm text-secondary">
+                <p className="text-sm ">
                   Manage user accounts
                 </p>
               </div>
@@ -105,12 +103,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+               
               >
                 <Database className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-medium text-primary">
+                <h3 className="font-medium ">
                   Database
                 </h3>
                 <p className="text-sm text-secondary">
@@ -128,12 +126,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+                
               >
                 <BellRing className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-medium text-primary">
+                <h3 className="font-medium ">
                   Notifications
                 </h3>
                 <p className="text-sm text-secondary">
@@ -151,12 +149,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             <div className="flex items-center gap-4 mb-4">
               <div 
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
               >
                 <Settings className="text-accent-primary" size={20} />
               </div>
               <div>
-                <h3 className="font-medium text-primary">
+                <h3 className="font-medium ">
                   Settings
                 </h3>
                 <p className="text-sm text-secondary">

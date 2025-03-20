@@ -4,6 +4,7 @@ import { Language, useTranslation } from '../../types/language';
 import { Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Button } from '../ui/button';
 
 interface AnalyseNormProps {
   currentTheme: Theme;
@@ -75,7 +76,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {norms.map(norm => (
-          <button
+          <Button
             key={norm.id}
             onClick={() => onSelectNorm(norm.id)}
             className={`p-2 rounded border transition-all hover:translate-x-1 text-left ${
@@ -92,7 +93,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
                 <Check size={12} className="text-accent-primary" />
               )}
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </div>

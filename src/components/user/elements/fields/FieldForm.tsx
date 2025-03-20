@@ -5,6 +5,9 @@ import { createField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
 import { Project } from '../../../../types/projects';
+import { Label } from '@radix-ui/react-label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const initialState = {
   name: '',
@@ -79,7 +82,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
               {translation("field.add_new")}
             </h3>
             <form onSubmit={handleSubmit}>
-              <label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
+              <Label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
                 {translation("field.name")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -89,29 +92,29 @@ const FieldForm: React.FC<FieldFormProps> = ({
                   value={newField.name}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.latitude")}
-                <input
+                <Input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
                   name="latitude"
                   value={newField.latitude}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.longitude")}
-                <input
+                <Input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
                   name="longitude"
                   value={newField.longitude}
                   onChange={handleChange}
                 />
-              </label>
+              </Label>
               <div className="block text-sm mb-1 text-secondary">
-                <label>{translation("field.has_fence")}</label>
+                <Label>{translation("field.has_fence")}</Label>
                 <select
                   name="has_fence"
                   value={newField.has_fence}
@@ -124,19 +127,19 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 </select>
               </div>
               <div className="w-full mt-6 flex items-center justify-end gap-x-2">
-                <button
+                <Button
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                   type="button"
                   onClick={handleReset}
                 >
                   {translation("actions.cancel")}
-                </button>
-                <button
+                </Button>
+                <Button
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   type="submit"
                 >
                   {translation("actions.save")}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

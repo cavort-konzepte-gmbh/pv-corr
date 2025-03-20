@@ -1,6 +1,7 @@
 import React from 'react';
 import { Theme } from '../../types/theme';
 import { Zap, BaselineIcon as PipelineIcon, Train, Cylinder, Radio, ShieldAlert } from 'lucide-react';
+import { Button } from '../ui/button';
 
 interface LandingPageProps {
   currentTheme: Theme;
@@ -105,12 +106,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) =
           </div>
         </div>
 
-        <button
+        <Button
           onClick={onContinue}
           className="px-8 py-3 rounded-lg font-medium text-lg transition-all hover:translate-y-[-2px] text-white bg-accent-primary"          
         >
           Continue to Login
-        </button>
+        </Button>
       </div>
     </div>
   );

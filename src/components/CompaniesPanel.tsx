@@ -286,8 +286,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                         onCreateCustomer(company.id, company.name);
                       }}
                       className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                      style={{ 
-                        backgroundColor: currentTheme.colors.accent.primary,
+                      style={{                        
                         color: 'white'
                       }}
                     >

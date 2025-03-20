@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
 // Create regular client with anon key for normal operations
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    debug: import.meta.env.DEV
+    //debug: import.meta.env.DEV
   }
 });
 

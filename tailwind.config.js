@@ -53,6 +53,7 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+
   		borderWidth: {
   			theme: '1px'
   		},
@@ -63,6 +64,7 @@ export default {
   			theme: 'var(--background)',
   			border: 'var(--border)'
   		},
+
   		boxShadow: {
   			theme: '0 2px 4px var(--border)'
   		},
@@ -73,4 +75,5 @@ export default {
   		}
   	}
   },
+
 };

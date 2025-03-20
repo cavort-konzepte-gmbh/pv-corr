@@ -70,7 +70,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+    
             >
               <Database className="text-accent-primary" size={24} />
             </div>
@@ -89,7 +89,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+     
             >
               <Users className="text-accent-primary" size={24} />
             </div>
@@ -111,7 +111,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
             >
               <HardDrive className="text-accent-primary" size={24} />
             </div>
