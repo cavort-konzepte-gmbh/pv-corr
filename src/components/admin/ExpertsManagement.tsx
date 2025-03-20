@@ -172,7 +172,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
         </Button>
         <h2 
           className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
+   
         >
           Experts Management
         </h2>
@@ -181,11 +181,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
       {error && (
         <div 
           className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
+     
         >
           {error}
         </div>
@@ -195,7 +191,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
         onClick={() => setIsNewExpert(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
         style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
+
           color: 'white'
         }}
       >

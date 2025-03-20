@@ -187,19 +187,19 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
             <div className="flex gap-2">
               <div 
                 className="flex-1 h-2 rounded bg-theme"
-                style={{ backgroundColor: theme.colors.background }}
+    
               />
               <div 
                 className="flex-1 h-2 rounded"
-                style={{ backgroundColor: theme.colors.surface }}
+       
               />
               <div 
                 className="flex-1 h-2 rounded"
-                style={{ backgroundColor: theme.colors.border }}
+     
               />
               <div 
                 className="flex-1 h-2 rounded"
-                style={{ backgroundColor: theme.colors.accent.primary }}
+ 
               />
             </div>
           </div>

@@ -219,7 +219,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                 <TableCell className="flex items-center gap-x-4">
                   <figure 
                     className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+           
                   >
                     <User className="text-accent-primary" size={16} />
                   </figure>

@@ -5,6 +5,9 @@ import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { Language, useTranslation } from '../../../../types/language';
 import { updateZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface ZoneSummaryProps {
   zone: Zone;
@@ -41,14 +44,14 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
 
   return (
     <div className="mb-8">
-      <table className="w-full border-collapse rounded-lg border transition-all text-primary border-theme bg-surface">
-        <thead>
-          <tr>
-            <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}> 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
-                    <input
+                    <Input
                       type="text"
                       value={editValues.name}
                       onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
@@ -67,7 +70,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   {isEditing ? (
                     <>
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSave();
@@ -75,8 +78,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <Save size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsEditing(false);
@@ -84,10 +87,10 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </>
                   ) : (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsEditing(true);
@@ -95,7 +98,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
                       <Edit2 size={14} />
-                    </button>
+                    </Button>
                   )}
                   {isExpanded ? (
                     <ChevronDown className="text-secondary" size={16} />
@@ -104,26 +107,26 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                   )}
                 </div>
               </div>
-            </th>
-          </tr>
-        </thead>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
         {isExpanded && (
-          <tbody>
-            <tr>
-              <td className="p-2 border-r border-theme w-1/6 text-secondary">
+          <TableBody>
+            <TableRow>
+              <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
                 {translation("zones.location")}
-              </td>
-              <td className="p-2 border-theme">
+              </TableCell>
+              <TableCell className="p-2 border-theme">
                 {isEditing ? (
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={editValues.latitude}
                       onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
                       className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder={translation("project.latitude")}
                     />
-                    <input
+                    <Input
                       type="text"
                       value={editValues.longitude}
                       onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
@@ -134,21 +137,21 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                 ) : zone.latitude && zone.longitude ? (
                   <div className="flex items-center justify-between">
                     <span>{zone.latitude}, {zone.longitude}</span>
-                    <button
+                    <Button
                       onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
                       className="text-sm hover:underline text-accent-primary"
                     >
                       {translation("general.view_on_map")}
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <span className="text-secondary">{translation("general.location_not_set")}</span>
                 )}
-              </td>
-            </tr>
-          </tbody>
+              </TableCell>
+            </TableRow>
+          </TableBody>
         )}
-      </table>
+      </Table>
     </div>
   );
 };

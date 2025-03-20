@@ -3,6 +3,8 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { updateField } from "../../../../services/fields";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
+import { Label } from "@radix-ui/react-label";
+import { Button } from "@/components/ui/button";
 
 interface EditFieldProps {
   field: {
@@ -60,7 +62,7 @@ export const EditField = ({
         </h3>
         <form onSubmit={handleSubmit}>
           {!isEditingCoordinates && (
-            <label
+            <Label
               className="block text-sm mb-1 text-secondary"
               htmlFor="new-field"
             >
@@ -73,9 +75,9 @@ export const EditField = ({
                 value={fields.name}
                 onChange={handleChange}
               />
-            </label>
+            </Label>
           )}
-          <label className="block text-sm mb-1 text-secondary">
+          <Label className="block text-sm mb-1 text-secondary">
             {translation("project.latitude")}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -84,8 +86,8 @@ export const EditField = ({
               value={fields.latitude}
               onChange={handleChange}
             />
-          </label>
-          <label className="block text-sm mb-1 text-secondary">
+          </Label>
+          <Label className="block text-sm mb-1 text-secondary">
             {translation("project.longitude")}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -94,10 +96,10 @@ export const EditField = ({
               value={fields.longitude}
               onChange={handleChange}
             />
-          </label>
+          </Label>
           {!isEditingCoordinates && (
             <div className="block text-sm mb-1 text-secondary">
-              <label>{translation("field.has_fence")}</label>
+              <Label>{translation("field.has_fence")}</Label>
               <select
                 name="has_fence"
                 value={fields.has_fence}
@@ -110,19 +112,19 @@ export const EditField = ({
             </div>
           )}
           <div className="w-full mt-6 flex items-center justify-end gap-x-2">
-            <button
+            <Button
               className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
               type="button"
               onClick={() => setShowForm(false)}
             >
               {translation("actions.cancel")}
-            </button>
-            <button
+            </Button>
+            <Button
               className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
               type="submit"
             >
               {translation("actions.save")}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

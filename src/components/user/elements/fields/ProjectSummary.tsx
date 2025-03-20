@@ -3,10 +3,13 @@ import { Theme } from '../../../../types/theme';
 import { Project } from '../../../../types/projects';
 import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from 'lucide-react';
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload} from 'lucide-react';
 import MediaDialog from '../../../shared/MediaDialog';
 import { Language, useTranslation } from '../../../../types/language';
 import { updateProject, fetchProjects } from '../../../../services/projects';
+import { TableBody, TableCell, TableHead, TableHeader, TableRow , Table} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ProjectSummaryProps {
   project: Project;
@@ -64,10 +67,12 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
 
   return (
     <div className="mb-8">
-      <table className="w-full border-collapse rounded-lg border transition-all text-primary border-theme bg-surface">
-        <thead>
-          <tr>
-            <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={onToggle}>
+      <Table>
+        <TableHeader>
+          <TableRow>
+ 
+
+            <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={onToggle}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Building2 className="text-accent-primary" size={16} />
@@ -96,7 +101,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   {isEditing ? (
                     <>
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleSave();
@@ -104,8 +109,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <Save size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsEditing(false);
@@ -113,11 +118,11 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </>
                   ) : (
                     <>
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowMediaDialog(project.id);
@@ -125,8 +130,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <Upload size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsEditing(true);
@@ -134,7 +139,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <Edit2 size={14} />
-                      </button>
+                      </Button>
                     </>
                   )}
                   {isExpanded ? (
@@ -144,15 +149,16 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                   )}
                 </div>
               </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody className={isExpanded ? '' : 'hidden'}>
-          <tr>
-            <td className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+   
+        <TableBody className={isExpanded ? '' : 'hidden'}>
+          <TableRow>
+            <TableCell className="p-2 border-b border-r border-theme w-1/6 text-secondary">
               {translation("project.type")}
-            </td>
-            <td className="p-2 border-b border-theme">
+            </TableCell>
+            <TableCell className="p-2 border-b border-theme">
               {isEditing ? (
                 <select
                   value={editValues.typeProject}
@@ -165,13 +171,13 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               ) : (
                 translation(project.typeProject === 'field' ? "project.type.field" : "project.type.roof")
               )}
-            </td>
-          </tr>
-          <tr>
-            <td className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+            </TableCell>
+          </TableRow>
+          < TableRow >
+            <TableCell className="p-2 border-b border-r border-theme w-1/6 text-secondary">
               {translation("project.manager")}
-            </td>
-            <td className="p-2 border-b border-theme">
+            </TableCell>
+            <TableCell className="p-2 border-b border-theme">
               {isEditing ? (
                 <select
                   value={editValues.managerId}
@@ -188,23 +194,23 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               ) : (
                 manager ? `${manager.firstName} ${manager.lastName}` : translation("project.manager.not_assigned")
               )}
-            </td>
-          </tr>
-          <tr>
-            <td className="p-2 border-r border-theme w-1/6 text-secondary">
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
               {translation("zones.location")}
-            </td>
-            <td className="p-2 border-theme">
+            </TableCell>
+            <TableCell className="p-2 border-theme">
               {isEditing ? (
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={editValues.latitude}
                     onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
                     className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder={translation("project.latitude")}
                   />
-                  <input
+                  <Input
                     type="text"
                     value={editValues.longitude}
                     onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
@@ -215,28 +221,21 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               ) : project.latitude && project.longitude ? (
                 <div className="flex items-center justify-between">
                   <span>{project.latitude}, {project.longitude}</span>
-                  <button
+                  <Button
                     onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank')}
                     className="text-sm hover:underline text-accent-primary"
                   >
                     {translation("general.view_on_map")}
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <span className="text-secondary">{translation("general.location_not_set")}</span>
               )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      {showMediaDialog && (
-        <MediaDialog
-          isOpen={true}
-          onClose={() => setShowMediaDialog(null)}
-          entityId={showMediaDialog}
-          currentTheme={currentTheme}
-        />
-      )}
+            </TableCell>
+          </  TableRow >
+        </  TableBody >
+      </Table>
+
       {showMediaDialog && (
         <MediaDialog
           isOpen={true}

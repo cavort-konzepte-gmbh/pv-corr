@@ -236,7 +236,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   return (
     <div className="p-6">
       {loading ? (
-        <div className="text-center p-4 text-secondary">
+        <div className="text-center p-4 ">
           {t("datapoint.loading")}
         </div>
       ) : (
@@ -247,7 +247,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
             </h3>
             <Button
               onClick={handleOpenParameter}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+              className="px-3 py-1 rounded text-sm flex items-center gap-2 "
             >
               <Plus size={14} />
               Add Parameter
@@ -273,14 +273,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
 
                 {parameters.map((parameter) => (
                   <TableRow key={parameter.id}>
-                    <TableCell className="p-2 border border-theme text-center text-secondary">
+                    <TableCell >
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="number"
                           name="orderNumber"
                           value={editingValues.orderNumber || '0'}
                           onChange={(e) => handleChangeEditingValues('orderNumber', e.target.value)}
-                          className="w-16 p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+              
                           min="0"
                           step="0.01"
                         />
@@ -288,7 +288,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.orderNumber
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell >
                       {editingParameter === parameter.id ? (
                         <FormHandler
                           isEditing={true}
@@ -306,7 +306,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.name
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell>
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -319,13 +319,13 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.shortName || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell >
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="unit"
                           value={editingValues.unit || ''}
                           onChange={(e) => handleChangeEditingValues('unit', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm border-theme border-solid bg-surface"
                         >
                           <option value="">No unit</option>
                           <option value="Ohm.m">Ohm.m</option>
@@ -345,7 +345,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.unit || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell  className="text-primary" >
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="rangeType"
@@ -366,7 +366,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.rangeType
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell  className="text-primary" >
                       {editingParameter === parameter.id ? (
                         <FormInput
                           type="text"
@@ -379,25 +379,25 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         parameter.rangeValue || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary text-secondary">
+                    <TableCell  className="text-primary" >
                       <Button
                         onClick={() => setEditingRatingLogic(parameter.id)}
-                        className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 text-secondary hover:bg-theme"
+                        className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 "
                         variant="ghost"
                       >
-                        <Code size={14} />
+                        <Code size={14}  />
                         {parameter.rating_logic_code && (
-                          <Check size={14} className="text-green-500" />
+                          <Check size={14} />
                         )}
                       </Button>
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell  className="text-primary">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={() => handleUpdateSaveParameter(parameter)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80"
                           variant="ghost"
-                        >
+                        > 
                           {editingParameter === parameter.id ? (
                             <Save size={14} />
                           ) : (
@@ -410,7 +410,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                               setDeleteConfirm(parameter.id);
                               setDeleteConfirmName('');
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-secondary" 
+                            className="p-1 rounded hover:bg-opacity-80 " 
                             variant="ghost"
                           >
                             <X size={14} />
@@ -422,7 +422,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 ))}
                 {isNewParameter && (
                   <TableRow>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       <FormInput
                         type="number"
                         name="orderNumber"
@@ -449,18 +449,18 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : null}
                       </FormHandler>
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       {isNewParameter ? (
                         <FormInput
                           type="text"
                           name="shortName"
                           value={newParameter.shortName || ''}
                           onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm  border-theme border-solid bg-surface"
                         />
                       ) : null}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       {isNewParameter ? (
                         <FormSelect
                           name="unit"
@@ -484,7 +484,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </FormSelect>
                       ) : null}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       {isNewParameter ? (
                         <FormSelect
                           value={newParameter.rangeType || ''}
@@ -503,7 +503,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </FormSelect>
                       ) : null}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       {isNewParameter ? (
                         <FormInput
                           type="text"
@@ -514,7 +514,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       ) : null}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2 border border-theme ">
                       <div className="flex items-center justify-center gap-2">
                         <Button onClick={handleAddNewParameter} variant="ghost">
                           <Save size={14} />

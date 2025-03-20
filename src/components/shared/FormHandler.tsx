@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useKeyAction } from '../../hooks/useKeyAction';
+import { Input } from '../ui/input';
 
 interface FormHandlerProps {
   children: ReactNode;
@@ -43,7 +44,7 @@ export const FormHandler: React.FC<FormHandlerProps> = ({
 
 export const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => {
   return (
-    <input
+    <Input
       {...props}
       className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${props.className || ''}`}
       onKeyDown={(e) => {
