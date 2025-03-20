@@ -47,7 +47,7 @@ const Zones: React.FC<ZonesProps> = ({
     return (
       <div 
         className="p-6 text-center"
-        style={{ color: currentTheme.colors.text.secondary }}
+        
       >
         {transition("zones.please_select_field")}
       </div>

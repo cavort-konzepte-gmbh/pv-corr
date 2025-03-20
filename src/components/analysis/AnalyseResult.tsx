@@ -5,6 +5,8 @@ import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { Datapoint, Project, Zone } from '../../types/projects';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
 
 interface AnalyseResultProps {
   currentTheme: Theme;
@@ -234,35 +236,46 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
               </div>
 
               {expandedDatapoints.has(datapoint.id) && (
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr>
-                      <th className="text-left p-2 text-secondary">Parameter</th>
-                      <th className="text-left p-2 text-secondary">Value</th>
-                      <th className="text-left p-2 text-secondary">Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table >
+                  <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                      Parameter
+                      </TableHead>
+                      <TableHead>
+                      Value 
+                      </TableHead>
+                      <TableHead>
+                      Rating
+                      </TableHead>
+
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+
+          
                     {Object.entries(parameterRatings)
                       .sort(([a], [b]) => a.localeCompare(b))
                       .map(([code, { value, rating, unit }]) => (
-                      <tr key={code} className="border-t border-theme">
-                        <td className="p-2 text-primary">{code.toUpperCase()}</td>
-                        <td className="p-2 text-primary">
+                      <TableRow key={code} className="border-t border-theme">
+                        <TableCell className="p-2 text-primary">{code.toUpperCase()}</TableCell>
+                        <TableCell className="p-2 text-primary">
                           {value} {unit && <span className="text-secondary">({unit})</span>}
-                        </td>
-                        <td className="p-2 text-primary">{rating}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell className="p-2 text-primary">{rating}</TableCell>
+                      </TableRow>
                     ))}
-                    <tr className="border-t-2 border-theme">
-                      <td className="p-2 font-bold text-primary">SUM</td>
-                      <td className="p-2 text-primary"></td>
-                      <td className="p-2 font-bold text-primary">
+                    <TableRow className="border-t-2 border-theme">
+                      <TableCell className="p-2 font-bold text-primary">SUM</TableCell>
+                      <TableCell className="p-2 text-primary"></TableCell>
+                      <TableCell className="p-2 font-bold text-primary">
                         {Object.values(parameterRatings).reduce((sum, { rating }) => sum + rating, 0)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                      </TableCell>
+                    </TableRow>
+                    </TableBody>
+                </Table>
+         
               )}
             </div>
           </div>
@@ -270,7 +283,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       </div>
 
       <div className="flex justify-end mt-6">
-        <button
+        <Button
           onClick={() => {
             if (navigating) return;
             setNavigating(true);
@@ -284,7 +297,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         >
           <FileText size={16} />
           {t("analysis.generate_report")} ({selectedDatapoints.length} {t("datapoints")})
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -40,10 +40,9 @@ export const useSupabaseMedia = (id: string) => {
       return;
     }
 
-  
     const { data: mediaAssetData, error: mediaAssetError } = await supabase
       .from("media_assets")
-      .insert([{ url: publicUrlData.publicUrl , type: "example" , title: name , description }])
+      .insert([{ url: publicUrlData.publicUrl, type: "example", title: name, description, entity_type: 'datapoint', entity_id }])
       .select()
       .single();
     if (mediaAssetError || !mediaAssetData) {
@@ -51,14 +50,7 @@ export const useSupabaseMedia = (id: string) => {
       setLoading(false);
       return;
     }
-    const { error: mediaLinkError } = await supabase
-      .from("media_links")
-      .insert([{ media_id: mediaAssetData.id, entity_type: 'datapoint' ,entity_id }]);
-    if (mediaLinkError) {
-      console.error("Error al insertar la URL en la tabla media_links:", mediaLinkError.message);
-      setLoading(false);
-      return;
-    }
+
     setMediaUrl(publicUrlData.publicUrl);
     setLoading(false);
   };
@@ -68,26 +60,15 @@ export const useSupabaseMedia = (id: string) => {
 
 export const fetchMediaUrlsByEntityId = async (entityId: string): Promise<{ url: string, title: string, description: string }[]> => {
   const { data, error } = await supabase
-    .from('media_links')
-    .select('media_id')
+    .from('media_assets')
+    .select('url, title, description')
     .eq('entity_id', entityId);
 
   if (error) {
-    throw new Error('Failed to fetch media links');
-  }
-
-  const mediaIds = data.map(link => link.media_id);
-
-  const { data: mediaData, error: mediaError } = await supabase
-    .from('media_assets')
-    .select('url, title, description')
-    .in('id', mediaIds);
-
-  if (mediaError) {
     throw new Error('Failed to fetch media assets');
   }
 
-  return mediaData;
+  return data;
 };
 
 export const updateMedia = async (mediaId: string, newTitle: string, newDescription: string) => {
@@ -112,15 +93,6 @@ export const deleteMedia = async (url: string) => {
 
   if (mediaError || !mediaData) {
     throw new Error('Failed to fetch media asset');
-  }
-
-  const { error: deleteLinkError } = await supabase
-    .from('media_links')
-    .delete()
-    .eq('media_id', mediaData.id);
-
-  if (deleteLinkError) {
-    throw new Error('Failed to delete media link');
   }
 
   const { error: deleteAssetError } = await supabase

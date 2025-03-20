@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
 import { Language, LANGUAGES } from '../../../../types/language';
 import { useTranslation } from '../../../../types/language';
 import { updateUserSettings } from '../../../../services/userSettings';
@@ -11,7 +10,8 @@ interface GeneralSettingsProps {
   onDecimalSeparatorChange: (separator: ',' | '.') => void;
   showHiddenIds: boolean;
   onShowHiddenIdsChange: (show: boolean) => void;
-  currentTheme: Theme;
+  currentTheme: any;
+  onThemeChange: (theme: string) => void
 }
 
 const GeneralSettings: React.FC<GeneralSettingsProps> = ({
@@ -21,7 +21,8 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   onDecimalSeparatorChange,
   showHiddenIds,
   onShowHiddenIdsChange,
-  currentTheme
+  currentTheme,
+  onThemeChange
 }) => {
   const t = useTranslation(currentLanguage);
   const [updating, setUpdating] = useState(false);
@@ -51,14 +52,19 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     }
   };
 
+  const handleChangeTheme = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onThemeChange(event.target.value)
+    handleSettingChange("theme_id", event.target.value)
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between p-3 rounded bg-border">
-        <div>
-          <span className="text-primary">
+      <div className="flex items-center justify-between p-3 rounded bg-primary">
+        <div className="text-primary-foreground">
+          <span>
             {t('settings.language')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-xs">
             {t('settings.language.description')}
           </div>
         </div>
@@ -66,7 +72,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           value={currentLanguage}
           onChange={(e) => handleSettingChange('language', e.target.value)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+          className="px-3 py-1 rounded text-sm text-accent-foreground bg-accent"
         >
           {LANGUAGES.map(lang => (
             <option key={lang.id} value={lang.id}>
@@ -76,12 +82,12 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         </select>
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded bg-border">
-        <div>
-          <span className="text-primary">
+      <div className="flex items-center justify-between p-3 rounded bg-primary">
+        <div className="text-primary-foreground">
+          <span>
             {t('settings.decimal_separator')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-xs">
             {t('settings.decimal_separator.description')}
           </div>
         </div>
@@ -89,36 +95,48 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           value={decimalSeparator}
           onChange={(e) => handleSettingChange('decimal_separator', e.target.value)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+          className="px-3 py-1 rounded text-sm text-accent-foreground bg-accent"
         >
           <option value=",">{t('settings.decimal_separator.comma')}</option>
           <option value=".">{t('settings.decimal_separator.point')}</option>
         </select>
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded bg-border">
-        <div>
-          <span className="text-primary">
+      <div className="flex items-center justify-between p-3 rounded bg-primary">
+        <div className="text-primary-foreground">
+          <span>
             {t('settings.hidden_ids')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-xs">
             {t('settings.hidden_ids.description')}
           </div>
         </div>
         <button
           onClick={() => handleSettingChange('show_hidden_ids', !showHiddenIds)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm"
-          style={{ 
-            backgroundColor: showHiddenIds ? currentTheme.colors.accent.primary : 'transparent',
-            color: showHiddenIds ? 'white' : currentTheme.colors.text.secondary,
-            border: showHiddenIds ? 'none' : `1px solid ${currentTheme.colors.border}`,
-            opacity: updating ? 0.5 : 1,
-            cursor: updating ? 'not-allowed' : 'pointer'
-          }}
+          className="px-3 py-1 rounded text-sm text-secondary-foreground bg-secondary hover:cursor-pointer data-[hidden='true']:text-accent-foreground data-[hidden='true']:bg-accent data-[updating='true']:opacity-50 data-[updating='true']:hover:cursor-not-allowed"
+          data-hidden={showHiddenIds}
+          data-updating={updating}          
         >
           {showHiddenIds ? t('settings.enabled') : t('settings.not_enabled')}
         </button>
+      </div>
+      <div className="p-3 flex items-center justify-between rounded bg-primary">
+        <div className="text-primary-foreground">
+          <span>Theme</span>
+          <span className="text-xs block">Select the theme</span>
+        </div>
+        <select
+          onChange={handleChangeTheme}
+          disabled={updating}
+          className="px-3 py-1 rounded text-sm text-accent-foreground bg-accent"
+          value={currentTheme}
+        >
+          <option value="zinc">Zinc Light</option>
+          <option value="zinc.dark">Zinc Dark</option>
+          <option value="green">Green Light</option>
+          <option value="green.dark">Green Dark</option>
+        </select>
       </div>
     </div>
   );

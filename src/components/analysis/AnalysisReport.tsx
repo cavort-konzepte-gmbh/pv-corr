@@ -4,7 +4,8 @@ import { Language, useTranslation } from '../../types/language';
 import { Project, Zone } from '../../types/projects';
 import { Standard } from '../../types/standards'; 
 import { getCurrentVersion } from '../../services/versions';
-import { Building2, FileText, Calendar, User, ChevronDown, ChevronRight } from 'lucide-react';
+import { Building2, FileText, Calendar, User, ChevronDown, ChevronRight, Table } from 'lucide-react';
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 interface AnalysisReportProps {
   currentTheme: Theme;
@@ -129,24 +130,21 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({
         </h2>
         
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border-theme text-primary">
-            <thead>
-              <tr>
-                <th className="p-2 text-left border font-normal border-theme">
-                  {t("analysis.parameter")}
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  {t("analysis.value")}
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  {t("analysis.unit")}
-                </th>
-                <th className="p-2 text-left border font-normal border-theme">
-                  {t("analysis.rating")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead> {t("analysis.parameter")}</TableHead>
+                <TableHead> {t("analysis.value")}</TableHead>
+                <TableHead> {t("analysis.unit")}</TableHead>
+                <TableHead> {t("analysis.rating")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+
+          
+    
+    
               {zone.datapoints?.[0]?.values && Object.entries(zone.datapoints[0].values).map(([key, value]) => {
                 const parameter = standard.parameters?.find(p => p.parameterCode === key);
                 const rating = zone.datapoints?.[0]?.ratings?.[key];
@@ -154,17 +152,17 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({
                 if (!parameter) return null;
 
                 return (
-                  <tr key={key}>
-                    <td className="p-2 border border-theme">
+                  <TableRow key={key}>
+                    <TableCell className="p-2 border border-theme">
                       {parameter.parameterCode}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme">
                       {value}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme">
                       {parameter.unit || '-'}
-                    </td>
-                    <td className="p-2 border border-theme">
+                    </TableCell>
+                    <TableCell className="p-2 border border-theme">
                       <div className="flex items-center gap-2">
                         <div 
                           className="w-2 h-2 rounded-full"
@@ -174,12 +172,12 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({
                         />
                         {rating}
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+          </TableBody>
+          </Table>
         </div>
       </div>
 

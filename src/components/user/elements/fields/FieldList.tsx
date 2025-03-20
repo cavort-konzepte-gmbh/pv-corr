@@ -8,6 +8,9 @@ import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createField } from '../../../../services/fields';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface FieldListProps {
   currentTheme: Theme;
@@ -136,36 +139,30 @@ const FieldList: React.FC<FieldListProps> = ({
 
   return (
     <div>
-      <button
+      <Button
         onClick={() => setIsAdding(true)}
         className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
       >
         <Plus size={16} />
         {translation("field.add")}
-      </button>
+      </Button>
 
       <div className="overflow-x-auto">
-      <table className="w-full border-collapse border-theme text-primary">
-        <thead>
-          <tr>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("field.name")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("field.has_fence")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("zones.location")}
-            </th>
-            <th className="p-2 text-center border font-normal border-theme">
-              {translation("actions")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+        <Table>
+          <TableCaption>List fields</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead> {translation("field.name")}</TableHead>
+              <TableHead> {translation("field.has_fence")}</TableHead>
+              <TableHead> {translation("zones.location")}</TableHead>
+              <TableHead> {translation("actions")}</TableHead>
+
+            </TableRow>
+          </TableHeader>
+          <TableBody>
           {isAdding && (
-            <tr>
-              <td className="p-2 border border-theme">
+            <TableRow>
+              <TableCell >
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddField}
@@ -179,7 +176,7 @@ const FieldList: React.FC<FieldListProps> = ({
                     });
                   }}
                 >
-                  <input
+                  <Input
                     type="text"
                     value={newValues.name}
                     onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
@@ -187,8 +184,8 @@ const FieldList: React.FC<FieldListProps> = ({
                     placeholder="Enter field name"
                   />
                 </FormHandler>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell >
                 <select
                   value={newValues.has_fence}
                   onChange={(e) => setNewValues({ ...newValues, has_fence: e.target.value })}
@@ -198,17 +195,17 @@ const FieldList: React.FC<FieldListProps> = ({
                   <option value="no">{translation("field.has_fence.no")}</option>
                   <option value="yes">{translation("field.has_fence.yes")}</option>
                 </select>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell >
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={newValues.latitude}
                     onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
                     className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder={translation("project.latitude")}
                   />
-                  <input
+                  <Input
                     type="text"
                     value={newValues.longitude}
                     onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
@@ -216,16 +213,16 @@ const FieldList: React.FC<FieldListProps> = ({
                     placeholder={translation("project.longitude")}
                   />
                 </div>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell >
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={handleAddField}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Save size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       setIsAdding(false);
                       setNewValues({
@@ -238,24 +235,24 @@ const FieldList: React.FC<FieldListProps> = ({
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <X size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {(initialFields || []).map(field => (
-            <tr key={field.id} className="hover:bg-opacity-50">
-              <td className="p-2 border border-theme">
+            <TableRow key={field.id} className="hover:bg-opacity-50">
+              <TableCell className="p-2 border border-theme">
                 {editingId === field.id ? (
-                  <input
+                  <Input
                     type="text"
                     value={editingValues.name || field.name}
                     onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                   />
                 ) : field.name}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 {editingId === field.id ? (
                   <select
                     value={editingValues.has_fence}
@@ -276,18 +273,18 @@ const FieldList: React.FC<FieldListProps> = ({
                      translation(field.has_fence === 'yes' || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no")}
                   </span>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 {editingId === field.id ? (
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.latitude || field.latitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                       className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                       placeholder={translation("project.latitude")}
                     />
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.longitude || field.longitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
@@ -296,19 +293,19 @@ const FieldList: React.FC<FieldListProps> = ({
                     />
                   </div>
                 ) : field.latitude && field.longitude ? (
-                  <button
+                  <Button
                     onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
                     className="text-sm hover:underline text-accent-primary"
                   >
                     {translation("general.view_on_map")}
-                  </button>
+                  </Button>
                 ) : (
                   <span className="text-secondary">{translation("general.location_not_set")}</span>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={async (event) => {
                       event.stopPropagation();
                       if (editingId === field.id) {
@@ -327,27 +324,27 @@ const FieldList: React.FC<FieldListProps> = ({
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
-                  </button>
+                  </Button>
                   {editingId === field.id && (
-                    <button
+                    <Button
                       onClick={event => handleRemoveField(event, field)}
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
                       <X size={14} />
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
                     onClick={() => onSelectField(field.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                   >
                     <ChevronRight size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+        </Table>
       </div>
       {error && (
         <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
