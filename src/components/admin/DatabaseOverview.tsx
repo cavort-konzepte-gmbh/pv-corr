@@ -66,7 +66,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
     <div className="p-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Database Stats */}
-        <div className="p-6 rounded-lg bg-surface">
+        <div className="p-6 rounded-lg border border-accent text-card-foreground">
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
@@ -76,7 +76,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
             </div>
             <div>
               <h3 className="text-lg font-medium text-primary">Database</h3>
-              <p className="text-sm text-secondary">REST Requests</p>
+              <p className="text-sm text-muted-foreground">REST Requests</p>
             </div>
           </div>
           <div className="text-3xl font-bold text-primary">
@@ -85,7 +85,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
         </div>
 
         {/* Auth Stats */}
-        <div className="p-6 rounded-lg bg-surface">
+        <div className="p-6 rounded-lg border border-accent text-card-foreground">
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
@@ -95,19 +95,19 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
             </div>
             <div>
               <h3 className="text-lg font-medium text-primary">Auth</h3>
-              <p className="text-sm text-secondary">Total Users</p>
+              <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>
           <div className="text-3xl font-bold text-primary">
             {stats?.auth.total_users.toLocaleString() || '0'}
           </div>
-          <div className="mt-2 text-sm text-secondary">
+          <div className="mt-2 text-sm text-muted-foreground">
             {stats?.auth.total_signups.toLocaleString() || '0'} new signups
           </div>
         </div>
 
         {/* Storage Stats */}
-        <div className="p-6 rounded-lg bg-surface">
+        <div className="p-6 rounded-lg border border-accent text-card-foreground">
           <div className="flex items-center gap-4 mb-6">
             <div 
               className="w-12 h-12 rounded-lg flex items-center justify-center"
@@ -117,13 +117,13 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
             </div>
             <div>
               <h3 className="text-lg font-medium text-primary">Storage</h3>
-              <p className="text-sm text-secondary">Total Storage</p>
+              <p className="text-sm text-muted-foreground">Total Storage</p>
             </div>
           </div>
           <div className="text-3xl font-bold text-primary">
             {formatBytes(stats?.storage.total_storage || 0)}
           </div>
-          <div className="mt-2 text-sm text-secondary">
+          <div className="mt-2 text-sm text-muted-foreground">
             {formatBytes(stats?.storage.total_egress || 0)} egress
           </div>
         </div>

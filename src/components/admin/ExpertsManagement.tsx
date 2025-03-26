@@ -165,7 +165,6 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
         <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
           variant="ghost"
         >
           <ArrowLeft size={20} />
@@ -189,11 +188,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
       <Button
         onClick={() => setIsNewExpert(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-
-          color: 'white'
-        }}
+        className="w-full"        
       >
         <Plus size={16} />
         Add New Expert
@@ -217,7 +212,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
             {experts.map(expert => (
               <TableRow key={expert.id}>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormHandler
                       isEditing={true}
@@ -230,74 +225,74 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                       <FormInput
                         value={editingValues.name || ''}
                         onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1 rounded text-sm text-primary border border-accent"
                       />
                     </FormHandler>
                   ) : (
                     expert.name
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="url"
                       value={editingValues.website || ''}
                       onChange={(e) => handleChangeEditingValues('website', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     />
                   ) : (
                     expert.website || '-'
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="email"
                       value={editingValues.email || ''}
                       onChange={(e) => handleChangeEditingValues('email', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     />
                   ) : (
                     expert.email || '-'
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="tel"
                       value={editingValues.phone || ''}
                       onChange={(e) => handleChangeEditingValues('phone', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     />
                   ) : (
                     expert.phone || '-'
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="text"
                       value={editingValues.vat_id || ''}
                       onChange={(e) => handleChangeEditingValues('vat_id', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     />
                   ) : (
                     expert.vat_id || '-'
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   {editingExpert === expert.id ? (
                     <FormInput
                       type="text"
                       value={editingValues.registration_number || ''}
                       onChange={(e) => handleChangeEditingValues('registration_number', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     />
                   ) : (
                     expert.registration_number || '-'
                   )}
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <div className="flex items-center justify-center gap-2">
                     <Button
                       onClick={() => handleUpdateSaveExpert(expert)}
@@ -325,7 +320,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
             ))}
             {isNewExpert && (
               <TableRow>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormHandler
                     isEditing={true}
                     onSave={handleAddNewExpert}
@@ -335,57 +330,57 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                       type="text"
                       value={newExpert.name || ''}
                       onChange={(e) => handleChangeNewExpert('name', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                       placeholder="Enter expert name"
                     />
                   </FormHandler>
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormInput
                     type="url"
                     value={newExpert.website || ''}
                     onChange={(e) => handleChangeNewExpert('website', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     placeholder="Enter website URL"
                   />
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormInput
                     type="email"
                     value={newExpert.email || ''}
                     onChange={(e) => handleChangeNewExpert('email', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     placeholder="Enter email"
                   />
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormInput
                     type="tel"
                     value={newExpert.phone || ''}
                     onChange={(e) => handleChangeNewExpert('phone', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     placeholder="Enter phone"
                   />
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormInput
                     type="text"
                     value={newExpert.vat_id || ''}
                     onChange={(e) => handleChangeNewExpert('vat_id', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     placeholder="Enter VAT ID"
                   />
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormInput
                     type="text"
                     value={newExpert.registration_number || ''}
                     onChange={(e) => handleChangeNewExpert('registration_number', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-accent bg-background"
                     placeholder="Enter reg. no."
                   />
                 </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <div className="flex items-center justify-center gap-2">
                     <Button onClick={handleAddNewExpert} variant="ghost">
                       <Save size={14} />

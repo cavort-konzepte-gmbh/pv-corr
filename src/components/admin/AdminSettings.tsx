@@ -3,6 +3,7 @@ import { Theme } from '../../types/theme';
 import { ArrowLeft, Palette, Globe, ChevronLeft } from 'lucide-react';
 import ThemeManagement from './ThemeManagement';
 import TranslationsPanel from './settings/TranslationsPanel';
+import { Button } from '../ui/button';
 
 interface AdminSettingsProps {
   currentTheme: Theme;
@@ -16,22 +17,22 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
     <div className="p-8">
       {activeView !== 'overview' ? (
         <div className="flex items-center gap-4 mb-8">
-          <button
+          {/* <Button
+            variant="ghost"
             onClick={() => setActiveView('overview')}
-            className="flex items-center gap-2 text-secondary"
           >
             <ChevronLeft size={20} />
             <span>System Configuration</span>
-          </button>
+          </Button> */}
         </div>
       ) : (
         <div className="flex items-center gap-4 mb-8">
-          <button
+          <Button
+            variant="ghost"
             onClick={onBack}
-            className="p-2 rounded hover:bg-opacity-80 text-secondary"
           >
-            <ArrowLeft size={20} />
-          </button>
+            <ArrowLeft className="text-primary" size={20} />
+          </Button>
           <h2 className="text-2xl font-bold text-primary">
             System Configuration
           </h2>
@@ -51,32 +52,32 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Theme Management */}
-          <div 
+          {/* <div 
             onClick={() => setActiveView('themes')}
-            className="p-6 rounded-lg bg-surface hover:bg-opacity-80 transition-colors cursor-pointer"
+            className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer"
           >
             <div className="flex flex-col gap-2">
-              <Palette className="text-accent-primary" size={24} />
-              <h3 className="text-lg font-medium text-primary mt-2">
+              <Palette className="text-primary" size={24} />
+              <h3 className="text-lg font-medium mt-2">
                 Theme Management
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage system themes
               </p>
             </div>
           </div>
-
+ */}
           {/* Translations Management */}
           <div 
             onClick={() => setActiveView('translations')}
-            className="p-6 rounded-lg bg-surface hover:bg-opacity-80 transition-colors cursor-pointer"
+            className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer"
           >
             <div className="flex flex-col gap-2">
               <Globe className="text-accent-primary" size={24} />
-              <h3 className="text-lg font-medium text-primary mt-2">
+              <h3 className="text-lg font-medium mt-2">
                 Translations Management
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage system translations
               </p>
             </div>

@@ -345,7 +345,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
       <Button
         onClick={() => setIsNewNorm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
+        className="w-full mb-6"
       >
         <Plus size={16} />
         {t("standards.add")}
@@ -363,9 +363,9 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 {t("standards.new")}
               </h3>
               
-              <form className="space-y-4">
+              <form className="text-card space-y-4">
                 <div>
-                  <Label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-primary">
                     {t("standards.name")}
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
@@ -373,31 +373,31 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                     type="text"
                     value={newNorm.name || ''}
                     onChange={(e) => handleChangeNorm('name', e.target.value)}
-                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-2"
                   />
                 </div>
 
                 <div>
-                  <Label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-primary">
                     Description
                   </Label>
                   <textarea
                     value={newNorm.description || ''}
                     onChange={(e) => handleChangeNorm('description', e.target.value)}
-                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-2 border border-primary rounded-md bg-background"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <Label className="block text-sm mb-1 text-secondary">
+                  <Label className="block text-sm mb-1 text-primary">
                     Version
                   </Label>
                   <Input
                     type="text"
                     value={newNorm.version || ''}
                     onChange={(e) => handleChangeNorm('version', e.target.value)}
-                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-2"
                   />
                 </div>
 
@@ -405,14 +405,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                   <Button
                     type="button"
                     onClick={handleCancelNewNorm}
-                    className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+                    variant="destructive"
                   >
                     {t("actions.cancel")}
                   </Button>
                   <Button
                     type="button"
                     onClick={handleAddNewNorm}
-                    className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
+                    className="px-4 py-2"
                   >
                     {t("actions.save")}
                   </Button>
@@ -424,7 +424,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
               {norms.map(norm => (
                 <div
                   key={norm.id}
-                  className="p-4 rounded-lg border transition-all text-primary border-theme border-solid bg-surface"
+                  className="p-4 rounded-lg border transition-all text-card-foreground border-accent bg-background"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -434,19 +434,19 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                             type="text"
                             value={editingValues.name || ''}
                             onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                            className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-2"
                           />
                           <Input
                             type="text"
                             value={editingValues.version || ''}
                             onChange={(e) => handleChangeEditingValues('version', e.target.value)}
-                            className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-2"
                             placeholder="Version"
                           />
                           <textarea
                             value={editingValues.description || ''}
                             onChange={(e) => handleChangeEditingValues('description', e.target.value)}
-                            className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-2 rounded text-sm text-primary border border-input bg-background"
                             placeholder="Description"
                             rows={3}
                           />
@@ -456,23 +456,23 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                           <h3 className="font-medium text-lg">
                             {norm.name}
                             {norm.version && (
-                              <span className="ml-2 text-sm text-secondary">
+                              <span className="ml-2 text-sm text-muted-foreground">
                                 v{norm.version}
                               </span>
                             )}
                           </h3>
                           {norm.description && (
-                            <p className="text-sm mt-1 text-secondary">
+                            <p className="text-sm mt-1 text-muted-foreground">
                               {norm.description}
                             </p>
                           )}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-secondary">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Button
                         onClick={() => handleUpdateSaveNorm(norm)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                       >
                         {editingNorm === norm.id ? (
@@ -483,14 +483,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                       </Button>
                       <Button
                         onClick={() => handleDeleteNorm(norm.id)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                       >
                         <X size={14} />
                       </Button>
                       <Button
                         onClick={() => setEditingOutputs(norm.id)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                         title="Configure Output Values"
                       >
@@ -501,7 +501,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
                   {editingNorm === norm.id ? (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-secondary">
+                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">
                         {t("standards.select_parameter")}
                       </h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -518,7 +518,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                 type="checkbox"
                                 checked={isSelected}
                                 onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
-                                className="rounded border-theme"
+                                className="size-5 rounded border-theme"
                               />
                               <div className="flex-1">
                                 <div className="flex items-center gap-1">
@@ -526,13 +526,13 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                     {param.shortName || param.name}
                                   </span>
                                   {param.unit && (
-                                    <span className="text-xs text-secondary">
+                                    <span className="text-xs text-muted-foreground">
                                       ({param.unit})
                                     </span>
                                   )}
                                   <div className="relative group">
-                                    <Info size={12} className="text-secondary cursor-help" />
-                                    <div className="absolute left-full ml-2 p-2 rounded bg-surface border border-theme invisible group-hover:visible min-w-[200px] z-10">
+                                    <Info size={12} className="text-muted-foreground cursor-help" />
+                                    <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">
                                       <p className="text-xs text-primary">{param.name}</p>
                                     </div>
                                   </div>
@@ -545,14 +545,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                     </div>
                   ) : (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-secondary">
+                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">
                         Selected Parameters
                       </h4>
                       <table className="w-full border-collapse">
                         <thead>
                           <tr>
-                            <th className="text-left p-2 text-sm font-normal text-secondary">Name</th>
-                            <th className="text-left p-2 text-sm font-normal text-secondary">Parameter Code</th>
+                            <th className="text-left p-2 text-sm font-normal text-muted-foreground">Name</th>
+                            <th className="text-left p-2 text-sm font-normal text-muted-foreground">Parameter Code</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -566,11 +566,11 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                               return aOrder - bOrder;
                             })
                             .map(param => (
-                              <tr key={param.id} className="border-t border-theme">
+                              <tr key={param.id} className="border-t border-accent">
                                 <td className="p-2 text-sm text-primary">
                                   {param.shortName || param.name}
                                 </td>
-                                <td className="p-2 text-sm text-secondary">
+                                <td className="p-2 text-sm text-muted-foreground">
                                   <div className="flex items-center gap-2">
                                     <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
                                     <Button
@@ -584,7 +584,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                           button.innerHTML = 'Copy';
                                         }, 1000);
                                       }}
-                                      className="text-xs px-2 py-1 rounded hover:bg-theme text-secondary"
+                                      className="text-xs px-2 py-1 rounded hover:bg-theme text-muted-foreground"
                                       variant="ghost"
                                     >
                                       Copy

@@ -5,25 +5,8 @@ export default {
   theme: {
   	extend: {
   		colors: {
-  			surface: 'var(--surface)',
-  			primary: {
-				// --primary variable used by shadcn
-  				DEFAULT: 'var(--text-primary)',
-  				foreground: 'hsl(var(--primary-foreground))'
-  			},
-  			secondary: {
-				// --secondary variable used by shadcn
-  				DEFAULT: 'var(--text-secondary)',
-  				foreground: 'hsl(var(--secondary-foreground))'
-  			},
-  			accent: {
-  				DEFAULT: 'var(--text-accent)',
-  				primary: 'var(--accent-primary)',
-  				hover: 'var(--accent-hover)',
-  				foreground: 'hsl(var(--accent-foreground))'
-  			},
-			// --background variable used by shadcn
-  			background: 'var(--background)',
+  			surface: '#1E1E1E',
+  			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -33,16 +16,27 @@ export default {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
   			},
+  			primary: {
+  				DEFAULT: 'hsl(var(--primary))',
+  				foreground: 'hsl(var(--primary-foreground))'
+  			},
+  			secondary: {
+  				DEFAULT: 'hsl(var(--secondary))',
+  				foreground: 'hsl(var(--secondary-foreground))'
+  			},
   			muted: {
   				DEFAULT: 'hsl(var(--muted))',
   				foreground: 'hsl(var(--muted-foreground))'
   			},
+  			accent: {
+  				DEFAULT: 'hsl(var(--accent))',
+  				foreground: 'hsl(var(--accent-foreground))'
+  			},
   			destructive: {
-				// --destructive variable used by shadcn
-  				DEFAULT: 'var(--accent-primary)',
+  				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
-  			border: 'var(--border)',
+  			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			chart: {
@@ -53,7 +47,6 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-
   		borderWidth: {
   			theme: '1px'
   		},
@@ -64,7 +57,6 @@ export default {
   			theme: 'var(--background)',
   			border: 'var(--border)'
   		},
-
   		boxShadow: {
   			theme: '0 2px 4px var(--border)'
   		},

@@ -287,12 +287,12 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       )}
 
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          variant="ghost"
         >
-          <ArrowLeft size={20} />
-        </button>
+          <ArrowLeft className="text-primary" size={20} />
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           Substructures Management
         </h2>
@@ -303,13 +303,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
           <h3 className="text-lg text-primary">
             Substructures
           </h3>
-          <button
+          <Button
             onClick={() => setIsNewSubstructure(true)}
-            className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+            className="px-3 py-1"
           >
             <Plus size={14} />
             Add Substructure
-          </button>
+          </Button>
         </div>
 
         <div className="overflow-x-auto">
@@ -340,12 +340,12 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
          
               {substructures.map((substructure) => (
                 <TableRow key={substructure.id}>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={substructure.manufacturer_id}
                         disabled={true}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       >
                         {manufacturers.map(mfg => (
                           <option key={mfg.id} value={mfg.id}>
@@ -357,12 +357,12 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       manufacturers.find(m => m.id === substructure.manufacturer_id)?.name
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={substructure.system_id}
                         disabled={true}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       >
                         {systems
                           .filter(sys => sys.manufacturer_id === substructure.manufacturer_id)
@@ -377,24 +377,24 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       systems.find(s => s.id === substructure.system_id)?.name
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary" >
+                  <TableCell className="p-2" >
                     {editingSubstructure === substructure.id ? (
                       <Input
                         type="text"
                         value={editingVersionName}
                         onChange={(e) => setEditingVersionName(e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                       />
                     ) : (
                       versions.find(v => v.id === substructure.version_id)?.name
                     )}
                   </TableCell> 
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <select
                         value={editingValues.type || substructure.type}
                         onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       >
                         <option value="field">Field</option>
                         <option value="roof">Roof</option>
@@ -403,13 +403,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       substructure.type
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <Input
                         type="url"
                         value={editingValues.link || substructure.link || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
                     ) : (
@@ -425,39 +425,39 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       )
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <Input
                         type="url"
                         value={editingValues.schematic || substructure.schematic || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
                     ) : (
                       substructure.schematic
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
-                      <input
+                      <Input
                         type="url"
                         value={editingValues.example || substructure.example || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
                     ) : (
                       substructure.example
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
                           value={editingValues.base_material_id || substructure.base_material_id || ''}
                           onChange={(e) => setEditingValues({ ...editingValues, base_material_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                         >
                           <option value="">Select material</option>
                           {materials.map(material => (
@@ -474,7 +474,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues, 
                               base_material_thickness: e.target.value 
                             })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-1"
                             min="0"
                             step="any"
                             placeholder="Thickness"
@@ -485,7 +485,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues,
                               base_material_thickness_unit: e.target.value as 'mm' | 'μm'
                             })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>
@@ -496,20 +496,20 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <div>
                         <div>{materials.find(m => m.id === substructure.base_material_id)?.name}</div>
                         {substructure.base_material_thickness && (
-                          <div className="text-sm text-secondary mt-1">
+                          <div className="text-sm text-primary mt-1">
                             {substructure.base_material_thickness} {substructure.base_material_thickness_unit || 'mm'}
                           </div>
                         )}
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
                           value={editingValues.first_layer_id || substructure.first_layer_id || ''}
                           onChange={(e) => setEditingValues({ ...editingValues, first_layer_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                         >
                           <option value="">Select material</option>
                           {materials.map(material => (
@@ -526,7 +526,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues, 
                               first_layer_thickness: e.target.value 
                             })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-1"
                             min="0"
                             step="any"
                             placeholder="Thickness"
@@ -537,7 +537,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues,
                               first_layer_thickness_unit: e.target.value as 'mm' | 'μm'
                             })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>
@@ -548,20 +548,20 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <div>
                         <div>{materials.find(m => m.id === substructure.first_layer_id)?.name}</div>
                         {substructure.first_layer_thickness && (
-                          <div className="text-sm text-secondary mt-1">
+                          <div className="text-sm text-primary mt-1">
                             {substructure.first_layer_thickness} {substructure.first_layer_thickness_unit || 'mm'}
                           </div>
                         )}
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     {editingSubstructure === substructure.id ? (
                       <div className="space-y-2">
                         <select
                           value={editingValues.second_layer_id || substructure.second_layer_id || ''}
                           onChange={(e) => setEditingValues({ ...editingValues, second_layer_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                         >
                           <option value="">Select material</option>
                           {materials.map(material => (
@@ -578,7 +578,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues, 
                               second_layer_thickness: e.target.value 
                             })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-1"
                             min="0"
                             step="any"
                             placeholder="Thickness"
@@ -589,7 +589,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues,
                               second_layer_thickness_unit: e.target.value as 'mm' | 'μm'
                             })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>
@@ -600,14 +600,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <div>
                         <div>{materials.find(m => m.id === substructure.second_layer_id)?.name}</div>
                         {substructure.second_layer_thickness && (
-                          <div className="text-sm text-secondary mt-1">
+                          <div className="text-sm text-primary mt-1">
                             {substructure.second_layer_thickness} {substructure.second_layer_thickness_unit || 'mm'}
                           </div>
                         )}
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
                       <Button
                         onClick={() => {
@@ -623,7 +623,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                             setEditingValues(substructure);
                           }
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                       >
                         {editingSubstructure === substructure.id ? (
@@ -641,7 +641,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                             handleDelete(substructure.id);
                           }
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                       >
                         <X size={14} />
@@ -652,7 +652,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               ))}
               {isNewSubstructure && (
                 <TableRow>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <select
                       value={selectedManufacturerId}
                       onChange={(e) => {
@@ -660,7 +660,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         setSelectedSystemId('');
                         setSelectedVersionId('');
                       }}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">Select Manufacturer</option>
                       {manufacturers.map(mfg => (
@@ -670,14 +670,14 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       ))}
                     </select>
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <select
                       value={selectedSystemId}
                       onChange={(e) => {
                         setSelectedSystemId(e.target.value);
                         setSelectedVersionId('');
                       }}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       disabled={!selectedManufacturerId}
                     >
                       <option value="">Select System</option>
@@ -691,59 +691,59 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       }
                     </select>
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <Input
                       type="text"
                       value={editingVersionName}
                       onChange={(e) => setEditingVersionName(e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       placeholder="Enter version name"
                       disabled={!selectedSystemId}
                     />
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <select
                       value={editingValues.type || 'field'}
                       onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                     >
                       <option value="field">Field</option>
                       <option value="roof">Roof</option>
                     </select>
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <Input
                       type="url"
                       value={editingValues.link || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       placeholder="https://"
                     />
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <Input
                       type="url"
                       value={editingValues.schematic || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       placeholder="https://"
                     />
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <Input
                       type="url"
                       value={editingValues.example || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       placeholder="https://"
                     />
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary" >
+                  <TableCell className="p-2" >
                     <div className="space-y-2">
                       <select
                         value={editingValues.base_material_id || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, base_material_id: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1 text-sm text-primary border border-input shadow-sm bg-accent"
                       >
                         <option value="">Select material</option>
                         {materials.map(material => (
@@ -760,7 +760,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                             ...editingValues, 
                             base_material_thickness: e.target.value 
                           })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           min="0"
                           step="any"
                           placeholder="Thickness"
@@ -771,7 +771,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                             ...editingValues,
                             base_material_thickness_unit: e.target.value as 'mm' | 'μm'
                           })}
-                          className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-24 p-1 text-sm text-primary border border-input shadow-sm bg-accent"
                         >
                           <option value="mm">mm</option>
                           <option value="μm">μm</option>
@@ -779,7 +779,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
+                  <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
                       <Button
                         onClick={handleSaveSubstructure}
@@ -787,7 +787,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           !selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type
                             ? 'opacity-50 cursor-not-allowed'
                             : ''
-                        } text-secondary`}
+                        } text-primary`}
                       variant="ghost"
                         disabled={!selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type}
                       >
@@ -802,7 +802,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           setEditingVersionName('');
                           setEditingValues({});
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary "
+                        className="p-1 rounded hover:bg-opacity-80 text-primary"
                         variant="ghost"
                       >
                         <X size={14} />

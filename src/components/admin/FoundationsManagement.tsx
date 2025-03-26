@@ -155,10 +155,9 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
       <div className="flex items-center gap-4 mb-8">
         <Button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
           variant="ghost"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft className="text-primary" size={20} />
         </Button>
         <h2 className="text-2xl font-bold text-primary">
           Foundations Management
@@ -166,7 +165,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
       </div>
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
+        <div className="text-center p-4 text-primary">
           Loading foundations...
         </div>
       ) : (
@@ -177,7 +176,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
             </h3>
             <Button
               onClick={handleOpenFoundation}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+              className="px-3 py-1"
             >
               <Plus size={14} />
               Add Foundation
@@ -201,7 +200,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
          
                 {foundations.map((foundation) => (
                   <TableRow key={foundation.id}>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingFoundation === foundation.id ? (
                         <Input
                           type="text"
@@ -214,11 +213,11 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                         foundation.name
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
-                      <div className="flex items-center justify-center gap-2">
+                    <TableCell className="p-2">
+                      <div className="flex items-center justify-start gap-2">
                         <Button
                           onClick={() => handleUpdateSaveFoundation(foundation)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
                           {editingFoundation === foundation.id ? (
@@ -228,7 +227,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                           )}
                         </Button>
                         <Button onClick={() => handleDeleteFoundation(foundation.id)} variant="ghost">
-                          <X className="text-secondary" size={14} />
+                          <X className="text-primary" size={14} />
                         </Button>
                       </div>
                     </TableCell>
@@ -236,23 +235,23 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                 ))}
                 {isNewFoundation && (
                   <TableRow>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <Input
                         type="text"
                         name="name"
                         value={newFoundation.name || ''}
                         onChange={(e) => handleChangeFoundation(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter foundation name"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
-                      <div className="flex items-center justify-center gap-2">
+                    <TableCell className="p-2">
+                      <div className="flex items-center justify-start gap-2">
                         <Button onClick={handleAddNewFoundation} variant="ghost">
-                          <Save size={14} />
+                          <Save className="text-primary" size={14} />
                         </Button>
                         <Button onClick={handleCancelNewFoundation} variant="ghost">
-                          <X size={14} />
+                          <X className="text-primary" size={14} />
                         </Button>
                       </div>
                     </TableCell>

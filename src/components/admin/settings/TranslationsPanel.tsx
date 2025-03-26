@@ -6,6 +6,8 @@ import { fetchAllTranslations, fetchLanguages, updateTranslation, deleteTranslat
 import { FormHandler } from '../../shared/FormHandler';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@radix-ui/react-label';
 
 interface TranslationsPanelProps {
   currentTheme: Theme;
@@ -105,27 +107,27 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4 flex-1">
-          <Search size={20} className="text-secondary" />
-          <input
+        <Label className="w-full mb-6 flex items-center gap-x-4 relative">
+          <Search className="text-primary absolute left-4" size={20} />
+          <Input 
+            className="h-12 indent-10 "
             type="text"
             placeholder="Search translations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-sm text-primary"
           />
-        </div>
-        <Button
-          onClick={() => setIsAdding(true)}
-          className="px-4 py-2 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
-        >
-          <Plus size={16} />
-          Add Translation
-        </Button>
+        </Label>
       </div>
+      <Button
+        onClick={() => setIsAdding(true)}
+        className="px-4 py-2 mb-10"
+      >
+        <Plus size={16} />
+        Add Translation
+      </Button>
 
       {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        <div className="p-4 mb-4 rounded text-destructive-foreground border border-destructive bg-destructive">
           {error}
         </div>
       )}
@@ -147,7 +149,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
 
             {isAdding && (
               <TableRow>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <FormHandler
                     isEditing={true}
                     onSave={handleAddNew}
@@ -159,21 +161,21 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                       });
                     }}
                   >
-                    <input
+                    <Input
                       type="text"
                       value={newValues.key}
                       onChange={(e) => setNewValues(prev => ({
                         ...prev,
                         key: e.target.value
                       }))}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       placeholder="Enter translation key"
                     />
                   </FormHandler>
                 </TableCell>
                 {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2 border border-theme text-secondary">
-                    <input
+                  <TableCell key={lang.id} className="p-2">
+                    <Input
                       type="text"
                       value={newValues.translations[lang.id] || ''}
                       onChange={(e) => setNewValues(prev => ({
@@ -183,21 +185,22 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           [lang.id]: e.target.value
                         }
                       }))}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                       dir={lang.direction}
                       placeholder={`Enter ${lang.name} translation`}
                     />
                   </TableCell>
                 ))}
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <div className="flex items-center justify-center gap-2">
                     <Button
                       onClick={handleAddNew}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      className="p-1 rounded hover:bg-opacity-80 text-primary"
                     >
                       <Save size={14} />
                     </Button>
                     <Button
+                      variant="ghost"
                       onClick={() => {
                         setIsAdding(false);
                         setNewValues({
@@ -205,9 +208,8 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           translations: {}
                         });
                       }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
-                      <X size={14} />
+                      <X className="text-primary" size={14} />
                     </Button>
                   </div>
                 </TableCell>
@@ -215,20 +217,20 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
             )}
             {filteredTranslations.map(([key, values]) => (
               <TableRow key={key}>
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2 text-primary">
                   <code className="font-mono text-sm">{key}</code>
                 </TableCell>
                 {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2 border border-theme text-secondary">
+                  <TableCell key={lang.id} className="p-2 text-muted-foreground">
                     {editingKey === key ? (
-                      <input
+                      <Input
                         type="text"
                         value={editValues[lang.id] || values[lang.id] || ''}
                         onChange={(e) => setEditValues(prev => ({
                           ...prev,
                           [lang.id]: e.target.value
                         }))}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         dir={lang.direction}
                       />
                     ) : (
@@ -238,7 +240,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                     )}
                   </TableCell>
                 ))}
-                <TableCell className="p-2 border border-theme text-secondary">
+                <TableCell className="p-2">
                   <div className="flex items-center justify-center gap-2">
                     <Button
                       onClick={() => {
@@ -249,8 +251,8 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           setEditValues(values);
                         }
                       }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       variant="ghost"
+                      className="text-primary"
                     >
                       {editingKey === key ? <Save size={14} /> : <Edit2 size={14} />}
                     </Button>
@@ -260,18 +262,16 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           setEditingKey(null);
                           setEditValues({});
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         variant="ghost"
                       >
-                        <X size={14} />
+                        <X className="text-primary" size={14} />
                       </Button>
                     ) : (
                       <Button
                         onClick={() => handleDelete(key)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         variant="ghost"
                       >
-                        <X size={14} />
+                        <X className="text-primary" size={14} />
                       </Button>
                     )}
                   </div>

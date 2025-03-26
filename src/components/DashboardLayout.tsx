@@ -399,9 +399,9 @@ const DashboardLayout = () => {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-theme">
+      <div className="min-h-screen flex flex-col">
         {/* Top Navigation Bar */}
-        <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
+        <div className="h-14 border-b flex items-center px-4 border-input">
           <div className="flex-1 flex items-center gap-6">
             {view === 'settings' ? (
               <>

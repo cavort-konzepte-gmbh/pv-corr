@@ -49,12 +49,12 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-surface">
+      <div className="p-6 rounded-lg max-w-4xl w-full ma">
         <h3 className="text-lg mb-6 text-primary">Edit Rating Logic</h3>
         
         <div className="space-y-4">
           <div>
-            <Label className="block text-sm mb-2 text-secondary">
+            <Label className="block text-sm mb-2 text-primary">
               Rating Logic Code
             </Label>
             <textarea
@@ -66,7 +66,7 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
           </div>
 
           <div>
-            <Label className="block text-sm mb-2 text-secondary">
+            <Label className="block text-sm mb-2 text-primary">
               Test Cases (JSON Array)
             </Label>
             <textarea
@@ -78,7 +78,7 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
           </div>
 
           {error && (
-            <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+            <div className="p-4 rounded text-accent-primary border-a">
               {error}
             </div>
           )}
@@ -254,7 +254,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
             </Button>
           </div>
           <div className="overflow-x-auto">
-         <Table>
+         <Table className="text-card-foreground">
          <TableCaption className="h-8">Parameters</TableCaption>
           <TableHeader>
             <TableRow>
@@ -274,7 +274,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 {parameters.map((parameter) => (
                   <TableRow key={parameter.id}>
 
-                    <TableCell className="p-2 border border-theme text-center text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormInput
@@ -291,7 +291,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormHandler
@@ -303,7 +303,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="name"
                           value={editingValues.name || ''}
                           onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         />
                         </FormHandler>
                       ) : (
@@ -311,7 +311,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormInput
@@ -319,21 +319,21 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="shortName"
                           value={editingValues.shortName || ''}
                           onChange={(e) => handleChangeEditingValues('shortName', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         />
                       ) : (
                         parameter.shortName || '-'
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="unit"
                           value={editingValues.unit || ''}
                           onChange={(e) => handleChangeEditingValues('unit', e.target.value)}
-                          className="w-full p-1 rounded text-sm border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm"
                         >
                           <option value="">No unit</option>
                           <option value="Ohm.m">Ohm.m</option>
@@ -354,14 +354,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormSelect
                           name="rangeType"
                           value={editingValues.rangeType || ''}
                           onChange={(e) => handleChangeEditingValues('rangeType', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         >
                           <option value="">Select Range Type</option>
                           <option value="range">Range</option>
@@ -377,7 +377,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       )}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {editingParameter === parameter.id ? (
                         <FormInput
@@ -385,7 +385,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="rangeValue"
                           value={editingValues.rangeValue || ''}
                           onChange={(e) => handleChangeEditingValues('rangeValue', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         />
                       ) : (
                         parameter.rangeValue || '-'
@@ -406,11 +406,11 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </Button>
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={() => handleUpdateSaveParameter(parameter)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
                           {editingParameter === parameter.id ? (
@@ -430,7 +430,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
 
                             variant="ghost"
                           >
-                            <X size={14} />
+                            <X className="text-primary" size={14} />
                           </Button>
                         )}
                       </div>
@@ -440,14 +440,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 {isNewParameter && (
                   <TableRow>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       <FormInput
                         type="number"
                         name="orderNumber"
                         value={newParameter.orderNumber || '0'}
                         onChange={(e) => handleChangeParameter('orderNumber', e.target.value)}
-                        className="w-16 p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+                        className="w-16 p-1 rounded text-sm text-primary text-center"
                         min="0"
                         step="0.01"
                       />
@@ -463,13 +463,13 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="name"
                           value={newParameter.name || ''}
                           onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         />
                       ) : null}
                       </FormHandler>
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {isNewParameter ? (
                         <FormInput
@@ -477,19 +477,19 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="shortName"
                           value={newParameter.shortName || ''}
                           onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm  border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm "
                         />
                       ) : null}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
 
                       {isNewParameter ? (
                         <FormSelect
                           name="unit"
                           value={newParameter.unit || ''}
                           onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         >
                           <option value="">No unit</option>
                           <option value="Ohm.m">Ohm.m</option>
@@ -508,14 +508,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : null}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme ">
+                    <TableCell className="p-2">
 
                       {isNewParameter ? (
                         <FormSelect
                           value={newParameter.rangeType || ''}
                           onChange={(e) => handleChangeParameter('rangeType', e.target.value)}
                           required
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         >
                           <option value="">Select Range Type</option>
                           <option value="range">Range</option>
@@ -529,7 +529,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       ) : null}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme ">
+                    <TableCell className="p-2">
 
                       {isNewParameter ? (
                         <FormInput
@@ -537,12 +537,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           name="rangeValue"
                           value={newParameter.rangeValue || ''}
                           onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 rounded text-sm text-primary"
                         />
                       ) : null}
                     </TableCell>
 
-                    <TableCell className="p-2 border border-theme ">
+                    <TableCell className="p-2">
 
                       <div className="flex items-center justify-center gap-2">
                         <Button onClick={handleAddNewParameter} variant="ghost">

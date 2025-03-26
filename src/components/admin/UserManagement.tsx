@@ -153,12 +153,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
+          variant="ghost"
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
-          <ArrowLeft size={20} />
-        </button>
+          <ArrowLeft className="text-primary" size={20} />
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           User Management
         </h2>
@@ -178,7 +178,6 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
 
       <Button
         className="mb-6"
-        variant="destructive"
         onClick={() => setShowNewUserForm(true)}
       >
         <Plus size={16} />
@@ -186,9 +185,9 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </Button>
 
       <Label className="mb-6 flex items-center gap-x-4 relative">
-        <Search className="text-secondary absolute left-4" size={20} />
+        <Search className="text-primary absolute left-4" size={20} />
         <Input 
-          className="h-12 indent-10 border-transparent bg-surface"
+          className="h-12 indent-10 "
           type="text"
           placeholder="Search users..."
           value={searchTerm}
@@ -197,7 +196,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       </Label>
       
 
-      <div className="rounded-lg overflow-hidden bg-surface">
+      <div className="rounded-lg overflow-hidden">
         {loading && (
           <div className="text-center p-4 text-secondary">
             Loading...
@@ -217,21 +216,18 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
             {filteredUsers.map(user => (
               <TableRow key={user.id}>
                 <TableCell className="flex items-center gap-x-4">
-                  <figure 
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-
-                  >
+                  <figure className="w-8 h-8 rounded-full flex items-center justify-center">
                     <User className="text-accent-primary" size={16} />
                   </figure>
                   <dl>
                     <dt className="text-primary">{user.displayName}</dt>
-                    <dd className="text-secondary">{user.email}</dd>
+                    <dd className="text-muted-foreground">{user.email}</dd>
                   </dl>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Shield className="text-accent-primary" size={16} />
-                    <span className="text-secondary">
+                    <span className="text-muted-foreground">
                       {user.adminLevel === 'super_admin' 
                         ? 'Super Admin' 
                         : user.adminLevel === 'admin' 
@@ -241,19 +237,18 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-secondary">
+                <TableCell>
                   {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
                 </TableCell>
                 <TableCell>
                   {editingUser === user.id ? (
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        className="text-secondary"
+                    <div className="flex items-center justify-start gap-2">
+                      <Button                       
                         variant="ghost"
                         onClick={() => handleUpdateRole(user.id)}
                         disabled={loading}
                       >
-                        <Save size={16} />
+                        <Save className="text-primary" size={16} />
                       </Button>
                       <Button
                         className="text-secondary disabled:opacity-50"
@@ -261,18 +256,18 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                         disabled={loading}
                         onClick={() => setEditingUser(null)}
                       >
-                        <X size={16} />
+                        <X className="text-primary" size={16} />
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-start gap-2">
                       <Button
                         className="text-secondary disabled:opacity-50"
                         variant="ghost"
                         disabled={loading}
                         onClick={() => handleEdit(user)}
                       >
-                        <Edit2 size={16} />
+                        <Edit2 className="text-primary" size={16} />
                       </Button>
                       {user.adminLevel !== 'super_admin' && (
                         <Button
@@ -282,7 +277,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                           //onClick={() => handleDelete(user.id)}
                           onClick={() => setIsDeleting(true)}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 className="text-primary" size={16} />
                         </Button>
                       )}
                     </div>
@@ -296,39 +291,39 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
 
       {showNewUserForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="p-6 rounded-lg max-w-md w-full bg-surface">
+          <div className="p-6 rounded-lg max-w-md w-full text-card-foreground bg-popover">
             <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
               <User className="text-accent-primary" size={20} />
               Add New User
             </h3>
             
             <div className="space-y-4">
-              <Label className="block text-secondary">
+              <Label className="block">
                 Email Address
                 <span className="text-red-500 ml-1">*</span>
                 <Input 
-                  className="mt-1.5 border-theme border-solid"
+                  className="mt-1.5"
                   type="email"
                   name="email"
                   value={newUser.email}
                   onChange={handleChange}
                 />
               </Label>
-              <Label className="block text-secondary">
+              <Label className="block">
                 Password
                 <span className="text-red-500 ml-1">*</span>
                 <Input 
-                  className="mt-1.5 border-theme border-solid"
+                  className="mt-1.5"
                   type="password"
                   name="password"
                   value={newUser.password}
                   onChange={handleChange}
                 />
               </Label>
-              <Label className="block text-secondary">
+              <Label className="block">
                 Display Name
                 <Input 
-                  className="mt-1.5 border-theme border-solid"
+                  className="mt-1.5"
                   type="text"
                   name="displayName"
                   value={newUser.displayName}
@@ -338,13 +333,12 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
 
               <div className="flex justify-end gap-2 mt-6">
                 <Button
-                  className="text-secondary border-theme border-solid bg-transparent"
+                  variant="destructive"
                   onClick={handleCancel}
                 >
                   Cancel
                 </Button>
                 <Button
-                  variant="destructive"
                   onClick={handleCreateUser}
                 >
                   Create User

@@ -7,6 +7,7 @@ import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table} from '../ui/table';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface NeighboringStructure {
   id: string;
@@ -229,7 +230,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
       <div className="flex items-center gap-4 mb-8">
         <Button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          className="p-2 rounded hover:bg-opacity-80 text-primary"
           variant="ghost"
         >
           <ArrowLeft size={20} />
@@ -240,7 +241,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
       </div>
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
+        <div className="text-center p-4 text-primary">
           Loading neighboring structures...
         </div>
       ) : (
@@ -251,7 +252,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
             </h3>
             <Button
               onClick={handleOpenNewStructure}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+              className="px-3 py-1"
             >
               <Plus size={14} />
               Add Structure
@@ -278,7 +279,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
            
                 {structures.map((structure) => (
                   <TableRow key={structure.id}>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingStructure === structure.id ? (
                         <FormHandler
                           isEditing={true}
@@ -288,23 +289,23 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                             setEditingValues({});
                           }}
                         >
-                        <FormInput
+                        <Input
                           value={editingValues.name || ''}
                           onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                         />
                         </FormHandler>
                       ) : (
                         structure.name
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingStructure === structure.id ? (
-                        <FormInput
+                        <Input
                           type="number"
                           value={editingValues.depth || ''}
                           onChange={(e) => handleChangeEditingValues('depth', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           min="0"
                           step="0.1"
                           placeholder="Enter depth"
@@ -313,13 +314,13 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         structure.depth || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingStructure === structure.id ? (
-                        <FormInput
+                        <Input
                           type="number"
                           value={editingValues.height || ''}
                           onChange={(e) => handleChangeEditingValues('height', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           min="0"
                           step="0.1"
                           placeholder="Enter height"
@@ -328,13 +329,13 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         structure.height || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingStructure === structure.id ? (
                         <div className="flex gap-2">
                           <FormSelect
                             value={editingValues.coating_material_id || ''}
                             onChange={(e) => handleChangeEditingValues('coating_material_id', e.target.value)}
-                            className="flex-1 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="flex-1 p-1"
                           >
                             <option value="">Select coating material</option>
                             {materials.map(material => (
@@ -343,11 +344,11 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               </option>
                             ))}
                           </FormSelect>
-                          <FormInput
+                          <Input
                             type="number"
                             value={editingValues.coating_thickness || ''}
                             onChange={(e) => handleChangeEditingValues('coating_thickness', e.target.value)}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1"
                             min="0"
                             step="0.1"
                             placeholder="Thickness"
@@ -355,7 +356,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           <FormSelect
                             value={editingValues.coating_thickness_unit || 'mm'}
                             onChange={(e) => handleChangeEditingValues('coating_thickness_unit', e.target.value)}
-                            className="w-20 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-20 p-1"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>
@@ -374,13 +375,13 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         ) : '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingStructure === structure.id ? (
-                        <FormInput
+                        <Input
                           type="number"
                           value={editingValues.construction_year || ''}
                           onChange={(e) => handleChangeEditingValues('construction_year', e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           min="1800"
                           max={new Date().getFullYear()}
                           placeholder="Enter year"
@@ -389,11 +390,11 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         structure.construction_year || '-'
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={() => handleUpdateSaveStructure(structure)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
                           {editingStructure === structure.id ? (
@@ -412,7 +413,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               setDeleteConfirm(structure.id);
                               setDeleteConfirmName('');
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            className="p-1 rounded hover:bg-opacity-80 text-primary"
                             variant="ghost"
                           >
                             <X size={14} />
@@ -424,49 +425,49 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                 ))}
                 {isNewStructure && (
                   <TableRow>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <FormHandler
                         isEditing={true}
                         onSave={handleAddNewStructure}
                         onCancel={handleCancelNewStructure}
                       >
-                      <FormInput
+                      <Input
                         type="text"
                         value={newStructure.name || ''}
                         onChange={(e) => handleChangeNewStructure('name', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter structure name"
                       />
                       </FormHandler>
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
-                      <FormInput
+                    <TableCell className="p-2">
+                      <Input
                         type="number"
                         value={newStructure.depth || ''}
                         onChange={(e) => handleChangeNewStructure('depth', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         min="0"
                         step="0.1"
                         placeholder="Enter depth"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
-                      <FormInput
+                    <TableCell className="p-2">
+                      <Input
                         type="number"
                         value={newStructure.height || ''}
                         onChange={(e) => handleChangeNewStructure('height', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         min="0"
                         step="0.1"
                         placeholder="Enter height"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex gap-2">
                         <FormSelect
                           value={newStructure.coating_material_id || ''}
                           onChange={(e) => handleChangeNewStructure('coating_material_id', e.target.value)}
-                          className="w-[60%] p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-[60%] p-2"
                         >
                           <option value="">Select coating material</option>
                           {materials.map(material => (
@@ -475,11 +476,11 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                             </option>
                           ))}
                         </FormSelect>
-                        <FormInput
+                        <Input
                           type="number"
                           value={newStructure.coating_thickness || ''}
                           onChange={(e) => handleChangeNewStructure('coating_thickness', e.target.value)}
-                          className="w-[25%] p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-[25%] p-2"
                           min="0"
                           step="0.1"
                           placeholder="Thickness"
@@ -487,31 +488,31 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         <FormSelect
                           value={newStructure.coating_thickness_unit || 'mm'}
                           onChange={(e) => handleChangeNewStructure('coating_thickness_unit', e.target.value)}
-                          className="w-[15%] p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-[15%] p-2"
                         >
                           <option value="mm">mm</option>
                           <option value="μm">μm</option>
                         </FormSelect>
                       </div>
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
-                      <FormInput
+                    <TableCell className="p-2">
+                      <Input
                         type="number"
                         value={newStructure.construction_year || ''}
                         onChange={(e) => handleChangeNewStructure('construction_year', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         min="1800"
                         max={new Date().getFullYear()}
                         placeholder="Enter year"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex items-center justify-center gap-2">
                         <Button onClick={handleAddNewStructure} variant="ghost">
-                          <Save size={14} />
+                          <Save className="text-primary" size={14} />
                         </Button>
                         <Button onClick={handleCancelNewStructure} variant="ghost">
-                          <X size={14} />
+                          <X className="text-primary" size={14} />
                         </Button>
                       </div>
                     </TableCell>

@@ -172,7 +172,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       )}
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
+        <div className="text-center p-4 text-primary">
           Loading materials...
         </div>
       ) : (
@@ -183,7 +183,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
             </h3>
             <Button
               onClick={handleOpenMaterial}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+              className="px-3 py-1"
             >
               <Plus size={14} />
               Add Material
@@ -208,66 +208,66 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
         
                 {materials.map((material) => (
                   <TableRow key={material.id}>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingMaterial === material.id ? (
                         <Input
                           type="text"
                           name="name"
                           value={editingValues.name || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                         />
                       ) : (
                         material.name
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingMaterial === material.id ? (
                         <Input
                           type="number"
                           name="e_potential"
                           value={editingValues.e_potential || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           step="any"
                         />
                       ) : (
                         material.e_potential
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingMaterial === material.id ? (
                         <Input
                           type="number"
                           name="valency"
                           value={editingValues.valency || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           step="any"
                         />
                       ) : (
                         material.valency
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       {editingMaterial === material.id ? (
                         <Input
                           type="number"
                           name="molar_mass"
                           value={editingValues.molar_mass || ''}
                           onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1"
                           step="any"
                         />
                       ) : (
                         material.molar_mass
                       )}
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={() => handleUpdateSaveMaterial(material)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
                           {editingMaterial === material.id ? (
@@ -277,7 +277,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                           )}
                         </Button>
                         <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
-                          <X className="text-secondary" size={14} />
+                          <X className="text-primary" size={14} />
                         </Button>
                       </div>
                     </TableCell>
@@ -285,64 +285,64 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                 ))}
                 {isNewMaterial && (
                   <TableRow>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <Input
                         type="text"
                         name="name"
                         value={newMaterial.name || ''}
                         onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter material name"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <Input
                         type="number"
                         name="e_potential"
                         value={newMaterial.e_potential || ''}
                         onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter E-Potential"
                         step="any"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <Input
                         type="number"
                         name="valency"
                         value={newMaterial.valency || ''}
                         onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter Valency"
                         step="any"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <Input
                         type="number"
                         name="molar_mass"
                         value={newMaterial.molar_mass || ''}
                         onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="Enter Molar Mass"
                         step="any"
                       />
                     </TableCell>
-                    <TableCell className="p-2 border border-theme text-secondary">
+                    <TableCell className="p-2">
                       <div className="flex items-center justify-center gap-2">
                         <Button
                           onClick={handleAddNewMaterial}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
                           <Save size={14} />
                         </Button>
                         <Button
                           onClick={handleCancelNewMaterial}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
                         >
-                          <X size={14} />
+                          <X className="text-primary" size={14} />
                         </Button>
                       </div>
                     </TableCell>

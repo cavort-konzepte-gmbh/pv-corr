@@ -51,7 +51,7 @@ const Settings: React.FC<SettingsProps> = ({
   onCreateCustomer
 }) => {
   return (
-    <div className="flex-1 p-6 overflow-auto bg-theme">
+    <div className="flex-1 p-6 overflow-auto">
         {view === 'general' && (
           <GeneralSettings
             currentLanguage={currentLanguage}
