@@ -59,7 +59,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
       <Table >
         <TableHeader>
           <TableRow>
-            <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={onToggle}>
+            <TableHead colSpan={2} className="p-4 text-left font-semibold cursor-pointer" onClick={onToggle}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
@@ -67,16 +67,16 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                       type="text"
                       value={editValues.name}
                       onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                      className="p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="p-1"
                     />
                   ) : (
                     <span>{field.name}</span>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-background">
                       {field.zones?.length || 0} {translation("zones")}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-background">
                       {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints")}
                     </span>
                   </div>
@@ -86,13 +86,13 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                     <>
                       <Button
                         onClick={handleSave}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="size-8"
                       >
                         <Save size={14} />
                       </Button>
                       <Button
                         onClick={() => setIsEditing(false)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="size-8"
                       >
                         <X size={14} />
                       </Button>
@@ -100,15 +100,15 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                   ) : (
                     <Button
                       onClick={() => setIsEditing(true)}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      className="size-8"
                     >
                       <Edit2 size={14} />
                     </Button>
                   )}
                   {isExpanded ? (
-                    <ChevronDown className="text-secondary" size={16} />
+                    <ChevronDown className="text-primary" size={16} />
                   ) : (
-                    <ChevronRight className="text-secondary" size={16} />
+                    <ChevronRight className="text-primary" size={16} />
                   )}
                 </div>
               </div>
@@ -117,24 +117,24 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
         </TableHeader>
         <TableBody className={isExpanded ? '' : 'hidden'}>
           <TableRow>
-            <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
+            <TableCell className="p-2 w-1/6 text-primary">
               {translation("zones.location")}
             </TableCell>
-            <TableCell className="p-2 border-theme">
+            <TableCell className="p-2">
               {isEditing ? (
                 <div className="flex gap-2">
                   <Input
                     type="text"
                     value={editValues.latitude}
                     onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-1/2 p-1"
                     placeholder={translation("project.latitude")}
                   />
                   <Input
                     type="text"
                     value={editValues.longitude}
                     onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-1/2 p-1"
                     placeholder={translation("project.longitude")}
                   />
                 </div>
@@ -143,25 +143,24 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                   <span>{field.latitude}, {field.longitude}</span>
                   <Button
                     onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, '_blank')}
-                    className="text-sm hover:underline text-accent-primary"
                   >
                     {translation("general.view_on_map")}
                   </Button>
                 </div>
               ) : (
-                <span className="text-secondary">{translation("general.location_not_set")}</span>
+                <span className="text-primary">{translation("general.location_not_set")}</span>
               )}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
+            <TableCell className="p-2 w-1/6 text-primary">
               {translation("field.has_fence")}
             </TableCell>
-            <TableCell className="p-2 border-theme">
+            <TableCell className="p-2">
               {isEditing ? (
                 <select
                   onChange={(e) => setEditValues({ ...editValues, has_fence: e.target.value })}
-                  className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                   defaultValue={editValues.has_fence}
                 >
                   <option value="no">{translation("field.has_fence.no")}</option>

@@ -25,7 +25,7 @@ const CustomerList: React.FC<CustomerListProps> = ({
       {customers.map(customer => (
         <div
           key={customer.id}
-          className="p-4 border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
+          className="p-4 border transition-all text-primary border-accent hover:cursor-pointer"
           onClick={() => onSelectCustomer(customer.id)}
         >
           <div className="flex items-center justify-between">

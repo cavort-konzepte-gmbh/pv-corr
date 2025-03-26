@@ -86,28 +86,28 @@ const ProjectList: React.FC<ProjectListProps> = ({
         <div key={project.id} className="relative">
      
           <Table
-            className="w-full border-collapse rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
+            className="w-full border-collapse rounded-lg border transition-all text-card-foreground hover:cursor-pointer"
             onClick={() => handleSelectProject(project.id)}
           >
             <TableHeader>
               <TableRow>
-                <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme bg-surface">
+                <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-accent">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Folder className="text-accent-primary" size={16} />
+                      <Folder className="text-primary" size={16} />
                       <div className="flex items-center gap-4">
                         <span>{project.name}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
                             {project.typeProject}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
                             {project.fields.length} {translation("fields")}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
                             {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
                             {project.fields.reduce((acc, field) => 
                               acc + field.zones.reduce((zAcc, zone) => 
                                 zAcc + (zone.datapoints?.length || 0), 0
@@ -125,7 +125,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               e.stopPropagation();
                               handleSaveProject(project);
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
+                            className="p-1 rounded hover:bg-opacity-80"
                           >
                             <Save size={14} />
                           </Button>
@@ -134,7 +134,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               e.stopPropagation();
                               handleDeleteProject(project.id);
                             }}
-                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            className="p-1 rounded hover:bg-opacity-80 text-primary"
                           >
                             <Trash2 size={14} />
                           </Button>
@@ -160,12 +160,12 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               typeProject: project.typeProject
                             });
                           }}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          className="size-8 p-1 rounded hover:bg-opacity-80"
                         >
                           <Edit2 size={14} />
                         </Button>
                       )}
-                      <ChevronRight className="text-secondary" size={16} />
+                      <ChevronRight className="text-primary" size={16} />
                     </div>
                   </div>
                 </TableHead>
@@ -173,16 +173,16 @@ const ProjectList: React.FC<ProjectListProps> = ({
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+                <TableCell className="p-2 border-b border-r border-accent w-1/6 text-primary">
                   {translation("project.manager")}
                 </TableCell>
-                <TableCell className="p-2 border-b border-theme">
+                <TableCell className="p-2 border-b border-accent">
                   {editingProject === project.id ? (
                     <select
                       value={editingValues.managerId || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, managerId: e.target.value })}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">{translation("project.manager.not_assigned")}</option>
                       {savedPeople.map(person => (
@@ -201,10 +201,10 @@ const ProjectList: React.FC<ProjectListProps> = ({
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
+                <TableCell className="p-2 border-r border-accent w-1/6 text-primary">
                   {translation("zones.location")}
                 </TableCell>
-                <TableCell className="p-2 border-theme">
+                <TableCell className="p-2">
                   {editingProject === project.id ? (
                     <div className="flex gap-2">
                       <Input
@@ -212,15 +212,15 @@ const ProjectList: React.FC<ProjectListProps> = ({
                         value={editingValues.latitude || project.latitude || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-1/2 p-1"
                         placeholder={translation("project.latitude")}
                       />
-                      <Inputnput
+                      <Input
                         type="text"
                         value={editingValues.longitude || project.longitude || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-1/2 p-1"
                         placeholder={translation("project.longitude")}
                       />
                     </div>
@@ -232,7 +232,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           e.stopPropagation();
                           window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank');
                         }}
-                        className="text-sm hover:underline text-accent-primary"
+                        className="text-sm hover:underline"
                       >
                         {translation("general.view_on_map")}
                       </Button>
