@@ -341,8 +341,10 @@ const FieldList: React.FC<FieldListProps> = ({
                   </Button>
                 </div>
               </TableCell>
-            </TableRow>
+              </TableRow>
+    
           ))}
+          
         </TableBody>
         </Table>
       </div>

@@ -10,6 +10,9 @@ import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
 import { fetchCompanies as fetchCompaniesService } from '../services/companies';
 import { toCase } from '../utils/cases';
+import { Input } from './ui/input';
+import { Label } from '@radix-ui/react-label';
+import { Button } from './ui/button';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
@@ -161,13 +164,13 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
         </div>
       ) : (
         <>
-          <button
+          <Button
             onClick={() => setShowNewCompanyForm(true)}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"            
           >
             <Plus size={16} />
             {translation("company.add")}
-          </button>
+          </Button>
 
           {showNewCompanyForm ? (
             <div>
@@ -179,11 +182,11 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             {COMPANY_FIELDS.map(field => (
               <div key={field.id}>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation(field.label as any)}
                   {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                <input
+                </Label>
+                <Input
                   type={field.type}
                   value={formValues[field.id] || ''}
                   onChange={(e) => setFormValues(prev => ({
@@ -196,9 +199,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               </div>
             ))}
             <div>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1 text-secondary">
                 CEO
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={selectedCeoId}
@@ -220,9 +223,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("company.contact_person")}
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={selectedContactId}
@@ -244,7 +247,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setShowNewCompanyForm(false);
@@ -256,13 +259,13 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
               >
                 {translation("actions.cancel")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
               >
                 {editingCompany ? translation("general.save_changes") : 'Create Company'}
-              </button>
+              </Button>
             </div>
           </form>
             </div>
@@ -280,7 +283,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </div>
                 <div className="flex items-center gap-4">
                   {onCreateCustomer && (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onCreateCustomer(company.id, company.name);
@@ -291,7 +294,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       }}
                     >
                       Make Customer
-                    </button>
+                    </Button>
                   )}
                   <ChevronRight className="text-secondary" size={16} />
                 </div>

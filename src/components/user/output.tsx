@@ -7,6 +7,7 @@ import PDFPreview from './elements/output/PDFPreview';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Button } from '../ui/button';
 
 interface OutputProps {
   currentTheme: Theme;
@@ -145,14 +146,14 @@ const Output: React.FC<OutputProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={() => setSelectedReport('example')}
                 className="p-2 rounded hover:bg-opacity-80 text-secondary"
                 title={t("output.view_history")}
               >
                 <History size={16} />
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   setSelectedVersion({
                     projectId: projects[0]?.id,
@@ -170,13 +171,13 @@ const Output: React.FC<OutputProps> = ({
                 title={t("output.view_report")}
               >
                 <Eye size={16} />
-              </button>
-              <button
+              </Button>
+              <Button
                 className="p-2 rounded hover:bg-opacity-80 text-secondary"
                 title={t("output.download_report")}
               >
                 <Download size={16} />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -203,7 +204,7 @@ const Output: React.FC<OutputProps> = ({
                       <div className="text-sm text-secondary">
                         {t("analysis.total_rating")}: {version === 1 ? -4 : -2}
                       </div>
-                      <button
+                      <Button
                         onClick={() => {
                           setSelectedVersion({
                             projectId: projects[0]?.id,
@@ -221,7 +222,7 @@ const Output: React.FC<OutputProps> = ({
                         title={t("output.view_version")}
                       >
                         <Eye size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}

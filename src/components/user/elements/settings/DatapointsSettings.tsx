@@ -5,6 +5,8 @@ import { Standard } from '../../../../types/standards';
 import { Parameter } from '../../../../types/parameters';
 import { fetchParameters } from '../../../../services/parameters';
 import { Plus, Edit2, Save, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface DatapointsSettingsProps {
   currentTheme: Theme;
@@ -55,68 +57,68 @@ const DatapointsSettings: React.FC<DatapointsSettingsProps> = () => {
         <h3 className="text-lg text-primary">
           Parameters
         </h3>
-        <button
+        <Button
           className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
         >
           <Plus size={14} />
           Add Parameter
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border-theme text-primary">
-          <thead>
-            <tr>
-              <th className="p-2 text-left border font-normal border-theme">
+        <Table >
+          <TableHeader>
+            <TableRow>
+              <TableHead >
                 Name
-              </th>
-              <th className="p-2 text-left border font-normal border-theme">
+              </TableHead>
+              <TableHead >
                 Short Name
-              </th>
-              <th className="p-2 text-left border font-normal border-theme">
+              </TableHead>
+              <TableHead >
                 Unit
-              </th>
-              <th className="p-2 text-left border font-normal border-theme">
+              </TableHead>
+              <TableHead >
                 Range Type
-              </th>
-              <th className="p-2 text-center border font-normal border-theme">
+              </TableHead>
+              <TableHead>
                 Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {parameters.map(param => (
-              <tr key={param.id}>
-                <td className="p-2 border border-theme">
+              <TableRow key={param.id}>
+                <TableCell className="p-2 border border-theme">
                   {param.name}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme">
                   {param.shortName || '-'}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme">
                   {param.unit || '-'}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme">
                   {param.rangeType}
-                </td>
-                <td className="p-2 border border-theme">
+                </TableCell>
+                <TableCell className="p-2 border border-theme">
                   <div className="flex items-center justify-center gap-2">
-                    <button
+                    <Button
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
                       <Edit2 size={14} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
                       <X size={14} />
-                    </button>
+                    </Button>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
