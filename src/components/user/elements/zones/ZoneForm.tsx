@@ -4,6 +4,8 @@ import { Plus } from 'lucide-react';
 import { createZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
+import { Button } from '@/components/ui/button';
+import { Label } from '@radix-ui/react-label';
 
 interface ZoneFormProps {
   currentTheme: Theme;
@@ -77,7 +79,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
               {translation("zones.add_new")}
             </h3>
             <form onSubmit={handleSubmit}>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("zones.name")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -87,8 +89,8 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                   value={newZone.name}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.latitude")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -97,8 +99,8 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                   value={newZone.latitude}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.longitude")}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -107,21 +109,21 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
                   value={newZone.longitude}
                   onChange={handleChange}
                 />
-              </label>
+              </Label>
               <div className="w-full mt-6 flex items-center justify-end gap-x-2">
-                <button
+                <Button
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                   type="button"
                   onClick={handleReset}
                 >
                   {translation("actions.cancel")}
-                </button>
-                <button
+                </Button>
+                <Button
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   type="submit"
                 >
                   {translation("actions.save")}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

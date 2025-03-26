@@ -7,6 +7,9 @@ import { createProject } from '../../../../services/projects';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
 import { Project } from '../../../../types/projects';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
@@ -101,11 +104,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             <h3 className="text-lg mb-6 text-primary">{translation("project.new")}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1">
                   {translation("project.name")}
                   <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
@@ -116,9 +119,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1">
                   {translation("project.manager")}
-                </label>
+                </Label>
                 <select
                   value={selectedManagerId || ''}
                   onChange={(e) => setSelectedManagerId(e.target.value || null)}
@@ -135,9 +138,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation("project.type")}
-                </label>
+                </Label>
                 <select
                   value={typeProject}
                   onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
@@ -153,21 +156,21 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   <h4 className="font-medium text-primary">Default Structure</h4>
                   
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       type="checkbox"
                       id="createDefaultField"
                       checked={createDefaultField}
                       onChange={(e) => setCreateDefaultField(e.target.checked)}
                       className="rounded border-theme"
                     />
-                    <label htmlFor="createDefaultField" className="text-sm text-primary">
+                    <Label htmlFor="createDefaultField" className="text-sm text-primary">
                       Create default field
-                    </label>
+                    </Label>
                   </div>
                   
                   {createDefaultField && (
                     <div>
-                      <input
+                      <Input
                         type="text"
                         value={defaultFieldName}
                         onChange={(e) => setDefaultFieldName(e.target.value)}
@@ -176,20 +179,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                       />
                       
                       <div className="mt-2 flex items-center gap-2">
-                        <input
+                        <Input
                           type="checkbox"
                           id="createDefaultZone"
                           checked={createDefaultZone}
                           onChange={(e) => setCreateDefaultZone(e.target.checked)}
                           className="rounded border-theme"
                         />
-                        <label htmlFor="createDefaultZone" className="text-sm text-primary">
+                        <Label htmlFor="createDefaultZone" className="text-sm text-primary">
                           Create default zone
-                        </label>
+                        </Label>
                       </div>
                       
                       {createDefaultZone && (
-                        <input
+                        <Input
                           type="text"
                           value={defaultZoneName}
                           onChange={(e) => setDefaultZoneName(e.target.value)}
@@ -203,10 +206,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation("project.client_ref")}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={clientRef}
                   onChange={(e) => setClientRef(e.target.value)}
@@ -216,10 +219,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation("project.latitude")}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
@@ -229,10 +232,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation("project.longitude")}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}
@@ -242,10 +245,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   {translation("project.image_url")}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
@@ -261,7 +264,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               )}
 
               <div className="flex justify-end gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setShowForm(false);
@@ -270,13 +273,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"
                 >
                   {translation("actions.cancel")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                 >
                   {translation("project.create")}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

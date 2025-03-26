@@ -29,9 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div
             key={item.id}
             className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
-            style={{
-              backgroundColor: currentView === item.id ? currentTheme.colors.background : 'transparent'
-            }}
+
             onClick={() => onViewChange(item.id)}
           >
             <span className="ml-1 font-mono text-xs truncate">

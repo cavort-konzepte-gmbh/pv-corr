@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Language, LANGUAGES } from '../../../../types/language';
 import { useTranslation } from '../../../../types/language';
 import { updateUserSettings } from '../../../../services/userSettings';
+import { Button } from '@/components/ui/button';
 
 interface GeneralSettingsProps {
   currentLanguage: Language;
@@ -111,7 +112,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
             {t('settings.hidden_ids.description')}
           </div>
         </div>
-        <button
+        <Button
           onClick={() => handleSettingChange('show_hidden_ids', !showHiddenIds)}
           disabled={updating}
           className="px-3 py-1 rounded text-sm text-secondary-foreground bg-secondary hover:cursor-pointer data-[hidden='true']:text-accent-foreground data-[hidden='true']:bg-accent data-[updating='true']:opacity-50 data-[updating='true']:hover:cursor-not-allowed"
@@ -119,7 +120,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           data-updating={updating}          
         >
           {showHiddenIds ? t('settings.enabled') : t('settings.not_enabled')}
-        </button>
+        </Button>
       </div>
       <div className="p-3 flex items-center justify-between rounded bg-primary">
         <div className="text-primary-foreground">

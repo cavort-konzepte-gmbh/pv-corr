@@ -5,6 +5,9 @@ import { supabase } from '../../../../lib/supabase';
 import { Plus, ChevronRight, MapPin, Edit2, X } from 'lucide-react';
 import { generateHiddenId } from '../../../../utils/generateHiddenId';
 import { useKeyAction } from '../../../../hooks/useKeyAction';
+import { Button } from '@/components/ui/button';
+import { Label } from '@radix-ui/react-label';
+import { Input } from '@/components/ui/input';
 
 interface PlacesSettingsProps {
   currentTheme: Theme;
@@ -175,13 +178,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
   return (
     <div className="p-6">
-      <button
+      <Button
         onClick={() => setShowNewPlaceForm(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
         {translation("place.new")}
-      </button>
+      </Button>
 
       {error && (
         <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
@@ -205,7 +208,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
               {!selectedCountry ? (
                 <div className="grid grid-cols-2 gap-4">
                   {countries.map(country => (
-                    <button
+                    <Button
                       key={country.id}
                       onClick={() => handleCountrySelect(country)}
                       className="p-4 rounded-lg border transition-all hover:translate-y-[-2px] text-primary border-theme border-solid bg-surface"
@@ -217,7 +220,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                           <span className="text-sm text-secondary">({country.native_name})</span>
                         )}
                       </div>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -225,11 +228,11 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     {addressFields.map(field => (
                       <div key={field.id}>
-                        <label className="block text-sm mb-1 text-secondary">
+                        <Label className="block text-sm mb-1 text-secondary">
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <input
+                        </Label>
+                        <Input
                           type={field.field_type === 'number' ? 'number' : 'text'}
                           value={formValues[field.code] || ''}
                           onChange={(e) => handleInputChange(field.code, e.target.value)}
@@ -240,7 +243,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                     ))}
                   </div>
                   <div className="flex justify-end gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setShowNewPlaceForm(false);
@@ -251,13 +254,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                       className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                     >
                       {translation("actions.cancel")}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="submit"
                       className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                     >
                       {editingPlace ? translation("actions.save") : translation("place.add")}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               )}

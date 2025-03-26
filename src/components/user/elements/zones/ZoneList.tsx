@@ -9,6 +9,9 @@ import { supabase } from '../../../../lib/supabase';
 import { Language, useTranslation } from '../../../../types/language';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createZone } from '../../../../services/zones';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ZoneListProps {
   currentTheme: Theme;
@@ -150,38 +153,38 @@ const ZoneList: React.FC<ZoneListProps> = ({
 
   return (
     <div className="overflow-x-auto">
-      <button
+      <Button
         onClick={() => setIsAdding(true)}
         className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
       >
         <Plus size={16} />
         {translation("zones.add")}
-      </button>
+      </Button>
 
-      <table className="w-full border-collapse border-theme text-primary">
-        <thead>
-          <tr>
-            <th className="p-2 text-left border font-normal border-theme">
+      <Table className="w-full border-collapse border-theme text-primary">
+        <TableHeader>
+          <TableRow>
+            <TableHead >
               {translation("zones.short_name")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               {translation("zones.location")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead>
               Substructure
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               Foundation
-            </th>
-            <th className="p-2 text-center border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               {translation("zones.actions")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {isAdding && (
-            <tr>
-              <td className="p-2 border border-theme">
+            <TableRow>
+              <TableCell className="p-2 border border-theme">
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddZone}
@@ -196,7 +199,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     });
                   }}
                 >
-                  <input
+                  <Input
                     type="text"
                     value={newValues.name}
                     onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
@@ -204,17 +207,17 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     placeholder="Enter zone name"
                   />
                 </FormHandler>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={newValues.latitude}
                     onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
                     className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     placeholder="Latitude"
                   />
-                  <input
+                  <Input
                     type="text"
                     value={newValues.longitude}
                     onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
@@ -222,8 +225,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     placeholder="Longitude"
                   />
                 </div>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <select
                   value={newValues.substructureId}
                   onChange={(e) => setNewValues({ ...newValues, substructureId: e.target.value })}
@@ -236,8 +239,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     </option>
                   ))}
                 </select>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <select
                   value={newValues.foundationId}
                   onChange={(e) => setNewValues({ ...newValues, foundationId: e.target.value })}
@@ -250,16 +253,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     </option>
                   ))}
                 </select>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={handleAddZone}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Save size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       setIsAdding(false);
                       setNewValues({
@@ -273,16 +276,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <X size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {zones.map(zone => (
-            <tr key={zone.id} className="hover:bg-opacity-50">
-              <td className="p-2 border border-theme">
+            <TableRow key={zone.id} className="hover:bg-opacity-50">
+              <TableCell className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
-                  <input
+                  <Input
                     name="name"
                     type="text"
                     value={editingValues.name || zone.name}
@@ -293,18 +296,18 @@ const ZoneList: React.FC<ZoneListProps> = ({
                 ) : (
                   zone.name
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.latitude || zone.latitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                       placeholder="Latitude"
                       className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                     />
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.longitude || zone.longitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
@@ -313,17 +316,17 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     />
                   </div>
                 ) : zone.latitude && zone.longitude ? (
-                  <button
+                  <Button
                     onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
                     className="text-sm hover:underline text-accent-primary"
                   >
                     View on map
-                  </button>
+                  </Button>
                 ) : (
                   <span className="text-secondary">{translation("general.location_not_set")}</span>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <select
                     value={editingValues.substructureId || zone.substructureId || ''}
@@ -354,8 +357,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     )}
                   </div>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 {editingZoneId === zone.id ? (
                   <select
                     value={editingValues.foundationId || zone.foundationId || ''}
@@ -386,10 +389,10 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     )}
                   </div>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2 border border-theme">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={() => editingZoneId === zone.id ? (
                       handleUpdateZone(zone.id, editingValues)
                     ) : (
@@ -408,16 +411,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     disabled={updatingZone}
                   >
                     {editingZoneId === zone.id ? <Save size={14} /> : <Edit2 size={14} />}
-                  </button>
+                  </Button>
                   {editingZoneId === zone.id && (
                     <>
-                      <button
+                      <Button
                         onClick={() => handleDeleteZone(zone.id)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="p-1 rounded hover:bg-opacity-80 "
                       >
                         {translation("actions.delete")}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           setEditingZoneId(null);
                           setEditingValues({});
@@ -425,21 +428,21 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </>
                   )}
-                  <button
+                  <Button
                     onClick={() => onSelectZone(zone.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                   >
                     <ChevronRight size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

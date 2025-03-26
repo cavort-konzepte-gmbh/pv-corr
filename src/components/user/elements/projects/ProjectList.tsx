@@ -7,6 +7,9 @@ import { Customer } from '../../../../types/customers';
 import { Folder } from 'lucide-react';
 import { Person } from '../../../../types/people';
 import { updateProject, deleteProject, fetchProjects } from '../../../../services/projects';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ProjectListProps {
   currentTheme: Theme;
@@ -81,13 +84,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
       )}
       {projects.map(project => (
         <div key={project.id} className="relative">
-          <table
+     
+          <Table
             className="w-full border-collapse rounded-lg border transition-all hover:translate-x-1 text-primary border-theme bg-surface hover:cursor-pointer"
             onClick={() => handleSelectProject(project.id)}
           >
-            <thead>
-              <tr>
-                <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme bg-surface">
+            <TableHeader>
+              <TableRow>
+                <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme bg-surface">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Folder className="text-accent-primary" size={16} />
@@ -116,7 +120,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     <div className="flex items-center gap-2">
                       {editingProject === project.id ? (
                         <>
-                          <button
+                          <Button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSaveProject(project);
@@ -124,8 +128,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
                           >
                             <Save size={14} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={e => {
                               e.stopPropagation();
                               handleDeleteProject(project.id);
@@ -133,8 +137,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
                             <Trash2 size={14} />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={e => {
                               e.stopPropagation();
                               setShowMoveMenu(showMoveMenu === project.id ? null : project.id);
@@ -142,10 +146,10 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"
                           >
                             Move
-                          </button>
+                          </Button>
                         </>
                       ) : (
-                        <button
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingProject(project.id);
@@ -159,20 +163,20 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
                           <Edit2 size={14} />
-                        </button>
+                        </Button>
                       )}
                       <ChevronRight className="text-secondary" size={16} />
                     </div>
                   </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="p-2 border-b border-r border-theme w-1/6 text-secondary">
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="p-2 border-b border-r border-theme w-1/6 text-secondary">
                   {translation("project.manager")}
-                </td>
-                <td className="p-2 border-b border-theme">
+                </TableCell>
+                <TableCell className="p-2 border-b border-theme">
                   {editingProject === project.id ? (
                     <select
                       value={editingValues.managerId || ''}
@@ -194,16 +198,16 @@ const ProjectList: React.FC<ProjectListProps> = ({
                         : translation("project.manager.not_assigned")}
                     </span>
                   )}
-                </td>
-              </tr>
-              <tr>
-                <td className="p-2 border-r border-theme w-1/6 text-secondary">
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
                   {translation("zones.location")}
-                </td>
-                <td className="p-2 border-theme">
+                </TableCell>
+                <TableCell className="p-2 border-theme">
                   {editingProject === project.id ? (
                     <div className="flex gap-2">
-                      <input
+                      <Input
                         type="text"
                         value={editingValues.latitude || project.latitude || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
@@ -211,7 +215,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                         className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
                         placeholder={translation("project.latitude")}
                       />
-                      <input
+                      <Inputnput
                         type="text"
                         value={editingValues.longitude || project.longitude || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
@@ -223,7 +227,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                   ) : project.latitude && project.longitude ? (
                     <div className="flex items-center justify-between">
                       <span>{project.latitude}, {project.longitude}</span>
-                      <button
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank');
@@ -231,37 +235,34 @@ const ProjectList: React.FC<ProjectListProps> = ({
                         className="text-sm hover:underline text-accent-primary"
                       >
                         {translation("general.view_on_map")}
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <span className="text-secondary">{translation("general.location_not_set")}</span>
                   )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
           {showMoveMenu === project.id && (
             <div className="mt-4 space-y-2">
               {selectedCustomerId && (
-                <button
+                <Button
                   onClick={e => {
                     e.stopPropagation();
                     onMoveProject(project.id, null);
                     setShowMoveMenu(null);
                   }}
                   className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
-                  style={{ 
-                    backgroundColor: currentTheme.colors.background,
-                    color: currentTheme.colors.text.primary
-                  }}
+         
                 >
                   Move to No Customer
-                </button>
+                </Button>
               )}
               {customers
                 .filter(c => c.id !== selectedCustomerId)
                 .map(customer => (
-                  <button
+                  <Button
                     key={customer.id}
                     onClick={e => {
                       e.stopPropagation();
@@ -269,13 +270,10 @@ const ProjectList: React.FC<ProjectListProps> = ({
                       setShowMoveMenu(null);
                     }}
                     className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
-                    style={{ 
-                      backgroundColor: currentTheme.colors.background,
-                      color: currentTheme.colors.text.primary
-                    }}
+                
                   >
                     Move to {customer.name}
-                  </button>
+                  </Button>
                 ))
               }
             </div>
