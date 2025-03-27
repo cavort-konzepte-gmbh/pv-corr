@@ -407,7 +407,7 @@ const DashboardLayout = () => {
               <>
                 <button
                   onClick={() => setView('projects')}
-                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-black"
+                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors "
                 >
                   <ArrowLeft size={18} />
                   <span>{t("nav.back")}</span>

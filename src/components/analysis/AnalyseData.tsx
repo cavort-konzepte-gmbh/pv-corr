@@ -71,7 +71,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
             Name
             <ArrowUpDown size={12} />
           </Button>
-          <button
+          <Button
             onClick={() => handleSort('timestamp')}
             className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${
               sortField === 'timestamp' ? 'text-accent-primary bg-theme' : 'text-secondary'
@@ -79,7 +79,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
           >
             Date
             <ArrowUpDown size={12} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -89,15 +89,15 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
             <Button
               key={datapoint.id}
               onClick={() => onToggleDatapoint(datapoint.id)}
-              className={`p-2 rounded border transition-all hover:translate-x-1 text-left ${
+              className={`px-3 py-1 rounded text-sm transition-colors ${
                 selectedDatapoints.includes(datapoint.id)
-                  ? 'border-accent-primary bg-opacity-10'
-                  : 'border-theme'
+                     ? 'bg-accent-primary text-primary' 
+                : 'text-primary-foreground hover:bg-theme'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-primary">
+                  <div className="text-sm ">
                     {getDatapointName(datapoint)}
                   </div>
                 </div>

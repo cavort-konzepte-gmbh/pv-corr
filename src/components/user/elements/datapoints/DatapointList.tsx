@@ -130,7 +130,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
     <div>
       <Button
         onClick={() => setIsAdding(true)}
-        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+         className="w-full py-3 px-4 mb-4"
       >
         <Plus size={16} />
         {translation("datapoint.add_new")}
@@ -141,7 +141,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
               <TableRow>
                 <TableHead>{translation("datapoint.short_name")}</TableHead>
                 {parameters.map(param => (
-                  <TableHead key={param.id} className="text-center w-32">
+                  <TableHead key={param.id} >
                     {param.shortName || param.name}
                   </TableHead>
                 ))}
@@ -153,7 +153,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
 
           {isAdding && (
             <TableRow>
-              <TableCell className="p-2 border border-theme">
+              <TableCell className="p-2">
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddDatapoint}
@@ -167,13 +167,13 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 "
                     placeholder="Enter custom name (optional)"
                   />
                 </FormHandler>
               </TableCell>
               {parameters.map(param => (
-                <TableCell key={param.id} className="p-2 border border-theme text-center">
+                <TableCell key={param.id} className="p-2">
                   <ParameterInput
                     parameter={{
                       ...param,
@@ -188,7 +188,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                   />
                 </TableCell>
               ))}
-              <TableCell className="p-2 border-t border-theme">
+              <TableCell className="p-2 ">
                 <div className="flex items-center justify-center gap-2">
                   <Button
                     onClick={handleAddDatapoint}
@@ -211,18 +211,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
             </TableRow>
           )}
           {datapoints.map(datapoint => (
-            <TableRow key={datapoint.id} className="border-t border-theme">
+            <TableRow key={datapoint.id}>
               <TableCell className="p-2">
                 {editingDatapoint === datapoint.id ? (
                   <Input
                     type="text"
                     value={editingName || ''}
                     onChange={(e) => setEditingName(e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 "
                     placeholder="Enter name"
                   />
                 ) : (
-                  <span className="text-primary">
+                  <span >
                     {datapoint.name}
                   </span>
                 )}
@@ -245,7 +245,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       currentTheme={currentTheme}
                     />
                   ) : (
-                    <span className="text-primary">
+                    <span >
                       {datapoint.values[param.id] || '-'}
                     </span>
                   )}

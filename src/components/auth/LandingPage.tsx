@@ -108,7 +108,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) =
 
         <Button
           onClick={onContinue}
-          className="px-8 py-3 rounded-lg font-medium text-lg transition-all hover:translate-y-[-2px] text-white bg-accent-primary"          
+          className="px-8 py-3 rounded-lg font-medium text-lg transition-all hover:translate-y-[-2px] "          
         >
           Continue to Login
         </Button>

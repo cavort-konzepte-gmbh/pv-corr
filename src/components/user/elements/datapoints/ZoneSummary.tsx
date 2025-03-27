@@ -47,7 +47,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}> 
+            <TableHead colSpan={2} className="p-4 text-left  font-semibold  cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}> 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
@@ -55,14 +55,14 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                       type="text"
                       value={editValues.name}
                       onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                      className="p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="p-1 rounded text-sm text-primary "
                       onClick={e => e.stopPropagation()}
                     />
                   ) : (
                     <span>{zone.name}</span>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
                       {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
                     </span>
                   </div>
@@ -101,9 +101,9 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                     </Button>
                   )}
                   {isExpanded ? (
-                    <ChevronDown className="text-secondary" size={16} />
+                    <ChevronDown className="text-primary"  size={16} />
                   ) : (
-                    <ChevronRight className="text-secondary" size={16} />
+                    <ChevronRight className="text-primary" size={16} />
                   )}
                 </div>
               </div>
@@ -113,24 +113,24 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
         {isExpanded && (
           <TableBody>
             <TableRow>
-              <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">
+              <TableCell className="p-2  w-1/6 text-primary">
                 {translation("zones.location")}
               </TableCell>
-              <TableCell className="p-2 border-theme">
+              <TableCell className="p-2 ">
                 {isEditing ? (
                   <div className="flex gap-2">
                     <Input
                       type="text"
                       value={editValues.latitude}
                       onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
-                      className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-1/2 p-1 rounded text-sm text-primary "
                       placeholder={translation("project.latitude")}
                     />
                     <Input
                       type="text"
                       value={editValues.longitude}
                       onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
-                      className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-1/2 p-1 rounded text-sm text-primary "
                       placeholder={translation("project.longitude")}
                     />
                   </div>
@@ -145,7 +145,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                     </Button>
                   </div>
                 ) : (
-                  <span className="text-secondary">{translation("general.location_not_set")}</span>
+                  <span className="text-primary">{translation("general.location_not_set")}</span>
                 )}
               </TableCell>
             </TableRow>

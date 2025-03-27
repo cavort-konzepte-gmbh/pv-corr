@@ -200,7 +200,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
           <div 
             key={datapoint.id}
-            className="p-4 rounded-lg border border-theme bg-surface"
+            className="p-4 rounded-lg border border-theme "
           >
             <div 
               className="flex items-center justify-between mb-2 cursor-pointer"
@@ -258,18 +258,18 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                     {Object.entries(parameterRatings)
                       .sort(([a], [b]) => a.localeCompare(b))
                       .map(([code, { value, rating, unit }]) => (
-                      <TableRow key={code} className="border-t border-theme">
-                        <TableCell className="p-2 text-primary">{code.toUpperCase()}</TableCell>
-                        <TableCell className="p-2 text-primary">
+                      <TableRow key={code} >
+                        <TableCell className="p-2">{code.toUpperCase()}</TableCell>
+                        <TableCell className="p-2">
                           {value} {unit && <span className="text-secondary">({unit})</span>}
                         </TableCell>
-                        <TableCell className="p-2 text-primary">{rating}</TableCell>
+                        <TableCell className="p-2 ">{rating}</TableCell>
                       </TableRow>
                     ))}
-                    <TableRow className="border-t-2 border-theme">
-                      <TableCell className="p-2 font-bold text-primary">SUM</TableCell>
-                      <TableCell className="p-2 text-primary"></TableCell>
-                      <TableCell className="p-2 font-bold text-primary">
+                    <TableRow >
+                      <TableCell className="p-2 font-bold ">SUM</TableCell>
+                      <TableCell className="p-2 "></TableCell>
+                      <TableCell className="p-2 font-bold ">
                         {Object.values(parameterRatings).reduce((sum, { rating }) => sum + rating, 0)}
                       </TableCell>
                     </TableRow>

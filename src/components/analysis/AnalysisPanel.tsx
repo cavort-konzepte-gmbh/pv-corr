@@ -189,7 +189,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       <h2 className="text-2xl font-bold text-primary mb-6">
         {t("analysis.title")}
         {selectedProject && (
-          <span className="text-sm text-secondary ml-2">
+          <span className="text-sm El text-secondary-foreground ml-2">
             {selectedProject.name} {selectedField && `→ ${selectedField.name}`} {selectedZone && `→ ${selectedZone.name}`}
           </span>
         )}

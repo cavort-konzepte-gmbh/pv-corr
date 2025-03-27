@@ -52,23 +52,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-theme">
-      <div className="max-w-sm w-full p-8 rounded-lg bg-surface">
+    <div className="min-h-screen flex items-center justify-center  ">
+      <div className="max-w-sm w-full p-8 rounded-lg border border-accent bg-background">
         <div className="flex gap-4 mb-8">
-          <button
+          <Button
             onClick={() => setLoginType('user')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-        
+            className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
+              loginType === 'user'
+                  ? 'bg-accent-primary text-primary' 
+                : 'text-primary-foreground hover:bg-theme'
+            }`}
           >
             User
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setLoginType('admin')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-       
+            className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
+              loginType === 'admin'
+                  ? 'bg-accent-primary text-primary' 
+                : 'text-primary-foreground hover:bg-theme'
+            }`}
           >
             Admin
-          </button>
+          </Button>
         </div>
 
         {error && (
@@ -82,7 +88,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2 text-secondary">
+            <label className="block text-sm font-medium mb-2 ">
               Email
             </label>
             <Input
@@ -90,13 +96,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"              
+              className="w-full p-2 rounded text-sm text-primary "              
               placeholder="name@company.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-secondary">
+            <label className="block text-sm font-medium mb-2 ">
               Password
             </label>
             <Input
@@ -104,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"            
+              className="w-full p-2 rounded text-sm text-primary "            
               placeholder="••••••••"
             />
           </div>
