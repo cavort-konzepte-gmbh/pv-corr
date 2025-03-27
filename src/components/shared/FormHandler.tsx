@@ -46,7 +46,7 @@ export const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = 
   return (
     <Input
       {...props}
-      className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${props.className || ''}`}
+      className={`w-full p-2 rounded text-sm text-primary  ${props.className || ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault(); // Prevent form submission
@@ -61,7 +61,7 @@ export const FormSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>>
   return (
     <select
       {...props}
-      className={`w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent" ${props.className || ''}`}
+      className={`w-full p-2 rounded text-sm text-primary " ${props.className || ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault(); // Prevent form submission

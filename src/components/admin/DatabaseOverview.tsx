@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
 import { BarChart2, Users, Database, HardDrive } from 'lucide-react';
+import { Card, CardContent} from '../ui/card';
+import { Bar,  BarChart,  ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 interface DatabaseOverviewProps {
   currentTheme: Theme;
@@ -61,7 +63,13 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
       </div>
     );
   }
-
+  const data = [
+    { name: "REST Requests", value: stats?.database.rest_requests || 0 },
+    { name: "Total Users", value: stats?.auth.total_users || 0 },
+    { name: "New Signups", value: stats?.auth.total_signups || 0 },
+    { name: "Total Storage", value: stats?.storage.total_storage || 0 },
+    { name: "Egress", value: stats?.storage.total_egress || 0 },
+  ];
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -134,7 +142,20 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
           <BarChart2 className="text-accent-primary" size={24} />
           <h3 className="text-lg font-medium text-primary">Usage Trends</h3>
         </div>
-        {/* Add charts/graphs here when needed */}
+         
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-medium text-primary">Database Statistics</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart width={500} height={300} data={data}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value"  />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

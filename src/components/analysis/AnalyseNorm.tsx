@@ -79,15 +79,15 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
           <Button
             key={norm.id}
             onClick={() => onSelectNorm(norm.id)}
-            className={`p-2 rounded border transition-all hover:translate-x-1 text-left ${
+            className={`px-3 py-1 rounded text-sm transition-colors ${
               selectedNormId === norm.id 
-              ? 'border-accent-primary bg-opacity-10'
-              : 'border-theme'
+                  ? 'bg-accent-primary text-primary' 
+                : 'text-primary-foreground hover:bg-theme'
             }`}
           >
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-primary">{norm.name}</div>
+                <div className="text-sm ">{norm.name}</div>
               </div>
               {selectedNormId === norm.id && (
                 <Check size={12} className="text-accent-primary" />

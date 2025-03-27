@@ -30,7 +30,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
       >
         <option value="">Select value</option>
         {options.map(opt => (
@@ -105,7 +105,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         min={!isNaN(min) ? min : undefined}
         max={max !== undefined && !isNaN(max) ? max : undefined}
         step="0.01"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded font-mono text-sm "
         placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : '+'})`}
       />
     );
@@ -120,7 +120,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+          className="w-full p-2 rounded font-mono text-sm "
           placeholder="Enter value"
         />
       );
@@ -139,7 +139,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         }}
         min={parameter.rangeType === 'greater' ? limit + 0.000001 : limit}
         step="any"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 "
         placeholder={`Enter value ${parameter.rangeType === 'greater' ? '>' : '>='} ${limit}`}
       />
     );
@@ -149,12 +149,12 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
     const limit = parseFloat(parameter.rangeValue);
     if (isNaN(limit)) {
       return (
-        <input
+        <Input
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+          className="w-full p-2 rounded font-mono text-sm "
           placeholder="Enter value"
         />
       );
@@ -173,7 +173,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         }}
         max={parameter.rangeType === 'less' ? limit - 0.000001 : limit}
         step="any"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded font-mono text-sm "
         placeholder={`Enter value ${parameter.rangeType === 'less' ? '<' : '<='} ${limit}`}
       />
     );
@@ -185,7 +185,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+      className="w-full p-2 rounded font-mono text-sm "
       placeholder="Enter value"
     />
   );
@@ -296,14 +296,14 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
         <Button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded font-mono text-sm text-secondary border-theme border-solid bg-transparent"          
+          className="size-8"   
         >
           {t('actions.cancel')}
         </Button>
         <Button
           type="submit"
           disabled={Object.keys(formValues).length === 0}
-          className="px-4 py-2 rounded font-mono text-sm disabled:opacity-50 disabled:cursor-not-allowed text-white bg-accent-primary"          
+          className="size-8"        
         >
           {t('datapoint.new')}
         </Button>

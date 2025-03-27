@@ -282,7 +282,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
             </TableRow>
           )}
           {zones.map(zone => (
-            <TableRow key={zone.id} className="hover:bg-opacity-50">
+            <TableRow key={zone.id} >
               <TableCell className="p-2">
                 {editingZoneId === zone.id ? (
                   <Input
@@ -322,7 +322,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     View on map
                   </Button>
                 ) : (
-                  <span className="text-secondary">{translation("general.location_not_set")}</span>
+                  <span >{translation("general.location_not_set")}</span>
                 )}
               </TableCell>
               <TableCell className="p-2">
