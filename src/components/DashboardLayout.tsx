@@ -401,7 +401,7 @@ const DashboardLayout = () => {
     <Router>
       <div className="min-h-screen flex flex-col">
         {/* Top Navigation Bar */}
-        <div className="h-14 border-b flex items-center px-4 border-input">
+        <div className="h-14 border-b flex items-center px-4 border-input bg-card">
           <div className="flex-1 flex items-center gap-6">
             {view === 'settings' ? (
               <>

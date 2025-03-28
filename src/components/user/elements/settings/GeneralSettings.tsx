@@ -139,6 +139,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           <option value="green.dark">Green Dark</option>
         </select>
       </div>
+      <div className="p-3 text-primary-foreground bg-primary">
+        <span>Theme</span>
+        <span className="text-xs">Select the theme</span>
+      </div>
     </div>
   );
 };

@@ -41,14 +41,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <button
           onClick={() => setActiveView('overview')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"          
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
        
             >
-              <Database className="text-accent-primary" size={20} />
+              <Database size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -63,14 +63,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('parameters')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
           
             >
-              <Table className="text-accent-primary" size={20} />
+              <Table size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -85,14 +85,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('norms')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
          
             >
-              <ClipboardList className="text-accent-primary" size={20} />
+              <ClipboardList size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -107,14 +107,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('constants')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
   
             >
-              <Ruler className="text-accent-primary" size={20} />
+              <Ruler size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -129,14 +129,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('materials')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
       
             >
-              <Flask className="text-accent-primary" size={20} />
+              <Flask size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -151,14 +151,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('foundations')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
      
             >
-              <Building2 className="text-accent-primary" size={20} />
+              <Building2 size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -173,7 +173,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('experts')}
-          className="p-6 rounded-lg border border-accent text-accent-foreground"
+          className="p-6 rounded-lg border border-accent text-accent-foreground bg-card"
       
         >
           <div className="flex items-center gap-4 mb-4">
@@ -181,7 +181,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
               className="w-10 h-10 rounded-lg flex items-center justify-center"
 
             >
-              <GraduationCap className="text-accent-primary" size={20} />
+              <GraduationCap size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -196,7 +196,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('neighboring')}
-          className="p-6 rounded-lg border border-accent text-accent-foreground"
+          className="p-6 rounded-lg border border-accent text-accent-foreground bg-card"
    
         >
           <div className="flex items-center gap-4 mb-4">
@@ -204,7 +204,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
               className="w-10 h-10 rounded-lg flex items-center justify-center"
          
             >
-              <Building2 className="text-accent-primary" size={20} />
+              <Building2 size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -219,14 +219,14 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('substructures')}
-          className="p-6 rounded-lg border border-accent text-card-foreground"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
 
             >
-              <Wrench className="text-accent-primary" size={20} />
+              <Wrench size={20} />
             </div>
             <div className="text-left">
               <h3 className="font-medium">
@@ -240,7 +240,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         </button>
       </div>
 
-      <div className="rounded-lg border border-accent">
+      <div className="rounded-lg text-card-foreground border border-accent bg-card">
         {activeView === 'parameters' && (
           <ParameterPanel
             currentTheme={currentTheme}

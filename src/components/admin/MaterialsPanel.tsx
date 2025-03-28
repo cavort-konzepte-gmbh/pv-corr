@@ -178,7 +178,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg text-primary">
+            <h3 className="text-lg font-bold">
               Materials
             </h3>
             <Button
@@ -190,167 +190,169 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
             </Button>
           </div>
 
-          <div className="overflow-x-auto">
-            <Table>
-              <TableCaption>Materials</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>E-Potential</TableHead>
-                  <TableHead>Valency</TableHead>
-                  <TableHead>Molar Mass</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <section className="border border-input rounded-md bg-card">
+            <div className="w-full relative overflow-auto">
+              <Table>
+                <TableCaption>Materials</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>E-Potential</TableHead>
+                    <TableHead>Valency</TableHead>
+                    <TableHead>Molar Mass</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
 
+            
           
-        
-                {materials.map((material) => (
-                  <TableRow key={material.id}>
-                    <TableCell className="p-2">
-                      {editingMaterial === material.id ? (
+                  {materials.map((material) => (
+                    <TableRow key={material.id}>
+                      <TableCell className="p-2">
+                        {editingMaterial === material.id ? (
+                          <Input
+                            type="text"
+                            name="name"
+                            value={editingValues.name || ''}
+                            onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                            className="w-full p-1"
+                          />
+                        ) : (
+                          material.name
+                        )}
+                      </TableCell>
+                      <TableCell className="p-2">
+                        {editingMaterial === material.id ? (
+                          <Input
+                            type="number"
+                            name="e_potential"
+                            value={editingValues.e_potential || ''}
+                            onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                            className="w-full p-1"
+                            step="any"
+                          />
+                        ) : (
+                          material.e_potential
+                        )}
+                      </TableCell>
+                      <TableCell className="p-2">
+                        {editingMaterial === material.id ? (
+                          <Input
+                            type="number"
+                            name="valency"
+                            value={editingValues.valency || ''}
+                            onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                            className="w-full p-1"
+                            step="any"
+                          />
+                        ) : (
+                          material.valency
+                        )}
+                      </TableCell>
+                      <TableCell className="p-2">
+                        {editingMaterial === material.id ? (
+                          <Input
+                            type="number"
+                            name="molar_mass"
+                            value={editingValues.molar_mass || ''}
+                            onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                            className="w-full p-1"
+                            step="any"
+                          />
+                        ) : (
+                          material.molar_mass
+                        )}
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            onClick={() => handleUpdateSaveMaterial(material)}
+                            className="p-1 rounded hover:bg-opacity-80"
+                            variant="ghost"
+                          >
+                            {editingMaterial === material.id ? (
+                              <Save size={14} />
+                            ) : (
+                              <Edit2 size={14} />
+                            )}
+                          </Button>
+                          <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
+                            <X size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {isNewMaterial && (
+                    <TableRow>
+                      <TableCell className="p-2">
                         <Input
                           type="text"
                           name="name"
-                          value={editingValues.name || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          value={newMaterial.name || ''}
+                          onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
+                          placeholder="Enter material name"
                         />
-                      ) : (
-                        material.name
-                      )}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      {editingMaterial === material.id ? (
+                      </TableCell>
+                      <TableCell className="p-2">
                         <Input
                           type="number"
                           name="e_potential"
-                          value={editingValues.e_potential || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          value={newMaterial.e_potential || ''}
+                          onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
+                          placeholder="Enter E-Potential"
                           step="any"
                         />
-                      ) : (
-                        material.e_potential
-                      )}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      {editingMaterial === material.id ? (
+                      </TableCell>
+                      <TableCell className="p-2">
                         <Input
                           type="number"
                           name="valency"
-                          value={editingValues.valency || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          value={newMaterial.valency || ''}
+                          onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
+                          placeholder="Enter Valency"
                           step="any"
                         />
-                      ) : (
-                        material.valency
-                      )}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      {editingMaterial === material.id ? (
+                      </TableCell>
+                      <TableCell className="p-2">
                         <Input
                           type="number"
                           name="molar_mass"
-                          value={editingValues.molar_mass || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          value={newMaterial.molar_mass || ''}
+                          onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
+                          placeholder="Enter Molar Mass"
                           step="any"
                         />
-                      ) : (
-                        material.molar_mass
-                      )}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex items-center justify-center gap-2">
-                        <Button
-                          onClick={() => handleUpdateSaveMaterial(material)}
-                          className="p-1 rounded hover:bg-opacity-80 text-primary"
-                          variant="ghost"
-                        >
-                          {editingMaterial === material.id ? (
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            onClick={handleAddNewMaterial}
+                            className="p-1 rounded hover:bg-opacity-80 text-primary"
+                            variant="ghost"
+                          >
                             <Save size={14} />
-                          ) : (
-                            <Edit2 size={14} />
-                          )}
-                        </Button>
-                        <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
-                          <X className="text-primary" size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {isNewMaterial && (
-                  <TableRow>
-                    <TableCell className="p-2">
-                      <Input
-                        type="text"
-                        name="name"
-                        value={newMaterial.name || ''}
-                        onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1"
-                        placeholder="Enter material name"
-                      />
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Input
-                        type="number"
-                        name="e_potential"
-                        value={newMaterial.e_potential || ''}
-                        onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1"
-                        placeholder="Enter E-Potential"
-                        step="any"
-                      />
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Input
-                        type="number"
-                        name="valency"
-                        value={newMaterial.valency || ''}
-                        onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1"
-                        placeholder="Enter Valency"
-                        step="any"
-                      />
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Input
-                        type="number"
-                        name="molar_mass"
-                        value={newMaterial.molar_mass || ''}
-                        onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
-                        className="w-full p-1"
-                        placeholder="Enter Molar Mass"
-                        step="any"
-                      />
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex items-center justify-center gap-2">
-                        <Button
-                          onClick={handleAddNewMaterial}
-                          className="p-1 rounded hover:bg-opacity-80 text-primary"
-                          variant="ghost"
-                        >
-                          <Save size={14} />
-                        </Button>
-                        <Button
-                          onClick={handleCancelNewMaterial}
-                          className="p-1 rounded hover:bg-opacity-80 text-primary"
-                          variant="ghost"
-                        >
-                          <X className="text-primary" size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                          </Button>
+                          <Button
+                            onClick={handleCancelNewMaterial}
+                            className="p-1 rounded hover:bg-opacity-80 text-primary"
+                            variant="ghost"
+                          >
+                            <X className="text-primary" size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </section>
         </div>
       )}
     </div>

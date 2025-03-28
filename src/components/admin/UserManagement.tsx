@@ -157,9 +157,9 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
           variant="ghost"
           onClick={onBack}
         >
-          <ArrowLeft className="text-primary" size={20} />
+          <ArrowLeft className="text-card-foreground" size={20} />
         </Button>
-        <h2 className="text-2xl font-bold text-primary">
+        <h2 className="text-2xl font-bold text-card-foreground">
           User Management
         </h2>
       </div>
@@ -187,7 +187,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       <Label className="mb-6 flex items-center gap-x-4 relative">
         <Search className="text-primary absolute left-4" size={20} />
         <Input 
-          className="h-12 indent-10 "
+          className="h-12 indent-10 bg-card"
           type="text"
           placeholder="Search users..."
           value={searchTerm}
@@ -202,98 +202,102 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
             Loading...
           </div>
         )}
-        <Table>
-          <TableCaption className="h-8">List of users registered.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map(user => (
-              <TableRow key={user.id}>
-                <TableCell className="flex items-center gap-x-4">
-                  <figure className="w-8 h-8 rounded-full flex items-center justify-center">
-                    <User className="text-accent-primary" size={16} />
-                  </figure>
-                  <dl>
-                    <dt className="text-primary">{user.displayName}</dt>
-                    <dd className="text-muted-foreground">{user.email}</dd>
-                  </dl>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Shield className="text-accent-primary" size={16} />
-                    <span className="text-muted-foreground">
-                      {user.adminLevel === 'super_admin' 
-                        ? 'Super Admin' 
-                        : user.adminLevel === 'admin' 
-                          ? 'Admin' 
-                          : 'User'
-                      }
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
-                </TableCell>
-                <TableCell>
-                  {editingUser === user.id ? (
-                    <div className="flex items-center justify-start gap-2">
-                      <Button                       
-                        variant="ghost"
-                        onClick={() => handleUpdateRole(user.id)}
-                        disabled={loading}
-                      >
-                        <Save className="text-primary" size={16} />
-                      </Button>
-                      <Button
-                        className="text-secondary disabled:opacity-50"
-                        variant="ghost"
-                        disabled={loading}
-                        onClick={() => setEditingUser(null)}
-                      >
-                        <X className="text-primary" size={16} />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-start gap-2">
-                      <Button
-                        className="text-secondary disabled:opacity-50"
-                        variant="ghost"
-                        disabled={loading}
-                        onClick={() => handleEdit(user)}
-                      >
-                        <Edit2 className="text-primary" size={16} />
-                      </Button>
-                      {user.adminLevel !== 'super_admin' && (
-                        <Button
-                          className="text-accent-primary disabled:opacity-50"
-                          variant="ghost"
-                          disabled={loading}
-                          //onClick={() => handleDelete(user.id)}
-                          onClick={() => setIsDeleting(true)}
-                        >
-                          <Trash2 className="text-primary" size={16} />
-                        </Button>
+        <section className="border border-input rounded-md bg-card">
+          <div className="w-full relative overflow-auto">
+            <Table>
+              <TableCaption className="h-8">List of users registered.</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map(user => (
+                  <TableRow key={user.id}>
+                    <TableCell className="flex items-center gap-x-4">
+                      <figure className="w-8 h-8 rounded-full flex items-center justify-center">
+                        <User size={16} />
+                      </figure>
+                      <dl>
+                        <dt>{user.displayName}</dt>
+                        <dd className="text-muted-foreground">{user.email}</dd>
+                      </dl>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Shield className="text-accent-primary" size={16} />
+                        <span className="text-muted-foreground">
+                          {user.adminLevel === 'super_admin' 
+                            ? 'Super Admin' 
+                            : user.adminLevel === 'admin' 
+                              ? 'Admin' 
+                              : 'User'
+                          }
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
+                    </TableCell>
+                    <TableCell>
+                      {editingUser === user.id ? (
+                        <div className="flex items-center justify-start gap-2">
+                          <Button                       
+                            variant="ghost"
+                            onClick={() => handleUpdateRole(user.id)}
+                            disabled={loading}
+                          >
+                            <Save size={16} />
+                          </Button>
+                          <Button
+                            className="disabled:opacity-50"
+                            variant="ghost"
+                            disabled={loading}
+                            onClick={() => setEditingUser(null)}
+                          >
+                            <X size={16} />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-start gap-2">
+                          <Button
+                            className="disabled:opacity-50"
+                            variant="ghost"
+                            disabled={loading}
+                            onClick={() => handleEdit(user)}
+                          >
+                            <Edit2 size={16} />
+                          </Button>
+                          {user.adminLevel !== 'super_admin' && (
+                            <Button
+                              className="disabled:opacity-50"
+                              variant="ghost"
+                              disabled={loading}
+                              //onClick={() => handleDelete(user.id)}
+                              onClick={() => setIsDeleting(true)}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>        
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>        
+          </div>
+        </section>
       </div>
 
       {showNewUserForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="p-6 rounded-lg max-w-md w-full text-card-foreground bg-popover">
-            <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
-              <User className="text-accent-primary" size={20} />
+          <div className="p-6 rounded-lg max-w-md w-full text-card-foreground bg-card">
+            <h3 className="text-lg mb-6 flex items-center gap-2">
+              <User size={20} />
               Add New User
             </h3>
             

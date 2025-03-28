@@ -31,9 +31,9 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
             variant="ghost"
             onClick={onBack}
           >
-            <ArrowLeft className="text-primary" size={20} />
+            <ArrowLeft size={20} />
           </Button>
-          <h2 className="text-2xl font-bold text-primary">
+          <h2 className="text-2xl font-bold">
             System Configuration
           </h2>
         </div>
@@ -70,7 +70,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
           {/* Translations Management */}
           <div 
             onClick={() => setActiveView('translations')}
-            className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer"
+            className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer bg-card"
           >
             <div className="flex flex-col gap-2">
               <Globe className="text-accent-primary" size={24} />

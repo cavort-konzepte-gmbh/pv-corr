@@ -58,7 +58,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
       ) : (
         <div className="p-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-primary">
+          <h1 className="text-3xl font-bold text-card-foreground">
             Admin Dashboard
           </h1>
           <Button
@@ -75,7 +75,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           {/* User Management */}
           <div 
             onClick={() => setActiveView('users')}
-            className="p-6 rounded-lg text-card-foreground border border-accent"
+            className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center">
@@ -95,7 +95,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           {/* Database Management */}
           <div 
             onClick={() => setActiveView('database')}
-            className="p-6 rounded-lg text-card-foreground border border-accent"
+            className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center">
@@ -115,7 +115,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           {/* Notifications Management */}
           <div 
             onClick={() => setActiveView('notifications')}
-            className="p-6 rounded-lg text-card-foreground border border-accent"
+            className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center">
@@ -135,7 +135,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           {/* System Settings */}
           <div 
             onClick={() => setActiveView('settings')}
-            className="p-6 rounded-lg text-card-foreground border border-accent"
+            className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center">

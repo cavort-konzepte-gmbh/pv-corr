@@ -110,7 +110,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
         <Label className="w-full mb-6 flex items-center gap-x-4 relative">
           <Search className="text-primary absolute left-4" size={20} />
           <Input 
-            className="h-12 indent-10 "
+            className="h-12 indent-10 bg-card"
             type="text"
             placeholder="Search translations..."
             value={searchTerm}
@@ -132,76 +132,29 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableCaption>Translations</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Key</TableHead>
-              {LANGUAGES.map(lang => (
-                <TableHead key={lang.id}>{lang.name}</TableHead>
-              ))}
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-   <TableBody>
-
-
-            {isAdding && (
+        <section className="border border-input rounded-md bg-card">
+          <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>Translations</TableCaption>
+            <TableHeader>
               <TableRow>
-                <TableCell className="p-2">
-                  <FormHandler
-                    isEditing={true}
-                    onSave={handleAddNew}
-                    onCancel={() => {
-                      setIsAdding(false);
-                      setNewValues({
-                        key: '',
-                        translations: {}
-                      });
-                    }}
-                  >
-                    <Input
-                      type="text"
-                      value={newValues.key}
-                      onChange={(e) => setNewValues(prev => ({
-                        ...prev,
-                        key: e.target.value
-                      }))}
-                      className="w-full p-1"
-                      placeholder="Enter translation key"
-                    />
-                  </FormHandler>
-                </TableCell>
+                <TableHead>Key</TableHead>
                 {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2">
-                    <Input
-                      type="text"
-                      value={newValues.translations[lang.id] || ''}
-                      onChange={(e) => setNewValues(prev => ({
-                        ...prev,
-                        translations: {
-                          ...prev.translations,
-                          [lang.id]: e.target.value
-                        }
-                      }))}
-                      className="w-full p-1"
-                      dir={lang.direction}
-                      placeholder={`Enter ${lang.name} translation`}
-                    />
-                  </TableCell>
+                  <TableHead key={lang.id}>{lang.name}</TableHead>
                 ))}
-                <TableCell className="p-2">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      onClick={handleAddNew}
-                      className="p-1 rounded hover:bg-opacity-80 text-primary"
-                    >
-                      <Save size={14} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+    <TableBody>
+
+
+              {isAdding && (
+                <TableRow>
+                  <TableCell className="p-2">
+                    <FormHandler
+                      isEditing={true}
+                      onSave={handleAddNew}
+                      onCancel={() => {
                         setIsAdding(false);
                         setNewValues({
                           key: '',
@@ -209,80 +162,127 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                         });
                       }}
                     >
-                      <X className="text-primary" size={14} />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-            {filteredTranslations.map(([key, values]) => (
-              <TableRow key={key}>
-                <TableCell className="p-2 text-primary">
-                  <code className="font-mono text-sm">{key}</code>
-                </TableCell>
-                {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2 text-muted-foreground">
-                    {editingKey === key ? (
                       <Input
                         type="text"
-                        value={editValues[lang.id] || values[lang.id] || ''}
-                        onChange={(e) => setEditValues(prev => ({
+                        value={newValues.key}
+                        onChange={(e) => setNewValues(prev => ({
                           ...prev,
-                          [lang.id]: e.target.value
+                          key: e.target.value
+                        }))}
+                        className="w-full p-1"
+                        placeholder="Enter translation key"
+                      />
+                    </FormHandler>
+                  </TableCell>
+                  {LANGUAGES.map(lang => (
+                    <TableCell key={lang.id} className="p-2">
+                      <Input
+                        type="text"
+                        value={newValues.translations[lang.id] || ''}
+                        onChange={(e) => setNewValues(prev => ({
+                          ...prev,
+                          translations: {
+                            ...prev.translations,
+                            [lang.id]: e.target.value
+                          }
                         }))}
                         className="w-full p-1"
                         dir={lang.direction}
+                        placeholder={`Enter ${lang.name} translation`}
                       />
-                    ) : (
-                      <div dir={lang.direction}>
-                        {values[lang.id] || '-'}
-                      </div>
-                    )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        onClick={handleAddNew}
+                        variant="ghost"
+                      >
+                        <Save size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setIsAdding(false);
+                          setNewValues({
+                            key: '',
+                            translations: {}
+                          });
+                        }}
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
                   </TableCell>
-                ))}
-                <TableCell className="p-2">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      onClick={() => {
-                        if (editingKey === key) {
-                          handleSave(key);
-                        } else {
-                          setEditingKey(key);
-                          setEditValues(values);
-                        }
-                      }}
-                      variant="ghost"
-                      className="text-primary"
-                    >
-                      {editingKey === key ? <Save size={14} /> : <Edit2 size={14} />}
-                    </Button>
-                    {editingKey === key ? (
+                </TableRow>
+              )}
+              {filteredTranslations.map(([key, values]) => (
+                <TableRow key={key}>
+                  <TableCell className="p-2">
+                    <code className="font-mono text-sm">{key}</code>
+                  </TableCell>
+                  {LANGUAGES.map(lang => (
+                    <TableCell key={lang.id} className="p-2 text-muted-foreground">
+                      {editingKey === key ? (
+                        <Input
+                          type="text"
+                          value={editValues[lang.id] || values[lang.id] || ''}
+                          onChange={(e) => setEditValues(prev => ({
+                            ...prev,
+                            [lang.id]: e.target.value
+                          }))}
+                          className="w-full p-1"
+                          dir={lang.direction}
+                        />
+                      ) : (
+                        <div dir={lang.direction}>
+                          {values[lang.id] || '-'}
+                        </div>
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Button
                         onClick={() => {
-                          setEditingKey(null);
-                          setEditValues({});
+                          if (editingKey === key) {
+                            handleSave(key);
+                          } else {
+                            setEditingKey(key);
+                            setEditValues(values);
+                          }
                         }}
                         variant="ghost"
                       >
-                        <X className="text-primary" size={14} />
+                        {editingKey === key ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
-                    ) : (
-                      <Button
-                        onClick={() => handleDelete(key)}
-                        variant="ghost"
-                      >
-                        <X className="text-primary" size={14} />
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+                      {editingKey === key ? (
+                        <Button
+                          onClick={() => {
+                            setEditingKey(null);
+                            setEditValues({});
+                          }}
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleDelete(key)}
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
 
-</Table>
-
-      </div>
+          </Table>
+          </div>
+        </section>
     </div>
   );
 };

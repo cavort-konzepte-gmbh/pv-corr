@@ -147,83 +147,27 @@ const FieldList: React.FC<FieldListProps> = ({
         {translation("field.add")}
       </Button>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableCaption>List fields</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead> {translation("field.name")}</TableHead>
-              <TableHead> {translation("field.has_fence")}</TableHead>
-              <TableHead> {translation("zones.location")}</TableHead>
-              <TableHead> {translation("actions")}</TableHead>
+      <section className="border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>List fields</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead> {translation("field.name")}</TableHead>
+                <TableHead> {translation("field.has_fence")}</TableHead>
+                <TableHead> {translation("zones.location")}</TableHead>
+                <TableHead> {translation("actions")}</TableHead>
 
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-          {isAdding && (
-            <TableRow>
-              <TableCell >
-                <FormHandler
-                  isEditing={true}
-                  onSave={handleAddField}
-                  onCancel={() => {
-                    setIsAdding(false);
-                    setNewValues({
-                      name: '',
-                      latitude: '',
-                      longitude: '',
-                      has_fence: 'no'
-                    });
-                  }}
-                >
-                  <Input
-                    type="text"
-                    value={newValues.name}
-                    onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
-                    className="w-full p-1"
-                    placeholder="Enter field name"
-                  />
-                </FormHandler>
-              </TableCell>
-              <TableCell >
-                <select
-                  value={newValues.has_fence}
-                  onChange={(e) => setNewValues({ ...newValues, has_fence: e.target.value })}
-                  className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
-                  required
-                >
-                  <option value="no">{translation("field.has_fence.no")}</option>
-                  <option value="yes">{translation("field.has_fence.yes")}</option>
-                </select>
-              </TableCell>
-              <TableCell >
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    value={newValues.latitude}
-                    onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
-                    className="w-1/2 p-1"
-                    placeholder={translation("project.latitude")}
-                  />
-                  <Input
-                    type="text"
-                    value={newValues.longitude}
-                    onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
-                    className="w-1/2 p-1"
-                    placeholder={translation("project.longitude")}
-                  />
-                </div>
-              </TableCell>
-              <TableCell >
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    onClick={handleAddField}
-                    className="size-8"
-                  >
-                    <Save size={14} />
-                  </Button>
-                  <Button
-                    onClick={() => {
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+            {isAdding && (
+              <TableRow>
+                <TableCell >
+                  <FormHandler
+                    isEditing={true}
+                    onSave={handleAddField}
+                    onCancel={() => {
                       setIsAdding(false);
                       setNewValues({
                         name: '',
@@ -232,121 +176,181 @@ const FieldList: React.FC<FieldListProps> = ({
                         has_fence: 'no'
                       });
                     }}
-                    className="size-8"
                   >
-                    <X size={14} />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-          {(initialFields || []).map(field => (
-            <TableRow key={field.id}>
-              <TableCell className="p-2">
-                {editingId === field.id ? (
-                  <Input
-                    type="text"
-                    value={editingValues.name || field.name}
-                    onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
-                    className="w-full p-1"
-                  />
-                ) : field.name}
-              </TableCell>
-              <TableCell className="p-2">
-                {editingId === field.id ? (
+                    <Input
+                      type="text"
+                      value={newValues.name}
+                      onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
+                      className="w-full p-1"
+                      placeholder="Enter field name"
+                    />
+                  </FormHandler>
+                </TableCell>
+                <TableCell >
                   <select
-                    value={editingValues.has_fence}
-                    onChange={(e) => setEditingValues(prev => ({
-                      ...prev,
-                      has_fence: e.target.value
-                    }))}
+                    value={newValues.has_fence}
+                    onChange={(e) => setNewValues({ ...newValues, has_fence: e.target.value })}
                     className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
-                    disabled={updatingField}
+                    required
                   >
-                    <option value="">Not set</option>
                     <option value="no">{translation("field.has_fence.no")}</option>
                     <option value="yes">{translation("field.has_fence.yes")}</option>
                   </select>
-                ) : (
-                  <span>
-                    {field.has_fence === null ? 'Not set' : 
-                     translation(field.has_fence === 'yes' || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no")}
-                  </span>
-                )}
-              </TableCell>
-              <TableCell className="p-2">
-                {editingId === field.id ? (
+                </TableCell>
+                <TableCell >
                   <div className="flex gap-2">
                     <Input
                       type="text"
-                      value={editingValues.latitude || field.latitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                      className="w-1/2 p-1"
+                      value={newValues.latitude}
+                      onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
                       placeholder={translation("project.latitude")}
                     />
                     <Input
                       type="text"
-                      value={editingValues.longitude || field.longitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                      className="w-1/2 p-1"
+                      value={newValues.longitude}
+                      onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
                       placeholder={translation("project.longitude")}
                     />
                   </div>
-                ) : field.latitude && field.longitude ? (
-                  <Button
-                    onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
-                  >
-                    {translation("general.view_on_map")}
-                  </Button>
-                ) : (
-                  <span className="text-primary">{translation("general.location_not_set")}</span>
-                )}
-              </TableCell>
-              <TableCell className="p-2">
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    onClick={async (event) => {
-                      event.stopPropagation();
-                      if (editingId === field.id) {
-                        handleSave(field);
-                      } else {
-                        setEditingId(field.id);
-                        setEditingValues({
-                          name: field.name,
-                          latitude: field.latitude || '',
-                          longitude: field.longitude || '',
-                          has_fence: field.has_fence === null ? '' : 
-                                   field.has_fence === true || field.has_fence === 'yes' ? 'yes' : 'no'
-                        });
-                      }
-                    }}
-                    className="size-8"
-                  >
-                    {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
-                  </Button>
-                  {editingId === field.id && (
+                </TableCell>
+                <TableCell >
+                  <div className="flex items-center justify-center gap-2">
                     <Button
-                      onClick={event => handleRemoveField(event, field)}
+                      onClick={handleAddField}
                       className="size-8"
+                      variant="ghost"
+                    >
+                      <Save size={14} />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsAdding(false);
+                        setNewValues({
+                          name: '',
+                          latitude: '',
+                          longitude: '',
+                          has_fence: 'no'
+                        });
+                      }}
+                      className="size-8"
+                      variant="ghost"
                     >
                       <X size={14} />
                     </Button>
-                  )}
-                  <Button
-                    onClick={() => onSelectField(field.id)}
-                    className="size-8"
-                  >
-                    <ChevronRight size={14} />
-                  </Button>
-                </div>
-              </TableCell>
+                  </div>
+                </TableCell>
               </TableRow>
-    
-          ))}
-          
-        </TableBody>
-        </Table>
-      </div>
+            )}
+            {(initialFields || []).map(field => (
+              <TableRow key={field.id}>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <Input
+                      type="text"
+                      value={editingValues.name || field.name}
+                      onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
+                      className="w-full p-1"
+                    />
+                  ) : field.name}
+                </TableCell>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <select
+                      value={editingValues.has_fence}
+                      onChange={(e) => setEditingValues(prev => ({
+                        ...prev,
+                        has_fence: e.target.value
+                      }))}
+                      className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                      disabled={updatingField}
+                    >
+                      <option value="">Not set</option>
+                      <option value="no">{translation("field.has_fence.no")}</option>
+                      <option value="yes">{translation("field.has_fence.yes")}</option>
+                    </select>
+                  ) : (
+                    <span>
+                      {field.has_fence === null ? 'Not set' : 
+                      translation(field.has_fence === 'yes' || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no")}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={editingValues.latitude || field.latitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
+                        placeholder={translation("project.latitude")}
+                      />
+                      <Input
+                        type="text"
+                        value={editingValues.longitude || field.longitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
+                        placeholder={translation("project.longitude")}
+                      />
+                    </div>
+                  ) : field.latitude && field.longitude ? (
+                    <Button
+                      onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
+                    >
+                      {translation("general.view_on_map")}
+                    </Button>
+                  ) : (
+                    <span>{translation("general.location_not_set")}</span>
+                  )}
+                </TableCell>
+                <TableCell className="p-2">
+                  <div className="flex items-center justify-center gap-2">
+                    <Button
+                      onClick={async (event) => {
+                        event.stopPropagation();
+                        if (editingId === field.id) {
+                          handleSave(field);
+                        } else {
+                          setEditingId(field.id);
+                          setEditingValues({
+                            name: field.name,
+                            latitude: field.latitude || '',
+                            longitude: field.longitude || '',
+                            has_fence: field.has_fence === null ? '' : 
+                                    field.has_fence === true || field.has_fence === 'yes' ? 'yes' : 'no'
+                          });
+                        }
+                      }}
+                      className="size-8"
+                      variant="ghost"
+                    >
+                      {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
+                    </Button>
+                    {editingId === field.id && (
+                      <Button
+                        onClick={event => handleRemoveField(event, field)}
+                        className="size-8"
+                        variant="ghost"
+                      >
+                        <X size={14} />
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => onSelectField(field.id)}
+                      className="size-8"
+                      variant="ghost"
+                    >
+                      <ChevronRight size={14} />
+                    </Button>
+                  </div>
+                </TableCell>
+                </TableRow>
+      
+            ))}
+            
+          </TableBody>
+          </Table>
+        </div>
+      </section>
+
       {error && (
         <div className="mt-2 p-2 rounded text-sm text-destructive-foreground border border-destructive bg-destructive">
           {error}

@@ -83,11 +83,11 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
               <Database className="text-accent-primary" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-primary">Database</h3>
+              <h3 className="text-lg font-medium">Database</h3>
               <p className="text-sm text-muted-foreground">REST Requests</p>
             </div>
           </div>
-          <div className="text-3xl font-bold text-primary">
+          <div className="text-3xl font-bold">
             {stats?.database.rest_requests.toLocaleString() || '0'}
           </div>
         </div>
@@ -102,11 +102,11 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
               <Users className="text-accent-primary" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-primary">Auth</h3>
+              <h3 className="text-lg font-medium">Auth</h3>
               <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>
-          <div className="text-3xl font-bold text-primary">
+          <div className="text-3xl font-bold">
             {stats?.auth.total_users.toLocaleString() || '0'}
           </div>
           <div className="mt-2 text-sm text-muted-foreground">
@@ -124,11 +124,11 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
               <HardDrive className="text-accent-primary" size={24} />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-primary">Storage</h3>
+              <h3 className="text-lg font-medium">Storage</h3>
               <p className="text-sm text-muted-foreground">Total Storage</p>
             </div>
           </div>
-          <div className="text-3xl font-bold text-primary">
+          <div className="text-3xl font-bold">
             {formatBytes(stats?.storage.total_storage || 0)}
           </div>
           <div className="mt-2 text-sm text-muted-foreground">
@@ -140,12 +140,12 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
       <div className="mt-8">
         <div className="flex items-center gap-4 mb-6">
           <BarChart2 className="text-accent-primary" size={24} />
-          <h3 className="text-lg font-medium text-primary">Usage Trends</h3>
+          <h3 className="text-lg font-medium">Usage Trends</h3>
         </div>
          
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-lg font-medium text-primary">Database Statistics</h3>
+            <h3 className="text-lg font-medium">Database Statistics</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart width={500} height={300} data={data}>
                 <XAxis dataKey="name" />
