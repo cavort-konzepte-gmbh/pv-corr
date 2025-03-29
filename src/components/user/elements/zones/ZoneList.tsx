@@ -152,7 +152,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div >
       <Button
         onClick={() => setIsAdding(true)}
         className="w-full py-3 px-4 mb-4"
@@ -160,8 +160,9 @@ const ZoneList: React.FC<ZoneListProps> = ({
         <Plus size={16} />
         {translation("zones.add")}
       </Button>
-
-      <Table className="w-full border-collapse text-card-foreground">
+      <section className="border border-input rounded-md bg-card">
+      <div className="w-full relative overflow-auto">
+      <Table >
         <TableHeader>
           <TableRow>
             <TableHead >
@@ -330,7 +331,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   <select
                     value={editingValues.substructureId || zone.substructureId || ''}
                     onChange={(e) => setEditingValues({ ...editingValues, substructureId: e.target.value })}
-                    className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                    className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                   >
                     <option value="">Select Substructure</option>
                     {substructures.map(sub => (
@@ -362,7 +363,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   <select
                     value={editingValues.foundationId || zone.foundationId || ''}
                     onChange={(e) => setEditingValues({ ...editingValues, foundationId: e.target.value })}
-                    className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                    className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                   >
                     <option value="">Select Foundation</option>
                     {foundations.map(foundation => (
@@ -407,6 +408,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                       })()
                     )}
                     className="size-8"
+                    variant="ghost"
                     disabled={updatingZone}
                   >
                     {editingZoneId === zone.id ? <Save size={14} /> : <Edit2 size={14} />}
@@ -415,7 +417,7 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     <>
                       <Button
                         onClick={() => handleDeleteZone(zone.id)}
-                        variant="destructive"
+                        variant="ghost"
                       >
                         {translation("actions.delete")}
                       </Button>
@@ -425,6 +427,8 @@ const ZoneList: React.FC<ZoneListProps> = ({
                           setEditingValues({});
                         }}
                         className="size-8"
+                        variant="ghost"
+                        
                       >
                         <X size={14} />
                       </Button>
@@ -442,6 +446,9 @@ const ZoneList: React.FC<ZoneListProps> = ({
           ))}
         </TableBody>
       </Table>
+      </div>
+      </section>
+
     </div>
   );
 };

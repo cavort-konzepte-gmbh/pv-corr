@@ -58,7 +58,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-primary">
+        <h3 className="text-lg font-medium ">
           {t("analysis.select_datapoints")}
         </h3>
         <div className="flex items-center gap-2">

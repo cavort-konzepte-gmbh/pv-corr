@@ -82,6 +82,8 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
               setValues({});
             }}
           >
+               <section className="border border-input rounded-md bg-card">
+               <div className="w-full relative overflow-auto">
             <Table>
               <TableCaption></TableCaption>
               <TableHeader>
@@ -118,7 +120,7 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                           ...prev,
                           [param.id]: e.target.value
                         }))}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface text-center"
+                        className="w-full p-1 rounded text-sm  border-theme border-solid bg-surface text-center"
                         placeholder={`Enter ${param.name}`}
                       />
                     </TableCell>
@@ -146,7 +148,8 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
                 </TableRow>
                 </TableBody>
             </Table>
-                
+            </div>
+            </section>
           </FormHandler>
 
           {error && (

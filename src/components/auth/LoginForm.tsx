@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Theme } from '../../types/theme';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 
 interface LoginFormProps {
   currentTheme: Theme;
@@ -59,8 +60,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             onClick={() => setLoginType('user')}
             className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
               loginType === 'user'
-                  ? 'bg-accent-primary text-primary' 
-                : 'text-primary-foreground hover:bg-theme'
+                 ? 'text-primary-foreground hover:bg-theme' 
+                : ' bg-accent-primary text-primary'
             }`}
           >
             User
@@ -69,8 +70,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             onClick={() => setLoginType('admin')}
             className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
               loginType === 'admin'
-                  ? 'bg-accent-primary text-primary' 
-                : 'text-primary-foreground hover:bg-theme'
+                  ? 'text-primary-foreground hover:bg-theme' 
+                : ' bg-accent-primary text-primary'
             }`}
           >
             Admin
@@ -88,29 +89,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2 ">
+            <Label className="block text-sm font-medium mb-2 ">
               Email
-            </label>
+            </Label>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary "              
+              className="w-full p-2 rounded text-sm   "              
               placeholder="name@company.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 ">
+            <Label className="block text-sm font-medium mb-2 ">
               Password
-            </label>
+            </Label>
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary "            
+              className="w-full p-2 rounded text-sm "            
               placeholder="••••••••"
             />
           </div>

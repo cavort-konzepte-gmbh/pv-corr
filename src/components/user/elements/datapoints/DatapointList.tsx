@@ -135,6 +135,8 @@ const DatapointList: React.FC<DatapointListProps> = ({
         <Plus size={16} />
         {translation("datapoint.add_new")}
       </Button>
+      <section className="border border-input rounded-md bg-card">
+      <div className="w-full relative overflow-auto">
           <Table>
             <TableCaption>Datapoints</TableCaption>
             <TableHeader>
@@ -292,6 +294,8 @@ const DatapointList: React.FC<DatapointListProps> = ({
           ))}
    </TableBody>
    </Table>
+   </div>
+   </section>
       {error && (
         <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
           {error}

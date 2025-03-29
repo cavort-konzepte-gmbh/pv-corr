@@ -69,7 +69,7 @@ const ParameterFilter: React.FC<ParameterFilterProps> = ({
 
   return (
     <div className="mb-4 flex items-center gap-4">
-      <div className="flex items-center gap-2 text-primary">
+      <div className="flex items-center gap-2 ">
         <Filter size={16} />
         <span>{t("datapoint.filter_by_norm")}</span>
       </div>

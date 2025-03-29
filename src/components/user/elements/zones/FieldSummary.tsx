@@ -56,10 +56,13 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
 
   return (
     <div className="mb-8">
+      
+      <section className="border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
       <Table >
         <TableHeader>
           <TableRow>
-            <TableHead colSpan={2} className="p-4 text-left font-semibold cursor-pointer" onClick={onToggle}>
+            <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
@@ -73,10 +76,10 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                     <span>{field.name}</span>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-background">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20  ">
                       {field.zones?.length || 0} {translation("zones")}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-background">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 ">
                       {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints")}
                     </span>
                   </div>
@@ -106,9 +109,9 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                     </Button>
                   )}
                   {isExpanded ? (
-                    <ChevronDown className="text-primary" size={16} />
+                    <ChevronDown  size={16} />
                   ) : (
-                    <ChevronRight className="text-primary" size={16} />
+                    <ChevronRight size={16} />
                   )}
                 </div>
               </div>
@@ -117,7 +120,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
         </TableHeader>
         <TableBody className={isExpanded ? '' : 'hidden'}>
           <TableRow>
-            <TableCell className="p-2 w-1/6 text-primary">
+            <TableCell className="p-2 w-1/6 ">
               {translation("zones.location")}
             </TableCell>
             <TableCell className="p-2">
@@ -148,12 +151,12 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                   </Button>
                 </div>
               ) : (
-                <span className="text-primary">{translation("general.location_not_set")}</span>
+                <span >{translation("general.location_not_set")}</span>
               )}
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell className="p-2 w-1/6 text-primary">
+            <TableCell className="p-2 w-1/6 ">
               {translation("field.has_fence")}
             </TableCell>
             <TableCell className="p-2">
@@ -173,6 +176,8 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
           </TableRow>
         </TableBody>
       </Table>
+      </div>
+      </section>
     </div>
   );
 };

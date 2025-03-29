@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { BarChart2, Users, Database, HardDrive } from 'lucide-react';
 import { Card, CardContent} from '../ui/card';
 import { Bar,  BarChart,  ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { ChartConfig } from '../ui/chart';
 
 interface DatabaseOverviewProps {
   currentTheme: Theme;
@@ -22,6 +23,8 @@ interface Statistics {
     total_egress: number;
   };
 }
+
+
 
 const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => {
   const [stats, setStats] = useState<Statistics | null>(null);
@@ -70,6 +73,13 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
     { name: "Total Storage", value: stats?.storage.total_storage || 0 },
     { name: "Egress", value: stats?.storage.total_egress || 0 },
   ];
+  const chartConfig = {
+    value: { label: "value", color:"hsl(var(--chart-1))"},
+    "Total Users": { label: "Total Users", color: "hsl(var(--chart-2))" },
+    "New Signups": { label: "New Signups", color: "hsl(var(--chart-3))" },
+    "Total Storage": { label: "Total Storage", color: "hsl(var(--chart-4))" },
+    "Egress": { label: "Egress", color: "#ef4444" },
+  } satisfies ChartConfig
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -151,7 +161,7 @@ const DatabaseOverview: React.FC<DatabaseOverviewProps> = ({ currentTheme }) => 
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value"  />
+                <Bar dataKey="value" fill="var(--color-value)" radius={4} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

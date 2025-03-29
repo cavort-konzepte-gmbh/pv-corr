@@ -61,7 +61,7 @@ export const FormSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>>
   return (
     <select
       {...props}
-      className={`w-full p-2 rounded text-sm text-primary " ${props.className || ''}`}
+      className={`w-full p-2 rounded text-sm  " ${props.className || ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault(); // Prevent form submission

@@ -192,7 +192,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-primary mb-4">
+      <h3 className="text-lg font-medium  mb-4">
         {t("analysis.results")}
       </h3>
 
@@ -206,17 +206,17 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
               className="flex items-center justify-between mb-2 cursor-pointer"
               onClick={() => toggleDatapoint(datapoint.id)}
             >
-              <div className="font-medium text-primary">
+              <div className="font-medium ">
                 {datapoint.name}
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-secondary">
+                <div className="text-sm ">
                   {new Date(datapoint.timestamp).toLocaleString()}
                 </div>
                 {expandedDatapoints.has(datapoint.id) ? (
-                  <ChevronDown size={16} className="text-secondary" />
+                  <ChevronDown size={16} />
                 ) : (
-                  <ChevronRight size={16} className="text-secondary" />
+                  <ChevronRight size={16}  />
                 )}
               </div>
             </div>
@@ -226,7 +226,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                 {selectedNorm?.output_config?.map((output: any) => (
                   <div 
                     key={output.id}
-                    className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border"
+                    className="text-sm px-3 py-1 rounded bg-opacity-20  bg-border"
                     title={output.description}
                   >
                     {output.name}: {outputs[output.id] || 0}
@@ -234,7 +234,8 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                   </div>
                 ))}
               </div>
-
+              
+           
               {expandedDatapoints.has(datapoint.id) && (
                 <Table >
                   <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>

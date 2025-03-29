@@ -81,16 +81,16 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       <div className="flex items-center gap-4">
                         <span>{project.name}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-background">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                             {project.typeProject === 'field' ? translation("project.type.field") : translation("project.type.roof")}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-background">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                             {project.fields.length} {translation("fields")}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-background">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border ">
                             {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-background">
+                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20">
                             {project.fields.reduce((acc, field) => 
                               acc + field.zones.reduce((zAcc, zone) => 
                                 zAcc + (zone.datapoints?.length || 0), 0

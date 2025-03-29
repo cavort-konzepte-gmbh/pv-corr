@@ -44,10 +44,12 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
 
   return (
     <div className="mb-8">
+       <section className="border border-input rounded-md bg-card">
+       <div className="w-full relative overflow-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead colSpan={2} className="p-4 text-left  font-semibold  cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}> 
+            <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-accent" onClick={() => setIsExpanded(!isExpanded)}> 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
@@ -59,10 +61,10 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                       onClick={e => e.stopPropagation()}
                     />
                   ) : (
-                    <span>{zone.name}</span>
+                    <span >{zone.name}</span>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-primary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                       {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
                     </span>
                   </div>
@@ -101,9 +103,9 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                     </Button>
                   )}
                   {isExpanded ? (
-                    <ChevronDown className="text-primary"  size={16} />
+                    <ChevronDown   size={16} />
                   ) : (
-                    <ChevronRight className="text-primary" size={16} />
+                    <ChevronRight  size={16} />
                   )}
                 </div>
               </div>
@@ -113,7 +115,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
         {isExpanded && (
           <TableBody>
             <TableRow>
-              <TableCell className="p-2  w-1/6 text-primary">
+              <TableCell className="p-2  w-1/6">
                 {translation("zones.location")}
               </TableCell>
               <TableCell className="p-2 ">
@@ -145,13 +147,15 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({
                     </Button>
                   </div>
                 ) : (
-                  <span className="text-primary">{translation("general.location_not_set")}</span>
+                  <span >{translation("general.location_not_set")}</span>
                 )}
               </TableCell>
             </TableRow>
           </TableBody>
         )}
       </Table>
+      </div>
+      </section>
     </div>
   );
 };

@@ -30,7 +30,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+        className="w-full p-2 rounded text-sm border border-input shadow-sm bg-accent"
       >
         <option value="">Select value</option>
         {options.map(opt => (
