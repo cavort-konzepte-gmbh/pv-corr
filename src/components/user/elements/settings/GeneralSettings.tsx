@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
 import { Language, LANGUAGES } from '../../../../types/language';
 import { useTranslation } from '../../../../types/language';
 import { updateUserSettings } from '../../../../services/userSettings';
+import { Button } from '@/components/ui/button';
 
 interface GeneralSettingsProps {
   currentLanguage: Language;
@@ -11,7 +11,8 @@ interface GeneralSettingsProps {
   onDecimalSeparatorChange: (separator: ',' | '.') => void;
   showHiddenIds: boolean;
   onShowHiddenIdsChange: (show: boolean) => void;
-  currentTheme: Theme;
+  currentTheme: any;
+  onThemeChange: (theme: string) => void
 }
 
 const GeneralSettings: React.FC<GeneralSettingsProps> = ({
@@ -21,7 +22,8 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   onDecimalSeparatorChange,
   showHiddenIds,
   onShowHiddenIdsChange,
-  currentTheme
+  currentTheme,
+  onThemeChange
 }) => {
   const t = useTranslation(currentLanguage);
   const [updating, setUpdating] = useState(false);
@@ -51,14 +53,19 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
     }
   };
 
+  const handleChangeTheme = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onThemeChange(event.target.value)
+    handleSettingChange("theme_id", event.target.value)
+  }
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between p-3 rounded bg-border">
+    <div className="text-card-foreground space-y-4">
+      <div className="flex items-center justify-between p-3 rounded">
         <div>
-          <span className="text-primary">
+          <span className="text-3xl font-semibold leading-none">
             {t('settings.language')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-muted-foreground">
             {t('settings.language.description')}
           </div>
         </div>
@@ -66,7 +73,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           value={currentLanguage}
           onChange={(e) => handleSettingChange('language', e.target.value)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+          className="px-3 py-1 rounded font-medium text-sm text-primary border border-input shadow-sm bg-accent"
         >
           {LANGUAGES.map(lang => (
             <option key={lang.id} value={lang.id}>
@@ -76,12 +83,12 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         </select>
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded bg-border">
+      <div className="flex items-center justify-between p-3 rounded">
         <div>
-          <span className="text-primary">
+          <span className="text-3xl font-semibold leading-none">
             {t('settings.decimal_separator')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-muted-foreground">
             {t('settings.decimal_separator.description')}
           </div>
         </div>
@@ -89,36 +96,52 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           value={decimalSeparator}
           onChange={(e) => handleSettingChange('decimal_separator', e.target.value)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm text-secondary border-theme border-solid bg-transparent"
+          className="px-3 py-1 rounded font-medium text-sm text-primary border border-input shadow-sm bg-accent"
         >
           <option value=",">{t('settings.decimal_separator.comma')}</option>
           <option value=".">{t('settings.decimal_separator.point')}</option>
         </select>
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded bg-border">
+      <div className="flex items-center justify-between p-3 rounded">
         <div>
-          <span className="text-primary">
+          <span className="text-3xl font-semibold leading-none">
             {t('settings.hidden_ids')}
           </span>
-          <div className="text-xs text-secondary">
+          <div className="text-muted-foreground">
             {t('settings.hidden_ids.description')}
           </div>
         </div>
-        <button
+        <Button
           onClick={() => handleSettingChange('show_hidden_ids', !showHiddenIds)}
           disabled={updating}
-          className="px-3 py-1 rounded text-sm"
-          style={{ 
-            backgroundColor: showHiddenIds ? currentTheme.colors.accent.primary : 'transparent',
-            color: showHiddenIds ? 'white' : currentTheme.colors.text.secondary,
-            border: showHiddenIds ? 'none' : `1px solid ${currentTheme.colors.border}`,
-            opacity: updating ? 0.5 : 1,
-            cursor: updating ? 'not-allowed' : 'pointer'
-          }}
+          className="px-3 py-1 rounded text-sm text-primary-foreground hover:cursor-pointer data-[hidden='true']:text-accent-foreground data-[hidden='true']:bg-secondary data-[updating='true']:opacity-50 data-[updating='true']:hover:cursor-not-allowed"
+          data-hidden={showHiddenIds}
+          data-updating={updating}          
         >
           {showHiddenIds ? t('settings.enabled') : t('settings.not_enabled')}
-        </button>
+        </Button>
+      </div>
+      <div className="p-3 flex items-center justify-between rounded">
+        <div>
+          <span className="text-3xl font-semibold leading-none">Theme</span>
+          <span  className="block text-muted-foreground">Select the theme</span>
+        </div>
+        <select
+          onChange={handleChangeTheme}
+          disabled={updating}
+          className="px-3 py-1 rounded font-medium text-sm text-primary border border-input shadow-sm bg-accent"
+          value={currentTheme}
+        >
+          <option value="zinc">Zinc Light</option>
+          <option value="zinc.dark">Zinc Dark</option>
+          <option value="green">Green Light</option>
+          <option value="green.dark">Green Dark</option>
+        </select>
+      </div>
+      <div className="p-3 text-primary-foreground bg-primary">
+        <span>Theme</span>
+        <span className="text-xs">Select the theme</span>
       </div>
     </div>
   );

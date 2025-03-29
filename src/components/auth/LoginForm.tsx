@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Theme } from '../../types/theme';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Label } from '../ui/label';
 
 interface LoginFormProps {
   currentTheme: Theme;
@@ -50,37 +53,35 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-theme">
-      <div className="max-w-sm w-full p-8 rounded-lg bg-surface">
+    <div className="min-h-screen flex items-center justify-center  ">
+      <div className="max-w-sm w-full p-8 rounded-lg border border-accent bg-background">
         <div className="flex gap-4 mb-8">
-          <button
+          <Button
             onClick={() => setLoginType('user')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-            style={{ 
-              backgroundColor: loginType === 'user' ? currentTheme.colors.accent.primary : 'transparent',
-              color: loginType === 'user' ? 'white' : currentTheme.colors.text.secondary,
-            }}
+            className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
+              loginType === 'user'
+                 ? 'text-primary-foreground hover:bg-theme' 
+                : ' bg-accent-primary text-primary'
+            }`}
           >
             User
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setLoginType('admin')}
-            className="flex-1 p-2 rounded font-medium transition-opacity text-sm border-theme border-solid"
-            style={{ 
-              backgroundColor: loginType === 'admin' ? currentTheme.colors.accent.primary : 'transparent',
-              color: loginType === 'admin' ? 'white' : currentTheme.colors.text.secondary,
-            }}
+            className={`flex-1 p-2 rounded font-medium transition-opacity text-sm  ${
+              loginType === 'admin'
+                  ? 'text-primary-foreground hover:bg-theme' 
+                : ' bg-accent-primary text-primary'
+            }`}
           >
             Admin
-          </button>
+          </Button>
         </div>
 
         {error && (
           <div 
             className="p-4 mb-4 rounded text-sm text-primary"
-            style={{ 
-              backgroundColor: `${currentTheme.colors.accent.primary}20`,
-            }}
+      
           >
             {error}
           </div>
@@ -88,40 +89,41 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2 text-secondary">
+            <Label className="block text-sm font-medium mb-2 ">
               Email
-            </label>
-            <input
+            </Label>
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"              
+              className="w-full p-2 rounded text-sm   "              
               placeholder="name@company.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-secondary">
+            <Label className="block text-sm font-medium mb-2 ">
               Password
-            </label>
-            <input
+            </Label>
+            <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-transparent"            
+              className="w-full p-2 rounded text-sm "            
               placeholder="••••••••"
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full p-2 rounded font-medium transition-opacity disabled:opacity-50 text-sm text-white bg-accent-primary"            
+            className="w-full p-2 rounded font-medium " 
+                       
           >
             {loading ? 'Signing in...' : 'Continue'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

@@ -11,6 +11,9 @@ import { FormHandler } from '../../../shared/FormHandler';
 import { createDatapoint } from '../../../../services/datapoints';
 import { deleteDatapoint } from '../../../../services/datapoints';
 import { ParameterInput } from '../../../DatapointForm';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -125,30 +128,34 @@ const DatapointList: React.FC<DatapointListProps> = ({
 
   return (
     <div>
-      <button
+      <Button
         onClick={() => setIsAdding(true)}
-        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+         className="w-full py-3 px-4 mb-4"
       >
         <Plus size={16} />
         {translation("datapoint.add_new")}
-      </button>
+      </Button>
+      <section className="border border-input rounded-md bg-card">
+      <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>Datapoints</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{translation("datapoint.short_name")}</TableHead>
+                {parameters.map(param => (
+                  <TableHead key={param.id} >
+                    {param.shortName || param.name}
+                  </TableHead>
+                ))}
+                <TableHead>{translation("actions")}</TableHead>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="text-left p-2 text-secondary">{translation("datapoint.short_name")}</th>
-            {parameters.map(param => (
-              <th key={param.id} className="text-center p-2 text-secondary w-32">
-                {param.shortName || param.name}
-              </th>
-            ))}
-            <th className="text-center p-2 text-secondary">{translation("actions")}</th>
-          </tr>
-        </thead>
-        <tbody>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+
           {isAdding && (
-            <tr>
-              <td className="p-2 border border-theme">
+            <TableRow>
+              <TableCell className="p-2">
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddDatapoint}
@@ -158,17 +165,17 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     setNewValues({});
                   }}
                 >
-                  <input
+                  <Input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 "
                     placeholder="Enter custom name (optional)"
                   />
                 </FormHandler>
-              </td>
+              </TableCell>
               {parameters.map(param => (
-                <td key={param.id} className="p-2 border border-theme text-center">
+                <TableCell key={param.id} className="p-2">
                   <ParameterInput
                     parameter={{
                       ...param,
@@ -181,17 +188,17 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     }))}
                     currentTheme={currentTheme}
                   />
-                </td>
+                </TableCell>
               ))}
-              <td className="p-2 border-t border-theme">
+              <TableCell className="p-2 ">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={handleAddDatapoint}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Save size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       setIsAdding(false);
                       setNewName('');
@@ -200,30 +207,30 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <X size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {datapoints.map(datapoint => (
-            <tr key={datapoint.id} className="border-t border-theme">
-              <td className="p-2">
+            <TableRow key={datapoint.id}>
+              <TableCell className="p-2">
                 {editingDatapoint === datapoint.id ? (
-                  <input
+                  <Input
                     type="text"
                     value={editingName || ''}
                     onChange={(e) => setEditingName(e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 "
                     placeholder="Enter name"
                   />
                 ) : (
-                  <span className="text-primary">
+                  <span >
                     {datapoint.name}
                   </span>
                 )}
-              </td>
+              </TableCell>
               {parameters.map(param => (
-                <td key={param.id} className="p-2 text-center w-32">
+                <TableCell key={param.id} className="p-2 text-center w-32">
                   {editingDatapoint === datapoint.id ? (
                     <ParameterInput
                       parameter={{
@@ -240,13 +247,13 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       currentTheme={currentTheme}
                     />
                   ) : (
-                    <span className="text-primary">
+                    <span >
                       {datapoint.values[param.id] || '-'}
                     </span>
                   )}
-                </td>
+                </TableCell>
               ))}
-              <td className="p-2">
+              <TableCell className="p-2">
                 <div className="flex items-center justify-center gap-2">
                   <div 
                     className="relative group cursor-help"
@@ -257,7 +264,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       {new Date(datapoint.timestamp).toLocaleString()}
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => handleUpdateDatapoint(datapoint)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
@@ -266,28 +273,29 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     ) : (
                       <Edit2 size={14} />
                     )}
-                  </button>
+                  </Button>
                   {editingDatapoint === datapoint.id && (
-                    <button
+                    <Button
                       onClick={() => handleDeleteDatapoint(datapoint.id)}
                       className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
                       <X size={14} />
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
                     onClick={() => setShowMediaDialog(datapoint.id)}
                     className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
                     <Upload size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-      
+   </TableBody>
+   </Table>
+   </div>
+   </section>
       {error && (
         <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
           {error}

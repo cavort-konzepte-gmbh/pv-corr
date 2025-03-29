@@ -9,6 +9,9 @@ import { supabase } from '../../../../lib/supabase';
 import { Language, useTranslation } from '../../../../types/language';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createZone } from '../../../../services/zones';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ZoneListProps {
   currentTheme: Theme;
@@ -149,39 +152,40 @@ const ZoneList: React.FC<ZoneListProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <button
+    <div >
+      <Button
         onClick={() => setIsAdding(true)}
-        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+        className="w-full py-3 px-4 mb-4"
       >
         <Plus size={16} />
         {translation("zones.add")}
-      </button>
-
-      <table className="w-full border-collapse border-theme text-primary">
-        <thead>
-          <tr>
-            <th className="p-2 text-left border font-normal border-theme">
+      </Button>
+      <section className="border border-input rounded-md bg-card">
+      <div className="w-full relative overflow-auto">
+      <Table >
+        <TableHeader>
+          <TableRow>
+            <TableHead >
               {translation("zones.short_name")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               {translation("zones.location")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead>
               Substructure
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               Foundation
-            </th>
-            <th className="p-2 text-center border font-normal border-theme">
+            </TableHead>
+            <TableHead >
               {translation("zones.actions")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {isAdding && (
-            <tr>
-              <td className="p-2 border border-theme">
+            <TableRow>
+              <TableCell className="p-2">
                 <FormHandler
                   isEditing={true}
                   onSave={handleAddZone}
@@ -196,38 +200,38 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     });
                   }}
                 >
-                  <input
+                  <Input
                     type="text"
                     value={newValues.name}
                     onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1"
                     placeholder="Enter zone name"
                   />
                 </FormHandler>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={newValues.latitude}
                     onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1"
                     placeholder="Latitude"
                   />
-                  <input
+                  <Input
                     type="text"
                     value={newValues.longitude}
                     onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     placeholder="Longitude"
                   />
                 </div>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 <select
                   value={newValues.substructureId}
                   onChange={(e) => setNewValues({ ...newValues, substructureId: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                 >
                   <option value="">Select Substructure</option>
                   {substructures.map(sub => (
@@ -236,12 +240,12 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     </option>
                   ))}
                 </select>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 <select
                   value={newValues.foundationId}
                   onChange={(e) => setNewValues({ ...newValues, foundationId: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                 >
                   <option value="">Select Foundation</option>
                   {foundations.map(foundation => (
@@ -250,16 +254,16 @@ const ZoneList: React.FC<ZoneListProps> = ({
                     </option>
                   ))}
                 </select>
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={handleAddZone}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    className="size-8"
                   >
                     <Save size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       setIsAdding(false);
                       setNewValues({
@@ -270,65 +274,64 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         foundationId: ''
                       });
                     }}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    className="size-8"
                   >
                     <X size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {zones.map(zone => (
-            <tr key={zone.id} className="hover:bg-opacity-50">
-              <td className="p-2 border border-theme">
+            <TableRow key={zone.id} >
+              <TableCell className="p-2">
                 {editingZoneId === zone.id ? (
-                  <input
+                  <Input
                     name="name"
                     type="text"
                     value={editingValues.name || zone.name}
                     onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-1"
                     required
                   />
                 ) : (
                   zone.name
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 {editingZoneId === zone.id ? (
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.latitude || zone.latitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                       placeholder="Latitude"
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                     />
-                    <input
+                    <Input
                       type="text"
                       value={editingValues.longitude || zone.longitude || ''}
                       onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
                       placeholder="Longitude"
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="w-full p-1"
                     />
                   </div>
                 ) : zone.latitude && zone.longitude ? (
-                  <button
+                  <Button
                     onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
-                    className="text-sm hover:underline text-accent-primary"
                   >
                     View on map
-                  </button>
+                  </Button>
                 ) : (
-                  <span className="text-secondary">{translation("general.location_not_set")}</span>
+                  <span >{translation("general.location_not_set")}</span>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 {editingZoneId === zone.id ? (
                   <select
                     value={editingValues.substructureId || zone.substructureId || ''}
                     onChange={(e) => setEditingValues({ ...editingValues, substructureId: e.target.value })}
-                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                   >
                     <option value="">Select Substructure</option>
                     {substructures.map(sub => (
@@ -339,28 +342,28 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   </select>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Wrench size={14} className="text-secondary" />
+                    <Wrench size={14} className="text-primary" />
                     {zone.substructureId ? (
                       (() => {
                         const sub = substructures.find(s => s.id === zone.substructureId);
                         return sub ? (
                           <span>{sub.manufacturer} - {sub.system}</span>
                         ) : (
-                          <span className="text-secondary">Not set</span>
+                          <span className="text-primary">Not set</span>
                         );
                       })()
                     ) : (
-                      <span className="text-secondary">Not set</span>
+                      <span className="text-primary">Not set</span>
                     )}
                   </div>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 {editingZoneId === zone.id ? (
                   <select
                     value={editingValues.foundationId || zone.foundationId || ''}
                     onChange={(e) => setEditingValues({ ...editingValues, foundationId: e.target.value })}
-                    className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                   >
                     <option value="">Select Foundation</option>
                     {foundations.map(foundation => (
@@ -371,25 +374,25 @@ const ZoneList: React.FC<ZoneListProps> = ({
                   </select>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Building2 size={14} className="text-secondary" />
+                    <Building2 size={14} className="text-primary" />
                     {zone.foundationId ? (
                       (() => {
                         const foundation = foundations.find(f => f.id === zone.foundationId);
                         return foundation ? (
                           <span>{foundation.name}</span>
                         ) : (
-                          <span className="text-secondary">Not set</span>
+                          <span className="text-primary">Not set</span>
                         );
                       })()
                     ) : (
-                      <span className="text-secondary">Not set</span>
+                      <span className="text-primary">Not set</span>
                     )}
                   </div>
                 )}
-              </td>
-              <td className="p-2 border border-theme">
+              </TableCell>
+              <TableCell className="p-2">
                 <div className="flex items-center justify-center gap-2">
-                  <button
+                  <Button
                     onClick={() => editingZoneId === zone.id ? (
                       handleUpdateZone(zone.id, editingValues)
                     ) : (
@@ -404,42 +407,48 @@ const ZoneList: React.FC<ZoneListProps> = ({
                         });
                       })()
                     )}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    className="size-8"
+                    variant="ghost"
                     disabled={updatingZone}
                   >
                     {editingZoneId === zone.id ? <Save size={14} /> : <Edit2 size={14} />}
-                  </button>
+                  </Button>
                   {editingZoneId === zone.id && (
                     <>
-                      <button
+                      <Button
                         onClick={() => handleDeleteZone(zone.id)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        variant="ghost"
                       >
                         {translation("actions.delete")}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           setEditingZoneId(null);
                           setEditingValues({});
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="size-8"
+                        variant="ghost"
+                        
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </>
                   )}
-                  <button
+                  <Button
                     onClick={() => onSelectZone(zone.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
+                    className="size-8"
                   >
                     <ChevronRight size={14} />
-                  </button>
+                  </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
+      </div>
+      </section>
+
     </div>
   );
 };

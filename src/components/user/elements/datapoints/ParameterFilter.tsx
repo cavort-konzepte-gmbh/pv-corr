@@ -4,6 +4,7 @@ import { Language, useTranslation } from '../../../../types/language';
 import { Parameter } from '../../../../types/parameters';
 import { supabase } from '../../../../lib/supabase';
 import { Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ParameterFilterProps {
   currentTheme: Theme;
@@ -68,23 +69,23 @@ const ParameterFilter: React.FC<ParameterFilterProps> = ({
 
   return (
     <div className="mb-4 flex items-center gap-4">
-      <div className="flex items-center gap-2 text-secondary">
+      <div className="flex items-center gap-2 ">
         <Filter size={16} />
         <span>{t("datapoint.filter_by_norm")}</span>
       </div>
       <div className="flex gap-2">
         {norms.map(norm => (
-          <button
+          <Button
             key={norm.id}
             onClick={() => handleNormChange(norm.id)}
             className={`px-3 py-1 rounded text-sm transition-colors ${
               selectedNorm === norm.id 
-                ? 'bg-accent-primary text-white' 
-                : 'text-secondary hover:bg-theme'
+                ? 'bg-accent-primary text-primary' 
+                : 'text-primary-foreground hover:bg-theme'
             }`}
           >
             {norm.name}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

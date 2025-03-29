@@ -5,6 +5,8 @@ import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { Datapoint, Project, Zone } from '../../types/projects';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
 
 interface AnalyseResultProps {
   currentTheme: Theme;
@@ -190,7 +192,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium text-primary mb-4">
+      <h3 className="text-lg font-medium  mb-4">
         {t("analysis.results")}
       </h3>
 
@@ -198,23 +200,23 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
           <div 
             key={datapoint.id}
-            className="p-4 rounded-lg border border-theme bg-surface"
+            className="p-4 rounded-lg border border-theme "
           >
             <div 
               className="flex items-center justify-between mb-2 cursor-pointer"
               onClick={() => toggleDatapoint(datapoint.id)}
             >
-              <div className="font-medium text-primary">
+              <div className="font-medium ">
                 {datapoint.name}
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-secondary">
+                <div className="text-sm ">
                   {new Date(datapoint.timestamp).toLocaleString()}
                 </div>
                 {expandedDatapoints.has(datapoint.id) ? (
-                  <ChevronDown size={16} className="text-secondary" />
+                  <ChevronDown size={16} />
                 ) : (
-                  <ChevronRight size={16} className="text-secondary" />
+                  <ChevronRight size={16}  />
                 )}
               </div>
             </div>
@@ -224,7 +226,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                 {selectedNorm?.output_config?.map((output: any) => (
                   <div 
                     key={output.id}
-                    className="text-sm px-3 py-1 rounded bg-opacity-20 text-secondary bg-border"
+                    className="text-sm px-3 py-1 rounded bg-opacity-20  bg-border"
                     title={output.description}
                   >
                     {output.name}: {outputs[output.id] || 0}
@@ -232,37 +234,49 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                   </div>
                 ))}
               </div>
-
+              
+           
               {expandedDatapoints.has(datapoint.id) && (
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr>
-                      <th className="text-left p-2 text-secondary">Parameter</th>
-                      <th className="text-left p-2 text-secondary">Value</th>
-                      <th className="text-left p-2 text-secondary">Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table >
+                  <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                      Parameter
+                      </TableHead>
+                      <TableHead>
+                      Value 
+                      </TableHead>
+                      <TableHead>
+                      Rating
+                      </TableHead>
+
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+
+          
                     {Object.entries(parameterRatings)
                       .sort(([a], [b]) => a.localeCompare(b))
                       .map(([code, { value, rating, unit }]) => (
-                      <tr key={code} className="border-t border-theme">
-                        <td className="p-2 text-primary">{code.toUpperCase()}</td>
-                        <td className="p-2 text-primary">
+                      <TableRow key={code} >
+                        <TableCell className="p-2">{code.toUpperCase()}</TableCell>
+                        <TableCell className="p-2">
                           {value} {unit && <span className="text-secondary">({unit})</span>}
-                        </td>
-                        <td className="p-2 text-primary">{rating}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell className="p-2 ">{rating}</TableCell>
+                      </TableRow>
                     ))}
-                    <tr className="border-t-2 border-theme">
-                      <td className="p-2 font-bold text-primary">SUM</td>
-                      <td className="p-2 text-primary"></td>
-                      <td className="p-2 font-bold text-primary">
+                    <TableRow >
+                      <TableCell className="p-2 font-bold ">SUM</TableCell>
+                      <TableCell className="p-2 "></TableCell>
+                      <TableCell className="p-2 font-bold ">
                         {Object.values(parameterRatings).reduce((sum, { rating }) => sum + rating, 0)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                      </TableCell>
+                    </TableRow>
+                    </TableBody>
+                </Table>
+         
               )}
             </div>
           </div>
@@ -270,7 +284,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       </div>
 
       <div className="flex justify-end mt-6">
-        <button
+        <Button
           onClick={() => {
             if (navigating) return;
             setNavigating(true);
@@ -284,7 +298,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         >
           <FileText size={16} />
           {t("analysis.generate_report")} ({selectedDatapoints.length} {t("datapoints")})
-        </button>
+        </Button>
       </div>
     </div>
   );

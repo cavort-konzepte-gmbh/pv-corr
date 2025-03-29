@@ -3,6 +3,9 @@ import { Theme } from '../types/theme';
 import { Language, useTranslation } from '../types/language';
 import { Standard } from '../types/standards';
 import { Parameter } from '../types/parameters';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
 
 interface Values {
   [key: string]: string;
@@ -27,7 +30,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded text-sm border border-input shadow-sm bg-accent"
       >
         <option value="">Select value</option>
         {options.map(opt => (
@@ -41,7 +44,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
     if (parameter.parameterCode === 'Z1') {
       return (
         <div className="flex items-center gap-4">
-          <input
+          <Input
             type="number"
             value={value === 'impurities' ? '' : value}
             onChange={(e) => {
@@ -59,8 +62,8 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
             className="flex-1 p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter value (0-100)"
           />
-          <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-theme hover:bg-opacity-10 bg-surface">
-            <input
+          <Label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-theme hover:bg-opacity-10 bg-surface">
+            <Input
               type="checkbox"
               checked={value === 'impurities'}
               onChange={(e) => {
@@ -69,7 +72,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
               className="rounded border-theme cursor-pointer"
             />
             <span className="text-sm text-primary whitespace-nowrap">Impurities</span>
-          </label>
+          </Label>
         </div>
       );
     }
@@ -81,7 +84,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
     
     // Only set min/max if they are valid numbers
     return (
-      <input
+      <Input
         type="number"
         value={value}
         onChange={(e) => {
@@ -102,7 +105,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         min={!isNaN(min) ? min : undefined}
         max={max !== undefined && !isNaN(max) ? max : undefined}
         step="0.01"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded font-mono text-sm "
         placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : '+'})`}
       />
     );
@@ -112,18 +115,18 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
     const limit = parseFloat(parameter.rangeValue);
     if (isNaN(limit)) {
       return (
-        <input
+        <Input
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+          className="w-full p-2 rounded font-mono text-sm "
           placeholder="Enter value"
         />
       );
     }
     return (
-      <input
+      <Input
         type="number"
         value={value}
         onChange={(e) => {
@@ -136,7 +139,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         }}
         min={parameter.rangeType === 'greater' ? limit + 0.000001 : limit}
         step="any"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 "
         placeholder={`Enter value ${parameter.rangeType === 'greater' ? '>' : '>='} ${limit}`}
       />
     );
@@ -146,18 +149,18 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
     const limit = parseFloat(parameter.rangeValue);
     if (isNaN(limit)) {
       return (
-        <input
+        <Input
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+          className="w-full p-2 rounded font-mono text-sm "
           placeholder="Enter value"
         />
       );
     }
     return (
-      <input
+      <Input
         type="number"
         value={value}
         onChange={(e) => {
@@ -170,7 +173,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
         }}
         max={parameter.rangeType === 'less' ? limit - 0.000001 : limit}
         step="any"
-        className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+        className="w-full p-2 rounded font-mono text-sm "
         placeholder={`Enter value ${parameter.rangeType === 'less' ? '<' : '<='} ${limit}`}
       />
     );
@@ -178,11 +181,11 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({
 
   // Default to open input
   return (
-    <input
+    <Input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface"
+      className="w-full p-2 rounded font-mono text-sm "
       placeholder="Enter value"
     />
   );
@@ -273,9 +276,9 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
       <div className="grid grid-cols-2 gap-4">
         {standard.parameters?.map((param) => (
           <div key={param.parameterCode || index}>
-            <label className="block font-mono text-sm mb-2 text-primary">
+            <Label className="block font-mono text-sm mb-2 text-primary">
               {param.parameterCode}
-            </label>
+            </Label>
             <ParameterInput
               parameter={param}
               value={formValues[param.parameterCode] || ''}
@@ -290,20 +293,20 @@ const DatapointForm: React.FC<DatapointFormProps> = ({
       </div>
 
       <div className="flex justify-end gap-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 rounded font-mono text-sm text-secondary border-theme border-solid bg-transparent"          
+          className="size-8"   
         >
           {t('actions.cancel')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={Object.keys(formValues).length === 0}
-          className="px-4 py-2 rounded font-mono text-sm disabled:opacity-50 disabled:cursor-not-allowed text-white bg-accent-primary"          
+          className="size-8"        
         >
           {t('datapoint.new')}
-        </button>
+        </Button>
       </div>
     </form>
   );

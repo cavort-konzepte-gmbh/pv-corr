@@ -287,85 +287,403 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       )}
 
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
+          variant="ghost"
         >
           <ArrowLeft size={20} />
-        </button>
-        <h2 className="text-2xl font-bold text-primary">
+        </Button>
+        <h2 className="text-2xl font-bold">
           Substructures Management
         </h2>
       </div>
 
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h3 className="text-lg text-primary">
+          <h3 className="text-lg">
             Substructures
           </h3>
-          <button
+          <Button
             onClick={() => setIsNewSubstructure(true)}
-            className="px-3 py-1 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+            className="px-3 py-1"
           >
             <Plus size={14} />
             Add Substructure
-          </button>
+          </Button>
         </div>
 
-        <div className="overflow-x-auto">
 
-          <Table>
-            <TableCaption>Substructures</TableCaption>
-            <TableHeader>
-              <TableRow>
-                 <TableHead>Manufacturer</TableHead>
-                  <TableHead>System</TableHead>
-                  <TableHead>Version</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Link</TableHead>
-                  <TableHead>Schematic</TableHead>
-                  <TableHead>Example</TableHead>
-                  <TableHead>Base Material</TableHead>
-                  <TableHead>First Layer</TableHead>
-                  <TableHead>Second Layer</TableHead>
-                  <TableHead>Actions</TableHead>
-            
-                </TableRow>    
-              </TableHeader> 
-                                     
-            <TableBody>
-       
-
+        <section className="border border-input rounded-md bg-card">
+            <div className="w-full relative overflow-auto">
+            <Table>
+              <TableCaption>Substructures</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Manufacturer</TableHead>
+                    <TableHead>System</TableHead>
+                    <TableHead>Version</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Link</TableHead>
+                    <TableHead>Schematic</TableHead>
+                    <TableHead>Example</TableHead>
+                    <TableHead>Base Material</TableHead>
+                    <TableHead>First Layer</TableHead>
+                    <TableHead>Second Layer</TableHead>
+                    <TableHead>Actions</TableHead>
+              
+                  </TableRow>    
+                </TableHeader> 
+                                      
+              <TableBody>
         
-         
-              {substructures.map((substructure) => (
-                <TableRow key={substructure.id}>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+
+          
+          
+                {substructures.map((substructure) => (
+                  <TableRow key={substructure.id}>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <select
+                          value={substructure.manufacturer_id}
+                          disabled={true}
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                        >
+                          {manufacturers.map(mfg => (
+                            <option key={mfg.id} value={mfg.id}>
+                              {mfg.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        manufacturers.find(m => m.id === substructure.manufacturer_id)?.name
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <select
+                          value={substructure.system_id}
+                          disabled={true}
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                        >
+                          {systems
+                            .filter(sys => sys.manufacturer_id === substructure.manufacturer_id)
+                            .map(sys => (
+                              <option key={sys.id} value={sys.id}>
+                                {sys.name}
+                              </option>
+                            ))
+                          }
+                        </select>
+                      ) : (
+                        systems.find(s => s.id === substructure.system_id)?.name
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2" >
+                      {editingSubstructure === substructure.id ? (
+                        <Input
+                          type="text"
+                          value={editingVersionName}
+                          onChange={(e) => setEditingVersionName(e.target.value)}
+                          className="w-full p-1"
+                        />
+                      ) : (
+                        versions.find(v => v.id === substructure.version_id)?.name
+                      )}
+                    </TableCell> 
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <select
+                          value={editingValues.type || substructure.type}
+                          onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
+                          className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                        >
+                          <option value="field">Field</option>
+                          <option value="roof">Roof</option>
+                        </select>
+                      ) : (
+                        substructure.type
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <Input
+                          type="url"
+                          value={editingValues.link || substructure.link || ''}
+                          onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
+                          className="w-full p-1"
+                          placeholder="https://"
+                        />
+                      ) : (
+                        substructure.link && (
+                          <a
+                            href={substructure.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-accent-primary hover:underline"
+                          >
+                            <Link size={14} />
+                          </a>
+                        )
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <Input
+                          type="url"
+                          value={editingValues.schematic || substructure.schematic || ''}
+                          onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
+                          className="w-full p-1"
+                          placeholder="https://"
+                        />
+                      ) : (
+                        substructure.schematic
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <Input
+                          type="url"
+                          value={editingValues.example || substructure.example || ''}
+                          onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
+                          className="w-full p-1"
+                          placeholder="https://"
+                        />
+                      ) : (
+                        substructure.example
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <div className="space-y-2">
+                          <select
+                            value={editingValues.base_material_id || substructure.base_material_id || ''}
+                            onChange={(e) => setEditingValues({ ...editingValues, base_material_id: e.target.value })}
+                            className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                          >
+                            <option value="">Select material</option>
+                            {materials.map(material => (
+                              <option key={material.id} value={material.id}>
+                                {material.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              value={editingValues.base_material_thickness || ''}
+                              onChange={(e) => setEditingValues({ 
+                                ...editingValues, 
+                                base_material_thickness: e.target.value 
+                              })}
+                              className="w-full p-1"
+                              min="0"
+                              step="any"
+                              placeholder="Thickness"
+                            />
+                            <select
+                              value={editingValues.base_material_thickness_unit || 'mm'}
+                              onChange={(e) => setEditingValues({
+                                ...editingValues,
+                                base_material_thickness_unit: e.target.value as 'mm' | 'μm'
+                              })}
+                              className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                            >
+                              <option value="mm">mm</option>
+                              <option value="μm">μm</option>
+                            </select>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div>{materials.find(m => m.id === substructure.base_material_id)?.name}</div>
+                          {substructure.base_material_thickness && (
+                            <div className="text-sm text-primary mt-1">
+                              {substructure.base_material_thickness} {substructure.base_material_thickness_unit || 'mm'}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <div className="space-y-2">
+                          <select
+                            value={editingValues.first_layer_id || substructure.first_layer_id || ''}
+                            onChange={(e) => setEditingValues({ ...editingValues, first_layer_id: e.target.value })}
+                            className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                          >
+                            <option value="">Select material</option>
+                            {materials.map(material => (
+                              <option key={material.id} value={material.id}>
+                                {material.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              value={editingValues.first_layer_thickness || substructure.first_layer_thickness || ''}
+                              onChange={(e) => setEditingValues({ 
+                                ...editingValues, 
+                                first_layer_thickness: e.target.value 
+                              })}
+                              className="w-full p-1"
+                              min="0"
+                              step="any"
+                              placeholder="Thickness"
+                            />
+                            <select
+                              value={editingValues.first_layer_thickness_unit || substructure.first_layer_thickness_unit || 'mm'}
+                              onChange={(e) => setEditingValues({
+                                ...editingValues,
+                                first_layer_thickness_unit: e.target.value as 'mm' | 'μm'
+                              })}
+                              className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                            >
+                              <option value="mm">mm</option>
+                              <option value="μm">μm</option>
+                            </select>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div>{materials.find(m => m.id === substructure.first_layer_id)?.name}</div>
+                          {substructure.first_layer_thickness && (
+                            <div className="text-sm text-primary mt-1">
+                              {substructure.first_layer_thickness} {substructure.first_layer_thickness_unit || 'mm'}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      {editingSubstructure === substructure.id ? (
+                        <div className="space-y-2">
+                          <select
+                            value={editingValues.second_layer_id || substructure.second_layer_id || ''}
+                            onChange={(e) => setEditingValues({ ...editingValues, second_layer_id: e.target.value })}
+                            className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                          >
+                            <option value="">Select material</option>
+                            {materials.map(material => (
+                              <option key={material.id} value={material.id}>
+                                {material.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              value={editingValues.second_layer_thickness || substructure.second_layer_thickness || ''}
+                              onChange={(e) => setEditingValues({ 
+                                ...editingValues, 
+                                second_layer_thickness: e.target.value 
+                              })}
+                              className="w-full p-1"
+                              min="0"
+                              step="any"
+                              placeholder="Thickness"
+                            />
+                            <select
+                              value={editingValues.second_layer_thickness_unit || substructure.second_layer_thickness_unit || 'mm'}
+                              onChange={(e) => setEditingValues({
+                                ...editingValues,
+                                second_layer_thickness_unit: e.target.value as 'mm' | 'μm'
+                              })}
+                              className="w-24 p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                            >
+                              <option value="mm">mm</option>
+                              <option value="μm">μm</option>
+                            </select>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div>{materials.find(m => m.id === substructure.second_layer_id)?.name}</div>
+                          {substructure.second_layer_thickness && (
+                            <div className="text-sm text-primary mt-1">
+                              {substructure.second_layer_thickness} {substructure.second_layer_thickness_unit || 'mm'}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          onClick={() => {
+                            if (editingSubstructure === substructure.id) {
+                              handleSaveSubstructure();
+                            } else {
+                              setEditingSubstructure(substructure.id);
+                              const version = versions.find(v => v.id === substructure.version_id);
+                              setEditingVersionName(version?.name || '');
+                              setSelectedManufacturerId(substructure.manufacturer_id);
+                              setSelectedSystemId(substructure.system_id);
+                              setSelectedVersionId(substructure.version_id);
+                              setEditingValues(substructure);
+                            }
+                          }}
+                          className="p-1 rounded hover:bg-opacity-80"
+                          variant="ghost"
+                        >
+                          {editingSubstructure === substructure.id ? (
+                            <Save size={14} />
+                          ) : (
+                            <Edit2 size={14} />
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            if (editingSubstructure === substructure.id) {
+                              setEditingSubstructure(null);
+                              setEditingValues({});
+                            } else {
+                              handleDelete(substructure.id);
+                            }
+                          }}
+                          className="p-1 rounded hover:bg-opacity-80"
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {isNewSubstructure && (
+                  <TableRow>
+                    <TableCell className="p-2">
                       <select
-                        value={substructure.manufacturer_id}
-                        disabled={true}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        value={selectedManufacturerId}
+                        onChange={(e) => {
+                          setSelectedManufacturerId(e.target.value);
+                          setSelectedSystemId('');
+                          setSelectedVersionId('');
+                        }}
+                        className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       >
+                        <option value="">Select Manufacturer</option>
                         {manufacturers.map(mfg => (
                           <option key={mfg.id} value={mfg.id}>
                             {mfg.name}
                           </option>
                         ))}
                       </select>
-                    ) : (
-                      manufacturers.find(m => m.id === substructure.manufacturer_id)?.name
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2">
                       <select
-                        value={substructure.system_id}
-                        disabled={true}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        value={selectedSystemId}
+                        onChange={(e) => {
+                          setSelectedSystemId(e.target.value);
+                          setSelectedVersionId('');
+                        }}
+                        className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                        disabled={!selectedManufacturerId}
                       >
+                        <option value="">Select System</option>
                         {systems
-                          .filter(sys => sys.manufacturer_id === substructure.manufacturer_id)
+                          .filter(sys => sys.manufacturer_id === selectedManufacturerId)
                           .map(sys => (
                             <option key={sys.id} value={sys.id}>
                               {sys.name}
@@ -373,91 +691,60 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                           ))
                         }
                       </select>
-                    ) : (
-                      systems.find(s => s.id === substructure.system_id)?.name
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary" >
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2">
                       <Input
                         type="text"
                         value={editingVersionName}
                         onChange={(e) => setEditingVersionName(e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
+                        placeholder="Enter version name"
+                        disabled={!selectedSystemId}
                       />
-                    ) : (
-                      versions.find(v => v.id === substructure.version_id)?.name
-                    )}
-                  </TableCell> 
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2">
                       <select
-                        value={editingValues.type || substructure.type}
+                        value={editingValues.type || 'field'}
                         onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                       >
                         <option value="field">Field</option>
                         <option value="roof">Roof</option>
                       </select>
-                    ) : (
-                      substructure.type
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2">
                       <Input
                         type="url"
-                        value={editingValues.link || substructure.link || ''}
+                        value={editingValues.link || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
-                    ) : (
-                      substructure.link && (
-                        <a
-                          href={substructure.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-accent-primary hover:underline"
-                        >
-                          <Link size={14} />
-                        </a>
-                      )
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2">
                       <Input
                         type="url"
-                        value={editingValues.schematic || substructure.schematic || ''}
+                        value={editingValues.schematic || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
-                    ) : (
-                      substructure.schematic
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
-                      <input
+                    </TableCell>
+                    <TableCell className="p-2">
+                      <Input
                         type="url"
-                        value={editingValues.example || substructure.example || ''}
+                        value={editingValues.example || ''}
                         onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                        className="w-full p-1"
                         placeholder="https://"
                       />
-                    ) : (
-                      substructure.example
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
+                    </TableCell>
+                    <TableCell className="p-2" >
                       <div className="space-y-2">
                         <select
-                          value={editingValues.base_material_id || substructure.base_material_id || ''}
+                          value={editingValues.base_material_id || ''}
                           onChange={(e) => setEditingValues({ ...editingValues, base_material_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          className="w-full p-1 text-sm text-primary border border-input shadow-sm bg-accent"
                         >
                           <option value="">Select material</option>
                           {materials.map(material => (
@@ -474,7 +761,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues, 
                               base_material_thickness: e.target.value 
                             })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-full p-1"
                             min="0"
                             step="any"
                             placeholder="Thickness"
@@ -485,335 +772,50 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                               ...editingValues,
                               base_material_thickness_unit: e.target.value as 'mm' | 'μm'
                             })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                            className="w-24 p-1 text-sm text-primary border border-input shadow-sm bg-accent"
                           >
                             <option value="mm">mm</option>
                             <option value="μm">μm</option>
                           </select>
                         </div>
                       </div>
-                    ) : (
-                      <div>
-                        <div>{materials.find(m => m.id === substructure.base_material_id)?.name}</div>
-                        {substructure.base_material_thickness && (
-                          <div className="text-sm text-secondary mt-1">
-                            {substructure.base_material_thickness} {substructure.base_material_thickness_unit || 'mm'}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
-                      <div className="space-y-2">
-                        <select
-                          value={editingValues.first_layer_id || substructure.first_layer_id || ''}
-                          onChange={(e) => setEditingValues({ ...editingValues, first_layer_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        >
-                          <option value="">Select material</option>
-                          {materials.map(material => (
-                            <option key={material.id} value={material.id}>
-                              {material.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            value={editingValues.first_layer_thickness || substructure.first_layer_thickness || ''}
-                            onChange={(e) => setEditingValues({ 
-                              ...editingValues, 
-                              first_layer_thickness: e.target.value 
-                            })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                            min="0"
-                            step="any"
-                            placeholder="Thickness"
-                          />
-                          <select
-                            value={editingValues.first_layer_thickness_unit || substructure.first_layer_thickness_unit || 'mm'}
-                            onChange={(e) => setEditingValues({
-                              ...editingValues,
-                              first_layer_thickness_unit: e.target.value as 'mm' | 'μm'
-                            })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                          >
-                            <option value="mm">mm</option>
-                            <option value="μm">μm</option>
-                          </select>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div>{materials.find(m => m.id === substructure.first_layer_id)?.name}</div>
-                        {substructure.first_layer_thickness && (
-                          <div className="text-sm text-secondary mt-1">
-                            {substructure.first_layer_thickness} {substructure.first_layer_thickness_unit || 'mm'}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    {editingSubstructure === substructure.id ? (
-                      <div className="space-y-2">
-                        <select
-                          value={editingValues.second_layer_id || substructure.second_layer_id || ''}
-                          onChange={(e) => setEditingValues({ ...editingValues, second_layer_id: e.target.value })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        >
-                          <option value="">Select material</option>
-                          {materials.map(material => (
-                            <option key={material.id} value={material.id}>
-                              {material.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="flex gap-2">
-                          <Input
-                            type="number"
-                            value={editingValues.second_layer_thickness || substructure.second_layer_thickness || ''}
-                            onChange={(e) => setEditingValues({ 
-                              ...editingValues, 
-                              second_layer_thickness: e.target.value 
-                            })}
-                            className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                            min="0"
-                            step="any"
-                            placeholder="Thickness"
-                          />
-                          <select
-                            value={editingValues.second_layer_thickness_unit || substructure.second_layer_thickness_unit || 'mm'}
-                            onChange={(e) => setEditingValues({
-                              ...editingValues,
-                              second_layer_thickness_unit: e.target.value as 'mm' | 'μm'
-                            })}
-                            className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                          >
-                            <option value="mm">mm</option>
-                            <option value="μm">μm</option>
-                          </select>
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <div>{materials.find(m => m.id === substructure.second_layer_id)?.name}</div>
-                        {substructure.second_layer_thickness && (
-                          <div className="text-sm text-secondary mt-1">
-                            {substructure.second_layer_thickness} {substructure.second_layer_thickness_unit || 'mm'}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <div className="flex items-center justify-center gap-2">
-                      <Button
-                        onClick={() => {
-                          if (editingSubstructure === substructure.id) {
-                            handleSaveSubstructure();
-                          } else {
-                            setEditingSubstructure(substructure.id);
-                            const version = versions.find(v => v.id === substructure.version_id);
-                            setEditingVersionName(version?.name || '');
-                            setSelectedManufacturerId(substructure.manufacturer_id);
-                            setSelectedSystemId(substructure.system_id);
-                            setSelectedVersionId(substructure.version_id);
-                            setEditingValues(substructure);
-                          }
-                        }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                    </TableCell>
+                    <TableCell className="p-2">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          onClick={handleSaveSubstructure}
+                          className={`p-1 rounded hover:bg-opacity-80 ${
+                            !selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          } text-primary`}
                         variant="ghost"
-                      >
-                        {editingSubstructure === substructure.id ? (
+                          disabled={!selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type}
+                        >
                           <Save size={14} />
-                        ) : (
-                          <Edit2 size={14} />
-                        )}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          if (editingSubstructure === substructure.id) {
-                            setEditingSubstructure(null);
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setIsNewSubstructure(false);
+                            setSelectedManufacturerId('');
+                            setSelectedSystemId('');
+                            setSelectedVersionId('');
+                            setEditingVersionName('');
                             setEditingValues({});
-                          } else {
-                            handleDelete(substructure.id);
-                          }
-                        }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                        variant="ghost"
-                      >
-                        <X size={14} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {isNewSubstructure && (
-                <TableRow>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <select
-                      value={selectedManufacturerId}
-                      onChange={(e) => {
-                        setSelectedManufacturerId(e.target.value);
-                        setSelectedSystemId('');
-                        setSelectedVersionId('');
-                      }}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    >
-                      <option value="">Select Manufacturer</option>
-                      {manufacturers.map(mfg => (
-                        <option key={mfg.id} value={mfg.id}>
-                          {mfg.name}
-                        </option>
-                      ))}
-                    </select>
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <select
-                      value={selectedSystemId}
-                      onChange={(e) => {
-                        setSelectedSystemId(e.target.value);
-                        setSelectedVersionId('');
-                      }}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      disabled={!selectedManufacturerId}
-                    >
-                      <option value="">Select System</option>
-                      {systems
-                        .filter(sys => sys.manufacturer_id === selectedManufacturerId)
-                        .map(sys => (
-                          <option key={sys.id} value={sys.id}>
-                            {sys.name}
-                          </option>
-                        ))
-                      }
-                    </select>
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <Input
-                      type="text"
-                      value={editingVersionName}
-                      onChange={(e) => setEditingVersionName(e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="Enter version name"
-                      disabled={!selectedSystemId}
-                    />
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <select
-                      value={editingValues.type || 'field'}
-                      onChange={(e) => setEditingValues({ ...editingValues, type: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    >
-                      <option value="field">Field</option>
-                      <option value="roof">Roof</option>
-                    </select>
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <Input
-                      type="url"
-                      value={editingValues.link || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, link: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="https://"
-                    />
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <Input
-                      type="url"
-                      value={editingValues.schematic || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, schematic: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="https://"
-                    />
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <Input
-                      type="url"
-                      value={editingValues.example || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, example: e.target.value })}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="https://"
-                    />
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary" >
-                    <div className="space-y-2">
-                      <select
-                        value={editingValues.base_material_id || ''}
-                        onChange={(e) => setEditingValues({ ...editingValues, base_material_id: e.target.value })}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      >
-                        <option value="">Select material</option>
-                        {materials.map(material => (
-                          <option key={material.id} value={material.id}>
-                            {material.name}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          value={editingValues.base_material_thickness || ''}
-                          onChange={(e) => setEditingValues({ 
-                            ...editingValues, 
-                            base_material_thickness: e.target.value 
-                          })}
-                          className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                          min="0"
-                          step="any"
-                          placeholder="Thickness"
-                        />
-                        <select
-                          value={editingValues.base_material_thickness_unit || 'mm'}
-                          onChange={(e) => setEditingValues({
-                            ...editingValues,
-                            base_material_thickness_unit: e.target.value as 'mm' | 'μm'
-                          })}
-                          className="w-24 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                          }}
+                          className="p-1 rounded hover:bg-opacity-80 text-primary"
+                          variant="ghost"
                         >
-                          <option value="mm">mm</option>
-                          <option value="μm">μm</option>
-                        </select>
+                          <X size={14} />
+                        </Button>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="p-2 border border-theme text-secondary">
-                    <div className="flex items-center justify-center gap-2">
-                      <Button
-                        onClick={handleSaveSubstructure}
-                        className={`p-1 rounded hover:bg-opacity-80 ${
-                          !selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type
-                            ? 'opacity-50 cursor-not-allowed'
-                            : ''
-                        } text-secondary`}
-                      variant="ghost"
-                        disabled={!selectedManufacturerId || !selectedSystemId || !editingVersionName.trim() || !editingValues.type}
-                      >
-                        <Save size={14} />
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setIsNewSubstructure(false);
-                          setSelectedManufacturerId('');
-                          setSelectedSystemId('');
-                          setSelectedVersionId('');
-                          setEditingVersionName('');
-                          setEditingValues({});
-                        }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary "
-                        variant="ghost"
-                      >
-                        <X size={14} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-               </TableBody>
-               </Table>
-        </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+                </TableBody>
+            </Table>
+            </div>
+        </section>
       </div>
     </div>
   );

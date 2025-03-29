@@ -87,8 +87,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
       }));
 
       // Apply theme from metadata
-      const themeId = metadata.theme_id || 'ferra';
-      document.documentElement.setAttribute('data-theme', themeId);
+      const themeId = metadata.theme_id || 'zinc';
+      const split = themeId.split(".")
+      document.documentElement.setAttribute('data-theme', split[0]);
+      if(split[1]) {
+        document.documentElement.classList.add("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+      }
     }
   };
 

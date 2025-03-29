@@ -4,6 +4,9 @@ import { Plus } from 'lucide-react';
 import { createCustomer } from '../../../../services/customers';
 import { Person } from '../../../../types/people';
 import { Company } from '../../../../types/companies';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface CustomerFormProps {
   currentTheme: Theme;
@@ -68,11 +71,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   Customer Name
                   <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
@@ -83,12 +86,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   Customer Type
-                </label>
+                </Label>
                 <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
+                  <Label className="flex items-center gap-2">
+                    <Input
                       type="radio"
                       checked={selectedType === 'person'}
                       onChange={() => {
@@ -97,9 +100,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                       }}
                     />
                     <span className="text-primary">Person</span>
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
+                  </Label>
+                  <Label className="flex items-center gap-2">
+                    <Input
                       type="radio"
                       checked={selectedType === 'company'}
                       onChange={() => {
@@ -108,15 +111,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                       }}
                     />
                     <span className="text-primary">Company</span>
-                  </label>
+                  </Label>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1 text-secondary">
                   Select {selectedType === 'person' ? 'Person' : 'Company'}
                   <span className="text-red-500 ml-1">*</span>
-                </label>
+                </Label>
                 <select
                   value={selectedId}
                   onChange={(e) => setSelectedId(e.target.value)}
@@ -147,8 +150,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               )}
 
               <div className="flex justify-end gap-2">
-                <button
-                  type="button"
+                <Button
+          
                   onClick={() => {
                     setShowForm(false);
                     setCustomerName('');
@@ -158,13 +161,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                 >
                   Create Customer
-                </button>
+                </Button>
               </div>
             </form>
           </div>

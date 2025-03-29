@@ -27,6 +27,7 @@ import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, Layo
 import { FileText } from 'lucide-react';
 import { ButtonSection } from './ui/ButtonSection';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { updateUserSettings } from '@/services/userSettings';
 
 const DashboardLayout = () => {
   const {
@@ -160,10 +161,9 @@ const DashboardLayout = () => {
       setShowHiddenIds(!!metadata.show_hidden_ids);
       
       // Update theme
-      const theme = THEMES.find(t => t.id === (metadata.theme_id || 'ferra'));
+      const theme = THEMES.find(t => t === (metadata.theme_id || 'zinc'));
       if (theme) {
         setCurrentTheme(theme);
-        document.documentElement.setAttribute('data-theme', theme.id);
       }
     };
 
@@ -173,9 +173,16 @@ const DashboardLayout = () => {
     };
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', currentTheme.id);
-  }, [currentTheme]);
+  const handleUpdateTheme = async (theme: Theme) => {
+    const split = theme.split(".")
+    document.documentElement.setAttribute('data-theme', split[0]);
+    if(split[1]) {
+      document.documentElement.classList.add("dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+    }
+    setCurrentTheme(theme)
+  }
 
   const renderContent = () => {
     const selectedProject = selectedProjectId 
@@ -339,7 +346,7 @@ const DashboardLayout = () => {
             selectedCustomerId={selectedCustomerId}
           />
         ) : (
-          <div className="p-6 text-center" style={{ color: currentTheme.colors.text.secondary }}>
+          <div className="p-6 text-center" >
             {t("datapoint.please_select_zone")}
           </div>
         );
@@ -374,7 +381,7 @@ const DashboardLayout = () => {
             onLanguageChange={handleLanguageChange}
             onShowHiddenIdsChange={setShowHiddenIds}
             currentTheme={currentTheme}
-            onThemeChange={setCurrentTheme}
+            onThemeChange={handleUpdateTheme}
             onClose={() => setView('projects')}
             savedCompanies={savedCompanies}
             onSaveCompanies={setCompanies}
@@ -392,15 +399,15 @@ const DashboardLayout = () => {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-theme">
+      <div className="min-h-screen flex flex-col">
         {/* Top Navigation Bar */}
-        <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
+        <div className="h-14 border-b flex items-center px-4 border-input bg-card">
           <div className="flex-1 flex items-center gap-6">
             {view === 'settings' ? (
               <>
                 <button
                   onClick={() => setView('projects')}
-                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors text-secondary"
+                  className="flex items-center gap-2 px-3 py-2 rounded transition-colors "
                 >
                   <ArrowLeft size={18} />
                   <span>{t("nav.back")}</span>
@@ -408,9 +415,6 @@ const DashboardLayout = () => {
                 <div className="h-6 w-px bg-border mx-2" />
                 <ButtonSection view={settingsView} match="general" onClick={() => setSettingsView('general')}>
                   <span>{t("settings.general")}</span>
-                </ButtonSection>
-                <ButtonSection view={settingsView} match="theme" onClick={() => setSettingsView('theme')}>
-                  <span>{t("settings.theme")}</span>
                 </ButtonSection>
                 <ButtonSection view={settingsView} match="companies" onClick={() => setSettingsView('companies')}>
                   <span>{t("settings.companies")}</span>

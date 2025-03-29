@@ -10,6 +10,9 @@ import { Language, useTranslation } from '../types/language';
 import { useKeyAction } from '../hooks/useKeyAction';
 import { fetchCompanies as fetchCompaniesService } from '../services/companies';
 import { toCase } from '../utils/cases';
+import { Input } from './ui/input';
+import { Label } from '@radix-ui/react-label';
+import { Button } from './ui/button';
 
 interface CompaniesPanelProps {
   currentTheme: Theme;
@@ -150,24 +153,24 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   return (
     <div className="p-6">
       {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border border-solid">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
+        <div className="text-center p-4 text-primary-foreground">
           {translation("company.loading")}
         </div>
       ) : (
         <>
-          <button
+          <Button
             onClick={() => setShowNewCompanyForm(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"            
+            className="w-full px-4 py-3 duration-200 mb-6"            
           >
             <Plus size={16} />
             {translation("company.add")}
-          </button>
+          </Button>
 
           {showNewCompanyForm ? (
             <div>
@@ -176,14 +179,14 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
             {editingCompany ? translation("company.edit") : translation("company.add")}
           </h3>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="text-card-foreground space-y-4">
             {COMPANY_FIELDS.map(field => (
               <div key={field.id}>
-                <label className="block text-sm mb-1 text-secondary">
+                <Label className="block text-sm mb-1">
                   {translation(field.label as any)}
                   {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                <input
+                </Label>
+                <Input
                   type={field.type}
                   value={formValues[field.id] || ''}
                   onChange={(e) => setFormValues(prev => ({
@@ -191,19 +194,19 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                     [field.id]: e.target.value
                   }))}
                   required={field.required}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"                  
+                  className="w-full p-2 rounded text-sm text-primary"                  
                 />
               </div>
             ))}
             <div>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1">
                 CEO
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={selectedCeoId}
                   onChange={(e) => setSelectedCeoId(e.target.value)}
-                  className="w-full p-2 rounded text-sm appearance-none text-primary border-theme border-solid bg-surface"                  
+                  className="w-full p-2 rounded text-sm appearance-none text-primary border border-input shadow-sm bg-accent"                  
                 >
                   <option value="">Select CEO</option>
                   {availablePeople.map(person => (
@@ -215,19 +218,19 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </select>
                 <ChevronRight 
                   size={14} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-primary"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("company.contact_person")}
-              </label>
+              </Label>
               <div className="relative">
                 <select
                   value={selectedContactId}
                   onChange={(e) => setSelectedContactId(e.target.value)}
-                  className="w-full p-2 rounded text-sm appearance-none text-primary border-theme border-solid bg-surface"
+                  className="w-full p-2 rounded text-sm appearance-none text-primary border border-input shadow-sm bg-accent"
                 >
                   <option value="">Select Contact Person</option>
                   {availablePeople.map(person => (
@@ -239,12 +242,12 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </select>
                 <ChevronRight 
                   size={14} 
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-primary"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setShowNewCompanyForm(false);
@@ -253,16 +256,16 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   setSelectedCeoId('');
                   setSelectedContactId('');
                 }}
-                className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
+                variant="destructive"
               >
                 {translation("actions.cancel")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
+                className="px-4 py-2 rounded"                
               >
                 {editingCompany ? translation("general.save_changes") : 'Create Company'}
-              </button>
+              </Button>
             </div>
           </form>
             </div>
@@ -271,7 +274,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
           {savedCompanies.map(company => (
             <div
               key={company.id}
-              className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-theme border-solid bg-surface"              
+              className="p-4 rounded-lg border transition-all hover:translate-x-1 border-accent text-card-foreground"              
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -280,24 +283,20 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                 </div>
                 <div className="flex items-center gap-4">
                   {onCreateCustomer && (
-                    <button
+                    <Button
                       onClick={(e) => {
                         e.stopPropagation();
                         onCreateCustomer(company.id, company.name);
                       }}
-                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80"
-                      style={{ 
-                        backgroundColor: currentTheme.colors.accent.primary,
-                        color: 'white'
-                      }}
+                      className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white"
                     >
                       Make Customer
-                    </button>
+                    </Button>
                   )}
-                  <ChevronRight className="text-secondary" size={16} />
+                  <ChevronRight className="text-primary" size={16} />
                 </div>
               </div>
-              <div className="text-sm space-y-2 text-secondary">
+              <div className="text-sm space-y-2 text-muted-foreground">
                 {company.ceoId && (
                   <div className="flex items-center gap-2">
                     <User size={14} />

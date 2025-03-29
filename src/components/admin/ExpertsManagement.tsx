@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
 import { ArrowLeft, Plus, Edit2, Save, X } from 'lucide-react';
-import { FormHandler, FormInput } from '../shared/FormHandler';
+import { FormHandler } from '../shared/FormHandler';
 import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface ExpertsManagementProps {
   currentTheme: Theme;
@@ -165,14 +166,13 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
         <Button
           onClick={onBack}
           className="p-2 rounded hover:bg-opacity-80"
-          style={{ color: currentTheme.colors.text.secondary }}
           variant="ghost"
         >
           <ArrowLeft size={20} />
         </Button>
         <h2 
           className="text-2xl font-bold"
-          style={{ color: currentTheme.colors.text.primary }}
+   
         >
           Experts Management
         </h2>
@@ -181,11 +181,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
       {error && (
         <div 
           className="p-4 mb-4 rounded"
-          style={{ 
-            backgroundColor: currentTheme.colors.surface,
-            color: currentTheme.colors.accent.primary,
-            border: `1px solid ${currentTheme.colors.accent.primary}`
-          }}
+     
         >
           {error}
         </div>
@@ -193,217 +189,203 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
       <Button
         onClick={() => setIsNewExpert(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
-          backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
-        }}
+        className="w-full"        
       >
         <Plus size={16} />
         Add New Expert
       </Button>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableCaption>Experts</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Website</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>VAT ID</TableHead>
-              <TableHead>Reg. No.</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      <section className="mt-8 border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>Experts</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Website</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>VAT ID</TableHead>
+                <TableHead>Reg. No.</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
 
-            {experts.map(expert => (
-              <TableRow key={expert.id}>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormHandler
-                      isEditing={true}
-                      onSave={() => handleUpdateSaveExpert(expert)}
-                      onCancel={() => {
-                        setEditingExpert(null);
-                        setEditingValues({});
-                      }}
-                    >
-                      <FormInput
-                        value={editingValues.name || ''}
-                        onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+              {experts.map(expert => (
+                <TableRow key={expert.id}>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <FormHandler
+                        isEditing={true}
+                        onSave={() => handleUpdateSaveExpert(expert)}
+                        onCancel={() => {
+                          setEditingExpert(null);
+                          setEditingValues({});
+                        }}
+                      >
+                        <Input
+                          value={editingValues.name || ''}
+                          onChange={(e) => handleChangeEditingValues('name', e.target.value)}
+                        />
+                      </FormHandler>
+                    ) : (
+                      expert.name
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <Input
+                        type="url"
+                        value={editingValues.website || ''}
+                        onChange={(e) => handleChangeEditingValues('website', e.target.value)}
                       />
-                    </FormHandler>
-                  ) : (
-                    expert.name
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormInput
-                      type="url"
-                      value={editingValues.website || ''}
-                      onChange={(e) => handleChangeEditingValues('website', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                  ) : (
-                    expert.website || '-'
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormInput
-                      type="email"
-                      value={editingValues.email || ''}
-                      onChange={(e) => handleChangeEditingValues('email', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                  ) : (
-                    expert.email || '-'
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormInput
-                      type="tel"
-                      value={editingValues.phone || ''}
-                      onChange={(e) => handleChangeEditingValues('phone', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                  ) : (
-                    expert.phone || '-'
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormInput
-                      type="text"
-                      value={editingValues.vat_id || ''}
-                      onChange={(e) => handleChangeEditingValues('vat_id', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                  ) : (
-                    expert.vat_id || '-'
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  {editingExpert === expert.id ? (
-                    <FormInput
-                      type="text"
-                      value={editingValues.registration_number || ''}
-                      onChange={(e) => handleChangeEditingValues('registration_number', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    />
-                  ) : (
-                    expert.registration_number || '-'
-                  )}
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      onClick={() => handleUpdateSaveExpert(expert)}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                      variant="ghost"
-                    >
-                      {editingExpert === expert.id ? (
-                        <Save size={14} />
-                      ) : (
-                        <Edit2 size={14} />
-                      )}
-                    </Button>
-                    {!editingExpert && (
+                    ) : (
+                      expert.website || '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <Input
+                        type="email"
+                        value={editingValues.email || ''}
+                        onChange={(e) => handleChangeEditingValues('email', e.target.value)}
+                      />
+                    ) : (
+                      expert.email || '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <Input
+                        type="tel"
+                        value={editingValues.phone || ''}
+                        onChange={(e) => handleChangeEditingValues('phone', e.target.value)}
+                      />
+                    ) : (
+                      expert.phone || '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <Input
+                        type="text"
+                        value={editingValues.vat_id || ''}
+                        onChange={(e) => handleChangeEditingValues('vat_id', e.target.value)}
+                      />
+                    ) : (
+                      expert.vat_id || '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editingExpert === expert.id ? (
+                      <Input
+                        type="text"
+                        value={editingValues.registration_number || ''}
+                        onChange={(e) => handleChangeEditingValues('registration_number', e.target.value)}
+                      />
+                    ) : (
+                      expert.registration_number || '-'
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Button
-                        onClick={() => handleDelete(expert.id)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        onClick={() => handleUpdateSaveExpert(expert)}
+                        className="p-1 rounded hover:bg-opacity-80"
                         variant="ghost"
                       >
+                        {editingExpert === expert.id ? (
+                          <Save size={14} />
+                        ) : (
+                          <Edit2 size={14} />
+                        )}
+                      </Button>
+                      {!editingExpert && (
+                        <Button
+                          onClick={() => handleDelete(expert.id)}
+                          className="p-1 rounded hover:bg-opacity-80"
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {isNewExpert && (
+                <TableRow>
+                  <TableCell className="p-2">
+                    <FormHandler
+                      isEditing={true}
+                      onSave={handleAddNewExpert}
+                      onCancel={handleCancelNewExpert}
+                    >
+                      <Input
+                        type="text"
+                        value={newExpert.name || ''}
+                        onChange={(e) => handleChangeNewExpert('name', e.target.value)}
+                        placeholder="Enter expert name"
+                      />
+                    </FormHandler>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="url"
+                      value={newExpert.website || ''}
+                      onChange={(e) => handleChangeNewExpert('website', e.target.value)}
+                      placeholder="Enter website URL"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="email"
+                      value={newExpert.email || ''}
+                      onChange={(e) => handleChangeNewExpert('email', e.target.value)}
+                      placeholder="Enter email"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="tel"
+                      value={newExpert.phone || ''}
+                      onChange={(e) => handleChangeNewExpert('phone', e.target.value)}
+                      placeholder="Enter phone"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="text"
+                      value={newExpert.vat_id || ''}
+                      onChange={(e) => handleChangeNewExpert('vat_id', e.target.value)}
+                      placeholder="Enter VAT ID"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="text"
+                      value={newExpert.registration_number || ''}
+                      onChange={(e) => handleChangeNewExpert('registration_number', e.target.value)}
+                      placeholder="Enter reg. no."
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Button onClick={handleAddNewExpert} variant="ghost">
+                        <Save size={14} />
+                      </Button>
+                      <Button onClick={handleCancelNewExpert} variant="ghost">
                         <X size={14} />
                       </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {isNewExpert && (
-              <TableRow>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormHandler
-                    isEditing={true}
-                    onSave={handleAddNewExpert}
-                    onCancel={handleCancelNewExpert}
-                  >
-                    <FormInput
-                      type="text"
-                      value={newExpert.name || ''}
-                      onChange={(e) => handleChangeNewExpert('name', e.target.value)}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="Enter expert name"
-                    />
-                  </FormHandler>
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormInput
-                    type="url"
-                    value={newExpert.website || ''}
-                    onChange={(e) => handleChangeNewExpert('website', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter website URL"
-                  />
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormInput
-                    type="email"
-                    value={newExpert.email || ''}
-                    onChange={(e) => handleChangeNewExpert('email', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter email"
-                  />
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormInput
-                    type="tel"
-                    value={newExpert.phone || ''}
-                    onChange={(e) => handleChangeNewExpert('phone', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter phone"
-                  />
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormInput
-                    type="text"
-                    value={newExpert.vat_id || ''}
-                    onChange={(e) => handleChangeNewExpert('vat_id', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter VAT ID"
-                  />
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormInput
-                    type="text"
-                    value={newExpert.registration_number || ''}
-                    onChange={(e) => handleChangeNewExpert('registration_number', e.target.value)}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter reg. no."
-                  />
-                </TableCell>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button onClick={handleAddNewExpert} variant="ghost">
-                      <Save size={14} />
-                    </Button>
-                    <Button onClick={handleCancelNewExpert} variant="ghost">
-                      <X size={14} />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-      </TableBody>
-      </Table>
-      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+        </TableBody>
+          </Table>
+        </div>
+      </section>
     </div>
   );
 };

@@ -8,6 +8,9 @@ import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
 import { FormHandler } from '../../../shared/FormHandler';
 import { createField } from '../../../../services/fields';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface FieldListProps {
   currentTheme: Theme;
@@ -136,97 +139,35 @@ const FieldList: React.FC<FieldListProps> = ({
 
   return (
     <div>
-      <button
+      <Button
         onClick={() => setIsAdding(true)}
-        className="w-full py-3 px-4 mb-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+        className="w-full py-3 px-4 mb-4"
       >
         <Plus size={16} />
         {translation("field.add")}
-      </button>
+      </Button>
 
-      <div className="overflow-x-auto">
-      <table className="w-full border-collapse border-theme text-primary">
-        <thead>
-          <tr>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("field.name")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("field.has_fence")}
-            </th>
-            <th className="p-2 text-left border font-normal border-theme">
-              {translation("zones.location")}
-            </th>
-            <th className="p-2 text-center border font-normal border-theme">
-              {translation("actions")}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {isAdding && (
-            <tr>
-              <td className="p-2 border border-theme">
-                <FormHandler
-                  isEditing={true}
-                  onSave={handleAddField}
-                  onCancel={() => {
-                    setIsAdding(false);
-                    setNewValues({
-                      name: '',
-                      latitude: '',
-                      longitude: '',
-                      has_fence: 'no'
-                    });
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={newValues.name}
-                    onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder="Enter field name"
-                  />
-                </FormHandler>
-              </td>
-              <td className="p-2 border border-theme">
-                <select
-                  value={newValues.has_fence}
-                  onChange={(e) => setNewValues({ ...newValues, has_fence: e.target.value })}
-                  className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                  required
-                >
-                  <option value="no">{translation("field.has_fence.no")}</option>
-                  <option value="yes">{translation("field.has_fence.yes")}</option>
-                </select>
-              </td>
-              <td className="p-2 border border-theme">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newValues.latitude}
-                    onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder={translation("project.latitude")}
-                  />
-                  <input
-                    type="text"
-                    value={newValues.longitude}
-                    onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    placeholder={translation("project.longitude")}
-                  />
-                </div>
-              </td>
-              <td className="p-2 border border-theme">
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={handleAddField}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                  >
-                    <Save size={14} />
-                  </button>
-                  <button
-                    onClick={() => {
+      <section className="border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>List fields</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead> {translation("field.name")}</TableHead>
+                <TableHead> {translation("field.has_fence")}</TableHead>
+                <TableHead> {translation("zones.location")}</TableHead>
+                <TableHead> {translation("actions")}</TableHead>
+
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+            {isAdding && (
+              <TableRow>
+                <TableCell >
+                  <FormHandler
+                    isEditing={true}
+                    onSave={handleAddField}
+                    onCancel={() => {
                       setIsAdding(false);
                       setNewValues({
                         name: '',
@@ -235,122 +176,183 @@ const FieldList: React.FC<FieldListProps> = ({
                         has_fence: 'no'
                       });
                     }}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
                   >
-                    <X size={14} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          )}
-          {(initialFields || []).map(field => (
-            <tr key={field.id} className="hover:bg-opacity-50">
-              <td className="p-2 border border-theme">
-                {editingId === field.id ? (
-                  <input
-                    type="text"
-                    value={editingValues.name || field.name}
-                    onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                  />
-                ) : field.name}
-              </td>
-              <td className="p-2 border border-theme">
-                {editingId === field.id ? (
+                    <Input
+                      type="text"
+                      value={newValues.name}
+                      onChange={(e) => setNewValues({ ...newValues, name: e.target.value })}
+                      className="w-full p-1"
+                      placeholder="Enter field name"
+                    />
+                  </FormHandler>
+                </TableCell>
+                <TableCell >
                   <select
-                    value={editingValues.has_fence}
-                    onChange={(e) => setEditingValues(prev => ({
-                      ...prev,
-                      has_fence: e.target.value
-                    }))}
-                    className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                    disabled={updatingField}
+                    value={newValues.has_fence}
+                    onChange={(e) => setNewValues({ ...newValues, has_fence: e.target.value })}
+                    className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                    required
                   >
-                    <option value="">Not set</option>
                     <option value="no">{translation("field.has_fence.no")}</option>
                     <option value="yes">{translation("field.has_fence.yes")}</option>
                   </select>
-                ) : (
-                  <span>
-                    {field.has_fence === null ? 'Not set' : 
-                     translation(field.has_fence === 'yes' || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no")}
-                  </span>
-                )}
-              </td>
-              <td className="p-2 border border-theme">
-                {editingId === field.id ? (
+                </TableCell>
+                <TableCell >
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
-                      value={editingValues.latitude || field.latitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                      className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      value={newValues.latitude}
+                      onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
                       placeholder={translation("project.latitude")}
                     />
-                    <input
+                    <Input
                       type="text"
-                      value={editingValues.longitude || field.longitude || ''}
-                      onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                      className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      value={newValues.longitude}
+                      onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
                       placeholder={translation("project.longitude")}
                     />
                   </div>
-                ) : field.latitude && field.longitude ? (
-                  <button
-                    onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
-                    className="text-sm hover:underline text-accent-primary"
-                  >
-                    {translation("general.view_on_map")}
-                  </button>
-                ) : (
-                  <span className="text-secondary">{translation("general.location_not_set")}</span>
-                )}
-              </td>
-              <td className="p-2 border border-theme">
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={async (event) => {
-                      event.stopPropagation();
-                      if (editingId === field.id) {
-                        handleSave(field);
-                      } else {
-                        setEditingId(field.id);
-                        setEditingValues({
-                          name: field.name,
-                          latitude: field.latitude || '',
-                          longitude: field.longitude || '',
-                          has_fence: field.has_fence === null ? '' : 
-                                   field.has_fence === true || field.has_fence === 'yes' ? 'yes' : 'no'
+                </TableCell>
+                <TableCell >
+                  <div className="flex items-center justify-center gap-2">
+                    <Button
+                      onClick={handleAddField}
+                      className="size-8"
+                      variant="ghost"
+                    >
+                      <Save size={14} />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsAdding(false);
+                        setNewValues({
+                          name: '',
+                          latitude: '',
+                          longitude: '',
+                          has_fence: 'no'
                         });
-                      }
-                    }}
-                    className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                  >
-                    {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
-                  </button>
-                  {editingId === field.id && (
-                    <button
-                      onClick={event => handleRemoveField(event, field)}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      }}
+                      className="size-8"
+                      variant="ghost"
                     >
                       <X size={14} />
-                    </button>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+            {(initialFields || []).map(field => (
+              <TableRow key={field.id}>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <Input
+                      type="text"
+                      value={editingValues.name || field.name}
+                      onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
+                      className="w-full p-1"
+                    />
+                  ) : field.name}
+                </TableCell>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <select
+                      value={editingValues.has_fence}
+                      onChange={(e) => setEditingValues(prev => ({
+                        ...prev,
+                        has_fence: e.target.value
+                      }))}
+                      className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
+                      disabled={updatingField}
+                    >
+                      <option value="">Not set</option>
+                      <option value="no">{translation("field.has_fence.no")}</option>
+                      <option value="yes">{translation("field.has_fence.yes")}</option>
+                    </select>
+                  ) : (
+                    <span>
+                      {field.has_fence === null ? 'Not set' : 
+                      translation(field.has_fence === 'yes' || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no")}
+                    </span>
                   )}
-                  <button
-                    onClick={() => onSelectField(field.id)}
-                    className="p-1 rounded hover:bg-opacity-80 text-accent-primary"
-                  >
-                    <ChevronRight size={14} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      </div>
+                </TableCell>
+                <TableCell className="p-2">
+                  {editingId === field.id ? (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={editingValues.latitude || field.latitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
+                        placeholder={translation("project.latitude")}
+                      />
+                      <Input
+                        type="text"
+                        value={editingValues.longitude || field.longitude || ''}
+                        onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
+                        placeholder={translation("project.longitude")}
+                      />
+                    </div>
+                  ) : field.latitude && field.longitude ? (
+                    <Button
+                      onClick={event => handleOpenGoogleMaps(event, field.latitude, field.longitude)}
+                    >
+                      {translation("general.view_on_map")}
+                    </Button>
+                  ) : (
+                    <span>{translation("general.location_not_set")}</span>
+                  )}
+                </TableCell>
+                <TableCell className="p-2">
+                  <div className="flex items-center justify-center gap-2">
+                    <Button
+                      onClick={async (event) => {
+                        event.stopPropagation();
+                        if (editingId === field.id) {
+                          handleSave(field);
+                        } else {
+                          setEditingId(field.id);
+                          setEditingValues({
+                            name: field.name,
+                            latitude: field.latitude || '',
+                            longitude: field.longitude || '',
+                            has_fence: field.has_fence === null ? '' : 
+                                    field.has_fence === true || field.has_fence === 'yes' ? 'yes' : 'no'
+                          });
+                        }
+                      }}
+                      className="size-8"
+                      variant="ghost"
+                    >
+                      {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
+                    </Button>
+                    {editingId === field.id && (
+                      <Button
+                        onClick={event => handleRemoveField(event, field)}
+                        className="size-8"
+                        variant="ghost"
+                      >
+                        <X size={14} />
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => onSelectField(field.id)}
+                      className="size-8"
+                      variant="ghost"
+                    >
+                      <ChevronRight size={14} />
+                    </Button>
+                  </div>
+                </TableCell>
+                </TableRow>
+      
+            ))}
+            
+          </TableBody>
+          </Table>
+        </div>
+      </section>
+
       {error && (
-        <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">
+        <div className="mt-2 p-2 rounded text-sm text-destructive-foreground border border-destructive bg-destructive">
           {error}
         </div>
       )}

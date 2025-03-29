@@ -10,6 +10,7 @@ import { MaterialsPanel } from './MaterialsPanel';
 import { NormsPanel } from './NormsPanel';
 import DatabaseOverview from './DatabaseOverview';
 import { Language } from '../../types/language';
+import { Button } from '../ui/button';
 
 
 
@@ -26,12 +27,12 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button
+        <Button
+          variant="ghost"
           onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
         >
-          <ArrowLeft size={20} />
-        </button>
+          <ArrowLeft className="text-primary" size={20} />
+        </Button>
         <h2 className="text-2xl font-bold text-primary">
           Database Management
         </h2>
@@ -40,20 +41,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <button
           onClick={() => setActiveView('overview')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"          
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"          
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+       
             >
-              <Database className="text-accent-primary" size={20} />
+              <Database size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Overview
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Database statistics
               </p>
             </div>
@@ -62,20 +63,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('parameters')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+          
             >
-              <Table className="text-accent-primary" size={20} />
+              <Table size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Parameters
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage parameters 
               </p>
             </div>
@@ -84,20 +85,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('norms')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+         
             >
-              <ClipboardList className="text-accent-primary" size={20} />
+              <ClipboardList size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Norms
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage norms
               </p>
             </div>
@@ -106,20 +107,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('constants')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+  
             >
-              <Ruler className="text-accent-primary" size={20} />
+              <Ruler size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Physical Constants
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage physical constants
               </p>
             </div>
@@ -128,20 +129,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('materials')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+      
             >
-              <Flask className="text-accent-primary" size={20} />
+              <Flask size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Materials
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage materials
               </p>
             </div>
@@ -150,20 +151,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('foundations')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+     
             >
-              <Building2 className="text-accent-primary" size={20} />
+              <Building2 size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Foundations
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage foundations
               </p>
             </div>
@@ -172,23 +173,21 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('experts')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg border border-accent text-accent-foreground bg-card"
+      
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
             >
-              <GraduationCap className="text-accent-primary" size={20} />
+              <GraduationCap size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Experts
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage experts
               </p>
             </div>
@@ -197,23 +196,21 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('neighboring')}
-          className="p-6 rounded-lg bg-surface"
-          style={{ 
-            border: `1px solid ${currentTheme.colors.border}`
-          }}
+          className="p-6 rounded-lg border border-accent text-accent-foreground bg-card"
+   
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+         
             >
-              <Building2 className="text-accent-primary" size={20} />
+              <Building2 size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Neighboring Structures
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage neighboring structures
               </p>
             </div>
@@ -222,20 +219,20 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
 
         <button
           onClick={() => setActiveView('substructures')}
-          className="p-6 rounded-lg bg-surface border-theme border-solid"
+          className="p-6 rounded-lg border border-accent text-card-foreground bg-card"
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
               className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
+
             >
-              <Wrench className="text-accent-primary" size={20} />
+              <Wrench size={20} />
             </div>
             <div className="text-left">
-              <h3 className="font-medium text-primary">
+              <h3 className="font-medium">
                 Substructures
               </h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 Manage substructure systems
               </p>
             </div>
@@ -243,7 +240,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         </button>
       </div>
 
-      <div className="rounded-lg bg-surface">
+      <div className="rounded-lg text-card-foreground border border-accent bg-card">
         {activeView === 'parameters' && (
           <ParameterPanel
             currentTheme={currentTheme}
@@ -265,7 +262,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+ 
             >
               Norms Management
             </h3>
@@ -276,7 +273,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+       
             >
               Physical Constants Management
             </h3>
@@ -317,7 +314,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
           <div className="p-6">
             <h3 
               className="text-lg font-medium mb-4"
-              style={{ color: currentTheme.colors.text.primary }}
+             
             >
               Foundations Management
             </h3>

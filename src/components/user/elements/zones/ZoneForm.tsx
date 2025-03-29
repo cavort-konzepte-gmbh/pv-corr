@@ -4,6 +4,9 @@ import { Plus } from 'lucide-react';
 import { createZone } from '../../../../services/zones';
 import { fetchProjects } from '../../../../services/projects';
 import { Language, useTranslation } from '../../../../types/language';
+import { Button } from '@/components/ui/button';
+import { Label } from '@radix-ui/react-label';
+import { Input } from '@/components/ui/input';
 
 interface ZoneFormProps {
   currentTheme: Theme;
@@ -62,13 +65,13 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
 
   return (
     <>
-      <button 
-        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+      <Button 
+        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 "
         onClick={() => setShowForm(true)}
       >
         <Plus className="size-4 text-primary" />
         {translation("zones.add")}
-      </button>
+      </Button>
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -77,51 +80,51 @@ const ZoneForm: React.FC<ZoneFormProps> = ({
               {translation("zones.add_new")}
             </h3>
             <form onSubmit={handleSubmit}>
-              <label className="block text-sm mb-1 text-secondary">
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("zones.name")}
-                <input
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                <Input
+                  className="w-full p-2 rounded text-sm "
                   type="text"
                   name="name"
                   required
                   value={newZone.name}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.latitude")}
-                <input
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                <Input
+                  className="w-full p-2 rounded text-sm "
                   type="text"
                   name="latitude"
                   value={newZone.latitude}
                   onChange={handleChange}
                 />
-              </label>
-              <label className="block text-sm mb-1 text-secondary">
+              </Label>
+              <Label className="block text-sm mb-1 text-secondary">
                 {translation("project.longitude")}
-                <input
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+                <Input
+                  className="w-full p-2 rounded "
                   type="text"
                   name="longitude"
                   value={newZone.longitude}
                   onChange={handleChange}
                 />
-              </label>
+              </Label>
               <div className="w-full mt-6 flex items-center justify-end gap-x-2">
-                <button
+                <Button
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                   type="button"
                   onClick={handleReset}
                 >
                   {translation("actions.cancel")}
-                </button>
-                <button
+                </Button>
+                <Button
                   className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
                   type="submit"
                 >
                   {translation("actions.save")}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

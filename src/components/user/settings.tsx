@@ -4,7 +4,6 @@ import { Language } from '../../types/language';
 import { Company } from '../../types/companies';
 import { Standard } from '../../types/standards';
 import GeneralSettings from './elements/settings/GeneralSettings';
-import ThemeSettings from './elements/settings/ThemeSettings';
 import CompaniesSettings from './elements/settings/CompaniesSettings';
 import PeopleSettings from './elements/settings/PeopleSettings';
 import DatapointsSettings from './elements/settings/DatapointsSettings';
@@ -52,7 +51,7 @@ const Settings: React.FC<SettingsProps> = ({
   onCreateCustomer
 }) => {
   return (
-    <div className="flex-1 p-6 overflow-auto bg-theme">
+    <div className="flex-1 p-6 overflow-auto">
         {view === 'general' && (
           <GeneralSettings
             currentLanguage={currentLanguage}
@@ -62,14 +61,7 @@ const Settings: React.FC<SettingsProps> = ({
             showHiddenIds={showHiddenIds}
             onShowHiddenIdsChange={onShowHiddenIdsChange}
             currentTheme={currentTheme}
-          />
-        )}
-
-        {view === 'theme' && (
-          <ThemeSettings
-            currentTheme={currentTheme}
             onThemeChange={onThemeChange}
-            themes={THEMES}
           />
         )}
 
@@ -99,13 +91,6 @@ const Settings: React.FC<SettingsProps> = ({
             currentLanguage={currentLanguage}
             standards={standards}
             onStandardsChange={onStandardsChange}
-          />
-        )}
-
-        {view === 'translations' && (
-          <TranslationsPanel
-            currentTheme={currentTheme}
-            currentLanguage={currentLanguage}
           />
         )}
       </div>

@@ -4,6 +4,9 @@ import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { Language, useTranslation } from '../../../../types/language';
 import { updateField } from '../../../../services/fields';
 import { fetchProjects } from '../../../../services/projects';
+import { TableBody, TableCell, TableHead, TableHeader, TableRow , Table} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface FieldSummaryProps {
   field: {
@@ -53,27 +56,30 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
 
   return (
     <div className="mb-8">
-      <table className="w-full border-collapse rounded-lg border transition-all text-primary border-theme bg-surface">
-        <thead>
-          <tr>
-            <th colSpan={2} className="p-4 text-left border-b font-semibold border-theme cursor-pointer" onClick={onToggle}>
+      
+      <section className="border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
+      <Table >
+        <TableHeader>
+          <TableRow>
+            <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
-                    <input
+                    <Input
                       type="text"
                       value={editValues.name}
                       onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                      className="p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                      className="p-1"
                     />
                   ) : (
                     <span>{field.name}</span>
                   )}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20  ">
                       {field.zones?.length || 0} {translation("zones")}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 text-secondary bg-border">
+                    <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 ">
                       {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints")}
                     </span>
                   </div>
@@ -81,84 +87,83 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   {isEditing ? (
                     <>
-                      <button
+                      <Button
                         onClick={handleSave}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="size-8"
                       >
                         <Save size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setIsEditing(false)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        className="size-8"
                       >
                         <X size={14} />
-                      </button>
+                      </Button>
                     </>
                   ) : (
-                    <button
+                    <Button
                       onClick={() => setIsEditing(true)}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                      className="size-8"
                     >
                       <Edit2 size={14} />
-                    </button>
+                    </Button>
                   )}
                   {isExpanded ? (
-                    <ChevronDown className="text-secondary" size={16} />
+                    <ChevronDown  size={16} />
                   ) : (
-                    <ChevronRight className="text-secondary" size={16} />
+                    <ChevronRight size={16} />
                   )}
                 </div>
               </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody className={isExpanded ? '' : 'hidden'}>
-          <tr>
-            <td className="p-2 border-r border-theme w-1/6 text-secondary">
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className={isExpanded ? '' : 'hidden'}>
+          <TableRow>
+            <TableCell className="p-2 w-1/6 ">
               {translation("zones.location")}
-            </td>
-            <td className="p-2 border-theme">
+            </TableCell>
+            <TableCell className="p-2">
               {isEditing ? (
                 <div className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={editValues.latitude}
                     onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-1/2 p-1"
                     placeholder={translation("project.latitude")}
                   />
-                  <input
+                  <Input
                     type="text"
                     value={editValues.longitude}
                     onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
-                    className="w-1/2 p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                    className="w-1/2 p-1"
                     placeholder={translation("project.longitude")}
                   />
                 </div>
               ) : field.latitude && field.longitude ? (
                 <div className="flex items-center justify-between">
                   <span>{field.latitude}, {field.longitude}</span>
-                  <button
+                  <Button
                     onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, '_blank')}
-                    className="text-sm hover:underline text-accent-primary"
                   >
                     {translation("general.view_on_map")}
-                  </button>
+                  </Button>
                 </div>
               ) : (
-                <span className="text-secondary">{translation("general.location_not_set")}</span>
+                <span >{translation("general.location_not_set")}</span>
               )}
-            </td>
-          </tr>
-          <tr>
-            <td className="p-2 border-r border-theme w-1/6 text-secondary">
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="p-2 w-1/6 ">
               {translation("field.has_fence")}
-            </td>
-            <td className="p-2 border-theme">
+            </TableCell>
+            <TableCell className="p-2">
               {isEditing ? (
                 <select
                   onChange={(e) => setEditValues({ ...editValues, has_fence: e.target.value })}
-                  className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
+                  className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                   defaultValue={editValues.has_fence}
                 >
                   <option value="no">{translation("field.has_fence.no")}</option>
@@ -167,10 +172,12 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
               ) : (
                 field.has_fence ? translation("field.has_fence.yes") : translation("field.has_fence.no")
               )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      </div>
+      </section>
     </div>
   );
 };

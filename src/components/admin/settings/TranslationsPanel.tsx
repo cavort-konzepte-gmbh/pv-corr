@@ -6,6 +6,8 @@ import { fetchAllTranslations, fetchLanguages, updateTranslation, deleteTranslat
 import { FormHandler } from '../../shared/FormHandler';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@radix-ui/react-label';
 
 interface TranslationsPanelProps {
   currentTheme: Theme;
@@ -105,184 +107,182 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4 flex-1">
-          <Search size={20} className="text-secondary" />
-          <input
+        <Label className="w-full mb-6 flex items-center gap-x-4 relative">
+          <Search className="text-primary absolute left-4" size={20} />
+          <Input 
+            className="h-12 indent-10 bg-card"
             type="text"
             placeholder="Search translations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-sm text-primary"
           />
-        </div>
-        <Button
-          onClick={() => setIsAdding(true)}
-          className="px-4 py-2 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
-        >
-          <Plus size={16} />
-          Add Translation
-        </Button>
+        </Label>
       </div>
+      <Button
+        onClick={() => setIsAdding(true)}
+        className="px-4 py-2 mb-10"
+      >
+        <Plus size={16} />
+        Add Translation
+      </Button>
 
       {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
+        <div className="p-4 mb-4 rounded text-destructive-foreground border border-destructive bg-destructive">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableCaption>Translations</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Key</TableHead>
-              {LANGUAGES.map(lang => (
-                <TableHead key={lang.id}>{lang.name}</TableHead>
-              ))}
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-   <TableBody>
-
-
-            {isAdding && (
+        <section className="border border-input rounded-md bg-card">
+          <div className="w-full relative overflow-auto">
+          <Table>
+            <TableCaption>Translations</TableCaption>
+            <TableHeader>
               <TableRow>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <FormHandler
-                    isEditing={true}
-                    onSave={handleAddNew}
-                    onCancel={() => {
-                      setIsAdding(false);
-                      setNewValues({
-                        key: '',
-                        translations: {}
-                      });
-                    }}
-                  >
-                    <input
-                      type="text"
-                      value={newValues.key}
-                      onChange={(e) => setNewValues(prev => ({
-                        ...prev,
-                        key: e.target.value
-                      }))}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      placeholder="Enter translation key"
-                    />
-                  </FormHandler>
-                </TableCell>
+                <TableHead>Key</TableHead>
                 {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2 border border-theme text-secondary">
-                    <input
-                      type="text"
-                      value={newValues.translations[lang.id] || ''}
-                      onChange={(e) => setNewValues(prev => ({
-                        ...prev,
-                        translations: {
-                          ...prev.translations,
-                          [lang.id]: e.target.value
-                        }
-                      }))}
-                      className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                      dir={lang.direction}
-                      placeholder={`Enter ${lang.name} translation`}
-                    />
-                  </TableCell>
+                  <TableHead key={lang.id}>{lang.name}</TableHead>
                 ))}
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      onClick={handleAddNew}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                    >
-                      <Save size={14} />
-                    </Button>
-                    <Button
-                      onClick={() => {
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+    <TableBody>
+
+
+              {isAdding && (
+                <TableRow>
+                  <TableCell className="p-2">
+                    <FormHandler
+                      isEditing={true}
+                      onSave={handleAddNew}
+                      onCancel={() => {
                         setIsAdding(false);
                         setNewValues({
                           key: '',
                           translations: {}
                         });
                       }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
                     >
-                      <X size={14} />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-            {filteredTranslations.map(([key, values]) => (
-              <TableRow key={key}>
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <code className="font-mono text-sm">{key}</code>
-                </TableCell>
-                {LANGUAGES.map(lang => (
-                  <TableCell key={lang.id} className="p-2 border border-theme text-secondary">
-                    {editingKey === key ? (
-                      <input
+                      <Input
                         type="text"
-                        value={editValues[lang.id] || values[lang.id] || ''}
-                        onChange={(e) => setEditValues(prev => ({
+                        value={newValues.key}
+                        onChange={(e) => setNewValues(prev => ({
                           ...prev,
-                          [lang.id]: e.target.value
+                          key: e.target.value
                         }))}
-                        className="w-full p-1 rounded text-sm text-primary border-theme border-solid bg-surface"
-                        dir={lang.direction}
+                        className="w-full p-1"
+                        placeholder="Enter translation key"
                       />
-                    ) : (
-                      <div dir={lang.direction}>
-                        {values[lang.id] || '-'}
-                      </div>
-                    )}
+                    </FormHandler>
                   </TableCell>
-                ))}
-                <TableCell className="p-2 border border-theme text-secondary">
-                  <div className="flex items-center justify-center gap-2">
-                    <Button
-                      onClick={() => {
-                        if (editingKey === key) {
-                          handleSave(key);
-                        } else {
-                          setEditingKey(key);
-                          setEditValues(values);
-                        }
-                      }}
-                      className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                      variant="ghost"
-                    >
-                      {editingKey === key ? <Save size={14} /> : <Edit2 size={14} />}
-                    </Button>
-                    {editingKey === key ? (
+                  {LANGUAGES.map(lang => (
+                    <TableCell key={lang.id} className="p-2">
+                      <Input
+                        type="text"
+                        value={newValues.translations[lang.id] || ''}
+                        onChange={(e) => setNewValues(prev => ({
+                          ...prev,
+                          translations: {
+                            ...prev.translations,
+                            [lang.id]: e.target.value
+                          }
+                        }))}
+                        className="w-full p-1"
+                        dir={lang.direction}
+                        placeholder={`Enter ${lang.name} translation`}
+                      />
+                    </TableCell>
+                  ))}
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        onClick={handleAddNew}
+                        variant="ghost"
+                      >
+                        <Save size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setIsAdding(false);
+                          setNewValues({
+                            key: '',
+                            translations: {}
+                          });
+                        }}
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+              {filteredTranslations.map(([key, values]) => (
+                <TableRow key={key}>
+                  <TableCell className="p-2">
+                    <code className="font-mono text-sm">{key}</code>
+                  </TableCell>
+                  {LANGUAGES.map(lang => (
+                    <TableCell key={lang.id} className="p-2 text-muted-foreground">
+                      {editingKey === key ? (
+                        <Input
+                          type="text"
+                          value={editValues[lang.id] || values[lang.id] || ''}
+                          onChange={(e) => setEditValues(prev => ({
+                            ...prev,
+                            [lang.id]: e.target.value
+                          }))}
+                          className="w-full p-1"
+                          dir={lang.direction}
+                        />
+                      ) : (
+                        <div dir={lang.direction}>
+                          {values[lang.id] || '-'}
+                        </div>
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell className="p-2">
+                    <div className="flex items-center justify-center gap-2">
                       <Button
                         onClick={() => {
-                          setEditingKey(null);
-                          setEditValues({});
+                          if (editingKey === key) {
+                            handleSave(key);
+                          } else {
+                            setEditingKey(key);
+                            setEditValues(values);
+                          }
                         }}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         variant="ghost"
                       >
-                        <X size={14} />
+                        {editingKey === key ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
-                    ) : (
-                      <Button
-                        onClick={() => handleDelete(key)}
-                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                        variant="ghost"
-                      >
-                        <X size={14} />
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
+                      {editingKey === key ? (
+                        <Button
+                          onClick={() => {
+                            setEditingKey(null);
+                            setEditValues({});
+                          }}
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleDelete(key)}
+                          variant="ghost"
+                        >
+                          <X size={14} />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
 
-</Table>
-
-      </div>
+          </Table>
+          </div>
+        </section>
     </div>
   );
 };

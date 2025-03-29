@@ -7,6 +7,9 @@ import { useKeyAction } from '../hooks/useKeyAction';
 import { useDebounce } from '../hooks/useDebounce';
 import { Language, useTranslation } from '../types/language';
 import { toCase } from '../utils/cases';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
 
 interface PlacesPanelProps {
   currentTheme: Theme;
@@ -172,16 +175,16 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
 
   return (
     <div className="p-6">
-      <button
+      <Button
         onClick={() => setShowNewPlaceForm(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
       >
         <Plus size={16} />
         {translation("place.new")}
-      </button>
+      </Button>
 
       <div className="mb-6">
-        <input
+        <Input
           type="text"
           placeholder={translation("place.search")}
           value={searchTerm}
@@ -216,7 +219,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
               {!selectedCountry ? (
                 <div className="grid grid-cols-2 gap-4">
                   {COUNTRIES.map(country => (
-                    <button
+                    <Button
                       key={country.id}
                       onClick={() => handleCountrySelect(country)}
                       className="p-4 rounded-lg border transition-all hover:translate-y-[-2px] text-primary border-theme border-solid bg-surface"                      
@@ -225,7 +228,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                         <MapPin className="text-accent-primary" size={16} />
                         <span>{country.name}</span>
                       </div>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -233,11 +236,11 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     {selectedCountry.fields.map(field => (
                       <div key={field.id}>
-                        <label className="block text-sm mb-1 text-secondary">
+                        <Label className="block text-sm mb-1 text-secondary">
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <input
+                        </Label>
+                        <Input
                           type={field.type}
                           value={formValues[field.id] || ''}
                           onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -250,7 +253,7 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                     ))}
                   </div>
                   <div className="flex justify-end gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setShowNewPlaceForm(false);
@@ -261,13 +264,13 @@ const PlacesPanel: React.FC<PlacesPanelProps> = ({
                       className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"                      
                     >
                       {translation("actions.cancel")}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="submit"
                       className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                      
                     >
                       {editingPlace ? translation("general.save_changes") : translation("place.add")}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               )}

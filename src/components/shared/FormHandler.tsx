@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useKeyAction } from '../../hooks/useKeyAction';
+import { Input } from '../ui/input';
 
 interface FormHandlerProps {
   children: ReactNode;
@@ -43,9 +44,9 @@ export const FormHandler: React.FC<FormHandlerProps> = ({
 
 export const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => {
   return (
-    <input
+    <Input
       {...props}
-      className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${props.className || ''}`}
+      className={`w-full p-2 rounded text-sm text-primary  ${props.className || ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault(); // Prevent form submission
@@ -60,7 +61,7 @@ export const FormSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>>
   return (
     <select
       {...props}
-      className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${props.className || ''}`}
+      className={`w-full p-2 rounded text-sm  " ${props.className || ''}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault(); // Prevent form submission
