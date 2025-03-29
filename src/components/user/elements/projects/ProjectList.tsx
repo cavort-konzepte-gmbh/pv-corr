@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Project } from '../../../../types/projects';
-import { ChevronRight, Edit2, Save, Trash2 } from 'lucide-react';
-import { Language, useTranslation } from '../../../../types/language';
-import { Customer } from '../../../../types/customers';
-import { Folder } from 'lucide-react';
-import { Person } from '../../../../types/people';
-import { updateProject, deleteProject, fetchProjects } from '../../../../services/projects';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react'
+import { Theme } from '../../../../types/theme'
+import { Project } from '../../../../types/projects'
+import { ChevronRight, Edit2, Save, Trash2 } from 'lucide-react'
+import { Language, useTranslation } from '../../../../types/language'
+import { Customer } from '../../../../types/customers'
+import { Folder } from 'lucide-react'
+import { Person } from '../../../../types/people'
+import { updateProject, deleteProject, fetchProjects } from '../../../../services/projects'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface ProjectListProps {
-  currentTheme: Theme;
-  projects: Project[];
-  savedPeople: Person[];
-  customers: Customer[];
-  selectedCustomerId: string | null;
-  onMoveProject: (projectId: string, customerId: string | null) => void;
-  onSelectProject: (projectId: string) => void;
-  currentLanguage: Language;
-  onProjectsChange: (projects: Project[]) => void;
+  currentTheme: Theme
+  projects: Project[]
+  savedPeople: Person[]
+  customers: Customer[]
+  selectedCustomerId: string | null
+  onMoveProject: (projectId: string, customerId: string | null) => void
+  onSelectProject: (projectId: string) => void
+  currentLanguage: Language
+  onProjectsChange: (projects: Project[]) => void
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({
@@ -34,46 +34,46 @@ const ProjectList: React.FC<ProjectListProps> = ({
   currentLanguage,
   onProjectsChange,
 }) => {
-  const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null);
-  const [editingProject, setEditingProject] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<Record<string, any>>({});
-  const translation = useTranslation(currentLanguage);
-  const [error, setError] = useState<string | null>(null);
+  const [showMoveMenu, setShowMoveMenu] = useState<string | null>(null)
+  const [editingProject, setEditingProject] = useState<string | null>(null)
+  const [editingValues, setEditingValues] = useState<Record<string, any>>({})
+  const translation = useTranslation(currentLanguage)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSaveProject = async (project: Project) => {
     try {
       await updateProject({
         ...project,
         ...editingValues,
-      });
-      const updatedProjects = await fetchProjects(selectedCustomerId as string);
-      onProjectsChange(updatedProjects);
-      setEditingProject(null);
-      setEditingValues({});
+      })
+      const updatedProjects = await fetchProjects(selectedCustomerId as string)
+      onProjectsChange(updatedProjects)
+      setEditingProject(null)
+      setEditingValues({})
     } catch (err) {
-      console.error('Error updating project:', err);
+      console.error('Error updating project:', err)
     }
-  };
+  }
 
   const handleDeleteProject = async (projectId: string) => {
     try {
-      setError(null);
-      await deleteProject(projectId);
-      const updatedProjects = await fetchProjects(selectedCustomerId as string);
-      onProjectsChange(updatedProjects);
-      setEditingProject(null);
-      setEditingValues({});
+      setError(null)
+      await deleteProject(projectId)
+      const updatedProjects = await fetchProjects(selectedCustomerId as string)
+      onProjectsChange(updatedProjects)
+      setEditingProject(null)
+      setEditingValues({})
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete project';
-      setError(message);
-      console.error('Error deleting project:', message);
+      const message = err instanceof Error ? err.message : 'Failed to delete project'
+      setError(message)
+      console.error('Error deleting project:', message)
     }
-  };
+  }
 
   const handleSelectProject = (projectId: string) => {
-    if (editingProject === projectId) return;
-    onSelectProject(projectId);
-  };
+    if (editingProject === projectId) return
+    onSelectProject(projectId)
+  }
 
   return (
     <div className="space-y-4">
@@ -114,8 +114,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             <>
                               <Button
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSaveProject(project);
+                                  e.stopPropagation()
+                                  handleSaveProject(project)
                                 }}
                                 className="p-1 rounded hover:bg-opacity-80"
                               >
@@ -123,8 +123,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               </Button>
                               <Button
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteProject(project.id);
+                                  e.stopPropagation()
+                                  handleDeleteProject(project.id)
                                 }}
                                 className="p-1 rounded hover:bg-opacity-80"
                               >
@@ -132,8 +132,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               </Button>
                               <Button
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  setShowMoveMenu(showMoveMenu === project.id ? null : project.id);
+                                  e.stopPropagation()
+                                  setShowMoveMenu(showMoveMenu === project.id ? null : project.id)
                                 }}
                                 className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"
                               >
@@ -143,14 +143,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           ) : (
                             <Button
                               onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingProject(project.id);
+                                e.stopPropagation()
+                                setEditingProject(project.id)
                                 setEditingValues({
                                   managerId: project.managerId,
                                   latitude: project.latitude,
                                   longitude: project.longitude,
                                   typeProject: project.typeProject,
-                                });
+                                })
                               }}
                               className="size-8 p-1 rounded hover:bg-opacity-80"
                             >
@@ -219,8 +219,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           </span>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank');
+                              e.stopPropagation()
+                              window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank')
                             }}
                             className="text-sm hover:underline"
                           >
@@ -241,9 +241,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
               {selectedCustomerId && (
                 <Button
                   onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveProject(project.id, null);
-                    setShowMoveMenu(null);
+                    e.stopPropagation()
+                    onMoveProject(project.id, null)
+                    setShowMoveMenu(null)
                   }}
                   className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
                 >
@@ -256,9 +256,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
                   <Button
                     key={customer.id}
                     onClick={(e) => {
-                      e.stopPropagation();
-                      onMoveProject(project.id, customer.id);
-                      setShowMoveMenu(null);
+                      e.stopPropagation()
+                      onMoveProject(project.id, customer.id)
+                      setShowMoveMenu(null)
                     }}
                     className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
                   >
@@ -270,7 +270,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default ProjectList;
+export default ProjectList

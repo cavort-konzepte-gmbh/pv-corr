@@ -1,43 +1,43 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project, Zone } from '../../types/projects';
-import { Standard } from '../../types/standards';
-import { getCurrentVersion } from '../../services/versions';
-import { Building2, FileText, Calendar, User, ChevronDown, ChevronRight, Table } from 'lucide-react';
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Project, Zone } from '../../types/projects'
+import { Standard } from '../../types/standards'
+import { getCurrentVersion } from '../../services/versions'
+import { Building2, FileText, Calendar, User, ChevronDown, ChevronRight, Table } from 'lucide-react'
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 
 interface AnalysisReportProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  project?: Project;
-  zone?: Zone;
-  standard?: Standard;
+  currentTheme: Theme
+  currentLanguage: Language
+  project?: Project
+  zone?: Zone
+  standard?: Standard
   analyst: {
-    name: string;
-    title?: string;
-    email?: string;
-  };
-  onBack: () => void;
+    name: string
+    title?: string
+    email?: string
+  }
+  onBack: () => void
 }
 
 const AnalysisReport: React.FC<AnalysisReportProps> = ({ currentTheme, currentLanguage, project, zone, standard, analyst, onBack }) => {
-  const [isExpanded, setIsExpanded] = React.useState(true);
-  const [currentVersion, setCurrentVersion] = React.useState<string>('1.0.0');
-  const t = useTranslation(currentLanguage);
+  const [isExpanded, setIsExpanded] = React.useState(true)
+  const [currentVersion, setCurrentVersion] = React.useState<string>('1.0.0')
+  const t = useTranslation(currentLanguage)
 
   React.useEffect(() => {
     const loadVersion = async () => {
-      const version = await getCurrentVersion();
+      const version = await getCurrentVersion()
       if (version) {
-        setCurrentVersion(version.version);
+        setCurrentVersion(version.version)
       }
-    };
-    loadVersion();
-  }, []);
+    }
+    loadVersion()
+  }, [])
 
   if (!project || !zone || !standard) {
-    return <div className="p-6 text-center text-secondary">{t('analysis.select_data')}</div>;
+    return <div className="p-6 text-center text-secondary">{t('analysis.select_data')}</div>
   }
 
   return (
@@ -120,10 +120,10 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ currentTheme, currentLa
             <TableBody>
               {zone.datapoints?.[0]?.values &&
                 Object.entries(zone.datapoints[0].values).map(([key, value]) => {
-                  const parameter = standard.parameters?.find((p) => p.parameterCode === key);
-                  const rating = zone.datapoints?.[0]?.ratings?.[key];
+                  const parameter = standard.parameters?.find((p) => p.parameterCode === key)
+                  const rating = zone.datapoints?.[0]?.ratings?.[key]
 
-                  if (!parameter) return null;
+                  if (!parameter) return null
 
                   return (
                     <TableRow key={key}>
@@ -142,7 +142,7 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ currentTheme, currentLa
                         </div>
                       </TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
             </TableBody>
           </Table>
@@ -194,7 +194,7 @@ const AnalysisReport: React.FC<AnalysisReportProps> = ({ currentTheme, currentLa
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AnalysisReport;
+export default AnalysisReport

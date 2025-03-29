@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react';
-import { Language, useTranslation } from '../../../../types/language';
-import { updateField } from '../../../../services/fields';
-import { fetchProjects } from '../../../../services/projects';
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react'
+import { Theme } from '../../../../types/theme'
+import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { Language, useTranslation } from '../../../../types/language'
+import { updateField } from '../../../../services/fields'
+import { fetchProjects } from '../../../../services/projects'
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface FieldSummaryProps {
   field: {
-    id?: string;
-    name: string;
-    latitude?: string;
-    longitude?: string;
-    has_fence?: string;
-    zones?: any[];
-  };
-  currentTheme: Theme;
-  currentLanguage: Language;
-  onProjectsChange: (projects: any[]) => void;
-  isExpanded?: boolean;
-  onToggle?: () => void;
+    id?: string
+    name: string
+    latitude?: string
+    longitude?: string
+    has_fence?: string
+    zones?: any[]
+  }
+  currentTheme: Theme
+  currentLanguage: Language
+  onProjectsChange: (projects: any[]) => void
+  isExpanded?: boolean
+  onToggle?: () => void
 }
 
 const FieldSummary: React.FC<FieldSummaryProps> = ({
@@ -32,27 +32,27 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
   isExpanded = true,
   onToggle,
 }) => {
-  const translation = useTranslation(currentLanguage);
-  const [isEditing, setIsEditing] = useState(false);
+  const translation = useTranslation(currentLanguage)
+  const [isEditing, setIsEditing] = useState(false)
   const [editValues, setEditValues] = useState({
     name: field.name || '',
     latitude: field.latitude || '',
     longitude: field.longitude || '',
     has_fence: field.has_fence ? 'yes' : 'no',
-  });
+  })
 
   const handleSave = async () => {
-    if (!field.id) return;
+    if (!field.id) return
 
     try {
-      await updateField(field.id, editValues);
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
-      setIsEditing(false);
+      await updateField(field.id, editValues)
+      const updatedProjects = await fetchProjects()
+      onProjectsChange(updatedProjects)
+      setIsEditing(false)
     } catch (err) {
-      console.error('Error updating field:', err);
+      console.error('Error updating field:', err)
     }
-  };
+  }
 
   return (
     <div className="mb-8">
@@ -163,7 +163,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default FieldSummary;
+export default FieldSummary

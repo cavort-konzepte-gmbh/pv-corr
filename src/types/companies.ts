@@ -1,21 +1,21 @@
 export interface Company {
-  id: string;
-  hiddenId: string;
-  name: string;
-  ceoId?: string;
-  contactPersonId?: string;
-  website?: string;
-  email?: string;
-  phone?: string;
-  vatId?: string;
-  registrationNumber?: string;
+  id: string
+  hiddenId: string
+  name: string
+  ceoId?: string
+  contactPersonId?: string
+  website?: string
+  email?: string
+  phone?: string
+  vatId?: string
+  registrationNumber?: string
 }
 
 export interface CompanyField {
-  id: string;
-  label: string;
-  type: 'text' | 'email' | 'tel' | 'url';
-  required: boolean;
+  id: string
+  label: string
+  type: 'text' | 'email' | 'tel' | 'url'
+  required: boolean
 }
 
 export const COMPANY_FIELDS: CompanyField[] = [
@@ -55,4 +55,4 @@ export const COMPANY_FIELDS: CompanyField[] = [
     type: 'text',
     required: false,
   },
-];
+]

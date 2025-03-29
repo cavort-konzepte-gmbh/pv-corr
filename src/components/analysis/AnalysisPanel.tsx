@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project, Zone } from '../../types/projects';
-import { FileText } from 'lucide-react';
-import AnalysisReport from './AnalysisReport';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../auth/AuthProvider';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import AnalyseData from './AnalyseData';
-import AnalyseNorm from './AnalyseNorm';
-import AnalyseResult from './AnalyseResult';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Project, Zone } from '../../types/projects'
+import { FileText } from 'lucide-react'
+import AnalysisReport from './AnalysisReport'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../auth/AuthProvider'
+import { generateHiddenId } from '../../utils/generateHiddenId'
+import AnalyseData from './AnalyseData'
+import AnalyseNorm from './AnalyseNorm'
+import AnalyseResult from './AnalyseResult'
 
 interface AnalysisPanelProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  projects: Project[];
-  selectedProjectId?: string;
-  selectedFieldId?: string;
-  selectedZoneId?: string;
-  onBack: () => void;
+  currentTheme: Theme
+  currentLanguage: Language
+  projects: Project[]
+  selectedProjectId?: string
+  selectedFieldId?: string
+  selectedZoneId?: string
+  onBack: () => void
 }
 
 const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
@@ -30,18 +30,18 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   selectedZoneId,
   onBack,
 }) => {
-  const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
-  const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([]);
-  const [showReport, setShowReport] = useState(false);
-  const [selectedNorm, setSelectedNorm] = useState<any>(null);
-  const t = useTranslation(currentLanguage);
-  const { user } = useAuth();
+  const [selectedNormId, setSelectedNormId] = useState<string | null>(null)
+  const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([])
+  const [showReport, setShowReport] = useState(false)
+  const [selectedNorm, setSelectedNorm] = useState<any>(null)
+  const t = useTranslation(currentLanguage)
+  const { user } = useAuth()
 
   useEffect(() => {
     const loadNorm = async () => {
       if (!selectedNormId) {
-        setSelectedNorm(null);
-        return;
+        setSelectedNorm(null)
+        return
       }
 
       try {
@@ -58,30 +58,30 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           `,
           )
           .eq('id', selectedNormId)
-          .single();
+          .single()
 
-        if (error) throw error;
-        setSelectedNorm(data);
+        if (error) throw error
+        setSelectedNorm(data)
       } catch (err) {
-        console.error('Error loading norm:', err);
+        console.error('Error loading norm:', err)
       }
-    };
+    }
 
-    loadNorm();
-  }, [selectedNormId]);
+    loadNorm()
+  }, [selectedNormId])
 
   const handleSaveAnalysis = async () => {
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
-      console.error('Missing required data for analysis');
-      return;
+      console.error('Missing required data for analysis')
+      return
     }
 
     try {
       // Get current user
       const {
         data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      } = await supabase.auth.getUser()
+      if (!user) throw new Error('User not authenticated')
 
       const { data: output, error: outputError } = await supabase
         .from('analysis_outputs')
@@ -93,12 +93,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           analyst_id: user.id,
         })
         .select()
-        .single();
+        .single()
 
-      if (outputError) throw outputError;
+      if (outputError) throw outputError
 
-      const selectedDps = selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id));
-      const totalRating = selectedDps.reduce((sum, dp) => sum + Object.values(dp.ratings).reduce((a, b) => a + b, 0), 0);
+      const selectedDps = selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id))
+      const totalRating = selectedDps.reduce((sum, dp) => sum + Object.values(dp.ratings).reduce((a, b) => a + b, 0), 0)
 
       const { error: versionError } = await supabase.from('analysis_versions').insert({
         output_id: output.id,
@@ -113,40 +113,40 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         classification: totalRating > 0 ? 'Good' : 'Poor',
         recommendations: 'Based on the analysis results...',
         created_by: user.id,
-      });
+      })
 
-      if (versionError) throw versionError;
+      if (versionError) throw versionError
 
-      setShowReport(true);
+      setShowReport(true)
     } catch (err) {
-      console.error('Error saving analysis:', err);
+      console.error('Error saving analysis:', err)
       // TODO: Show error to user
     }
-  };
+  }
 
   // Get selected project and zone from navigation state
-  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
-  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
-  const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null
+  const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null
 
   useEffect(() => {
     const loadAnalysisData = async () => {
       try {
-        const { data, error } = await supabase.from('analysis_parameters').select('*').order('created_at', { ascending: true });
+        const { data, error } = await supabase.from('analysis_parameters').select('*').order('created_at', { ascending: true })
 
-        if (error) throw error;
-        setParameters(data || []);
+        if (error) throw error
+        setParameters(data || [])
       } catch (err) {
-        console.error('Error loading analysis data:', err);
+        console.error('Error loading analysis data:', err)
       }
-    };
+    }
 
-    loadAnalysisData();
-  }, []);
+    loadAnalysisData()
+  }, [])
 
   const toggleDatapoint = (datapointId: string) => {
-    setSelectedDatapoints((prev) => (prev.includes(datapointId) ? prev.filter((id) => id !== datapointId) : [...prev, datapointId]));
-  };
+    setSelectedDatapoints((prev) => (prev.includes(datapointId) ? prev.filter((id) => id !== datapointId) : [...prev, datapointId]))
+  }
 
   if (showReport && selectedProject && selectedZone && selectedNorm) {
     return (
@@ -167,11 +167,11 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         }
         onBack={() => setShowReport(false)}
       />
-    );
+    )
   }
 
   if (!selectedZone) {
-    return <div className="p-6 text-center text-secondary">{t('datapoint.please_select_zone')}</div>;
+    return <div className="p-6 text-center text-secondary">{t('datapoint.please_select_zone')}</div>
   }
 
   return (
@@ -216,7 +216,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AnalysisPanel;
+export default AnalysisPanel

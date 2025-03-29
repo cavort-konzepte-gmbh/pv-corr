@@ -1,49 +1,49 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Datapoint } from '../../types/projects';
-import { Check, ArrowUpDown } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '../ui/button';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Datapoint } from '../../types/projects'
+import { Check, ArrowUpDown } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '../ui/button'
 
 interface AnalyseDataProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  datapoints: Datapoint[];
-  selectedDatapoints: string[];
-  onToggleDatapoint: (id: string) => void;
+  currentTheme: Theme
+  currentLanguage: Language
+  datapoints: Datapoint[]
+  selectedDatapoints: string[]
+  onToggleDatapoint: (id: string) => void
 }
 
-type SortField = 'name' | 'timestamp';
-type SortOrder = 'asc' | 'desc';
+type SortField = 'name' | 'timestamp'
+type SortOrder = 'asc' | 'desc'
 
 const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage, datapoints, selectedDatapoints, onToggleDatapoint }) => {
-  const t = useTranslation(currentLanguage);
-  const [sortField, setSortField] = useState<SortField>('name');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const t = useTranslation(currentLanguage)
+  const [sortField, setSortField] = useState<SortField>('name')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 
   // Get name from datapoint, falling back to id if not available
   const getDatapointName = (datapoint: Datapoint) => {
-    return datapoint.name || datapoint.id;
-  };
+    return datapoint.name || datapoint.id
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
     } else {
-      setSortField(field);
-      setSortOrder('asc');
+      setSortField(field)
+      setSortOrder('asc')
     }
-  };
+  }
 
   const sortedDatapoints = [...datapoints].sort((a, b) => {
-    const aValue = sortField === 'name' ? getDatapointName(a).toLowerCase() : a.timestamp;
-    const bValue = sortField === 'name' ? getDatapointName(b).toLowerCase() : b.timestamp;
+    const aValue = sortField === 'name' ? getDatapointName(a).toLowerCase() : a.timestamp
+    const bValue = sortField === 'name' ? getDatapointName(b).toLowerCase() : b.timestamp
 
-    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
-  });
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1
+    return 0
+  })
 
   return (
     <div className="space-y-4">
@@ -88,11 +88,11 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
                 {selectedDatapoints.includes(datapoint.id) && <Check size={12} className="text-accent-primary" />}
               </div>
             </Button>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AnalyseData;
+export default AnalyseData

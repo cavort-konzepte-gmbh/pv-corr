@@ -1,21 +1,21 @@
-import { SavedPlace } from '../components/PlacesPanel';
-import { COUNTRIES } from '../types/places';
-import { Company } from '../types/companies';
+import { SavedPlace } from '../components/PlacesPanel'
+import { COUNTRIES } from '../types/places'
+import { Company } from '../types/companies'
 
 export interface SavedPerson {
-  id: string;
-  values: Record<string, string>;
+  id: string
+  values: Record<string, string>
   addresses: {
-    homeAddress?: string;
-    business?: string;
-  };
+    homeAddress?: string
+    business?: string
+  }
 }
 
-const FIRST_NAMES_MALE = ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles'];
+const FIRST_NAMES_MALE = ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles']
 
-const FIRST_NAMES_FEMALE = ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen'];
+const FIRST_NAMES_FEMALE = ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen']
 
-const LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+const LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez']
 
 const COMPANY_NAMES = [
   'Tech Solutions',
@@ -28,7 +28,7 @@ const COMPANY_NAMES = [
   'Elite Enterprises',
   'Prime Partners',
   'Strategic Services',
-];
+]
 
 const COMPANY_DESCRIPTIONS = [
   'Construction & Engineering',
@@ -36,15 +36,15 @@ const COMPANY_DESCRIPTIONS = [
   'Building Solutions',
   'Civil Engineering',
   'Project Management',
-];
+]
 
 const generateRandomCompanies = (count: number, places: SavedPlace[], people: SavedPerson[]): Company[] => {
-  const companies: Company[] = [];
+  const companies: Company[] = []
 
   for (let i = 0; i < count; i++) {
-    const companyName = `${pickRandom(COMPANY_NAMES)} ${pickRandom(COMPANY_DESCRIPTIONS)}`;
-    const vatId = `VAT${generateRandomNumber(100000000, 999999999)}`;
-    const regNumber = `REG${generateRandomNumber(10000, 99999)}`;
+    const companyName = `${pickRandom(COMPANY_NAMES)} ${pickRandom(COMPANY_DESCRIPTIONS)}`
+    const vatId = `VAT${generateRandomNumber(100000000, 999999999)}`
+    const regNumber = `REG${generateRandomNumber(10000, 99999)}`
 
     companies.push({
       id: `sample-company-${i + 1}`,
@@ -58,11 +58,11 @@ const generateRandomCompanies = (count: number, places: SavedPlace[], people: Sa
       phone: `+${generateRandomNumber(1, 9)}${generateRandomNumber(100000000, 999999999)}`,
       vatId,
       registrationNumber: regNumber,
-    });
+    })
   }
 
-  return companies;
-};
+  return companies
+}
 
 const STREET_NAMES = {
   usa: ['Main Street', 'Broadway', 'Park Avenue', 'Oak Street', 'Maple Drive'],
@@ -70,7 +70,7 @@ const STREET_NAMES = {
   france: ['Rue de la Paix', 'Avenue des Champs-Élysées', 'Boulevard Saint-Germain'],
   italy: ['Via Roma', 'Corso Italia', 'Via Veneto', 'Via Nazionale', 'Corso Vittorio Emanuele'],
   china: ['Nanjing Road', 'Huaihai Road', 'Century Avenue', 'Zhongshan Road', 'Jianguo Road'],
-};
+}
 
 const CITIES = {
   usa: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
@@ -78,27 +78,27 @@ const CITIES = {
   france: ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice'],
   italy: ['Rome', 'Milan', 'Naples', 'Turin', 'Florence'],
   china: ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Chengdu'],
-};
+}
 
 const STATES = {
   usa: ['NY', 'CA', 'IL', 'TX', 'AZ'],
   china: ['Shanghai', 'Beijing', 'Guangdong', 'Sichuan', 'Zhejiang'],
-};
+}
 
-const generateRandomNumber = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const generateRandomNumber = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min
 
-const pickRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
+const pickRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * array.length)]
 
 const generateRandomPlaces = (count: number): SavedPlace[] => {
-  const places: SavedPlace[] = [];
+  const places: SavedPlace[] = []
 
   for (let i = 0; i < count; i++) {
-    const country = pickRandom(COUNTRIES);
-    const companyName = `${pickRandom(COMPANY_NAMES)} ${country.name}`;
+    const country = pickRandom(COUNTRIES)
+    const companyName = `${pickRandom(COMPANY_NAMES)} ${country.name}`
 
     let values: Record<string, string> = {
       name: companyName,
-    };
+    }
 
     switch (country.id) {
       case 'usa':
@@ -109,8 +109,8 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
           city: pickRandom(CITIES.usa),
           state: pickRandom(STATES.usa),
           zip: generateRandomNumber(10000, 99999).toString(),
-        };
-        break;
+        }
+        break
       case 'germany':
         values = {
           ...values,
@@ -118,8 +118,8 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
           house_number: generateRandomNumber(1, 150).toString(),
           postal_code: generateRandomNumber(10000, 99999).toString(),
           city: pickRandom(CITIES.germany),
-        };
-        break;
+        }
+        break
       case 'france':
         values = {
           ...values,
@@ -127,8 +127,8 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
           street_name: pickRandom(STREET_NAMES.france),
           postal_code: generateRandomNumber(10000, 99999).toString(),
           city: pickRandom(CITIES.france),
-        };
-        break;
+        }
+        break
       case 'italy':
         values = {
           ...values,
@@ -137,8 +137,8 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
           postal_code: generateRandomNumber(10000, 99999).toString(),
           city: pickRandom(CITIES.italy),
           province: pickRandom(['MI', 'RM', 'NA', 'TO', 'FI']),
-        };
-        break;
+        }
+        break
       case 'china':
         values = {
           ...values,
@@ -150,8 +150,8 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
           city: pickRandom(CITIES.china),
           province: pickRandom(STATES.china),
           postal_code: generateRandomNumber(100000, 999999).toString(),
-        };
-        break;
+        }
+        break
     }
 
     places.push({
@@ -159,25 +159,25 @@ const generateRandomPlaces = (count: number): SavedPlace[] => {
       hiddenId: generateHiddenId(),
       country: country.id,
       values,
-    });
+    })
   }
 
-  return places;
-};
+  return places
+}
 
 const generateRandomPeople = (count: number, places: SavedPlace[]) => {
-  const people = [];
+  const people = []
 
   // If no places are available, return empty array
   if (!places || places.length === 0) {
-    return [];
+    return []
   }
 
   for (let i = 0; i < count; i++) {
-    const isFemale = Math.random() < 0.5;
-    const firstName = pickRandom(isFemale ? FIRST_NAMES_FEMALE : FIRST_NAMES_MALE);
-    const lastName = pickRandom(LAST_NAMES);
-    const hasTitle = Math.random() < 0.3;
+    const isFemale = Math.random() < 0.5
+    const firstName = pickRandom(isFemale ? FIRST_NAMES_FEMALE : FIRST_NAMES_MALE)
+    const lastName = pickRandom(LAST_NAMES)
+    const hasTitle = Math.random() < 0.3
 
     const person = {
       id: `sample-person-${i + 1}`,
@@ -194,15 +194,15 @@ const generateRandomPeople = (count: number, places: SavedPlace[]) => {
         homeAddress: places.length > 0 ? pickRandom(places).id : undefined,
         business: places.length > 0 ? pickRandom(places).id : undefined,
       },
-    };
+    }
 
-    people.push(person);
+    people.push(person)
   }
 
-  return people;
-};
+  return people
+}
 
-import { generateHiddenId } from './generateHiddenId';
+import { generateHiddenId } from './generateHiddenId'
 
 // Initialize activity log for sample data
 const generateInitialActivityLog = () => [
@@ -227,7 +227,7 @@ const generateInitialActivityLog = () => [
     oldValue: '4.5',
     newValue: '5.2',
   },
-];
+]
 
 const generateRandomDatapoint = (id: string, sequentialId: string, timestamp: string) => ({
   id,
@@ -259,19 +259,19 @@ const generateRandomDatapoint = (id: string, sequentialId: string, timestamp: st
     z9: pickRandom([-4, -3, -2, -1, 0]),
     z10: pickRandom([-2, -1, 0]),
   },
-});
+})
 
 const generateInitialHistory = (datapointId: string, timestamp: string) => {
-  const parameters = ['z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'z9', 'z10'];
-  const initialEntries = [];
+  const parameters = ['z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'z9', 'z10']
+  const initialEntries = []
 
   // Generate 2-3 random history entries for each datapoint
-  const numEntries = generateRandomNumber(2, 3);
+  const numEntries = generateRandomNumber(2, 3)
 
   for (let i = 0; i < numEntries; i++) {
-    const param = pickRandom(parameters);
-    const oldValue = generateRandomNumber(0, 100).toString();
-    const newValue = generateRandomNumber(0, 100).toString();
+    const param = pickRandom(parameters)
+    const oldValue = generateRandomNumber(0, 100).toString()
+    const newValue = generateRandomNumber(0, 100).toString()
 
     initialEntries.push({
       timestamp: new Date(new Date(timestamp).getTime() - (i + 1) * 24 * 60 * 60 * 1000).toISOString(),
@@ -279,11 +279,11 @@ const generateInitialHistory = (datapointId: string, timestamp: string) => {
       parameter: param.toUpperCase(),
       oldValue,
       newValue,
-    });
+    })
   }
 
-  return initialEntries;
-};
+  return initialEntries
+}
 
 const generateSampleProjects = () => [
   {
@@ -330,10 +330,10 @@ const generateSampleProjects = () => [
             latitude: '51.5082',
             longitude: '-0.1282',
             datapoints: Array.from({ length: 5 }, (_, i) => {
-              const timestamp = new Date(2024, 0, 15 + i).toISOString();
-              const datapointId = `dp-${i + 1}`;
-              const datapoint = generateRandomDatapoint(`dp-${i + 1}`, `DP${String(i + 1).padStart(3, '0')}`, timestamp);
-              return datapoint;
+              const timestamp = new Date(2024, 0, 15 + i).toISOString()
+              const datapointId = `dp-${i + 1}`
+              const datapoint = generateRandomDatapoint(`dp-${i + 1}`, `DP${String(i + 1).padStart(3, '0')}`, timestamp)
+              return datapoint
             }),
           },
           {
@@ -533,6 +533,6 @@ const generateSampleProjects = () => [
       },
     ],
   },
-];
+]
 
-export { generateRandomPlaces, generateRandomPeople, generateSampleProjects, generateRandomCompanies };
+export { generateRandomPlaces, generateRandomPeople, generateSampleProjects, generateRandomCompanies }

@@ -1,21 +1,21 @@
 export interface RatingRange {
-  min: number | string | null;
-  max?: number | string | null;
-  rating: number;
+  min: number | string | null
+  max?: number | string | null
+  rating: number
 }
 
 export interface StandardParameter {
-  parameterId: string;
-  parameterCode: string;
-  ratingRanges: RatingRange[];
+  parameterId: string
+  parameterCode: string
+  ratingRanges: RatingRange[]
 }
 
 export interface Standard {
-  id: string;
-  hiddenId?: string;
-  name: string;
-  description?: string;
-  parameters?: StandardParameter[];
+  id: string
+  hiddenId?: string
+  name: string
+  description?: string
+  parameters?: StandardParameter[]
 }
 
 export const STANDARDS: Standard[] = [
@@ -79,7 +79,7 @@ export const STANDARDS: Standard[] = [
       },
     ],
   },
-];
+]
 
 export const DEFAULT_STANDARDS: Standard[] = [
   {
@@ -142,4 +142,4 @@ export const DEFAULT_STANDARDS: Standard[] = [
       },
     ],
   },
-];
+]

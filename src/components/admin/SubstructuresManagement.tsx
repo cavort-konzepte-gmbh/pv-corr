@@ -1,96 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save, Link } from 'lucide-react';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '../ui/table';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../types/theme'
+import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Plus, Edit2, X, Save, Link } from 'lucide-react'
+import { generateHiddenId } from '../../utils/generateHiddenId'
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '../ui/table'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
 
 interface SubstructuresManagementProps {
-  currentTheme: Theme;
-  onBack: () => void;
+  currentTheme: Theme
+  onBack: () => void
 }
 
 interface Manufacturer {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface SubstructureSystem {
-  id: string;
-  name: string;
-  manufacturer_id: string;
+  id: string
+  name: string
+  manufacturer_id: string
 }
 
 interface SubstructureVersion {
-  id: string;
-  system_id: string;
-  name: string;
+  id: string
+  system_id: string
+  name: string
 }
 
 interface MediaAsset {
-  id: string;
-  url: string;
-  type: 'schematic' | 'example';
-  title?: string;
-  description?: string;
+  id: string
+  url: string
+  type: 'schematic' | 'example'
+  title?: string
+  description?: string
 }
 
 interface Substructure {
-  id: string;
-  hidden_id: string;
-  manufacturer_id: string;
-  system_id: string;
-  version_id: string;
-  base_material_id?: string;
-  first_layer_id?: string;
-  second_layer_id?: string;
-  base_material_thickness?: number;
-  base_material_thickness_unit?: 'mm' | 'μm';
-  first_layer_thickness?: number;
-  first_layer_thickness_unit?: 'mm' | 'μm';
-  second_layer_thickness?: number;
-  second_layer_thickness_unit?: 'mm' | 'μm';
-  schematic?: string;
-  example?: string;
-  type: 'roof' | 'field';
-  link?: string;
+  id: string
+  hidden_id: string
+  manufacturer_id: string
+  system_id: string
+  version_id: string
+  base_material_id?: string
+  first_layer_id?: string
+  second_layer_id?: string
+  base_material_thickness?: number
+  base_material_thickness_unit?: 'mm' | 'μm'
+  first_layer_thickness?: number
+  first_layer_thickness_unit?: 'mm' | 'μm'
+  second_layer_thickness?: number
+  second_layer_thickness_unit?: 'mm' | 'μm'
+  schematic?: string
+  example?: string
+  type: 'roof' | 'field'
+  link?: string
 }
 
 const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ currentTheme, onBack }) => {
-  const [isNewSubstructure, setIsNewSubstructure] = useState(false);
-  const [editingSubstructure, setEditingSubstructure] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-  const [substructures, setSubstructures] = useState<Substructure[]>([]);
-  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
-  const [systems, setSystems] = useState<SubstructureSystem[]>([]);
-  const [versions, setVersions] = useState<SubstructureVersion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedManufacturerId, setSelectedManufacturerId] = useState<string>('');
-  const [selectedSystemId, setSelectedSystemId] = useState<string>('');
-  const [selectedVersionId, setSelectedVersionId] = useState<string>('');
-  const [editingVersionName, setEditingVersionName] = useState<string>('');
-  const [materials, setMaterials] = useState<{ id: string; name: string }[]>([]);
+  const [isNewSubstructure, setIsNewSubstructure] = useState(false)
+  const [editingSubstructure, setEditingSubstructure] = useState<string | null>(null)
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
+  const [substructures, setSubstructures] = useState<Substructure[]>([])
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([])
+  const [systems, setSystems] = useState<SubstructureSystem[]>([])
+  const [versions, setVersions] = useState<SubstructureVersion[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedManufacturerId, setSelectedManufacturerId] = useState<string>('')
+  const [selectedSystemId, setSelectedSystemId] = useState<string>('')
+  const [selectedVersionId, setSelectedVersionId] = useState<string>('')
+  const [editingVersionName, setEditingVersionName] = useState<string>('')
+  const [materials, setMaterials] = useState<{ id: string; name: string }[]>([])
 
   // Add state for thickness values
   const [editingThickness, setEditingThickness] = useState<{
-    base_material_thickness?: string;
-    base_material_thickness_unit?: 'mm' | 'μm';
-    first_layer_thickness?: string;
-    first_layer_thickness_unit?: 'mm' | 'μm';
-    second_layer_thickness?: string;
-    second_layer_thickness_unit?: 'mm' | 'μm';
-  }>({});
+    base_material_thickness?: string
+    base_material_thickness_unit?: 'mm' | 'μm'
+    first_layer_thickness?: string
+    first_layer_thickness_unit?: 'mm' | 'μm'
+    second_layer_thickness?: string
+    second_layer_thickness_unit?: 'mm' | 'μm'
+  }>({})
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
   const loadData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const [
         { data: subData, error: subError },
         { data: mfgData, error: mfgError },
@@ -103,51 +103,51 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         supabase.from('substructure_systems').select('*').order('name', { ascending: true }),
         supabase.from('substructure_versions').select('*').order('name', { ascending: true }),
         supabase.from('materials').select('id, name').order('name', { ascending: true }),
-      ]);
+      ])
 
-      if (subError) throw subError;
-      if (mfgError) throw mfgError;
-      if (sysError) throw sysError;
-      if (verError) throw verError;
-      if (matError) throw matError;
+      if (subError) throw subError
+      if (mfgError) throw mfgError
+      if (sysError) throw sysError
+      if (verError) throw verError
+      if (matError) throw matError
 
-      setSubstructures(subData || []);
-      setManufacturers(mfgData || []);
-      setSystems(sysData || []);
-      setVersions(verData || []);
-      setMaterials(matData || []);
+      setSubstructures(subData || [])
+      setManufacturers(mfgData || [])
+      setSystems(sysData || [])
+      setVersions(verData || [])
+      setMaterials(matData || [])
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error('Error loading data:', err)
+      setError('Failed to load data')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSaveSubstructure = async () => {
-    setError(null);
+    setError(null)
 
     if (!selectedManufacturerId || !selectedSystemId || !editingVersionName.trim()) {
-      setError('Please fill in all required fields');
-      return;
+      setError('Please fill in all required fields')
+      return
     }
 
     try {
-      let versionId;
+      let versionId
 
       if (editingSubstructure) {
         // When editing an existing substructure
-        const currentVersion = versions.find((v) => v.id === selectedVersionId);
+        const currentVersion = versions.find((v) => v.id === selectedVersionId)
         if (currentVersion && currentVersion.name !== editingVersionName.trim()) {
           // Update version name if it changed
           const { error: versionError } = await supabase
             .from('substructure_versions')
             .update({ name: editingVersionName.trim() })
-            .eq('id', selectedVersionId);
+            .eq('id', selectedVersionId)
 
-          if (versionError) throw versionError;
+          if (versionError) throw versionError
         }
-        versionId = selectedVersionId;
+        versionId = selectedVersionId
       } else {
         // Creating new substructure
         const { data: versionData, error: versionError } = await supabase
@@ -157,10 +157,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
             system_id: selectedSystemId,
           })
           .select()
-          .single();
+          .single()
 
-        if (versionError) throw versionError;
-        versionId = versionData.id;
+        if (versionError) throw versionError
+        versionId = versionData.id
       }
 
       const data = {
@@ -181,7 +181,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         second_layer_thickness_unit: editingValues.second_layer_thickness_unit || 'mm',
         schematic: editingValues.schematic,
         example: editingValues.example,
-      };
+      }
 
       if (editingSubstructure) {
         // When editing, update all fields
@@ -205,55 +205,55 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
             schematic: data.schematic,
             example: data.example,
           })
-          .eq('id', editingSubstructure);
+          .eq('id', editingSubstructure)
 
-        if (error) throw error;
+        if (error) throw error
       } else {
-        const { error } = await supabase.from('substructures').insert(data);
+        const { error } = await supabase.from('substructures').insert(data)
 
-        if (error) throw error;
+        if (error) throw error
       }
 
-      await loadData();
-      setSelectedVersionId('');
-      setEditingVersionName('');
-      setIsNewSubstructure(false);
-      setEditingSubstructure(null);
-      setEditingValues({});
-      setSelectedManufacturerId('');
-      setSelectedSystemId('');
+      await loadData()
+      setSelectedVersionId('')
+      setEditingVersionName('')
+      setIsNewSubstructure(false)
+      setEditingSubstructure(null)
+      setEditingValues({})
+      setSelectedManufacturerId('')
+      setSelectedSystemId('')
     } catch (err) {
-      console.error('Error saving substructure:', err);
-      setError('Failed to save substructure');
+      console.error('Error saving substructure:', err)
+      setError('Failed to save substructure')
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase.from('substructures').delete().eq('id', id);
+      const { error } = await supabase.from('substructures').delete().eq('id', id)
 
-      if (error) throw error;
-      await loadData();
+      if (error) throw error
+      await loadData()
     } catch (err) {
-      console.error('Error deleting substructure:', err);
-      setError('Failed to delete substructure. Please try again.');
+      console.error('Error deleting substructure:', err)
+      setError('Failed to delete substructure. Please try again.')
     }
-  };
+  }
 
   const handleUpdateVersion = async (versionId: string, newName: string) => {
     try {
-      const { error } = await supabase.from('substructure_versions').update({ name: newName }).eq('id', versionId);
+      const { error } = await supabase.from('substructure_versions').update({ name: newName }).eq('id', versionId)
 
-      if (error) throw error;
+      if (error) throw error
 
-      await loadData();
-      setEditingVersionId(null);
-      setEditingVersionName('');
+      await loadData()
+      setEditingVersionId(null)
+      setEditingVersionName('')
     } catch (err) {
-      console.error('Error updating version:', err);
-      setError('Failed to update version name');
+      console.error('Error updating version:', err)
+      setError('Failed to update version name')
     }
-  };
+  }
 
   return (
     <div className="p-8">
@@ -585,15 +585,15 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         <Button
                           onClick={() => {
                             if (editingSubstructure === substructure.id) {
-                              handleSaveSubstructure();
+                              handleSaveSubstructure()
                             } else {
-                              setEditingSubstructure(substructure.id);
-                              const version = versions.find((v) => v.id === substructure.version_id);
-                              setEditingVersionName(version?.name || '');
-                              setSelectedManufacturerId(substructure.manufacturer_id);
-                              setSelectedSystemId(substructure.system_id);
-                              setSelectedVersionId(substructure.version_id);
-                              setEditingValues(substructure);
+                              setEditingSubstructure(substructure.id)
+                              const version = versions.find((v) => v.id === substructure.version_id)
+                              setEditingVersionName(version?.name || '')
+                              setSelectedManufacturerId(substructure.manufacturer_id)
+                              setSelectedSystemId(substructure.system_id)
+                              setSelectedVersionId(substructure.version_id)
+                              setEditingValues(substructure)
                             }
                           }}
                           className="p-1 rounded hover:bg-opacity-80"
@@ -604,10 +604,10 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         <Button
                           onClick={() => {
                             if (editingSubstructure === substructure.id) {
-                              setEditingSubstructure(null);
-                              setEditingValues({});
+                              setEditingSubstructure(null)
+                              setEditingValues({})
                             } else {
-                              handleDelete(substructure.id);
+                              handleDelete(substructure.id)
                             }
                           }}
                           className="p-1 rounded hover:bg-opacity-80"
@@ -625,9 +625,9 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <select
                         value={selectedManufacturerId}
                         onChange={(e) => {
-                          setSelectedManufacturerId(e.target.value);
-                          setSelectedSystemId('');
-                          setSelectedVersionId('');
+                          setSelectedManufacturerId(e.target.value)
+                          setSelectedSystemId('')
+                          setSelectedVersionId('')
                         }}
                         className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       >
@@ -643,8 +643,8 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                       <select
                         value={selectedSystemId}
                         onChange={(e) => {
-                          setSelectedSystemId(e.target.value);
-                          setSelectedVersionId('');
+                          setSelectedSystemId(e.target.value)
+                          setSelectedVersionId('')
                         }}
                         className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                         disabled={!selectedManufacturerId}
@@ -767,12 +767,12 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                         </Button>
                         <Button
                           onClick={() => {
-                            setIsNewSubstructure(false);
-                            setSelectedManufacturerId('');
-                            setSelectedSystemId('');
-                            setSelectedVersionId('');
-                            setEditingVersionName('');
-                            setEditingValues({});
+                            setIsNewSubstructure(false)
+                            setSelectedManufacturerId('')
+                            setSelectedSystemId('')
+                            setSelectedVersionId('')
+                            setEditingVersionName('')
+                            setEditingValues({})
                           }}
                           className="p-1 rounded hover:bg-opacity-80 text-primary"
                           variant="ghost"
@@ -789,7 +789,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         </section>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SubstructuresManagement;
+export default SubstructuresManagement

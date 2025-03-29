@@ -1,41 +1,41 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Zone } from '../../../../types/projects';
-import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react';
-import { Language, useTranslation } from '../../../../types/language';
-import { updateZone } from '../../../../services/zones';
-import { fetchProjects } from '../../../../services/projects';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React, { useState } from 'react'
+import { Theme } from '../../../../types/theme'
+import { Zone } from '../../../../types/projects'
+import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react'
+import { Language, useTranslation } from '../../../../types/language'
+import { updateZone } from '../../../../services/zones'
+import { fetchProjects } from '../../../../services/projects'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface ZoneSummaryProps {
-  zone: Zone;
-  currentTheme: Theme;
-  currentLanguage: Language;
-  onProjectsChange: (projects: any[]) => void;
+  zone: Zone
+  currentTheme: Theme
+  currentLanguage: Language
+  onProjectsChange: (projects: any[]) => void
 }
 
 const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLanguage, onProjectsChange }) => {
-  const translation = useTranslation(currentLanguage);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const translation = useTranslation(currentLanguage)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
   const [editValues, setEditValues] = useState({
     name: zone.name,
     latitude: zone.latitude || '',
     longitude: zone.longitude || '',
-  });
+  })
 
   const handleSave = async () => {
     try {
-      await updateZone(zone.id, editValues);
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
-      setIsEditing(false);
+      await updateZone(zone.id, editValues)
+      const updatedProjects = await fetchProjects()
+      onProjectsChange(updatedProjects)
+      setIsEditing(false)
     } catch (err) {
-      console.error('Error updating zone:', err);
+      console.error('Error updating zone:', err)
     }
-  };
+  }
 
   return (
     <div className="mb-8">
@@ -73,8 +73,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              handleSave();
+                              e.stopPropagation()
+                              handleSave()
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
@@ -82,8 +82,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              setIsEditing(false);
+                              e.stopPropagation()
+                              setIsEditing(false)
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
@@ -93,8 +93,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                       ) : (
                         <Button
                           onClick={(e) => {
-                            e.stopPropagation();
-                            setIsEditing(true);
+                            e.stopPropagation()
+                            setIsEditing(true)
                           }}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
@@ -152,7 +152,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default ZoneSummary;
+export default ZoneSummary

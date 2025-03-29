@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { Theme, THEMES } from '../types/theme';
-import { Language, LANGUAGES, useTranslation } from '../types/language';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { generateHiddenId } from '../utils/generateHiddenId';
-import { Project, Zone } from '../types/projects';
-import { Company } from '../types/companies';
-import { Customer } from '../types/customers';
-import { Standard, STANDARDS } from '../types/standards';
-import { fetchProjects } from '../services/projects';
-import { fetchCustomers } from '../services/customers';
-import { useAuth } from './auth/AuthProvider';
-import { ArrowLeft } from 'lucide-react';
-import { SavedPlace } from './shared/types';
-import { Person } from '../types/people';
-import { fetchPeople } from '../services/people';
-import { fetchCompanies } from '../services/companies';
-import Customers from './user/customers';
-import Projects from './user/projects';
-import Fields from './user/fields';
-import Zones from './user/zones';
-import Datapoints from './user/datapoints';
-import Settings from './user/settings';
-import AnalysisPanel from './analysis/AnalysisPanel';
-import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2 } from 'lucide-react';
-import { FileText } from 'lucide-react';
-import { ButtonSection } from './ui/ButtonSection';
-import { useAppNavigation } from '../hooks/useAppNavigation';
-import { updateUserSettings } from '@/services/userSettings';
+import React, { useState, useEffect } from 'react'
+import { Theme, THEMES } from '../types/theme'
+import { Language, LANGUAGES, useTranslation } from '../types/language'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { generateHiddenId } from '../utils/generateHiddenId'
+import { Project, Zone } from '../types/projects'
+import { Company } from '../types/companies'
+import { Customer } from '../types/customers'
+import { Standard, STANDARDS } from '../types/standards'
+import { fetchProjects } from '../services/projects'
+import { fetchCustomers } from '../services/customers'
+import { useAuth } from './auth/AuthProvider'
+import { ArrowLeft } from 'lucide-react'
+import { SavedPlace } from './shared/types'
+import { Person } from '../types/people'
+import { fetchPeople } from '../services/people'
+import { fetchCompanies } from '../services/companies'
+import Customers from './user/customers'
+import Projects from './user/projects'
+import Fields from './user/fields'
+import Zones from './user/zones'
+import Datapoints from './user/datapoints'
+import Settings from './user/settings'
+import AnalysisPanel from './analysis/AnalysisPanel'
+import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2 } from 'lucide-react'
+import { FileText } from 'lucide-react'
+import { ButtonSection } from './ui/ButtonSection'
+import { useAppNavigation } from '../hooks/useAppNavigation'
+import { updateUserSettings } from '@/services/userSettings'
 
 const DashboardLayout = () => {
   const {
@@ -42,22 +42,22 @@ const DashboardLayout = () => {
     setSelectedZoneId,
     setSelectedCustomerId,
     resetNavigation,
-  } = useAppNavigation();
+  } = useAppNavigation()
 
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [savedPeople, setSavedPeople] = useState<Person[]>([]);
-  const [showHiddenIds, setShowHiddenIds] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
-  const [savedCompanies, setCompanies] = useState<Company[]>([]);
-  const [currentTheme, setCurrentTheme] = useState<Theme>(THEMES.find((theme) => theme.id === 'ferra') || THEMES[0]);
-  const [loading, setLoading] = useState(true);
-  const [settingsView, setSettingsView] = useState<'general' | 'theme' | 'companies' | 'people' | 'datapoints'>('general');
-  const [selectedZone, setSelectedZone] = useState<Zone | undefined>();
-  const [error, setError] = useState<string | null>(null);
-  const [standards, setStandards] = useState<Standard[]>(STANDARDS);
-  const t = useTranslation(currentLanguage);
+  const [projects, setProjects] = useState<Project[]>([])
+  const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [savedPeople, setSavedPeople] = useState<Person[]>([])
+  const [showHiddenIds, setShowHiddenIds] = useState(false)
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('en')
+  const [savedCompanies, setCompanies] = useState<Company[]>([])
+  const [currentTheme, setCurrentTheme] = useState<Theme>(THEMES.find((theme) => theme.id === 'ferra') || THEMES[0])
+  const [loading, setLoading] = useState(true)
+  const [settingsView, setSettingsView] = useState<'general' | 'theme' | 'companies' | 'people' | 'datapoints'>('general')
+  const [selectedZone, setSelectedZone] = useState<Zone | undefined>()
+  const [error, setError] = useState<string | null>(null)
+  const [standards, setStandards] = useState<Standard[]>(STANDARDS)
+  const t = useTranslation(currentLanguage)
 
   const handleCreateCustomer = async (id: string, name: string, type: 'person' | 'company') => {
     try {
@@ -70,124 +70,124 @@ const DashboardLayout = () => {
           company_id: type === 'company' ? id : null,
         })
         .select()
-        .single();
+        .single()
 
-      if (error) throw error;
+      if (error) throw error
 
       // Refresh customers list
-      const updatedCustomers = await fetchCustomers();
-      setCustomers(updatedCustomers);
+      const updatedCustomers = await fetchCustomers()
+      setCustomers(updatedCustomers)
 
       // Show success message
-      setError(`Successfully created customer: ${name}`);
-      setTimeout(() => setError(null), 3000);
+      setError(`Successfully created customer: ${name}`)
+      setTimeout(() => setError(null), 3000)
     } catch (err) {
-      console.error('Error creating customer:', err);
-      setError('Failed to create customer');
+      console.error('Error creating customer:', err)
+      setError('Failed to create customer')
     }
-  };
+  }
 
   const handleMoveProject = async (projectId: string, newCustomerId: string | null) => {
     try {
-      const { error } = await supabase.from('projects').update({ customer_id: newCustomerId }).eq('id', projectId);
+      const { error } = await supabase.from('projects').update({ customer_id: newCustomerId }).eq('id', projectId)
 
-      if (error) throw error;
+      if (error) throw error
       // Refresh projects list
-      const updatedProjects = await fetchProjects(selectedCustomerId);
+      const updatedProjects = await fetchProjects(selectedCustomerId)
 
-      setProjects(updatedProjects);
+      setProjects(updatedProjects)
 
-      setError('Project moved successfully');
-      setTimeout(() => setError(null), 3000);
+      setError('Project moved successfully')
+      setTimeout(() => setError(null), 3000)
     } catch (err) {
-      console.error('Error moving project:', err);
-      setError('Failed to move project');
+      console.error('Error moving project:', err)
+      setError('Failed to move project')
     }
-  };
+  }
 
   const handleLanguageChange = (language: Language) => {
-    if (!language || !LANGUAGES.find((l) => l.id === language)) return;
-    setCurrentLanguage(language);
-  };
+    if (!language || !LANGUAGES.find((l) => l.id === language)) return
+    setCurrentLanguage(language)
+  }
 
-  const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth();
+  const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth()
 
   useEffect(() => {
     const loadInitialData = async () => {
-      setError(null);
+      setError(null)
       try {
-        setLoading(true);
+        setLoading(true)
         // Load initial data
-        const [people, companies, fetchedCustomers] = await Promise.all([fetchPeople(), fetchCompanies(), fetchCustomers()]);
+        const [people, companies, fetchedCustomers] = await Promise.all([fetchPeople(), fetchCompanies(), fetchCustomers()])
 
-        setSavedPeople(people);
-        setCompanies(companies);
-        setCustomers(fetchedCustomers);
+        setSavedPeople(people)
+        setCompanies(companies)
+        setCustomers(fetchedCustomers)
 
         // Load uncategorized projects
-        const uncategorizedProjects = await fetchProjects();
-        setProjects(uncategorizedProjects);
+        const uncategorizedProjects = await fetchProjects()
+        setProjects(uncategorizedProjects)
       } catch (error) {
-        console.error('Error loading initial data:', error);
-        setError('Failed to load data. Please try again.');
+        console.error('Error loading initial data:', error)
+        setError('Failed to load data. Please try again.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     if (user) {
-      loadInitialData();
+      loadInitialData()
     }
-  }, [user]);
+  }, [user])
 
   useEffect(() => {
     // Listen for user settings loaded event
     const handleUserSettings = (e: CustomEvent) => {
-      const metadata = e.detail || {};
+      const metadata = e.detail || {}
 
       // Update language if set in metadata
       if (metadata.language && LANGUAGES.find((l) => l.id === metadata.language)) {
-        setCurrentLanguage(metadata.language);
+        setCurrentLanguage(metadata.language)
       }
 
       // Update hidden IDs preference
-      setShowHiddenIds(!!metadata.show_hidden_ids);
+      setShowHiddenIds(!!metadata.show_hidden_ids)
 
       // Update theme
-      const theme = THEMES.find((t) => t === (metadata.theme_id || 'zinc'));
+      const theme = THEMES.find((t) => t === (metadata.theme_id || 'zinc'))
       if (theme) {
-        setCurrentTheme(theme);
+        setCurrentTheme(theme)
       }
-    };
+    }
 
-    window.addEventListener('userSettingsLoaded', handleUserSettings as EventListener);
+    window.addEventListener('userSettingsLoaded', handleUserSettings as EventListener)
     return () => {
-      window.removeEventListener('userSettingsLoaded', handleUserSettings as EventListener);
-    };
-  }, []);
+      window.removeEventListener('userSettingsLoaded', handleUserSettings as EventListener)
+    }
+  }, [])
 
   const handleUpdateTheme = async (theme: Theme) => {
-    const split = theme.split('.');
-    document.documentElement.setAttribute('data-theme', split[0]);
+    const split = theme.split('.')
+    document.documentElement.setAttribute('data-theme', split[0])
     if (split[1]) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('dark')
     }
-    setCurrentTheme(theme);
-  };
+    setCurrentTheme(theme)
+  }
 
   const renderContent = () => {
-    const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+    const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null
 
-    const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+    const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null
 
-    const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
+    const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null
 
     // Get manager and company info for project
-    const manager = selectedProject?.managerId ? savedPeople.find((p) => p.id === selectedProject.managerId) : null;
+    const manager = selectedProject?.managerId ? savedPeople.find((p) => p.id === selectedProject.managerId) : null
 
-    const company = selectedProject?.companyId ? savedCompanies.find((c) => c.id === selectedProject.companyId) : null;
+    const company = selectedProject?.companyId ? savedCompanies.find((c) => c.id === selectedProject.companyId) : null
 
     // Prepare project data with manager and company info
     const projectData = selectedProject
@@ -198,7 +198,7 @@ const DashboardLayout = () => {
           managerPhone: manager?.phone,
           companyName: company?.name,
         }
-      : undefined;
+      : undefined
 
     // Prepare field data
     const fieldData = selectedField
@@ -207,7 +207,7 @@ const DashboardLayout = () => {
           latitude: selectedField.latitude,
           longitude: selectedField.longitude,
         }
-      : undefined;
+      : undefined
     switch (view) {
       case 'customers':
         return (
@@ -217,42 +217,42 @@ const DashboardLayout = () => {
             savedPeople={savedPeople}
             savedCompanies={savedCompanies}
             onSelectCustomer={(customerId) => {
-              setSelectedCustomerId(customerId);
-              setView('projects');
-              setSelectedProjectId(undefined);
-              setSelectedFieldId(undefined);
-              setSelectedZoneId(undefined);
+              setSelectedCustomerId(customerId)
+              setView('projects')
+              setSelectedProjectId(undefined)
+              setSelectedFieldId(undefined)
+              setSelectedZoneId(undefined)
               // Load projects for selected customer
               const loadCustomerProjects = async () => {
                 try {
-                  const customerProjects = await fetchProjects(customerId);
-                  setProjects(customerProjects);
+                  const customerProjects = await fetchProjects(customerId)
+                  setProjects(customerProjects)
                 } catch (err) {
-                  console.error('Error loading customer projects:', err);
-                  setError('Failed to load customer projects');
+                  console.error('Error loading customer projects:', err)
+                  setError('Failed to load customer projects')
                 }
-              };
-              loadCustomerProjects();
+              }
+              loadCustomerProjects()
             }}
             onSelectUncategorized={() => {
-              setSelectedCustomerId(null);
-              setView('projects');
-              setSelectedProjectId(undefined);
-              setSelectedFieldId(undefined);
-              setSelectedZoneId(undefined);
+              setSelectedCustomerId(null)
+              setView('projects')
+              setSelectedProjectId(undefined)
+              setSelectedFieldId(undefined)
+              setSelectedZoneId(undefined)
               const loadUncategorizedProjects = async () => {
                 try {
-                  const projects = await fetchProjects(null);
-                  setProjects(projects);
+                  const projects = await fetchProjects(null)
+                  setProjects(projects)
                 } catch (err) {
-                  console.error('Error loading uncategorized projects:', err);
-                  setError('Failed to load uncategorized projects');
+                  console.error('Error loading uncategorized projects:', err)
+                  setError('Failed to load uncategorized projects')
                 }
-              };
-              loadUncategorizedProjects();
+              }
+              loadUncategorizedProjects()
             }}
           />
-        );
+        )
       case 'projects':
         return (
           <Projects
@@ -265,15 +265,15 @@ const DashboardLayout = () => {
             selectedCustomerId={selectedCustomerId}
             onMoveProject={handleMoveProject}
             onSelectProject={(projectId) => {
-              setView('fields');
-              setSelectedProjectId(projectId);
-              setSelectedFieldId(undefined);
-              setSelectedZoneId(undefined);
+              setView('fields')
+              setSelectedProjectId(projectId)
+              setSelectedFieldId(undefined)
+              setSelectedZoneId(undefined)
             }}
             currentLanguage={currentLanguage}
             onProjectsChange={setProjects}
           />
-        );
+        )
       case 'fields':
         return (
           <Fields
@@ -284,16 +284,16 @@ const DashboardLayout = () => {
             selectedProjectId={selectedProjectId}
             selectedField={selectedFieldId}
             onSelectField={(projectId, fieldId) => {
-              setView('zones');
-              setSelectedProjectId(projectId);
-              setSelectedFieldId(fieldId);
-              setSelectedZoneId(undefined);
+              setView('zones')
+              setSelectedProjectId(projectId)
+              setSelectedFieldId(fieldId)
+              setSelectedZoneId(undefined)
             }}
             people={savedPeople}
             companies={savedCompanies}
             selectedCustomerId={selectedCustomerId}
           />
-        );
+        )
       case 'zones':
         return (
           <Zones
@@ -305,17 +305,17 @@ const DashboardLayout = () => {
             selectedFieldId={selectedFieldId}
             onSelectZone={(zoneId) => {
               // Find the selected zone
-              const zone = selectedField?.zones.find((z) => z.id === zoneId);
+              const zone = selectedField?.zones.find((z) => z.id === zoneId)
               if (zone) {
-                setSelectedZone(zone);
-                setSelectedZoneId(zoneId);
-                setView('datapoints');
+                setSelectedZone(zone)
+                setSelectedZoneId(zoneId)
+                setView('datapoints')
               }
             }}
             people={savedPeople}
             companies={savedCompanies}
           />
-        );
+        )
       case 'datapoints':
         return selectedZone && selectedProject && selectedField ? (
           <Datapoints
@@ -325,16 +325,16 @@ const DashboardLayout = () => {
             field={fieldData}
             selectedZone={selectedZone}
             onBack={() => {
-              setView('zones');
-              setSelectedZoneId(undefined);
-              setSelectedZone(undefined);
+              setView('zones')
+              setSelectedZoneId(undefined)
+              setSelectedZone(undefined)
             }}
             onProjectsChange={setProjects}
             selectedCustomerId={selectedCustomerId}
           />
         ) : (
           <div className="p-6 text-center">{t('datapoint.please_select_zone')}</div>
-        );
+        )
       case 'analyse':
         return (
           <AnalysisPanel
@@ -347,9 +347,9 @@ const DashboardLayout = () => {
             selectedZoneId={selectedZoneId}
             onBack={() => setView('projects')}
           />
-        );
+        )
       case 'output':
-        return <div className="p-6 text-center text-secondary">{t('output.panel_coming_soon')}</div>;
+        return <div className="p-6 text-center text-secondary">{t('output.panel_coming_soon')}</div>
       case 'settings':
         return (
           <Settings
@@ -372,11 +372,11 @@ const DashboardLayout = () => {
             standards={standards}
             onStandardsChange={setStandards}
           />
-        );
+        )
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   return (
     <Router>
@@ -414,27 +414,27 @@ const DashboardLayout = () => {
                     if (selectedCustomerId === null) {
                       const loadUncategorizedProjects = async () => {
                         try {
-                          const projects = await fetchProjects(null);
-                          setProjects(projects);
+                          const projects = await fetchProjects(null)
+                          setProjects(projects)
                         } catch (err) {
-                          console.error('Error loading uncategorized projects:', err);
-                          setError('Failed to load uncategorized projects');
+                          console.error('Error loading uncategorized projects:', err)
+                          setError('Failed to load uncategorized projects')
                         }
-                      };
-                      loadUncategorizedProjects();
+                      }
+                      loadUncategorizedProjects()
                     } else if (selectedCustomerId) {
                       const loadCustomerProjects = async () => {
                         try {
-                          const customerProjects = await fetchProjects(selectedCustomerId);
-                          setProjects(customerProjects);
+                          const customerProjects = await fetchProjects(selectedCustomerId)
+                          setProjects(customerProjects)
                         } catch (err) {
-                          console.error('Error loading customer projects:', err);
-                          setError('Failed to load customer projects');
+                          console.error('Error loading customer projects:', err)
+                          setError('Failed to load customer projects')
                         }
-                      };
-                      loadCustomerProjects();
+                      }
+                      loadCustomerProjects()
                     }
-                    setView('projects');
+                    setView('projects')
                   }}
                 >
                   <FolderOpen size={18} />
@@ -445,7 +445,7 @@ const DashboardLayout = () => {
                   match="fields"
                   onClick={() => {
                     if (selectedProjectId) {
-                      setView('fields');
+                      setView('fields')
                     }
                   }}
                 >
@@ -457,7 +457,7 @@ const DashboardLayout = () => {
                   match="zones"
                   onClick={() => {
                     if (selectedProjectId && selectedFieldId) {
-                      setView('zones');
+                      setView('zones')
                     }
                   }}
                 >
@@ -469,13 +469,13 @@ const DashboardLayout = () => {
                   match="datapoints"
                   onClick={() => {
                     if (selectedProjectId && selectedFieldId && selectedZoneId) {
-                      setView('datapoints');
+                      setView('datapoints')
                       // Find and set the selected zone
-                      const project = projects.find((p) => p.id === selectedProjectId);
-                      const field = project?.fields.find((f) => f.id === selectedFieldId);
-                      const zone = field?.zones.find((z) => z.id === selectedZoneId);
+                      const project = projects.find((p) => p.id === selectedProjectId)
+                      const field = project?.fields.find((f) => f.id === selectedFieldId)
+                      const zone = field?.zones.find((z) => z.id === selectedZoneId)
                       if (zone) {
-                        setSelectedZone(zone);
+                        setSelectedZone(zone)
                       }
                     }
                   }}
@@ -488,13 +488,13 @@ const DashboardLayout = () => {
                   match="analyse"
                   onClick={() => {
                     if (selectedProjectId && selectedFieldId && selectedZoneId) {
-                      setView('analyse');
+                      setView('analyse')
                       // Find and set the selected zone
-                      const project = projects.find((p) => p.id === selectedProjectId);
-                      const field = project?.fields.find((f) => f.id === selectedFieldId);
-                      const zone = field?.zones.find((z) => z.id === selectedZoneId);
+                      const project = projects.find((p) => p.id === selectedProjectId)
+                      const field = project?.fields.find((f) => f.id === selectedFieldId)
+                      const zone = field?.zones.find((z) => z.id === selectedZoneId)
                       if (zone) {
-                        setSelectedZone(zone);
+                        setSelectedZone(zone)
                       }
                     }
                   }}
@@ -540,7 +540,7 @@ const DashboardLayout = () => {
         </div>
       </div>
     </Router>
-  );
-};
+  )
+}
 
-export default DashboardLayout;
+export default DashboardLayout

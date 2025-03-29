@@ -1,17 +1,17 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { ArrowLeft, Palette, Globe, ChevronLeft } from 'lucide-react';
-import ThemeManagement from './ThemeManagement';
-import TranslationsPanel from './settings/TranslationsPanel';
-import { Button } from '../ui/button';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { ArrowLeft, Palette, Globe, ChevronLeft } from 'lucide-react'
+import ThemeManagement from './ThemeManagement'
+import TranslationsPanel from './settings/TranslationsPanel'
+import { Button } from '../ui/button'
 
 interface AdminSettingsProps {
-  currentTheme: Theme;
-  onBack: () => void;
+  currentTheme: Theme
+  onBack: () => void
 }
 
 const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) => {
-  const [activeView, setActiveView] = React.useState<'overview' | 'themes' | 'translations'>('overview');
+  const [activeView, setActiveView] = React.useState<'overview' | 'themes' | 'translations'>('overview')
 
   return (
     <div className="p-8">
@@ -70,7 +70,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AdminSettings;
+export default AdminSettings

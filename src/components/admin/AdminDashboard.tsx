@@ -1,33 +1,33 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Users, Database, Settings, LogOut, BellRing } from 'lucide-react';
-import DatabaseManagement from './DatabaseManagement';
-import UserManagement from './UserManagement';
-import AdminSettings from './AdminSettings';
-import NotificationsPanel from './notifications/NotificationsPanel';
-import TranslationsPanel from './settings/TranslationsPanel';
-import { Language } from '../../types/language';
-import { supabase } from '../../lib/supabase';
-import { Button } from '../ui/button';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Users, Database, Settings, LogOut, BellRing } from 'lucide-react'
+import DatabaseManagement from './DatabaseManagement'
+import UserManagement from './UserManagement'
+import AdminSettings from './AdminSettings'
+import NotificationsPanel from './notifications/NotificationsPanel'
+import TranslationsPanel from './settings/TranslationsPanel'
+import { Language } from '../../types/language'
+import { supabase } from '../../lib/supabase'
+import { Button } from '../ui/button'
 
 interface AdminDashboardProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
+  currentTheme: Theme
+  currentLanguage: Language
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
   const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'notifications' | 'settings' | 'translations'>(
     'overview',
-  );
+  )
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut()
       // The AuthProvider will handle the redirect after sign out
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error signing out:', error)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen">
@@ -119,7 +119,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AdminDashboard;
+export default AdminDashboard

@@ -1,35 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Theme } from '../types/theme';
-import { Person, PERSON_FIELDS } from '../types/people';
-import { User, Plus, ChevronRight } from 'lucide-react';
-import { generateHiddenId } from '../utils/generateHiddenId';
-import { Language, useTranslation } from '../types/language';
-import { useKeyAction } from '../hooks/useKeyAction';
-import { toCase } from '../utils/cases';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { Theme } from '../types/theme'
+import { Person, PERSON_FIELDS } from '../types/people'
+import { User, Plus, ChevronRight } from 'lucide-react'
+import { generateHiddenId } from '../utils/generateHiddenId'
+import { Language, useTranslation } from '../types/language'
+import { useKeyAction } from '../hooks/useKeyAction'
+import { toCase } from '../utils/cases'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
 
 interface PeoplePanelProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  savedPeople: Person[];
-  onSavePeople: (people: Person[]) => void;
-  onCreateCustomer?: (personId: string, name: string) => void;
+  currentTheme: Theme
+  currentLanguage: Language
+  savedPeople: Person[]
+  onSavePeople: (people: Person[]) => void
+  onCreateCustomer?: (personId: string, name: string) => void
 }
 
 const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage, savedPeople, onSavePeople, onCreateCustomer }) => {
-  const [showNewPersonForm, setShowNewPersonForm] = useState(false);
-  const [editingPerson, setEditingPerson] = useState<Person | null>(null);
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
+  const [showNewPersonForm, setShowNewPersonForm] = useState(false)
+  const [editingPerson, setEditingPerson] = useState<Person | null>(null)
+  const [formValues, setFormValues] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
-    fetchPeople();
-  }, []);
+    fetchPeople()
+  }, [])
   const fetchPeople = async () => {
     try {
       const { data, error } = await supabase
@@ -46,11 +46,11 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
           phone
         `,
         )
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true })
 
       if (error) {
-        console.error('Error fetching people:', error);
-        throw error;
+        console.error('Error fetching people:', error)
+        throw error
       }
 
       const formattedPeople = data.map((person) => ({
@@ -62,19 +62,19 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
         lastName: person.last_name,
         email: person.email,
         phone: person.phone,
-      }));
+      }))
 
-      onSavePeople(formattedPeople);
+      onSavePeople(formattedPeople)
     } catch (err) {
-      console.error('Error in fetchPeople:', err);
-      setError('Failed to fetch people');
+      console.error('Error in fetchPeople:', err)
+      setError('Failed to fetch people')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEditPerson = (person: Person) => {
-    setEditingPerson(person);
+    setEditingPerson(person)
     setFormValues({
       salutation: person.salutation,
       title: person.title || '',
@@ -82,77 +82,77 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
       lastName: person.lastName,
       email: person.email,
       phone: person.phone || '',
-    });
-    setShowNewPersonForm(true);
-  };
+    })
+    setShowNewPersonForm(true)
+  }
 
   const handleInputChange = (fieldId: string, value: string) => {
     setFormValues((prev) => {
-      const newValues = { ...prev };
-      newValues[fieldId] = value;
-      return newValues;
-    });
-  };
+      const newValues = { ...prev }
+      newValues[fieldId] = value
+      return newValues
+    })
+  }
 
   const updateSelectedProject = async () => {
-    setError(null);
+    setError(null)
 
     if (!formValues.salutation || !formValues.firstName || !formValues.lastName || !formValues.email) {
-      setError('Please fill in all required fields');
-      return;
+      setError('Please fill in all required fields')
+      return
     }
 
     try {
       const personData = {
         ...toCase(formValues, 'snakeCase'),
-      };
+      }
 
       if (editingPerson) {
-        const { error } = await supabase.from('people').update(personData).eq('id', editingPerson.id);
+        const { error } = await supabase.from('people').update(personData).eq('id', editingPerson.id)
 
-        if (error) throw error;
+        if (error) throw error
       } else {
         const { error } = await supabase.from('people').insert({
           ...personData,
           hidden_id: generateHiddenId(),
-        });
+        })
 
-        if (error) throw error;
+        if (error) throw error
       }
 
-      await fetchPeople();
-      setShowNewPersonForm(false);
-      setEditingPerson(null);
-      setFormValues({});
+      await fetchPeople()
+      setShowNewPersonForm(false)
+      setEditingPerson(null)
+      setFormValues({})
     } catch (err) {
-      console.error('Error saving person:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save person');
+      console.error('Error saving person:', err)
+      setError(err instanceof Error ? err.message : 'Failed to save person')
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    updateSelectedProject();
-  };
+    e.preventDefault()
+    updateSelectedProject()
+  }
 
   const handleDelete = async (personId: string) => {
     try {
-      const { error } = await supabase.from('people').delete().eq('id', personId);
+      const { error } = await supabase.from('people').delete().eq('id', personId)
 
-      if (error) throw error;
-      await fetchPeople();
+      if (error) throw error
+      await fetchPeople()
     } catch (err) {
-      console.error('Error deleting person:', err);
-      setError('Failed to delete person');
+      console.error('Error deleting person:', err)
+      setError('Failed to delete person')
     }
-  };
+  }
 
   useKeyAction(() => {
-    updateSelectedProject();
-  }, showNewPersonForm);
+    updateSelectedProject()
+  }, showNewPersonForm)
 
   if (loading) {
-    return <div className="text-center p-4 text-secondary">{translation('people.loading')}</div>;
+    return <div className="text-center p-4 text-secondary">{translation('people.loading')}</div>
   }
 
   return (
@@ -210,9 +210,9 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                 type="button"
                 variant="destructive"
                 onClick={() => {
-                  setShowNewPersonForm(false);
-                  setFormValues({});
-                  setEditingPerson(null);
+                  setShowNewPersonForm(false)
+                  setFormValues({})
+                  setEditingPerson(null)
                 }}
               >
                 {translation('actions.cancel')}
@@ -242,8 +242,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                   {onCreateCustomer && (
                     <Button
                       onClick={(e) => {
-                        e.stopPropagation();
-                        onCreateCustomer(person.id, `${person.firstName} ${person.lastName}`);
+                        e.stopPropagation()
+                        onCreateCustomer(person.id, `${person.firstName} ${person.lastName}`)
                       }}
                       className="px-2 py-1 text-xs hover:bg-opacity-80"
                     >
@@ -263,7 +263,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default PeoplePanel;
+export default PeoplePanel

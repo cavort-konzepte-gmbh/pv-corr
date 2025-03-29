@@ -1,21 +1,21 @@
 export interface Person {
-  id: string;
-  hiddenId: string;
-  salutation: string;
-  title?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
+  id: string
+  hiddenId: string
+  salutation: string
+  title?: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
 }
 
 export interface PersonField {
-  id: string;
-  hiddenId?: string;
-  label: string;
-  type: 'text' | 'email' | 'tel' | 'select' | 'address';
-  required: boolean;
-  options?: string[];
+  id: string
+  hiddenId?: string
+  label: string
+  type: 'text' | 'email' | 'tel' | 'select' | 'address'
+  required: boolean
+  options?: string[]
 }
 
 export const PERSON_FIELDS: PersonField[] = [
@@ -57,4 +57,4 @@ export const PERSON_FIELDS: PersonField[] = [
     type: 'tel',
     required: false,
   },
-];
+]

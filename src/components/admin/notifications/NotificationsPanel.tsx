@@ -1,73 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../../types/theme';
-import { ArrowLeft, BellRing, AlertTriangle, AlertOctagon, Plus, Edit2, Save, X, Clock } from 'lucide-react';
-import { NotificationDuration, Notification, DURATION_OPTIONS } from '../../../types/security';
-import { createNotification, updateNotification, deleteNotification, getNotificationsByType } from '../../../services/notifications';
-import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../../types/theme'
+import { ArrowLeft, BellRing, AlertTriangle, AlertOctagon, Plus, Edit2, Save, X, Clock } from 'lucide-react'
+import { NotificationDuration, Notification, DURATION_OPTIONS } from '../../../types/security'
+import { createNotification, updateNotification, deleteNotification, getNotificationsByType } from '../../../services/notifications'
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 interface NotificationsPanelProps {
-  currentTheme: Theme;
-  onBack: () => void;
+  currentTheme: Theme
+  onBack: () => void
 }
 
-type NotificationType = 'info' | 'warning' | 'error' | null;
+type NotificationType = 'info' | 'warning' | 'error' | null
 
 const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, onBack }) => {
-  const [selectedType, setSelectedType] = useState<NotificationType>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<Record<string, any>>({});
-  const [isNewRow, setIsNewRow] = useState(false);
+  const [selectedType, setSelectedType] = useState<NotificationType>(null)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingValues, setEditingValues] = useState<Record<string, any>>({})
+  const [isNewRow, setIsNewRow] = useState(false)
 
   // Load notifications when type is selected
   useEffect(() => {
     const loadNotifications = async () => {
-      if (!selectedType) return;
+      if (!selectedType) return
 
       try {
-        setLoading(true);
-        const data = await getNotificationsByType(selectedType);
-        setNotifications(data);
+        setLoading(true)
+        const data = await getNotificationsByType(selectedType)
+        setNotifications(data)
       } catch (err) {
-        console.error('Error loading notifications:', err);
-        setError('Failed to load notifications');
+        console.error('Error loading notifications:', err)
+        setError('Failed to load notifications')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    loadNotifications();
-  }, [selectedType]);
+    loadNotifications()
+  }, [selectedType])
 
   const getTypeColor = (type: NotificationType) => {
-    return '';
+    return ''
     // skip this for now
     switch (type) {
       case 'info':
-        return currentTheme.colors.accent.primary;
+        return currentTheme.colors.accent.primary
       case 'warning':
-        return '#f59e0b';
+        return '#f59e0b'
       case 'error':
-        return '#ef4444';
+        return '#ef4444'
       default:
-        return currentTheme.colors.text.secondary;
+        return currentTheme.colors.text.secondary
     }
-  };
+  }
 
   const handleSave = async () => {
     if (!selectedType || !editingValues.name || !editingValues.description) {
-      setError('Name and description are required');
-      return;
+      setError('Name and description are required')
+      return
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const notificationData = {
         type: selectedType,
@@ -75,49 +75,49 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
         description: editingValues.description,
         duration: editingValues.duration || 'timed',
         timeout: editingValues.duration === 'timed' ? editingValues.timeout || 5 : undefined,
-      };
+      }
 
       if (isNewRow) {
-        await createNotification(notificationData);
+        await createNotification(notificationData)
       } else if (editingId) {
-        await updateNotification(editingId, notificationData);
+        await updateNotification(editingId, notificationData)
       }
 
       // Refresh notifications list
-      const updatedNotifications = await getNotificationsByType(selectedType);
-      setNotifications(updatedNotifications);
+      const updatedNotifications = await getNotificationsByType(selectedType)
+      setNotifications(updatedNotifications)
 
       // Reset editing state
-      setEditingId(null);
-      setEditingValues({});
-      setIsNewRow(false);
+      setEditingId(null)
+      setEditingValues({})
+      setIsNewRow(false)
     } catch (err) {
-      console.error('Error saving notification:', err);
-      setError('Failed to save notification');
+      console.error('Error saving notification:', err)
+      setError('Failed to save notification')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
-    if (!selectedType) return;
+    if (!selectedType) return
 
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
-      await deleteNotification(id);
+      await deleteNotification(id)
 
       // Refresh notifications list
-      const updatedNotifications = await getNotificationsByType(selectedType);
-      setNotifications(updatedNotifications);
+      const updatedNotifications = await getNotificationsByType(selectedType)
+      setNotifications(updatedNotifications)
     } catch (err) {
-      console.error('Error deleting notification:', err);
-      setError('Failed to delete notification');
+      console.error('Error deleting notification:', err)
+      setError('Failed to delete notification')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="p-8 text-card-foreground">
@@ -189,14 +189,14 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
             </h3>
             <Button
               onClick={() => {
-                setIsNewRow(true);
-                setEditingId(null);
+                setIsNewRow(true)
+                setEditingId(null)
                 setEditingValues({
                   name: '',
                   description: '',
                   duration: 'timed',
                   timeout: 5,
-                });
+                })
               }}
               style={{
                 backgroundColor: getTypeColor(selectedType),
@@ -240,14 +240,14 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           rows={1}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSave();
+                              e.preventDefault()
+                              handleSave()
                             }
                           }}
                           onInput={(e) => {
-                            const target = e.target as HTMLTextAreaElement;
-                            target.style.height = 'auto';
-                            target.style.height = `${target.scrollHeight}px`;
+                            const target = e.target as HTMLTextAreaElement
+                            target.style.height = 'auto'
+                            target.style.height = `${target.scrollHeight}px`
                           }}
                         />
                       </TableCell>
@@ -288,8 +288,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           <Button
                             variant="ghost"
                             onClick={() => {
-                              setIsNewRow(false);
-                              setEditingValues({});
+                              setIsNewRow(false)
+                              setEditingValues({})
                             }}
                           >
                             <X size={14} />
@@ -323,8 +323,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                               rows={3}
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
-                                  e.preventDefault();
-                                  handleSave();
+                                  e.preventDefault()
+                                  handleSave()
                                 }
                               }}
                             />
@@ -385,8 +385,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                                 <Button
                                   variant="ghost"
                                   onClick={() => {
-                                    setEditingId(null);
-                                    setEditingValues({});
+                                    setEditingId(null)
+                                    setEditingValues({})
                                   }}
                                 >
                                   <X size={14} />
@@ -397,13 +397,13 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                                 <Button
                                   variant="ghost"
                                   onClick={() => {
-                                    setEditingId(notification.id);
+                                    setEditingId(notification.id)
                                     setEditingValues({
                                       name: notification.name,
                                       description: notification.description,
                                       duration: notification.duration,
                                       timeout: notification.timeout,
-                                    });
+                                    })
                                   }}
                                 >
                                   <Edit2 size={14} />
@@ -424,7 +424,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default NotificationsPanel;
+export default NotificationsPanel

@@ -1,18 +1,18 @@
-import { supabase } from '../lib/supabase';
-import { Zone } from '../types/projects';
-import { generateHiddenId } from '../utils/generateHiddenId';
+import { supabase } from '../lib/supabase'
+import { Zone } from '../types/projects'
+import { generateHiddenId } from '../utils/generateHiddenId'
 
 export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hiddenId' | 'datapoints'>) => {
   if (!fieldId) {
-    throw new Error('Field ID is required');
+    throw new Error('Field ID is required')
   }
 
   // First check if field exists
-  const { data: field, error: fieldError } = await supabase.from('fields').select('id').eq('id', fieldId).single();
+  const { data: field, error: fieldError } = await supabase.from('fields').select('id').eq('id', fieldId).single()
 
   if (fieldError) {
-    console.error('Error finding field:', fieldError);
-    throw fieldError;
+    console.error('Error finding field:', fieldError)
+    throw fieldError
   }
 
   const { data, error } = await supabase
@@ -25,11 +25,11 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
       longitude: zone.longitude,
     })
     .select()
-    .single();
+    .single()
 
   if (error) {
-    console.error('Error creating zone:', error);
-    throw error;
+    console.error('Error creating zone:', error)
+    throw error
   }
 
   // Fetch complete zone data after creation
@@ -42,19 +42,19 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
     `,
     )
     .eq('id', data.id)
-    .single();
+    .single()
 
   if (fetchError) {
-    console.error('Error fetching complete zone:', fetchError);
-    throw fetchError;
+    console.error('Error fetching complete zone:', fetchError)
+    throw fetchError
   }
 
-  return completeZone;
-};
+  return completeZone
+}
 
 export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Zone> => {
   if (!zoneId) {
-    throw new Error('Zone ID is required for update');
+    throw new Error('Zone ID is required for update')
   }
 
   try {
@@ -65,7 +65,7 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       longitude: zone.longitude || null,
       substructure_id: zone.substructureId === '' ? null : zone.substructureId || null,
       foundation_id: zone.foundationId === '' ? null : zone.foundationId || null,
-    };
+    }
 
     // Update zone
     const { data, error } = await supabase
@@ -78,21 +78,21 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
         datapoints (*)
       `,
       )
-      .single();
+      .single()
 
-    if (error) throw error;
-    return data;
+    if (error) throw error
+    return data
   } catch (err) {
-    console.error('Error updating zone:', err);
-    throw err;
+    console.error('Error updating zone:', err)
+    throw err
   }
-};
+}
 
 export const deleteZone = async (zoneId: string) => {
-  const { error } = await supabase.from('zones').delete().eq('id', zoneId);
+  const { error } = await supabase.from('zones').delete().eq('id', zoneId)
 
   if (error) {
-    console.error('Error deleting zone:', error);
-    throw error;
+    console.error('Error deleting zone:', error)
+    throw error
   }
-};
+}

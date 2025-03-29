@@ -1,10 +1,10 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
 
 interface SidebarProps {
-  currentView: string;
-  onViewChange: (view: string) => void;
-  currentTheme: Theme;
+  currentView: string
+  onViewChange: (view: string) => void
+  currentTheme: Theme
 }
 
 const menuItems = [
@@ -15,7 +15,7 @@ const menuItems = [
   { id: 'people', label: 'People' },
   { id: 'projects', label: 'Projects' },
   { id: 'datapoints', label: 'Datapoints' },
-];
+]
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, currentTheme }) => {
   return (
@@ -32,7 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, currentThe
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

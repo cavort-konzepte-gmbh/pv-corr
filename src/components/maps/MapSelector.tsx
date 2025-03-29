@@ -1,41 +1,41 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Theme } from '../../types/theme';
-import { MapPin, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react'
+import { Theme } from '../../types/theme'
+import { MapPin, X } from 'lucide-react'
 
 interface MapSelectorProps {
-  currentTheme: Theme;
-  initialLat?: string;
-  initialLng?: string;
-  onSelect: (lat: string, lng: string) => void;
-  onClose: () => void;
+  currentTheme: Theme
+  initialLat?: string
+  initialLng?: string
+  onSelect: (lat: string, lng: string) => void
+  onClose: () => void
 }
 
 const MapSelector: React.FC<MapSelectorProps> = ({ currentTheme, initialLat, initialLng, onSelect, onClose }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null)
+  const [map, setMap] = useState<google.maps.Map | null>(null)
+  const [marker, setMarker] = useState<google.maps.Marker | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<{ lat: number; lng: number } | null>(
     initialLat && initialLng ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) } : null,
-  );
+  )
 
   useEffect(() => {
     // Load Google Maps script
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    script.onload = initMap;
-    document.head.appendChild(script);
+    const script = document.createElement('script')
+    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`
+    script.async = true
+    script.defer = true
+    script.onload = initMap
+    document.head.appendChild(script)
 
     return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
+      document.head.removeChild(script)
+    }
+  }, [])
 
   const initMap = () => {
-    if (!mapRef.current) return;
+    if (!mapRef.current) return
 
-    const initialPosition = selectedPosition || { lat: 51.1657, lng: 10.4515 }; // Germany center
+    const initialPosition = selectedPosition || { lat: 51.1657, lng: 10.4515 } // Germany center
 
     const mapInstance = new google.maps.Map(mapRef.current, {
       center: initialPosition,
@@ -57,68 +57,68 @@ const MapSelector: React.FC<MapSelectorProps> = ({ currentTheme, initialLat, ini
           stylers: [{ color: currentTheme.colors.background }],
         },
       ],
-    });
+    })
 
-    let markerInstance: google.maps.Marker | null = null;
+    let markerInstance: google.maps.Marker | null = null
 
     if (selectedPosition) {
       markerInstance = new google.maps.Marker({
         position: selectedPosition,
         map: mapInstance,
         draggable: true,
-      });
+      })
 
       markerInstance.addListener('dragend', () => {
-        const position = markerInstance?.getPosition();
+        const position = markerInstance?.getPosition()
         if (position) {
           setSelectedPosition({
             lat: position.lat(),
             lng: position.lng(),
-          });
+          })
         }
-      });
+      })
     }
 
     mapInstance.addListener('click', (e: google.maps.MapMouseEvent) => {
-      const position = e.latLng;
-      if (!position) return;
+      const position = e.latLng
+      if (!position) return
 
-      const lat = position.lat();
-      const lng = position.lng();
+      const lat = position.lat()
+      const lng = position.lng()
 
       if (markerInstance) {
-        markerInstance.setPosition({ lat, lng });
+        markerInstance.setPosition({ lat, lng })
       } else {
         markerInstance = new google.maps.Marker({
           position: { lat, lng },
           map: mapInstance,
           draggable: true,
-        });
+        })
 
         markerInstance.addListener('dragend', () => {
-          const newPosition = markerInstance?.getPosition();
+          const newPosition = markerInstance?.getPosition()
           if (newPosition) {
             setSelectedPosition({
               lat: newPosition.lat(),
               lng: newPosition.lng(),
-            });
+            })
           }
-        });
+        })
       }
 
-      setSelectedPosition({ lat, lng });
-      setMarker(markerInstance);
-    });
+      setSelectedPosition({ lat, lng })
+      setMarker(markerInstance)
+    })
 
-    setMap(mapInstance);
-    setMarker(markerInstance);
-  };
+    setMap(mapInstance)
+    setMarker(markerInstance)
+  }
 
   const handleConfirm = () => {
     if (selectedPosition) {
-      onSelect(selectedPosition.lat.toFixed(6), selectedPosition.lng.toFixed(6));
+      onSelect(selectedPosition.lat.toFixed(6), selectedPosition.lng.toFixed(6))
     }
-  };
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -152,7 +152,7 @@ const MapSelector: React.FC<MapSelectorProps> = ({ currentTheme, initialLat, ini
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MapSelector;
+export default MapSelector

@@ -1,16 +1,16 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Customer } from '../../../../types/customers';
-import { Building2, ChevronRight, Mail, Phone, Link, User } from 'lucide-react';
-import { Person } from '../../../../types/people';
-import { Company } from '../../../../types/companies';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
+import { Customer } from '../../../../types/customers'
+import { Building2, ChevronRight, Mail, Phone, Link, User } from 'lucide-react'
+import { Person } from '../../../../types/people'
+import { Company } from '../../../../types/companies'
 
 interface CustomerListProps {
-  currentTheme: Theme;
-  customers: Customer[];
-  savedPeople: Person[];
-  savedCompanies: Company[];
-  onSelectCustomer: (customerId: string) => void;
+  currentTheme: Theme
+  customers: Customer[]
+  savedPeople: Person[]
+  savedCompanies: Company[]
+  onSelectCustomer: (customerId: string) => void
 }
 
 const CustomerList: React.FC<CustomerListProps> = ({ currentTheme, customers, savedPeople, savedCompanies, onSelectCustomer }) => {
@@ -36,7 +36,7 @@ const CustomerList: React.FC<CustomerListProps> = ({ currentTheme, customers, sa
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default CustomerList;
+export default CustomerList

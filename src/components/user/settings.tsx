@@ -1,33 +1,33 @@
-import React from 'react';
-import { Theme, THEMES } from '../../types/theme';
-import { Language } from '../../types/language';
-import { Company } from '../../types/companies';
-import { Standard } from '../../types/standards';
-import GeneralSettings from './elements/settings/GeneralSettings';
-import CompaniesSettings from './elements/settings/CompaniesSettings';
-import PeopleSettings from './elements/settings/PeopleSettings';
-import DatapointsSettings from './elements/settings/DatapointsSettings';
-import { Person } from '../../types/people';
+import React from 'react'
+import { Theme, THEMES } from '../../types/theme'
+import { Language } from '../../types/language'
+import { Company } from '../../types/companies'
+import { Standard } from '../../types/standards'
+import GeneralSettings from './elements/settings/GeneralSettings'
+import CompaniesSettings from './elements/settings/CompaniesSettings'
+import PeopleSettings from './elements/settings/PeopleSettings'
+import DatapointsSettings from './elements/settings/DatapointsSettings'
+import { Person } from '../../types/people'
 
 interface SettingsProps {
-  view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations';
-  onViewChange: (view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations') => void;
-  showHiddenIds: boolean;
-  currentLanguage: Language;
-  onLanguageChange: (language: Language) => void;
-  onShowHiddenIdsChange: (show: boolean) => void;
-  decimalSeparator: ',' | '.';
-  onDecimalSeparatorChange: (separator: ',' | '.') => void;
-  currentTheme: Theme;
-  onThemeChange: (theme: Theme) => void;
-  onClose: () => void;
-  standards: Standard[];
-  onStandardsChange: (standards: Standard[]) => void;
-  savedCompanies: Company[];
-  onSaveCompanies: (companies: Company[]) => void;
-  savedPeople: Person[];
-  onSavePeople: (people: Person[]) => void;
-  onCreateCustomer: (...args: any) => void;
+  view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations'
+  onViewChange: (view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations') => void
+  showHiddenIds: boolean
+  currentLanguage: Language
+  onLanguageChange: (language: Language) => void
+  onShowHiddenIdsChange: (show: boolean) => void
+  decimalSeparator: ',' | '.'
+  onDecimalSeparatorChange: (separator: ',' | '.') => void
+  currentTheme: Theme
+  onThemeChange: (theme: Theme) => void
+  onClose: () => void
+  standards: Standard[]
+  onStandardsChange: (standards: Standard[]) => void
+  savedCompanies: Company[]
+  onSaveCompanies: (companies: Company[]) => void
+  savedPeople: Person[]
+  onSavePeople: (people: Person[]) => void
+  onCreateCustomer: (...args: any) => void
 }
 
 const Settings: React.FC<SettingsProps> = ({
@@ -94,7 +94,7 @@ const Settings: React.FC<SettingsProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Settings;
+export default Settings

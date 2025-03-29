@@ -1,95 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Link, Image } from 'lucide-react';
-import { generateHiddenId } from '../../utils/generateHiddenId';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../types/theme'
+import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Plus, Edit2, X, Link, Image } from 'lucide-react'
+import { generateHiddenId } from '../../utils/generateHiddenId'
 
 interface SubstructuresManagementProps {
-  currentTheme: Theme;
-  onBack: () => void;
+  currentTheme: Theme
+  onBack: () => void
 }
 
 interface Substructure {
-  id: string;
-  manufacturer: string;
-  system: string;
-  version: string;
-  type: 'roof' | 'field';
-  link?: string;
-  schematic?: string;
-  example?: string;
+  id: string
+  manufacturer: string
+  system: string
+  version: string
+  type: 'roof' | 'field'
+  link?: string
+  schematic?: string
+  example?: string
 }
 
 const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ currentTheme, onBack }) => {
-  const [substructures, setSubstructures] = useState<Substructure[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showNewForm, setShowNewForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState<Partial<Substructure>>({});
+  const [substructures, setSubstructures] = useState<Substructure[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showNewForm, setShowNewForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [formValues, setFormValues] = useState<Partial<Substructure>>({})
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
   const loadData = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase.from('substructures').select('*').order('created_at', { ascending: true });
+      setLoading(true)
+      const { data, error } = await supabase.from('substructures').select('*').order('created_at', { ascending: true })
 
-      if (error) throw error;
-      setSubstructures(data || []);
+      if (error) throw error
+      setSubstructures(data || [])
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error('Error loading data:', err)
+      setError('Failed to load data')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSubmit = async () => {
     try {
       if (!formValues.manufacturer || !formValues.system || !formValues.version || !formValues.type) {
-        setError('Please fill in all required fields');
-        return;
+        setError('Please fill in all required fields')
+        return
       }
 
       const data = {
         ...formValues,
         hidden_id: generateHiddenId(),
-      };
-
-      if (editingId) {
-        const { error } = await supabase.from('substructures').update(data).eq('id', editingId);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('substructures').insert(data);
-
-        if (error) throw error;
       }
 
-      await loadData();
-      setShowNewForm(false);
-      setEditingId(null);
-      setFormValues({});
+      if (editingId) {
+        const { error } = await supabase.from('substructures').update(data).eq('id', editingId)
+
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('substructures').insert(data)
+
+        if (error) throw error
+      }
+
+      await loadData()
+      setShowNewForm(false)
+      setEditingId(null)
+      setFormValues({})
     } catch (err) {
-      console.error('Error saving substructure:', err);
-      setError('Failed to save substructure');
+      console.error('Error saving substructure:', err)
+      setError('Failed to save substructure')
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase.from('substructures').delete().eq('id', id);
+      const { error } = await supabase.from('substructures').delete().eq('id', id)
 
-      if (error) throw error;
-      await loadData();
+      if (error) throw error
+      await loadData()
     } catch (err) {
-      console.error('Error deleting substructure:', err);
-      setError('Failed to delete substructure');
+      console.error('Error deleting substructure:', err)
+      setError('Failed to delete substructure')
     }
-  };
+  }
 
   return (
     <div className="p-8">
@@ -192,9 +192,9 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => {
-                    setShowNewForm(false);
-                    setEditingId(null);
-                    setFormValues({});
+                    setShowNewForm(false)
+                    setEditingId(null)
+                    setFormValues({})
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
@@ -232,9 +232,9 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    setEditingId(substructure.id);
-                    setFormValues(substructure);
-                    setShowNewForm(true);
+                    setEditingId(substructure.id)
+                    setFormValues(substructure)
+                    setShowNewForm(true)
                   }}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
@@ -284,7 +284,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SubstructuresManagement;
+export default SubstructuresManagement

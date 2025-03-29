@@ -1,134 +1,134 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project, Zone, Datapoint } from '../../types/projects';
-import { Standard } from '../../types/standards';
-import { FileText, ChevronRight, Download, Eye, History, Building2, User, Calendar, Info } from 'lucide-react';
-import { fetchReports } from '../../services/reports';
-import AnalysisReport from '../analysis/AnalysisReport';
-import { getCurrentVersion } from '../../services/versions';
-import { supabase } from '../../lib/supabase';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Project, Zone, Datapoint } from '../../types/projects'
+import { Standard } from '../../types/standards'
+import { FileText, ChevronRight, Download, Eye, History, Building2, User, Calendar, Info } from 'lucide-react'
+import { fetchReports } from '../../services/reports'
+import AnalysisReport from '../analysis/AnalysisReport'
+import { getCurrentVersion } from '../../services/versions'
+import { supabase } from '../../lib/supabase'
 
 interface OutputPanelProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  projects: Project[];
-  standards: Standard[];
+  currentTheme: Theme
+  currentLanguage: Language
+  projects: Project[]
+  standards: Standard[]
 }
 
 interface Report {
-  id: string;
-  hiddenId: string;
-  projectId: string;
-  zoneId: string;
-  standardId: string;
-  createdAt: string;
+  id: string
+  hiddenId: string
+  projectId: string
+  zoneId: string
+  standardId: string
+  createdAt: string
   versions: {
-    id: string;
-    versionNumber: number;
-    totalRating: number;
-    classification: string;
-    createdAt: string;
-  }[];
+    id: string
+    versionNumber: number
+    totalRating: number
+    classification: string
+    createdAt: string
+  }[]
 }
 
 const OutputPanel: React.FC<OutputPanelProps> = ({ currentTheme, currentLanguage, projects, standards }) => {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState<any>(null);
-  const [selectedNorm, setSelectedNorm] = useState<any>(null);
-  const [currentVersion, setCurrentVersion] = React.useState<string>('1.0.0');
+  const [reports, setReports] = useState<Report[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedReport, setSelectedReport] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [selectedVersion, setSelectedVersion] = useState<any>(null)
+  const [selectedNorm, setSelectedNorm] = useState<any>(null)
+  const [currentVersion, setCurrentVersion] = React.useState<string>('1.0.0')
   const [analyst, setAnalyst] = useState<{
-    name: string;
-    title?: string;
-    email?: string;
-  } | null>(null);
-  const t = useTranslation(currentLanguage);
+    name: string
+    title?: string
+    email?: string
+  } | null>(null)
+  const t = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadVersion = async () => {
-      const version = await getCurrentVersion();
+      const version = await getCurrentVersion()
       if (version) {
-        setCurrentVersion(version.version);
+        setCurrentVersion(version.version)
       }
-    };
-    loadVersion();
+    }
+    loadVersion()
 
     // Get current user info
     const loadUserInfo = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await supabase.auth.getUser()
       if (user) {
         setAnalyst({
           name: user.user_metadata?.display_name || user.email || '',
           title: user.user_metadata?.title || '',
           email: user.email || '',
-        });
+        })
       }
-    };
-    loadUserInfo();
-  }, []);
+    }
+    loadUserInfo()
+  }, [])
 
   useEffect(() => {
-    loadReports();
-  }, []);
+    loadReports()
+  }, [])
 
   const loadReports = async () => {
     try {
-      setLoading(true);
-      const data = await fetchReports();
-      setReports(data);
+      setLoading(true)
+      const data = await fetchReports()
+      setReports(data)
     } catch (err) {
-      console.error('Error loading reports:', err);
-      setError('Failed to load reports');
+      console.error('Error loading reports:', err)
+      setError('Failed to load reports')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getProjectName = (projectId: string) => {
-    return projects.find((p) => p.id === projectId)?.name || 'Unknown Project';
-  };
+    return projects.find((p) => p.id === projectId)?.name || 'Unknown Project'
+  }
 
   const getZoneName = (projectId: string, zoneId: string) => {
-    const project = projects.find((p) => p.id === projectId);
-    if (!project) return 'Unknown Zone';
+    const project = projects.find((p) => p.id === projectId)
+    if (!project) return 'Unknown Zone'
 
     for (const field of project.fields) {
-      const zone = field.zones.find((z) => z.id === zoneId);
-      if (zone) return zone.name;
+      const zone = field.zones.find((z) => z.id === zoneId)
+      if (zone) return zone.name
     }
-    return 'Unknown Zone';
-  };
+    return 'Unknown Zone'
+  }
 
   const getStandardName = (standardId: string) => {
-    return standards.find((s) => s.id === standardId)?.name || 'Unknown Standard';
-  };
+    return standards.find((s) => s.id === standardId)?.name || 'Unknown Standard'
+  }
 
   const handleShowPreview = (report: Report, version: any) => {
-    setSelectedVersion(version);
-    setShowPreview(true);
-  };
+    setSelectedVersion(version)
+    setShowPreview(true)
+  }
 
   if (showPreview && selectedVersion) {
-    const project = projects.find((p) => p.id === selectedVersion.projectId);
-    const zone = project?.fields.flatMap((f) => f.zones).find((z) => z.id === selectedVersion.zoneId);
-    const standard = standards.find((s) => s.id === selectedVersion.standardId);
+    const project = projects.find((p) => p.id === selectedVersion.projectId)
+    const zone = project?.fields.flatMap((f) => f.zones).find((z) => z.id === selectedVersion.zoneId)
+    const standard = standards.find((s) => s.id === selectedVersion.standardId)
 
     // Get all entered parameters
-    const enteredParameters = zone?.datapoints?.[0]?.values || {};
+    const enteredParameters = zone?.datapoints?.[0]?.values || {}
     const parameterDescriptions = Object.entries(enteredParameters).map(([key, value]) => {
-      const param = standard?.parameters?.find((p) => p.parameterId === key);
+      const param = standard?.parameters?.find((p) => p.parameterId === key)
       return {
         code: param?.parameterCode || key,
         value: value,
         unit: param?.unit,
-      };
-    });
+      }
+    })
 
     return (
       <div className="p-6 max-w-[210mm] mx-auto bg-theme">
@@ -238,15 +238,15 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ currentTheme, currentLanguage
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (loading) {
-    return <div className="p-6 text-center text-secondary">{t('output.loading')}</div>;
+    return <div className="p-6 text-center text-secondary">{t('output.loading')}</div>
   }
 
   if (error) {
-    return <div className="p-6 text-center text-accent-primary">{error}</div>;
+    return <div className="p-6 text-center text-accent-primary">{error}</div>
   }
 
   return (
@@ -335,7 +335,7 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ currentTheme, currentLanguage
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OutputPanel;
+export default OutputPanel

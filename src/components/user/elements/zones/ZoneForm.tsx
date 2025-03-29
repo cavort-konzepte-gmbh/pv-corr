@@ -1,62 +1,62 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Plus } from 'lucide-react';
-import { createZone } from '../../../../services/zones';
-import { fetchProjects } from '../../../../services/projects';
-import { Language, useTranslation } from '../../../../types/language';
-import { Button } from '@/components/ui/button';
-import { Label } from '@radix-ui/react-label';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react'
+import { Theme } from '../../../../types/theme'
+import { Plus } from 'lucide-react'
+import { createZone } from '../../../../services/zones'
+import { fetchProjects } from '../../../../services/projects'
+import { Language, useTranslation } from '../../../../types/language'
+import { Button } from '@/components/ui/button'
+import { Label } from '@radix-ui/react-label'
+import { Input } from '@/components/ui/input'
 
 interface ZoneFormProps {
-  currentTheme: Theme;
-  selectedFieldId: string;
-  onProjectsChange: (projects: Project[]) => void;
-  currentLanguage: Language;
+  currentTheme: Theme
+  selectedFieldId: string
+  onProjectsChange: (projects: Project[]) => void
+  currentLanguage: Language
 }
 
 const ZoneForm: React.FC<ZoneFormProps> = ({ currentTheme, selectedFieldId, onProjectsChange, currentLanguage }) => {
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(false)
   const [newZone, setNewZone] = useState({
     name: '',
     latitude: '',
     longitude: '',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
+  })
+  const [error, setError] = useState<string | null>(null)
+  const translation = useTranslation(currentLanguage)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
     setNewZone((previous) => ({
       ...previous,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleReset = () => {
     setNewZone({
       name: '',
       latitude: '',
       longitude: '',
-    });
-    setShowForm(false);
-  };
+    })
+    setShowForm(false)
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!newZone || !selectedFieldId) return;
+    event.preventDefault()
+    if (!newZone || !selectedFieldId) return
     try {
-      await createZone(selectedFieldId, newZone);
-      const updatedProjects = await fetchProjects();
+      await createZone(selectedFieldId, newZone)
+      const updatedProjects = await fetchProjects()
       if (updatedProjects) {
-        onProjectsChange(updatedProjects);
+        onProjectsChange(updatedProjects)
       }
     } catch (err) {
-      console.error('Error creating zone:', err);
-      setError('Failed to create zone');
+      console.error('Error creating zone:', err)
+      setError('Failed to create zone')
     }
-    handleReset();
-  };
+    handleReset()
+  }
 
   return (
     <>
@@ -112,7 +112,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({ currentTheme, selectedFieldId, onPr
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default ZoneForm;
+export default ZoneForm

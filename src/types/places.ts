@@ -1,16 +1,16 @@
 export interface AddressField {
-  id: string;
-  label: string;
-  type: 'text' | 'number';
-  required: boolean;
-  placeholder?: string;
+  id: string
+  label: string
+  type: 'text' | 'number'
+  required: boolean
+  placeholder?: string
 }
 
 export interface Country {
-  id: string;
-  name: string;
-  code: string;
-  fields: AddressField[];
+  id: string
+  name: string
+  code: string
+  fields: AddressField[]
 }
 
 export const COUNTRIES: Country[] = [
@@ -81,4 +81,4 @@ export const COUNTRIES: Country[] = [
       { id: 'postal_code', label: 'Postal Code', type: 'text', required: true },
     ],
   },
-];
+]

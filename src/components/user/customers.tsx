@@ -1,18 +1,18 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Customer } from '../../types/customers';
-import { ChevronRight } from 'lucide-react';
-import CustomerList from './elements/customers/CustomerList';
-import { Person } from '../../types/people';
-import { Company } from '../../types/companies';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Customer } from '../../types/customers'
+import { ChevronRight } from 'lucide-react'
+import CustomerList from './elements/customers/CustomerList'
+import { Person } from '../../types/people'
+import { Company } from '../../types/companies'
 
 interface CustomersProps {
-  currentTheme: Theme;
-  customers: Customer[];
-  savedPeople: Person[];
-  savedCompanies: Company[];
-  onSelectCustomer: (customerId: string) => void;
-  onSelectUncategorized: () => void;
+  currentTheme: Theme
+  customers: Customer[]
+  savedPeople: Person[]
+  savedCompanies: Company[]
+  onSelectCustomer: (customerId: string) => void
+  onSelectUncategorized: () => void
 }
 
 const Customers: React.FC<CustomersProps> = ({
@@ -45,7 +45,7 @@ const Customers: React.FC<CustomersProps> = ({
         onSelectCustomer={onSelectCustomer}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Customers;
+export default Customers

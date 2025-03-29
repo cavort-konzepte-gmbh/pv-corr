@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Language, LANGUAGES } from '../../../../types/language';
-import { useTranslation } from '../../../../types/language';
-import { updateUserSettings } from '../../../../services/userSettings';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react'
+import { Language, LANGUAGES } from '../../../../types/language'
+import { useTranslation } from '../../../../types/language'
+import { updateUserSettings } from '../../../../services/userSettings'
+import { Button } from '@/components/ui/button'
 
 interface GeneralSettingsProps {
-  currentLanguage: Language;
-  onLanguageChange: (language: Language) => void;
-  decimalSeparator: ',' | '.';
-  onDecimalSeparatorChange: (separator: ',' | '.') => void;
-  showHiddenIds: boolean;
-  onShowHiddenIdsChange: (show: boolean) => void;
-  currentTheme: any;
-  onThemeChange: (theme: string) => void;
+  currentLanguage: Language
+  onLanguageChange: (language: Language) => void
+  decimalSeparator: ',' | '.'
+  onDecimalSeparatorChange: (separator: ',' | '.') => void
+  showHiddenIds: boolean
+  onShowHiddenIdsChange: (show: boolean) => void
+  currentTheme: any
+  onThemeChange: (theme: string) => void
 }
 
 const GeneralSettings: React.FC<GeneralSettingsProps> = ({
@@ -25,12 +25,12 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   currentTheme,
   onThemeChange,
 }) => {
-  const t = useTranslation(currentLanguage);
-  const [updating, setUpdating] = useState(false);
+  const t = useTranslation(currentLanguage)
+  const [updating, setUpdating] = useState(false)
 
   const handleSettingChange = async (key: string, value: any) => {
-    if (updating) return;
-    setUpdating(true);
+    if (updating) return
+    setUpdating(true)
 
     try {
       // Update settings through service
@@ -42,24 +42,24 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
             : key === 'show_hidden_ids'
               ? 'showHiddenIds'
               : key]: value,
-      });
+      })
 
       if (!success) {
-        throw new Error('Failed to update settings');
+        throw new Error('Failed to update settings')
       }
 
       // Local state will be updated via userSettingsLoaded event
     } catch (err) {
-      console.error('Error updating user setting:', err);
+      console.error('Error updating user setting:', err)
     } finally {
-      setUpdating(false);
+      setUpdating(false)
     }
-  };
+  }
 
   const handleChangeTheme = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onThemeChange(event.target.value);
-    handleSettingChange('theme_id', event.target.value);
-  };
+    onThemeChange(event.target.value)
+    handleSettingChange('theme_id', event.target.value)
+  }
 
   return (
     <div className="text-card-foreground space-y-4">
@@ -135,7 +135,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         <span className="text-xs">Select the theme</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default GeneralSettings;
+export default GeneralSettings

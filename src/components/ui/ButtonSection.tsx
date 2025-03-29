@@ -1,14 +1,14 @@
 interface ButtonSectionProps {
-  view: string;
-  match: string;
-  children: React.ReactNode;
-  onClick: () => void;
-  className?: string;
+  view: string
+  match: string
+  children: React.ReactNode
+  onClick: () => void
+  className?: string
 }
 
 export const ButtonSection = ({ children, view, match, onClick, className }: ButtonSectionProps) => {
-  const isActive = view === match;
-  const classNameActive = isActive ? '!text-primary-foreground !bg-primary' : '';
+  const isActive = view === match
+  const classNameActive = isActive ? '!text-primary-foreground !bg-primary' : ''
   return (
     <button
       onClick={onClick}
@@ -16,5 +16,5 @@ export const ButtonSection = ({ children, view, match, onClick, className }: But
     >
       {children}
     </button>
-  );
-};
+  )
+}

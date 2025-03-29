@@ -1,18 +1,18 @@
 export interface DIN50929Parameter {
-  id: string;
-  code: string;
+  id: string
+  code: string
   name: {
-    en: string;
-    es: string;
-    de: string;
-  };
-  unit: string;
+    en: string
+    es: string
+    de: string
+  }
+  unit: string
   ranges: {
-    min: number | string;
-    max?: number | string;
-    rating: number;
-  }[];
-  minMax: string;
+    min: number | string
+    max?: number | string
+    rating: number
+  }[]
+  minMax: string
 }
 
 export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
@@ -191,4 +191,4 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     ],
     minMax: 'n.a.',
   },
-];
+]

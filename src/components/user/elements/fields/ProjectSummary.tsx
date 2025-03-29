@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Project } from '../../../../types/projects';
-import { Person } from '../../../../types/people';
-import { Company } from '../../../../types/companies';
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from 'lucide-react';
-import MediaDialog from '../../../shared/MediaDialog';
-import { Language, useTranslation } from '../../../../types/language';
-import { updateProject, fetchProjects } from '../../../../services/projects';
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react'
+import { Theme } from '../../../../types/theme'
+import { Project } from '../../../../types/projects'
+import { Person } from '../../../../types/people'
+import { Company } from '../../../../types/companies'
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from 'lucide-react'
+import MediaDialog from '../../../shared/MediaDialog'
+import { Language, useTranslation } from '../../../../types/language'
+import { updateProject, fetchProjects } from '../../../../services/projects'
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 interface ProjectSummaryProps {
-  project: Project;
-  manager?: Person;
-  company?: Company;
-  currentTheme: Theme;
-  currentLanguage: Language;
-  savedPeople: Person[];
-  onProjectsChange: (projects: Project[]) => void;
-  isExpanded?: boolean;
-  onToggle?: () => void;
-  selectedCustomerId: string | null;
+  project: Project
+  manager?: Person
+  company?: Company
+  currentTheme: Theme
+  currentLanguage: Language
+  savedPeople: Person[]
+  onProjectsChange: (projects: Project[]) => void
+  isExpanded?: boolean
+  onToggle?: () => void
+  selectedCustomerId: string | null
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
@@ -36,15 +36,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   onToggle,
   selectedCustomerId,
 }) => {
-  const translation = useTranslation(currentLanguage);
-  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const translation = useTranslation(currentLanguage)
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
   const [editValues, setEditValues] = useState({
     managerId: project.managerId || '',
     typeProject: project.typeProject || 'field',
     latitude: project.latitude || '',
     longitude: project.longitude || '',
-  });
+  })
 
   const handleSave = async () => {
     try {
@@ -54,15 +54,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         typeProject: editValues.typeProject,
         latitude: editValues.latitude,
         longitude: editValues.longitude,
-      });
+      })
 
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
-      setIsEditing(false);
+      const updatedProjects = await fetchProjects()
+      onProjectsChange(updatedProjects)
+      setIsEditing(false)
     } catch (err) {
-      console.error('Error updating project:', err);
+      console.error('Error updating project:', err)
     }
-  };
+  }
 
   return (
     <div className="mb-8">
@@ -102,8 +102,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              handleSave();
+                              e.stopPropagation()
+                              handleSave()
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -111,8 +111,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              setIsEditing(false);
+                              e.stopPropagation()
+                              setIsEditing(false)
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -123,8 +123,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              setShowMediaDialog(project.id);
+                              e.stopPropagation()
+                              setShowMediaDialog(project.id)
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -132,8 +132,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation();
-                              setIsEditing(true);
+                              e.stopPropagation()
+                              setIsEditing(true)
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -240,7 +240,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ProjectSummary;
+export default ProjectSummary

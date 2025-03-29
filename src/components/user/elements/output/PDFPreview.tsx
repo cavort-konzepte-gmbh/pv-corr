@@ -1,28 +1,28 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Language, useTranslation } from '../../../../types/language';
-import { Project, Zone } from '../../../../types/projects';
-import { FileText, Calendar, User, Building2 } from 'lucide-react';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
+import { Language, useTranslation } from '../../../../types/language'
+import { Project, Zone } from '../../../../types/projects'
+import { FileText, Calendar, User, Building2 } from 'lucide-react'
 
 interface PDFPreviewProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  project?: Project;
-  zone?: Zone;
-  norm?: any;
+  currentTheme: Theme
+  currentLanguage: Language
+  project?: Project
+  zone?: Zone
+  norm?: any
   analyst?: {
-    name: string;
-    title?: string;
-    email?: string;
-  };
-  onBack: () => void;
+    name: string
+    title?: string
+    email?: string
+  }
+  onBack: () => void
 }
 
 const PDFPreview: React.FC<PDFPreviewProps> = ({ currentTheme, currentLanguage, project, zone, norm, analyst, onBack }) => {
-  const t = useTranslation(currentLanguage);
+  const t = useTranslation(currentLanguage)
 
   if (!project || !zone || !norm) {
-    return <div className="p-6 text-center text-secondary">{t('analysis.select_data')}</div>;
+    return <div className="p-6 text-center text-secondary">{t('analysis.select_data')}</div>
   }
 
   return (
@@ -92,10 +92,10 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ currentTheme, currentLanguage, 
             <tbody>
               {zone.datapoints?.[0]?.values &&
                 Object.entries(zone.datapoints[0].values).map(([key, value]) => {
-                  const parameter = norm.parameters?.find((p) => p.parameter_code === key);
-                  const rating = zone.datapoints?.[0]?.ratings?.[key];
+                  const parameter = norm.parameters?.find((p) => p.parameter_code === key)
+                  const rating = zone.datapoints?.[0]?.ratings?.[key]
 
-                  if (!parameter) return null;
+                  if (!parameter) return null
 
                   return (
                     <tr key={key} className="border-b">
@@ -114,7 +114,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ currentTheme, currentLanguage, 
                         </div>
                       </td>
                     </tr>
-                  );
+                  )
                 })}
             </tbody>
           </table>
@@ -161,7 +161,7 @@ const PDFPreview: React.FC<PDFPreviewProps> = ({ currentTheme, currentLanguage, 
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PDFPreview;
+export default PDFPreview

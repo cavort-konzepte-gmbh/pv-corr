@@ -1,65 +1,65 @@
-import React, { useState } from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project, Zone } from '../../types/projects';
-import { FileText, ChevronRight, Download, Eye, History } from 'lucide-react';
-import PDFPreview from './elements/output/PDFPreview';
-import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Button } from '../ui/button';
+import React, { useState } from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Project, Zone } from '../../types/projects'
+import { FileText, ChevronRight, Download, Eye, History } from 'lucide-react'
+import PDFPreview from './elements/output/PDFPreview'
+import { useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { supabase } from '../../lib/supabase'
+import { Button } from '../ui/button'
 
 interface OutputProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  projects: Project[];
+  currentTheme: Theme
+  currentLanguage: Language
+  projects: Project[]
 }
 
 interface Report {
-  id: string;
-  hiddenId: string;
-  projectId: string;
-  zoneId: string;
-  normId: string;
-  createdAt: string;
+  id: string
+  hiddenId: string
+  projectId: string
+  zoneId: string
+  normId: string
+  createdAt: string
   versions: {
-    id: string;
-    versionNumber: number;
-    totalRating: number;
-    classification: string;
-    createdAt: string;
-  }[];
+    id: string
+    versionNumber: number
+    totalRating: number
+    classification: string
+    createdAt: string
+  }[]
 }
 
 const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects }) => {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState<any>(null);
-  const [selectedNorm, setSelectedNorm] = useState<any>(null);
-  const location = useLocation();
-  const t = useTranslation(currentLanguage);
+  const [reports, setReports] = useState<Report[]>([])
+  const [selectedReport, setSelectedReport] = useState<string | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
+  const [selectedVersion, setSelectedVersion] = useState<any>(null)
+  const [selectedNorm, setSelectedNorm] = useState<any>(null)
+  const location = useLocation()
+  const t = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadPreview = async () => {
-      const params = new URLSearchParams(location.search);
-      const preview = params.get('preview');
-      const projectId = params.get('projectId');
-      const zoneId = params.get('zoneId');
-      const normId = params.get('normId');
+      const params = new URLSearchParams(location.search)
+      const preview = params.get('preview')
+      const projectId = params.get('projectId')
+      const zoneId = params.get('zoneId')
+      const normId = params.get('normId')
 
       if (preview === 'true' && projectId && zoneId && normId) {
         try {
           // Load norm data
-          const { data: norm, error: normError } = await supabase.from('norms').select('*').eq('id', normId).single();
+          const { data: norm, error: normError } = await supabase.from('norms').select('*').eq('id', normId).single()
 
-          if (normError) throw normError;
-          setSelectedNorm(norm);
+          if (normError) throw normError
+          setSelectedNorm(norm)
 
           // Get user info from auth
           const {
             data: { user },
-          } = await supabase.auth.getUser();
+          } = await supabase.auth.getUser()
 
           setSelectedVersion({
             projectId,
@@ -70,34 +70,34 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
               title: user?.user_metadata?.title || '',
               email: user?.email || '',
             },
-          });
-          setShowPreview(true);
+          })
+          setShowPreview(true)
         } catch (err) {
-          console.error('Error loading preview data:', err);
+          console.error('Error loading preview data:', err)
         }
       }
-    };
+    }
 
-    loadPreview();
-  }, [location.search]);
+    loadPreview()
+  }, [location.search])
 
   const getProjectName = (projectId: string) => {
-    return projects.find((p) => p.id === projectId)?.name || 'Unknown Project';
-  };
+    return projects.find((p) => p.id === projectId)?.name || 'Unknown Project'
+  }
   const getZoneName = (projectId: string, zoneId: string) => {
-    const project = projects.find((p) => p.id === projectId);
-    if (!project) return 'Unknown Zone';
+    const project = projects.find((p) => p.id === projectId)
+    if (!project) return 'Unknown Zone'
 
     for (const field of project.fields) {
-      const zone = field.zones.find((z) => z.id === zoneId);
-      if (zone) return zone.name;
+      const zone = field.zones.find((z) => z.id === zoneId)
+      if (zone) return zone.name
     }
-    return 'Unknown Zone';
-  };
+    return 'Unknown Zone'
+  }
 
   if (showPreview && selectedVersion) {
-    const project = projects.find((p) => p.id === selectedVersion.projectId);
-    const zone = project?.fields.flatMap((f) => f.zones).find((z) => z.id === selectedVersion.zoneId);
+    const project = projects.find((p) => p.id === selectedVersion.projectId)
+    const zone = project?.fields.flatMap((f) => f.zones).find((z) => z.id === selectedVersion.zoneId)
 
     return (
       <PDFPreview
@@ -108,12 +108,12 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
         norm={selectedNorm}
         analyst={selectedVersion.analyst}
         onBack={() => {
-          setShowPreview(false);
-          setSelectedVersion(null);
-          setSelectedNorm(null);
+          setShowPreview(false)
+          setSelectedVersion(null)
+          setSelectedNorm(null)
         }}
       />
-    );
+    )
   }
 
   return (
@@ -150,8 +150,8 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
                       title: 'Senior Analyst',
                       email: 'john@example.com',
                     },
-                  });
-                  setShowPreview(true);
+                  })
+                  setShowPreview(true)
                 }}
                 className="p-2 rounded hover:bg-opacity-80 text-secondary"
                 title={t('output.view_report')}
@@ -191,8 +191,8 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
                               title: 'Senior Analyst',
                               email: 'john@example.com',
                             },
-                          });
-                          setShowPreview(true);
+                          })
+                          setShowPreview(true)
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         title={t('output.view_version')}
@@ -208,7 +208,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Output;
+export default Output

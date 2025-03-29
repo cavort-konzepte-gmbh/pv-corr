@@ -1,41 +1,41 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../types/theme';
-import { Plus, Edit2, Save, X, Clock } from 'lucide-react';
-import { NotificationDuration, DURATION_OPTIONS } from '../../../types/security';
-import { generateHiddenId } from '../../../utils/generateHiddenId';
+import React, { useState } from 'react'
+import { Theme } from '../../../types/theme'
+import { Plus, Edit2, Save, X, Clock } from 'lucide-react'
+import { NotificationDuration, DURATION_OPTIONS } from '../../../types/security'
+import { generateHiddenId } from '../../../utils/generateHiddenId'
 
 interface ErrorNotificationsProps {
-  currentTheme: Theme;
+  currentTheme: Theme
 }
 
 const ErrorNotifications: React.FC<ErrorNotificationsProps> = ({ currentTheme }) => {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [formValues, setFormValues] = useState({
     name: '',
     description: '',
     duration: 'timed' as NotificationDuration,
     timeout: 5,
-  });
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     const notification = {
       id: `err-${notifications.length + 1}`,
       hidden_id: generateHiddenId(),
       type: 'error',
       ...formValues,
-    };
-    setNotifications([...notifications, notification]);
-    setShowForm(false);
+    }
+    setNotifications([...notifications, notification])
+    setShowForm(false)
     setFormValues({
       name: '',
       description: '',
       duration: 'timed',
       timeout: 5,
-    });
-  };
+    })
+  }
 
   return (
     <div className="p-6">
@@ -129,14 +129,14 @@ const ErrorNotifications: React.FC<ErrorNotificationsProps> = ({ currentTheme })
                 <button
                   type="button"
                   onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
+                    setShowForm(false)
+                    setEditingId(null)
                     setFormValues({
                       name: '',
                       description: '',
                       duration: 'timed',
                       timeout: 5,
-                    });
+                    })
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
@@ -168,14 +168,14 @@ const ErrorNotifications: React.FC<ErrorNotificationsProps> = ({ currentTheme })
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    setEditingId(notification.id);
+                    setEditingId(notification.id)
                     setFormValues({
                       name: notification.name,
                       description: notification.description,
                       duration: notification.duration,
                       timeout: notification.timeout || 5,
-                    });
-                    setShowForm(true);
+                    })
+                    setShowForm(true)
                   }}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
@@ -204,7 +204,7 @@ const ErrorNotifications: React.FC<ErrorNotificationsProps> = ({ currentTheme })
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ErrorNotifications;
+export default ErrorNotifications

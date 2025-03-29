@@ -1,14 +1,14 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Project } from '../../../../types/projects';
-import { Person } from '../../../../types/people';
-import { Company } from '../../../../types/companies';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
+import { Project } from '../../../../types/projects'
+import { Person } from '../../../../types/people'
+import { Company } from '../../../../types/companies'
 
 interface ProjectHeaderProps {
-  project: Project;
-  manager?: Person;
-  company?: Company;
-  currentTheme: Theme;
+  project: Project
+  manager?: Person
+  company?: Company
+  currentTheme: Theme
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, manager, company, currentTheme }) => {
@@ -28,7 +28,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, manager, company
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProjectHeader;
+export default ProjectHeader

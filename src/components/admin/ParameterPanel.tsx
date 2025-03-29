@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Language, useTranslation } from '../../types/language';
-import { Theme } from '../../types/theme';
-import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from '../../services/parameters';
-import { Edit2, Plus, Save, X, Code, Check } from 'lucide-react';
-import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { supabase } from '@/lib/supabase';
-import { Label } from '../ui/label';
-import { Button } from '../ui/button';
+import { useEffect, useState } from 'react'
+import { Language, useTranslation } from '../../types/language'
+import { Theme } from '../../types/theme'
+import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from '../../services/parameters'
+import { Edit2, Plus, Save, X, Code, Check } from 'lucide-react'
+import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler'
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
+import { supabase } from '@/lib/supabase'
+import { Label } from '../ui/label'
+import { Button } from '../ui/button'
 
 interface RatingLogicDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentTheme: Theme;
-  parameterId: string;
-  initialCode: string;
-  initialTestCases: string;
-  onSave: (code: string, testCases: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  currentTheme: Theme
+  parameterId: string
+  initialCode: string
+  initialTestCases: string
+  onSave: (code: string, testCases: string) => void
 }
 
 const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
@@ -28,24 +28,24 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
   initialTestCases,
   onSave,
 }) => {
-  const [code, setCode] = useState(initialCode || '');
-  const [testCases, setTestCases] = useState(initialTestCases || '');
-  const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState(initialCode || '')
+  const [testCases, setTestCases] = useState(initialTestCases || '')
+  const [error, setError] = useState<string | null>(null)
 
   const handleSave = () => {
     try {
       // Validate test cases JSON
       if (testCases) {
-        JSON.parse(testCases);
+        JSON.parse(testCases)
       }
-      onSave(code, testCases);
-      onClose();
+      onSave(code, testCases)
+      onClose()
     } catch (err) {
-      setError('Invalid JSON format for test cases');
+      setError('Invalid JSON format for test cases')
     }
-  };
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -86,61 +86,61 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface ParameterPanelProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
+  currentTheme: Theme
+  currentLanguage: Language
 }
 
 export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, currentLanguage }) => {
-  const t = useTranslation(currentLanguage);
-  const [parameters, setParameters] = useState<Parameter[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editingParameter, setEditingParameter] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-  const [isNewParameter, setIsNewParameter] = useState<boolean>(false);
-  const [editingRatingLogic, setEditingRatingLogic] = useState<string | null>(null);
-  const [newParameter, setNewParameter] = useState<Record<string, string>>({});
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [deleteConfirmName, setDeleteConfirmName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
+  const t = useTranslation(currentLanguage)
+  const [parameters, setParameters] = useState<Parameter[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editingParameter, setEditingParameter] = useState<string | null>(null)
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
+  const [isNewParameter, setIsNewParameter] = useState<boolean>(false)
+  const [editingRatingLogic, setEditingRatingLogic] = useState<string | null>(null)
+  const [newParameter, setNewParameter] = useState<Record<string, string>>({})
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [deleteConfirmName, setDeleteConfirmName] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const translation = useTranslation(currentLanguage)
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);
-        const fetchedParameters = await fetchParameters();
-        setParameters(fetchedParameters);
+        setLoading(true)
+        const fetchedParameters = await fetchParameters()
+        setParameters(fetchedParameters)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    load();
-  }, []);
+    }
+    load()
+  }, [])
 
   const handleChangeEditingValues = (name: string, value: string) => {
     setEditingValues((previous) => ({
       ...previous,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleChangeParameter = (name: string, value: string) => {
     setNewParameter((previous) => ({
       ...previous,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const resetValues = () => {
-    setEditingValues({});
-    setEditingParameter(null);
-  };
+    setEditingValues({})
+    setEditingParameter(null)
+  }
 
   const handleUpdateSaveParameter = async (parameter: any) => {
     if (editingParameter === parameter.id) {
@@ -148,76 +148,76 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         const updateData = {
           ...editingValues,
           orderNumber: parseFloat(editingValues.orderNumber) || 0,
-        };
-        await updateParameter(parameter.id, updateData);
-        const updatedParameters = await fetchParameters();
-        setParameters(updatedParameters);
+        }
+        await updateParameter(parameter.id, updateData)
+        const updatedParameters = await fetchParameters()
+        setParameters(updatedParameters)
       } catch (err) {
-        console.error('Error updating parameter:', err);
-        setError('Failed to update parameter');
+        console.error('Error updating parameter:', err)
+        setError('Failed to update parameter')
       }
-      const updatedParameters = await fetchParameters();
-      setParameters(updatedParameters);
-      resetValues();
+      const updatedParameters = await fetchParameters()
+      setParameters(updatedParameters)
+      resetValues()
     } else {
-      setEditingParameter(parameter.id);
-      setEditingValues(parameter);
-      setNewParameter({});
-      setIsNewParameter(false);
+      setEditingParameter(parameter.id)
+      setEditingValues(parameter)
+      setNewParameter({})
+      setIsNewParameter(false)
     }
-  };
+  }
 
   const handleDeleteParameter = async (parameterId: string) => {
     // Get parameter name for confirmation
-    const parameter = parameters.find((p) => p.id === parameterId);
-    if (!parameter) return;
+    const parameter = parameters.find((p) => p.id === parameterId)
+    if (!parameter) return
 
     // Only proceed if name matches
     if (deleteConfirmName !== parameter.name) {
-      setError('Parameter name does not match');
-      return;
+      setError('Parameter name does not match')
+      return
     }
 
-    await deleteParameter(parameterId);
-    const updatedParameters = await fetchParameters();
-    setParameters(updatedParameters);
-    setDeleteConfirm(null);
-    setDeleteConfirmName('');
-  };
+    await deleteParameter(parameterId)
+    const updatedParameters = await fetchParameters()
+    setParameters(updatedParameters)
+    setDeleteConfirm(null)
+    setDeleteConfirmName('')
+  }
 
   const handleOpenParameter = () => {
-    resetValues();
-    setIsNewParameter(true);
-  };
+    resetValues()
+    setIsNewParameter(true)
+  }
 
   const handleAddNewParameter = async () => {
     try {
       if (!newParameter.rangeType) {
-        setError('Range type is required');
-        return;
+        setError('Range type is required')
+        return
       }
 
       const createData = {
         ...newParameter,
         orderNumber: parseFloat(newParameter.orderNumber) || 0,
-      };
+      }
 
-      await createParameter(createData as any);
-      const updatedParameters = await fetchParameters();
-      setParameters(updatedParameters);
-      resetValues();
-      setNewParameter({});
-      setIsNewParameter(false);
+      await createParameter(createData as any)
+      const updatedParameters = await fetchParameters()
+      setParameters(updatedParameters)
+      resetValues()
+      setNewParameter({})
+      setIsNewParameter(false)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const handleCancelNewParameter = () => {
-    resetValues();
-    setNewParameter({});
-    setIsNewParameter(false);
-  };
+    resetValues()
+    setNewParameter({})
+    setIsNewParameter(false)
+  }
 
   return (
     <div className="p-6">
@@ -382,8 +382,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           {!editingParameter && (
                             <Button
                               onClick={() => {
-                                setDeleteConfirm(parameter.id);
-                                setDeleteConfirmName('');
+                                setDeleteConfirm(parameter.id)
+                                setDeleteConfirmName('')
                               }}
                               className="p-1 rounded hover:bg-opacity-80 "
                               variant="ghost"
@@ -518,13 +518,13 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
           parameterId={editingRatingLogic}
           initialCode={parameters.find((p) => p.id === editingRatingLogic)?.rating_logic_code || ''}
           initialTestCases={(() => {
-            const param = parameters.find((p) => p.id === editingRatingLogic);
-            if (!param?.rating_logic_test_cases) return '';
+            const param = parameters.find((p) => p.id === editingRatingLogic)
+            if (!param?.rating_logic_test_cases) return ''
             try {
-              return JSON.stringify(param.rating_logic_test_cases, null, 2);
+              return JSON.stringify(param.rating_logic_test_cases, null, 2)
             } catch (err) {
-              console.error('Error parsing test cases:', err);
-              return '';
+              console.error('Error parsing test cases:', err)
+              return ''
             }
           })()}
           onSave={async (code, testCases) => {
@@ -535,15 +535,15 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                   rating_logic_code: code,
                   rating_logic_test_cases: testCases ? JSON.parse(testCases) : null,
                 })
-                .eq('id', editingRatingLogic);
+                .eq('id', editingRatingLogic)
 
-              if (error) throw error;
-              const updatedParameters = await fetchParameters();
-              setParameters(updatedParameters);
-              setEditingRatingLogic(null);
+              if (error) throw error
+              const updatedParameters = await fetchParameters()
+              setParameters(updatedParameters)
+              setEditingRatingLogic(null)
             } catch (err) {
-              console.error('Error updating rating logic:', err);
-              setError('Failed to update rating logic');
+              console.error('Error updating rating logic:', err)
+              setError('Failed to update rating logic')
             }
           }}
         />
@@ -556,10 +556,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         onConfirmChange={setDeleteConfirmName}
         onConfirm={() => handleDeleteParameter(deleteConfirm!)}
         onCancel={() => {
-          setDeleteConfirm(null);
-          setDeleteConfirmName('');
+          setDeleteConfirm(null)
+          setDeleteConfirmName('')
         }}
       />
     </div>
-  );
-};
+  )
+}

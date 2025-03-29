@@ -1,28 +1,28 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Check } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Button } from '../ui/button';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Language, useTranslation } from '../../types/language'
+import { Check } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
+import { Button } from '../ui/button'
 
 interface AnalyseNormProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  selectedNormId: string | null;
-  onSelectNorm: (id: string) => void;
+  currentTheme: Theme
+  currentLanguage: Language
+  selectedNormId: string | null
+  onSelectNorm: (id: string) => void
 }
 
 const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage, selectedNormId, onSelectNorm }) => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [norms, setNorms] = useState<any[]>([]);
-  const t = useTranslation(currentLanguage);
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [norms, setNorms] = useState<any[]>([])
+  const t = useTranslation(currentLanguage)
 
   useEffect(() => {
     const loadNorms = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         const { data, error } = await supabase
           .from('norms')
           .select(
@@ -35,27 +35,27 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
             )
           `,
           )
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: true })
 
-        if (error) throw error;
-        setNorms(data || []);
+        if (error) throw error
+        setNorms(data || [])
       } catch (err) {
-        console.error('Error loading norms:', err);
-        setError('Failed to load norms');
+        console.error('Error loading norms:', err)
+        setError('Failed to load norms')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    loadNorms();
-  }, []);
+    loadNorms()
+  }, [])
 
   if (loading) {
-    return <div className="text-center p-4 text-secondary">{t('analysis.loading')}</div>;
+    return <div className="text-center p-4 text-secondary">{t('analysis.loading')}</div>
   }
 
   if (error) {
-    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>;
+    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
   }
 
   return (
@@ -80,7 +80,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AnalyseNorm;
+export default AnalyseNorm

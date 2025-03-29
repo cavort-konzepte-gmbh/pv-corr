@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { Theme } from '../../types/theme';
-import { Database, Table, ArrowLeft, ClipboardList, Wrench, Ruler, FlaskRound as Flask, Building2, GraduationCap } from 'lucide-react';
-import SubstructuresManagement from './SubstructuresManagement';
-import NeighboringStructuresManagement from './NeighboringStructuresManagement';
-import FoundationsManagement from './FoundationsManagement';
-import ExpertsManagement from './ExpertsManagement';
-import { ParameterPanel } from './ParameterPanel';
-import { MaterialsPanel } from './MaterialsPanel';
-import { NormsPanel } from './NormsPanel';
-import DatabaseOverview from './DatabaseOverview';
-import { Language } from '../../types/language';
-import { Button } from '../ui/button';
+import React, { useState } from 'react'
+import { Theme } from '../../types/theme'
+import { Database, Table, ArrowLeft, ClipboardList, Wrench, Ruler, FlaskRound as Flask, Building2, GraduationCap } from 'lucide-react'
+import SubstructuresManagement from './SubstructuresManagement'
+import NeighboringStructuresManagement from './NeighboringStructuresManagement'
+import FoundationsManagement from './FoundationsManagement'
+import ExpertsManagement from './ExpertsManagement'
+import { ParameterPanel } from './ParameterPanel'
+import { MaterialsPanel } from './MaterialsPanel'
+import { NormsPanel } from './NormsPanel'
+import DatabaseOverview from './DatabaseOverview'
+import { Language } from '../../types/language'
+import { Button } from '../ui/button'
 
 interface DatabaseManagementProps {
-  currentTheme: Theme;
-  onBack: () => void;
-  currentLanguage: Language;
+  currentTheme: Theme
+  onBack: () => void
+  currentLanguage: Language
 }
 
 const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, onBack, currentLanguage }) => {
   const [activeView, setActiveView] = useState<
     'overview' | 'parameters' | 'substructures' | 'norms' | 'constants' | 'materials' | 'foundations' | 'neighboring' | 'experts' | 'norms'
-  >('overview');
-  const [standards, setStandards] = useState([]);
+  >('overview')
+  const [standards, setStandards] = useState([])
 
   return (
     <div className="p-8">
@@ -178,7 +178,7 @@ const DatabaseManagement: React.FC<DatabaseManagementProps> = ({ currentTheme, o
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DatabaseManagement;
+export default DatabaseManagement

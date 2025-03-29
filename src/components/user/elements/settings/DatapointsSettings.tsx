@@ -1,46 +1,46 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Language } from '../../../../types/language';
-import { Standard } from '../../../../types/standards';
-import { Parameter } from '../../../../types/parameters';
-import { fetchParameters } from '../../../../services/parameters';
-import { Plus, Edit2, Save, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
+import { Language } from '../../../../types/language'
+import { Standard } from '../../../../types/standards'
+import { Parameter } from '../../../../types/parameters'
+import { fetchParameters } from '../../../../services/parameters'
+import { Plus, Edit2, Save, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface DatapointsSettingsProps {
-  currentTheme: Theme;
-  currentLanguage: Language;
-  standards: Standard[];
-  onStandardsChange: (standards: Standard[]) => void;
+  currentTheme: Theme
+  currentLanguage: Language
+  standards: Standard[]
+  onStandardsChange: (standards: Standard[]) => void
 }
 
 const DatapointsSettings: React.FC<DatapointsSettingsProps> = () => {
-  const [parameters, setParameters] = React.useState<Parameter[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [parameters, setParameters] = React.useState<Parameter[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     const loadParameters = async () => {
       try {
-        const fetchedParams = await fetchParameters();
-        setParameters(fetchedParams);
+        const fetchedParams = await fetchParameters()
+        setParameters(fetchedParams)
       } catch (err) {
-        console.error('Error loading parameters:', err);
-        setError('Failed to load parameters');
+        console.error('Error loading parameters:', err)
+        setError('Failed to load parameters')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    loadParameters();
-  }, []);
+    }
+    loadParameters()
+  }, [])
 
   if (loading) {
-    return <div className="text-center p-4 text-secondary">Loading parameters...</div>;
+    return <div className="text-center p-4 text-secondary">Loading parameters...</div>
   }
 
   if (error) {
-    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>;
+    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
   }
 
   return (
@@ -87,7 +87,7 @@ const DatapointsSettings: React.FC<DatapointsSettingsProps> = () => {
         </Table>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DatapointsSettings;
+export default DatapointsSettings

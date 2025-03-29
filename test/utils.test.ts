@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest';
-import { fromCamelCaseToSnakeCase, toCase } from '../src/utils/cases';
+import { describe, test, expect } from 'vitest'
+import { fromCamelCaseToSnakeCase, toCase } from '../src/utils/cases'
 
 describe('FromCamelCaseToSnakeCase', () => {
   const testCases = [
@@ -15,13 +15,13 @@ describe('FromCamelCaseToSnakeCase', () => {
       input: 'kebab-case',
       expected: 'kebab-case',
     },
-  ];
+  ]
   testCases.forEach(({ input, expected }) => {
     test(`should convert ${input} to ${expected}`, () => {
-      expect(fromCamelCaseToSnakeCase(input)).toBe(expected);
-    });
-  });
-});
+      expect(fromCamelCaseToSnakeCase(input)).toBe(expected)
+    })
+  })
+})
 
 describe('toCase function from camelCase to snakeCase', () => {
   const testCases = [
@@ -84,13 +84,13 @@ describe('toCase function from camelCase to snakeCase', () => {
         type_project: 'value',
       },
     },
-  ];
+  ]
   testCases.forEach(({ description, input, expected }) => {
     test(description, () => {
-      expect(toCase(input, 'snakeCase')).toEqual(expected);
-    });
-  });
-});
+      expect(toCase(input, 'snakeCase')).toEqual(expected)
+    })
+  })
+})
 
 describe('toCase function from snakeCase to camelCase', () => {
   const testCases = [
@@ -273,10 +273,10 @@ describe('toCase function from snakeCase to camelCase', () => {
         ],
       },
     },
-  ];
+  ]
   testCases.forEach(({ description, input, expected }) => {
     test(description, () => {
-      expect(toCase(input, 'camelCase')).toEqual(expected);
-    });
-  });
-});
+      expect(toCase(input, 'camelCase')).toEqual(expected)
+    })
+  })
+})

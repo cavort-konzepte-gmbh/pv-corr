@@ -1,104 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
-import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
-import { useKeyAction } from '../../hooks/useKeyAction';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '../ui/table';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import React, { useState, useEffect } from 'react'
+import { Theme } from '../../types/theme'
+import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react'
+import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler'
+import { useKeyAction } from '../../hooks/useKeyAction'
+import { generateHiddenId } from '../../utils/generateHiddenId'
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '../ui/table'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
 
 interface NeighboringStructure {
-  id: string;
-  hidden_id: string;
-  name: string;
-  depth?: number;
-  height?: number;
-  coating_material_id?: string;
-  coating_thickness?: number;
-  coating_thickness_unit?: 'mm' | 'μm';
-  construction_year?: number;
+  id: string
+  hidden_id: string
+  name: string
+  depth?: number
+  height?: number
+  coating_material_id?: string
+  coating_thickness?: number
+  coating_thickness_unit?: 'mm' | 'μm'
+  construction_year?: number
 }
 
 interface NeighboringStructuresManagementProps {
-  currentTheme: Theme;
-  onBack: () => void;
+  currentTheme: Theme
+  onBack: () => void
 }
 
 const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementProps> = ({ currentTheme, onBack }) => {
-  const [structures, setStructures] = useState<NeighboringStructure[]>([]);
-  const [materials, setMaterials] = useState<{ id: string; name: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingStructure, setEditingStructure] = useState<string | null>(null);
-  const [editingValues, setEditingValues] = useState<Partial<NeighboringStructure>>({});
-  const [isNewStructure, setIsNewStructure] = useState(false);
-  const [newStructure, setNewStructure] = useState<Partial<NeighboringStructure>>({});
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [structures, setStructures] = useState<NeighboringStructure[]>([])
+  const [materials, setMaterials] = useState<{ id: string; name: string }[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [editingStructure, setEditingStructure] = useState<string | null>(null)
+  const [editingValues, setEditingValues] = useState<Partial<NeighboringStructure>>({})
+  const [isNewStructure, setIsNewStructure] = useState(false)
+  const [newStructure, setNewStructure] = useState<Partial<NeighboringStructure>>({})
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [deleteConfirmName, setDeleteConfirmName] = useState('')
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
   useEffect(() => {
-    loadMaterials();
-  }, []);
+    loadMaterials()
+  }, [])
 
   const loadMaterials = async () => {
     try {
-      const { data, error } = await supabase.from('materials').select('id, name').order('name', { ascending: true });
+      const { data, error } = await supabase.from('materials').select('id, name').order('name', { ascending: true })
 
-      if (error) throw error;
-      setMaterials(data || []);
+      if (error) throw error
+      setMaterials(data || [])
     } catch (err) {
-      console.error('Error loading materials:', err);
-      setError('Failed to load materials');
+      console.error('Error loading materials:', err)
+      setError('Failed to load materials')
     }
-  };
+  }
 
   const loadData = async () => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase.from('neighboring_structures').select('*').order('created_at', { ascending: true });
+      setLoading(true)
+      const { data, error } = await supabase.from('neighboring_structures').select('*').order('created_at', { ascending: true })
 
-      if (error) throw error;
-      setStructures(data || []);
+      if (error) throw error
+      setStructures(data || [])
     } catch (err) {
-      console.error('Error loading neighboring structures:', err);
-      setError('Failed to load neighboring structures');
+      console.error('Error loading neighboring structures:', err)
+      setError('Failed to load neighboring structures')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleChangeEditingValues = (field: keyof NeighboringStructure, value: string) => {
     setEditingValues((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
+    }))
+  }
 
   const handleChangeNewStructure = (field: keyof NeighboringStructure, value: string) => {
     setNewStructure((prev) => ({
       ...prev,
       [field]: value,
-    }));
-  };
+    }))
+  }
 
   const resetValues = () => {
-    setEditingValues({});
-    setEditingStructure(null);
-  };
+    setEditingValues({})
+    setEditingStructure(null)
+  }
 
   const handleUpdateSaveStructure = async (structure: NeighboringStructure) => {
     if (editingStructure === structure.id) {
       try {
         // Validate required fields
         if (!editingValues.name?.trim()) {
-          setError('Name is required');
-          return;
+          setError('Name is required')
+          return
         }
 
         // Prepare update data with proper type conversions
@@ -110,60 +110,60 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
           coating_thickness: editingValues.coating_thickness ? parseFloat(editingValues.coating_thickness.toString()) : null,
           coating_thickness_unit: editingValues.coating_thickness_unit || null,
           construction_year: editingValues.construction_year ? parseInt(editingValues.construction_year.toString()) : null,
-        };
+        }
 
-        const { error } = await supabase.from('neighboring_structures').update(updateData).eq('id', structure.id);
+        const { error } = await supabase.from('neighboring_structures').update(updateData).eq('id', structure.id)
 
-        if (error) throw error;
-        await loadData();
-        resetValues();
+        if (error) throw error
+        await loadData()
+        resetValues()
       } catch (err) {
-        console.error('Error updating structure:', err);
-        setError('Failed to update structure');
+        console.error('Error updating structure:', err)
+        setError('Failed to update structure')
       }
     } else {
-      setEditingStructure(structure.id);
-      setEditingValues(structure);
-      setNewStructure({});
-      setIsNewStructure(false);
+      setEditingStructure(structure.id)
+      setEditingValues(structure)
+      setNewStructure({})
+      setIsNewStructure(false)
     }
-  };
+  }
 
   const handleDeleteStructure = async (structureId: string) => {
     try {
       // Get structure name for confirmation
-      const structure = structures.find((s) => s.id === structureId);
-      if (!structure) return;
+      const structure = structures.find((s) => s.id === structureId)
+      if (!structure) return
 
       // Only proceed if name matches
       if (deleteConfirmName !== structure.name) {
-        setError('Structure name does not match');
-        return;
+        setError('Structure name does not match')
+        return
       }
 
-      const { error } = await supabase.from('neighboring_structures').delete().eq('id', structureId);
+      const { error } = await supabase.from('neighboring_structures').delete().eq('id', structureId)
 
-      if (error) throw error;
-      setDeleteConfirm(null);
-      setDeleteConfirmName('');
-      await loadData();
+      if (error) throw error
+      setDeleteConfirm(null)
+      setDeleteConfirmName('')
+      await loadData()
     } catch (err) {
-      console.error('Error deleting structure:', err);
-      setError('Failed to delete structure');
+      console.error('Error deleting structure:', err)
+      setError('Failed to delete structure')
     }
-  };
+  }
 
   const handleOpenNewStructure = () => {
-    resetValues();
-    setIsNewStructure(true);
-  };
+    resetValues()
+    setIsNewStructure(true)
+  }
 
   const handleAddNewStructure = async () => {
     try {
       // Validate required fields
       if (!newStructure.name?.trim()) {
-        setError('Name is required');
-        return;
+        setError('Name is required')
+        return
       }
 
       // Prepare structure data with proper type conversions
@@ -176,39 +176,39 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
         coating_thickness_unit: newStructure.coating_thickness_unit || null,
         construction_year: newStructure.construction_year ? parseInt(newStructure.construction_year.toString()) : null,
         hidden_id: generateHiddenId(),
-      };
+      }
 
-      const { error } = await supabase.from('neighboring_structures').insert(structureData);
+      const { error } = await supabase.from('neighboring_structures').insert(structureData)
 
-      if (error) throw error;
-      await loadData();
-      resetValues();
-      setNewStructure({});
-      setIsNewStructure(false);
+      if (error) throw error
+      await loadData()
+      resetValues()
+      setNewStructure({})
+      setIsNewStructure(false)
     } catch (err) {
-      console.error('Error creating structure:', err);
-      setError('Failed to create structure');
+      console.error('Error creating structure:', err)
+      setError('Failed to create structure')
     }
-  };
+  }
 
   const handleCancelNewStructure = () => {
-    resetValues();
-    setNewStructure({});
-    setIsNewStructure(false);
-  };
+    resetValues()
+    setNewStructure({})
+    setIsNewStructure(false)
+  }
 
   useKeyAction(
     () => {
       if (editingStructure) {
-        handleUpdateSaveStructure(structures.find((s) => s.id === editingStructure)!);
+        handleUpdateSaveStructure(structures.find((s) => s.id === editingStructure)!)
       } else if (isNewStructure) {
-        handleAddNewStructure();
+        handleAddNewStructure()
       }
     },
     editingStructure !== null || isNewStructure,
     'Enter',
     500,
-  );
+  )
 
   return (
     <div className="p-8">
@@ -256,8 +256,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                             isEditing={true}
                             onSave={() => handleUpdateSaveStructure(structure)}
                             onCancel={() => {
-                              setEditingStructure(null);
-                              setEditingValues({});
+                              setEditingStructure(null)
+                              setEditingValues({})
                             }}
                           >
                             <Input
@@ -379,8 +379,8 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           {!editingStructure && (
                             <Button
                               onClick={() => {
-                                setDeleteConfirm(structure.id);
-                                setDeleteConfirmName('');
+                                setDeleteConfirm(structure.id)
+                                setDeleteConfirmName('')
                               }}
                               className="p-1 rounded hover:bg-opacity-80"
                               variant="ghost"
@@ -497,12 +497,12 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
         onConfirmChange={setDeleteConfirmName}
         onConfirm={() => handleDeleteStructure(deleteConfirm!)}
         onCancel={() => {
-          setDeleteConfirm(null);
-          setDeleteConfirmName('');
+          setDeleteConfirm(null)
+          setDeleteConfirmName('')
         }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default NeighboringStructuresManagement;
+export default NeighboringStructuresManagement

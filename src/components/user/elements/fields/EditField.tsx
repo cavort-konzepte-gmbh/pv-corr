@@ -1,49 +1,49 @@
-import { Folder } from 'lucide-react';
-import React, { Dispatch, SetStateAction, useState } from 'react';
-import { updateField } from '../../../../services/fields';
-import { fetchProjects } from '../../../../services/projects';
-import { Language, useTranslation } from '../../../../types/language';
-import { Label } from '@radix-ui/react-label';
-import { Button } from '@/components/ui/button';
+import { Folder } from 'lucide-react'
+import React, { Dispatch, SetStateAction, useState } from 'react'
+import { updateField } from '../../../../services/fields'
+import { fetchProjects } from '../../../../services/projects'
+import { Language, useTranslation } from '../../../../types/language'
+import { Label } from '@radix-ui/react-label'
+import { Button } from '@/components/ui/button'
 
 interface EditFieldProps {
   field: {
-    id: string;
-    name: string;
-    latitude: string;
-    longitude: string;
-    has_fence: string;
-  };
-  isEditingCoordinates: boolean;
-  setShowForm: Dispatch<SetStateAction<boolean>>;
-  onProjectsChange: (projects: any[]) => void;
-  currentLanguage: Language;
+    id: string
+    name: string
+    latitude: string
+    longitude: string
+    has_fence: string
+  }
+  isEditingCoordinates: boolean
+  setShowForm: Dispatch<SetStateAction<boolean>>
+  onProjectsChange: (projects: any[]) => void
+  currentLanguage: Language
 }
 
 export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjectsChange, currentLanguage }: EditFieldProps) => {
-  const [fields, setFields] = useState(field);
-  const translation = useTranslation(currentLanguage);
+  const [fields, setFields] = useState(field)
+  const translation = useTranslation(currentLanguage)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
     setFields((previous) => ({
       ...previous,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const { id, ...data } = fields;
+    event.preventDefault()
+    const { id, ...data } = fields
     try {
-      await updateField(id, data);
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
+      await updateField(id, data)
+      const updatedProjects = await fetchProjects()
+      onProjectsChange(updatedProjects)
     } catch (error) {
-      console.error('Error updating field:', error);
+      console.error('Error updating field:', error)
     }
-    setShowForm(false);
-  };
+    setShowForm(false)
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -115,5 +115,5 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
         </form>
       </div>
     </div>
-  );
-};
+  )
+}

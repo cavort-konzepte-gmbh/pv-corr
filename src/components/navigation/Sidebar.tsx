@@ -1,22 +1,22 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Project } from '../../types/projects';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import React from 'react'
+import { Theme } from '../../types/theme'
+import { Project } from '../../types/projects'
+import { ChevronRight, ChevronDown } from 'lucide-react'
 
 interface SidebarProps {
-  projects: Project[];
-  expandedItems: Set<string>;
-  showHiddenIds: boolean;
-  selectedItem: any;
-  currentTheme: Theme;
-  onToggleExpand: (id: string) => void;
-  onSelectItem: (item: any) => void;
+  projects: Project[]
+  expandedItems: Set<string>
+  showHiddenIds: boolean
+  selectedItem: any
+  currentTheme: Theme
+  onToggleExpand: (id: string) => void
+  onSelectItem: (item: any) => void
 }
 
 const ensureArray = <T,>(value: T | T[] | null | undefined): T[] => {
-  if (Array.isArray(value)) return value;
-  return [];
-};
+  if (Array.isArray(value)) return value
+  return []
+}
 
 const Sidebar: React.FC<SidebarProps> = ({
   projects,
@@ -39,8 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   selectedItem?.type === 'project' && selectedItem?.id === project.id ? currentTheme.colors.background : 'transparent',
               }}
               onClick={() => {
-                onSelectItem({ type: 'project', id: project.id });
-                onToggleExpand(project.id);
+                onSelectItem({ type: 'project', id: project.id })
+                onToggleExpand(project.id)
               }}
             >
               <div className="flex items-center justify-between w-full">
@@ -48,8 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <span
                     className="w-4 flex items-center justify-center"
                     onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleExpand(project.id);
+                      e.stopPropagation()
+                      onToggleExpand(project.id)
                     }}
                   >
                     {expandedItems.has(project.id) ? (
@@ -77,16 +77,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                           selectedItem?.type === 'field' && selectedItem?.id === field.id ? currentTheme.colors.background : 'transparent',
                       }}
                       onClick={() => {
-                        onSelectItem({ type: 'field', projectId: project.id, id: field.id });
-                        onToggleExpand(field.id);
+                        onSelectItem({ type: 'field', projectId: project.id, id: field.id })
+                        onToggleExpand(field.id)
                       }}
                     >
                       <div className="flex items-center flex-1 min-w-0">
                         <span
                           className="w-4 flex items-center justify-center"
                           onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleExpand(field.id);
+                            e.stopPropagation()
+                            onToggleExpand(field.id)
                           }}
                         >
                           {expandedItems.has(field.id) ? (
@@ -139,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

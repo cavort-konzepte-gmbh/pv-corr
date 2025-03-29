@@ -1,25 +1,25 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Project, Zone } from '../../../../types/projects';
-import { ArrowLeft, ChevronDown, Table } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from 'react'
+import { Theme } from '../../../../types/theme'
+import { Project, Zone } from '../../../../types/projects'
+import { ArrowLeft, ChevronDown, Table } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface ProjectHeaderProps {
-  project: Project;
+  project: Project
   field: {
-    name: string;
-    latitude?: string;
-    longitude?: string;
-  };
-  zone: Zone;
-  onBack: () => void;
-  currentTheme: Theme;
+    name: string
+    latitude?: string
+    longitude?: string
+  }
+  zone: Zone
+  onBack: () => void
+  currentTheme: Theme
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, field, zone, onBack, currentTheme }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true)
 
   return (
     <Table>
@@ -85,7 +85,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, field, zone, onB
         </TableBody>
       )}
     </Table>
-  );
-};
+  )
+}
 
-export default ProjectHeader;
+export default ProjectHeader
