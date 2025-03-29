@@ -1,7 +1,7 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Project } from '../../types/projects';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Project } from "../../types/projects";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
 interface SidebarProps {
   projects: Project[];
@@ -25,26 +25,27 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedItem,
   currentTheme,
   onToggleExpand,
-  onSelectItem
+  onSelectItem,
 }) => {
   return (
     <div className="w-64 border-r h-screen overflow-auto border-theme border-solid bg-surface">
       <div>
-        {ensureArray(projects).map(project => (
+        {ensureArray(projects).map((project) => (
           <div key={project.id}>
-            <div 
+            <div
               className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
               style={{
-                backgroundColor: selectedItem?.type === 'project' && selectedItem?.id === project.id ? currentTheme.colors.background : 'transparent'
+                backgroundColor:
+                  selectedItem?.type === "project" && selectedItem?.id === project.id ? currentTheme.colors.background : "transparent",
               }}
               onClick={() => {
-                onSelectItem({ type: 'project', id: project.id });
+                onSelectItem({ type: "project", id: project.id });
                 onToggleExpand(project.id);
               }}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center min-w-0">
-                  <span 
+                  <span
                     className="w-4 flex items-center justify-center"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -52,43 +53,36 @@ const Sidebar: React.FC<SidebarProps> = ({
                     }}
                   >
                     {expandedItems.has(project.id) ? (
-                      <ChevronDown 
-                        size={14}
-                        style={{ color: currentTheme.colors.text.secondary }} 
-                      />
+                      <ChevronDown size={14} style={{ color: currentTheme.colors.text.secondary }} />
                     ) : (
-                      <ChevronRight 
-                        size={14}
-                        style={{ color: currentTheme.colors.text.secondary }} 
-                      />
+                      <ChevronRight size={14} style={{ color: currentTheme.colors.text.secondary }} />
                     )}
                   </span>
                   <span className="ml-1 font-mono text-xs truncate">
-                    {project.name.length > 28 ? project.name.substring(0, 28) + '...' : project.name}
+                    {project.name.length > 28 ? project.name.substring(0, 28) + "..." : project.name}
                   </span>
                 </div>
-                <div className="text-[10px] opacity-60 ml-1 text-secondary">
-                  {project.fields.length}f
-                </div>
+                <div className="text-[10px] opacity-60 ml-1 text-secondary">{project.fields.length}f</div>
               </div>
             </div>
-            
+
             {expandedItems.has(project.id) && (
               <div>
-                {project.fields.map(field => (
+                {project.fields.map((field) => (
                   <div key={field.id}>
-                    <div 
+                    <div
                       className="flex items-center h-7 pl-6 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                       style={{
-                        backgroundColor: selectedItem?.type === 'field' && selectedItem?.id === field.id ? currentTheme.colors.background : 'transparent'
+                        backgroundColor:
+                          selectedItem?.type === "field" && selectedItem?.id === field.id ? currentTheme.colors.background : "transparent",
                       }}
                       onClick={() => {
-                        onSelectItem({ type: 'field', projectId: project.id, id: field.id });
+                        onSelectItem({ type: "field", projectId: project.id, id: field.id });
                         onToggleExpand(field.id);
                       }}
                     >
                       <div className="flex items-center flex-1 min-w-0">
-                        <span 
+                        <span
                           className="w-4 flex items-center justify-center"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -96,48 +90,43 @@ const Sidebar: React.FC<SidebarProps> = ({
                           }}
                         >
                           {expandedItems.has(field.id) ? (
-                            <ChevronDown 
-                              size={14}
-                              className='text-secondary'
-                            />
+                            <ChevronDown size={14} className="text-secondary" />
                           ) : (
-                            <ChevronRight 
-                              size={14}
-                              className='text-secondary'
-                            />
+                            <ChevronRight size={14} className="text-secondary" />
                           )}
                         </span>
                         <span className="ml-1 font-mono text-xs truncate">
-                          {field.name.length > 26 ? field.name.substring(0, 26) + '...' : field.name}
+                          {field.name.length > 26 ? field.name.substring(0, 26) + "..." : field.name}
                         </span>
                       </div>
-                      <div className="text-[10px] opacity-60 ml-1 text-secondary">
-                        {field.zones.length}z
-                      </div>
+                      <div className="text-[10px] opacity-60 ml-1 text-secondary">{field.zones.length}z</div>
                     </div>
-                    
+
                     {expandedItems.has(field.id) && (
                       <div>
-                        {field.zones.map(zone => (
-                          <div 
+                        {field.zones.map((zone) => (
+                          <div
                             key={zone.id}
                             className="flex items-center h-7 pl-10 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                             style={{
-                              backgroundColor: selectedItem?.type === 'zone' && selectedItem?.id === zone.id ? currentTheme.colors.background : 'transparent'
+                              backgroundColor:
+                                selectedItem?.type === "zone" && selectedItem?.id === zone.id
+                                  ? currentTheme.colors.background
+                                  : "transparent",
                             }}
-                            onClick={() => onSelectItem({
-                              type: 'zone',
-                              projectId: project.id,
-                              fieldId: field.id,
-                              id: zone.id
-                            })}
+                            onClick={() =>
+                              onSelectItem({
+                                type: "zone",
+                                projectId: project.id,
+                                fieldId: field.id,
+                                id: zone.id,
+                              })
+                            }
                           >
                             <span className="font-mono text-xs truncate flex-1">
-                              {zone.name.length > 24 ? zone.name.substring(0, 24) + '...' : zone.name}
+                              {zone.name.length > 24 ? zone.name.substring(0, 24) + "..." : zone.name}
                             </span>
-                            <span className="text-[10px] opacity-60 ml-1 text-secondary">
-                              {zone.datapoints?.length || 0}dp
-                            </span>
+                            <span className="text-[10px] opacity-60 ml-1 text-secondary">{zone.datapoints?.length || 0}dp</span>
                           </div>
                         ))}
                       </div>

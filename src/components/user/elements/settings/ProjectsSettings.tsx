@@ -1,8 +1,8 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Project } from '../../../../types/projects';
-import { SavedPlace } from '../../../PlacesPanel';
-import ProjectsPanel from '../../../ProjectsPanel';
+import React from "react";
+import { Theme } from "../../../../types/theme";
+import { Project } from "../../../../types/projects";
+import { SavedPlace } from "../../../PlacesPanel";
+import ProjectsPanel from "../../../ProjectsPanel";
 
 interface ProjectsSettingsProps {
   currentTheme: Theme;
@@ -11,12 +11,7 @@ interface ProjectsSettingsProps {
   places: SavedPlace[];
 }
 
-const ProjectsSettings: React.FC<ProjectsSettingsProps> = ({
-  currentTheme,
-  projects,
-  onProjectsChange,
-  places
-}) => {
+const ProjectsSettings: React.FC<ProjectsSettingsProps> = ({ currentTheme, projects, onProjectsChange, places }) => {
   return (
     <ProjectsPanel
       currentTheme={currentTheme}

@@ -1,16 +1,4 @@
-export type ParameterUnit = 
-  'Ohm.m' |
-  'Ohm.cm' |
-  'mmol/kg' |
-  'mg/kg' |
-  'g/mol' |
-  'mg/mmol' |
-  '%' |
-  'ppm' |
-  'V' |
-  'mV' |
-  'A' |
-  'mA';
+export type ParameterUnit = "Ohm.m" | "Ohm.cm" | "mmol/kg" | "mg/kg" | "g/mol" | "mg/mmol" | "%" | "ppm" | "V" | "mV" | "A" | "mA";
 
 export interface Parameter {
   id: string;
@@ -20,7 +8,7 @@ export interface Parameter {
   customName?: string;
   shortName?: string;
   unit?: ParameterUnit;
-  rangeType: 'range' | 'selection' | 'open' | 'greater' | 'less' | 'greaterEqual' | 'lessEqual';
+  rangeType: "range" | "selection" | "open" | "greater" | "less" | "greaterEqual" | "lessEqual";
   rangeValue: string;
   orderNumber: number | string;
   rating_logic_code?: string;

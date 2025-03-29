@@ -1,8 +1,8 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Language } from '../../../../types/language';
-import { Company } from '../../../../types/companies';
-import CompaniesPanel from '../../../CompaniesPanel';
+import React from "react";
+import { Theme } from "../../../../types/theme";
+import { Language } from "../../../../types/language";
+import { Company } from "../../../../types/companies";
+import CompaniesPanel from "../../../CompaniesPanel";
 
 interface CompaniesSettingsProps {
   currentTheme: Theme;
@@ -17,7 +17,7 @@ const CompaniesSettings: React.FC<CompaniesSettingsProps> = ({
   currentLanguage,
   savedCompanies,
   onSaveCompanies,
-  onCreateCustomer
+  onCreateCustomer,
 }) => {
   return (
     <CompaniesPanel

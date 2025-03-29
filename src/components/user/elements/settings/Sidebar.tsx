@@ -1,5 +1,5 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
+import React from "react";
+import { Theme } from "../../../../types/theme";
 
 interface SidebarProps {
   currentView: string;
@@ -8,33 +8,26 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'general', label: 'General' },
-  { id: 'theme', label: 'Theme' },
-  { id: 'places', label: 'Places' },
-  { id: 'companies', label: 'Companies' },
-  { id: 'people', label: 'People' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'datapoints', label: 'Datapoints' }
+  { id: "general", label: "General" },
+  { id: "theme", label: "Theme" },
+  { id: "places", label: "Places" },
+  { id: "companies", label: "Companies" },
+  { id: "people", label: "People" },
+  { id: "projects", label: "Projects" },
+  { id: "datapoints", label: "Datapoints" },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({
-  currentView,
-  onViewChange,
-  currentTheme
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, currentTheme }) => {
   return (
     <div className="w-64 border-r h-screen overflow-auto border-theme bg-surface">
       <div>
-        {menuItems.map(item => (
+        {menuItems.map((item) => (
           <div
             key={item.id}
             className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
-
             onClick={() => onViewChange(item.id)}
           >
-            <span className="ml-1 font-mono text-xs truncate">
-              {item.label}
-            </span>
+            <span className="ml-1 font-mono text-xs truncate">{item.label}</span>
           </div>
         ))}
       </div>

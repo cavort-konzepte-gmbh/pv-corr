@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Theme } from '../../types/theme';
-import { MapPin, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from "react";
+import { Theme } from "../../types/theme";
+import { MapPin, X } from "lucide-react";
 
 interface MapSelectorProps {
   currentTheme: Theme;
@@ -10,25 +10,17 @@ interface MapSelectorProps {
   onClose: () => void;
 }
 
-const MapSelector: React.FC<MapSelectorProps> = ({
-  currentTheme,
-  initialLat,
-  initialLng,
-  onSelect,
-  onClose
-}) => {
+const MapSelector: React.FC<MapSelectorProps> = ({ currentTheme, initialLat, initialLng, onSelect, onClose }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
-  const [selectedPosition, setSelectedPosition] = useState<{lat: number, lng: number} | null>(
-    initialLat && initialLng 
-      ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) }
-      : null
+  const [selectedPosition, setSelectedPosition] = useState<{ lat: number; lng: number } | null>(
+    initialLat && initialLng ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) } : null,
   );
 
   useEffect(() => {
     // Load Google Maps script
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
     script.async = true;
     script.defer = true;
@@ -44,50 +36,50 @@ const MapSelector: React.FC<MapSelectorProps> = ({
     if (!mapRef.current) return;
 
     const initialPosition = selectedPosition || { lat: 51.1657, lng: 10.4515 }; // Germany center
-    
+
     const mapInstance = new google.maps.Map(mapRef.current, {
       center: initialPosition,
       zoom: selectedPosition ? 15 : 6,
       styles: [
         {
-          featureType: 'all',
-          elementType: 'geometry',
-          stylers: [{ color: currentTheme.colors.surface }]
+          featureType: "all",
+          elementType: "geometry",
+          stylers: [{ color: currentTheme.colors.surface }],
         },
         {
-          featureType: 'all',
-          elementType: 'labels.text.fill',
-          stylers: [{ color: currentTheme.colors.text.primary }]
+          featureType: "all",
+          elementType: "labels.text.fill",
+          stylers: [{ color: currentTheme.colors.text.primary }],
         },
         {
-          featureType: 'all',
-          elementType: 'labels.text.stroke',
-          stylers: [{ color: currentTheme.colors.background }]
-        }
-      ]
+          featureType: "all",
+          elementType: "labels.text.stroke",
+          stylers: [{ color: currentTheme.colors.background }],
+        },
+      ],
     });
 
     let markerInstance: google.maps.Marker | null = null;
-    
+
     if (selectedPosition) {
       markerInstance = new google.maps.Marker({
         position: selectedPosition,
         map: mapInstance,
-        draggable: true
+        draggable: true,
       });
 
-      markerInstance.addListener('dragend', () => {
+      markerInstance.addListener("dragend", () => {
         const position = markerInstance?.getPosition();
         if (position) {
           setSelectedPosition({
             lat: position.lat(),
-            lng: position.lng()
+            lng: position.lng(),
           });
         }
       });
     }
 
-    mapInstance.addListener('click', (e: google.maps.MapMouseEvent) => {
+    mapInstance.addListener("click", (e: google.maps.MapMouseEvent) => {
       const position = e.latLng;
       if (!position) return;
 
@@ -100,15 +92,15 @@ const MapSelector: React.FC<MapSelectorProps> = ({
         markerInstance = new google.maps.Marker({
           position: { lat, lng },
           map: mapInstance,
-          draggable: true
+          draggable: true,
         });
 
-        markerInstance.addListener('dragend', () => {
+        markerInstance.addListener("dragend", () => {
           const newPosition = markerInstance?.getPosition();
           if (newPosition) {
             setSelectedPosition({
               lat: newPosition.lat(),
-              lng: newPosition.lng()
+              lng: newPosition.lng(),
             });
           }
         });
@@ -124,10 +116,7 @@ const MapSelector: React.FC<MapSelectorProps> = ({
 
   const handleConfirm = () => {
     if (selectedPosition) {
-      onSelect(
-        selectedPosition.lat.toFixed(6),
-        selectedPosition.lng.toFixed(6)
-      );
+      onSelect(selectedPosition.lat.toFixed(6), selectedPosition.lng.toFixed(6));
     }
   };
 
@@ -139,18 +128,12 @@ const MapSelector: React.FC<MapSelectorProps> = ({
             <MapPin className="text-accent-primary" size={20} />
             Select Location
           </h3>
-          <button
-            onClick={onClose}
-            className="p-1 rounded hover:bg-opacity-80 text-secondary"
-          >
+          <button onClick={onClose} className="p-1 rounded hover:bg-opacity-80 text-secondary">
             <X size={20} />
           </button>
         </div>
 
-        <div 
-          ref={mapRef} 
-          className="w-full h-[500px] rounded mb-4 border-theme border-solid"
-        />
+        <div ref={mapRef} className="w-full h-[500px] rounded mb-4 border-theme border-solid" />
 
         {selectedPosition && (
           <div className="flex items-center justify-between">
@@ -158,16 +141,10 @@ const MapSelector: React.FC<MapSelectorProps> = ({
               Selected: {selectedPosition.lat.toFixed(6)}, {selectedPosition.lng.toFixed(6)}
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                
-              >
+              <button onClick={onClose} className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent">
                 Cancel
               </button>
-              <button
-                onClick={handleConfirm}
-                className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
-              >
+              <button onClick={handleConfirm} className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
                 Confirm Location
               </button>
             </div>

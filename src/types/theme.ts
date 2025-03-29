@@ -4,4 +4,4 @@ export const THEMES = ["zinc", "zing.dark", "green", "green.dark"];
  * @deprecated
  * Remove in future versions
  */
-export type Theme = any
+export type Theme = any;

@@ -1,15 +1,17 @@
-import { supabase } from '../lib/supabase';
-import { Language } from '../types/language';
-import { ThemeId } from '../types/theme';
+import { supabase } from "../lib/supabase";
+import { Language } from "../types/language";
+import { ThemeId } from "../types/theme";
 export interface UserSettings {
   language: Language;
-  decimalSeparator: ',' | '.';
+  decimalSeparator: "," | ".";
   showHiddenIds: boolean;
   theme_id: ThemeId;
 }
 
 export const fetchUserSettings = async (): Promise<UserSettings | null> => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) return null;
 
   try {
@@ -17,14 +19,13 @@ export const fetchUserSettings = async (): Promise<UserSettings | null> => {
 
     // Return settings from metadata with defaults
     return {
-      language: metadata.language || 'en',
-      decimalSeparator: metadata.decimal_separator || ',',
+      language: metadata.language || "en",
+      decimalSeparator: metadata.decimal_separator || ",",
       showHiddenIds: metadata.show_hidden_ids || false,
-      theme_id: metadata.theme_id || 'ferra'
+      theme_id: metadata.theme_id || "ferra",
     };
-
   } catch (err) {
-    console.error('Error in fetchUserSettings:', err);
+    console.error("Error in fetchUserSettings:", err);
     return null;
   }
 };
@@ -37,27 +38,29 @@ export const updateUserSettings = async (settings: Partial<UserSettings>): Promi
         ...(settings.language && { language: settings.language }),
         ...(settings.decimalSeparator && { decimal_separator: settings.decimalSeparator }),
         ...(settings.showHiddenIds !== undefined && { show_hidden_ids: settings.showHiddenIds }),
-        ...(settings.theme_id && { theme_id: settings.theme_id })
-      }
+        ...(settings.theme_id && { theme_id: settings.theme_id }),
+      },
     });
 
     if (error) {
-      console.error('Error updating user settings:', error);
+      console.error("Error updating user settings:", error);
       return false;
     }
 
     if (!data.user) {
-      throw new Error('No user returned after update');
+      throw new Error("No user returned after update");
     }
 
     // Dispatch event with updated settings
-    window.dispatchEvent(new CustomEvent('userSettingsLoaded', { 
-      detail: data.user.user_metadata
-    }));
+    window.dispatchEvent(
+      new CustomEvent("userSettingsLoaded", {
+        detail: data.user.user_metadata,
+      }),
+    );
 
     return true;
   } catch (error) {
-    console.error('Error in updateUserSettings:', error);
+    console.error("Error in updateUserSettings:", error);
     return false;
   }
 };

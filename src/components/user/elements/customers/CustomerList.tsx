@@ -1,9 +1,9 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Customer } from '../../../../types/customers';
-import { Building2, ChevronRight, Mail, Phone, Link, User } from 'lucide-react';
-import { Person } from '../../../../types/people';
-import { Company } from '../../../../types/companies';
+import React from "react";
+import { Theme } from "../../../../types/theme";
+import { Customer } from "../../../../types/customers";
+import { Building2, ChevronRight, Mail, Phone, Link, User } from "lucide-react";
+import { Person } from "../../../../types/people";
+import { Company } from "../../../../types/companies";
 
 interface CustomerListProps {
   currentTheme: Theme;
@@ -13,16 +13,10 @@ interface CustomerListProps {
   onSelectCustomer: (customerId: string) => void;
 }
 
-const CustomerList: React.FC<CustomerListProps> = ({
-  currentTheme,
-  customers,
-  savedPeople,
-  savedCompanies,
-  onSelectCustomer
-}) => {
+const CustomerList: React.FC<CustomerListProps> = ({ currentTheme, customers, savedPeople, savedCompanies, onSelectCustomer }) => {
   return (
     <div className="space-y-4">
-      {customers.map(customer => (
+      {customers.map((customer) => (
         <div
           key={customer.id}
           className="p-4 border transition-all border-accent hover:cursor-pointer bg-card"

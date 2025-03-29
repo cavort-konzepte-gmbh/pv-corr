@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Person } from '../../../../types/people';
-import { Company } from '../../../../types/companies';
-import { Plus } from 'lucide-react';
-import { createProject } from '../../../../services/projects';
-import { fetchProjects } from '../../../../services/projects';
-import { Language, useTranslation } from '../../../../types/language';
-import { Project } from '../../../../types/projects';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Person } from "../../../../types/people";
+import { Company } from "../../../../types/companies";
+import { Plus } from "lucide-react";
+import { createProject } from "../../../../services/projects";
+import { fetchProjects } from "../../../../services/projects";
+import { Language, useTranslation } from "../../../../types/language";
+import { Project } from "../../../../types/projects";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
   savedPeople: Person[];
   savedCompanies: Company[];
   onProjectsChange: (projects: Project[]) => void;
-  currentLanguage: Language
+  currentLanguage: Language;
   selectedCustomerId: string | null;
 }
 
@@ -26,73 +26,74 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   savedCompanies,
   currentLanguage,
   selectedCustomerId,
-  onProjectsChange
+  onProjectsChange,
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [projectName, setProjectName] = useState('');
-  const [clientRef, setClientRef] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [projectName, setProjectName] = useState("");
+  const [clientRef, setClientRef] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
-  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field');
+  const [typeProject, setTypeProject] = useState<"roof" | "field">("field");
   const [error, setError] = useState<string | null>(null);
   const [createDefaultField, setCreateDefaultField] = useState(true);
-  const [defaultFieldName, setDefaultFieldName] = useState('Field 1');
+  const [defaultFieldName, setDefaultFieldName] = useState("Field 1");
   const [createDefaultZone, setCreateDefaultZone] = useState(true);
-  const [defaultZoneName, setDefaultZoneName] = useState('Zone 1');
-  const translation = useTranslation(currentLanguage)
+  const [defaultZoneName, setDefaultZoneName] = useState("Zone 1");
+  const translation = useTranslation(currentLanguage);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectName.trim()) {
-      setError('Project name is required');
+      setError("Project name is required");
       return;
     }
 
     try {
       setError(null);
-      const newProject = await createProject({
-        name: projectName.trim(),
-        clientRef: clientRef.trim() || undefined,
-        customerId: selectedCustomerId,
-        latitude: latitude.trim() || undefined,
-        longitude: longitude.trim() || undefined,
-        imageUrl: imageUrl.trim() || undefined,
-        managerId: selectedManagerId,
-        typeProject,
-      }, {
-        createDefaultField,
-        defaultFieldName: defaultFieldName.trim(),
-        createDefaultZone,
-        defaultZoneName: defaultZoneName.trim()
-      });
+      const newProject = await createProject(
+        {
+          name: projectName.trim(),
+          clientRef: clientRef.trim() || undefined,
+          customerId: selectedCustomerId,
+          latitude: latitude.trim() || undefined,
+          longitude: longitude.trim() || undefined,
+          imageUrl: imageUrl.trim() || undefined,
+          managerId: selectedManagerId,
+          typeProject,
+        },
+        {
+          createDefaultField,
+          defaultFieldName: defaultFieldName.trim(),
+          createDefaultZone,
+          defaultZoneName: defaultZoneName.trim(),
+        },
+      );
 
       // Update projects list with new project
       const updatedProjects = await fetchProjects(selectedCustomerId as string);
       onProjectsChange(updatedProjects);
 
       setShowForm(false);
-      setProjectName('');
-      setClientRef('');
-      setLatitude('');
-      setLongitude('');
-      setImageUrl('');
+      setProjectName("");
+      setClientRef("");
+      setLatitude("");
+      setLongitude("");
+      setImageUrl("");
       setSelectedManagerId(null);
-      setTypeProject('field');
+      setTypeProject("field");
       setError(null);
     } catch (err) {
-      console.error('Error creating project:', err);
+      console.error("Error creating project:", err);
       // Keep form open if there's an error
-      setError(err instanceof Error ? err.message : 'Failed to create project');
+      setError(err instanceof Error ? err.message : "Failed to create project");
     }
   };
 
   return (
     <>
-      <Button
-        onClick={() => setShowForm(true)}
-      >
+      <Button onClick={() => setShowForm(true)}>
         <Plus size={16} />
         {translation("project.add")}
       </Button>
@@ -117,18 +118,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1">
-                  {translation("project.manager")}
-                </Label>
+                <Label className="block text-sm mb-1">{translation("project.manager")}</Label>
                 <select
-                  value={selectedManagerId || ''}
+                  value={selectedManagerId || ""}
                   onChange={(e) => setSelectedManagerId(e.target.value || null)}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="">{translation("project.manager.not_assigned")}</option>
-                  {savedPeople.map(person => (
+                  {savedPeople.map((person) => (
                     <option key={person.id} value={person.id}>
-                      {person.title ? `${person.title} ` : ''}
+                      {person.title ? `${person.title} ` : ""}
                       {person.firstName} {person.lastName}
                     </option>
                   ))}
@@ -136,12 +135,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  {translation("project.type")}
-                </Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.type")}</Label>
                 <select
                   value={typeProject}
-                  onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
+                  onChange={(e) => setTypeProject(e.target.value as "roof" | "field")}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="field">{translation("project.type.field")}</option>
@@ -152,7 +149,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               <div>
                 <div className="space-y-4 mt-4 p-4 rounded bg-theme">
                   <h4 className="font-medium text-primary">Default Structure</h4>
-                  
+
                   <div className="flex items-center gap-2">
                     <Input
                       type="checkbox"
@@ -165,7 +162,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                       Create default field
                     </Label>
                   </div>
-                  
+
                   {createDefaultField && (
                     <div>
                       <Input
@@ -174,7 +171,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                         onChange={(e) => setDefaultFieldName(e.target.value)}
                         placeholder="Field name"
                       />
-                      
+
                       <div className="mt-2 flex items-center gap-2">
                         <Input
                           type="checkbox"
@@ -187,7 +184,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                           Create default zone
                         </Label>
                       </div>
-                      
+
                       {createDefaultZone && (
                         <Input
                           type="text"
@@ -202,45 +199,22 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  {translation("project.client_ref")}
-                </Label>
-                <Input
-                  type="text"
-                  value={clientRef}
-                  onChange={(e) => setClientRef(e.target.value)}
-                  placeholder="Enter client reference"
-                />
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.client_ref")}</Label>
+                <Input type="text" value={clientRef} onChange={(e) => setClientRef(e.target.value)} placeholder="Enter client reference" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  {translation("project.latitude")}
-                </Label>
-                <Input
-                  type="text"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                  placeholder="Enter latitude"
-                />
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.latitude")}</Label>
+                <Input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Enter latitude" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  {translation("project.longitude")}
-                </Label>
-                <Input
-                  type="text"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                  placeholder="Enter longitude"
-                />
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.longitude")}</Label>
+                <Input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Enter longitude" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  {translation("project.image_url")}
-                </Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.image_url")}</Label>
                 <Input
                   type="url"
                   value={imageUrl}
@@ -249,11 +223,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                 />
               </div>
 
-              {error && (
-                <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-card">
-                  {error}
-                </div>
-              )}
+              {error && <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-card">{error}</div>}
 
               <div className="flex justify-end gap-2">
                 <Button
@@ -261,16 +231,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   variant="destructive"
                   onClick={() => {
                     setShowForm(false);
-                    setProjectName('');
+                    setProjectName("");
                   }}
                 >
                   {translation("actions.cancel")}
                 </Button>
-                <Button
-                  type="submit"
-                >
-                  {translation("project.create")}
-                </Button>
+                <Button type="submit">{translation("project.create")}</Button>
               </div>
             </form>
           </div>

@@ -3,16 +3,10 @@ interface ButtonSectionProps {
   match: string;
   children: React.ReactNode;
   onClick: () => void;
-  className?: string
+  className?: string;
 }
 
-export const ButtonSection = ({
-  children,
-  view,
-  match,
-  onClick,
-  className,
-}: ButtonSectionProps) => {
+export const ButtonSection = ({ children, view, match, onClick, className }: ButtonSectionProps) => {
   const isActive = view === match;
   const classNameActive = isActive ? "!text-primary-foreground !bg-primary" : "";
   return (

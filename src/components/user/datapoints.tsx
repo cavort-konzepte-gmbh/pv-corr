@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project, Zone } from '../../types/projects';
-import { Parameter } from '../../types/parameters';
-import ZoneSummary from './elements/datapoints/ZoneSummary';
-import ParameterFilter from './elements/datapoints/ParameterFilter';
-import DatapointList from './elements/datapoints/DatapointList';
-import { fetchParameters } from '../../services/parameters';
-import ProjectSummary from './elements/fields/ProjectSummary';
-import FieldSummary from './elements/zones/FieldSummary';
-import { Person } from '../../types/people';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { Project, Zone } from "../../types/projects";
+import { Parameter } from "../../types/parameters";
+import ZoneSummary from "./elements/datapoints/ZoneSummary";
+import ParameterFilter from "./elements/datapoints/ParameterFilter";
+import DatapointList from "./elements/datapoints/DatapointList";
+import { fetchParameters } from "../../services/parameters";
+import ProjectSummary from "./elements/fields/ProjectSummary";
+import FieldSummary from "./elements/zones/FieldSummary";
+import { Person } from "../../types/people";
 
 interface DatapointsProps {
   currentTheme: Theme;
@@ -36,7 +36,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   onBack,
   onProjectsChange,
   savedPeople = [],
-  selectedCustomerId
+  selectedCustomerId,
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
   const [filteredParameters, setFilteredParameters] = useState<Parameter[]>([]);
@@ -44,7 +44,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   const [showFieldSummary, setShowFieldSummary] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage)
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const loadParameters = async () => {
@@ -53,8 +53,8 @@ const Datapoints: React.FC<DatapointsProps> = ({
         setParameters(fetchedParams);
         setFilteredParameters(fetchedParams);
       } catch (err) {
-        console.error('Error loading parameters:', err);
-        setError('Failed to load parameters');
+        console.error("Error loading parameters:", err);
+        setError("Failed to load parameters");
       } finally {
         setLoading(false);
       }
@@ -63,27 +63,15 @@ const Datapoints: React.FC<DatapointsProps> = ({
   }, []);
 
   if (!project || !field || !selectedZone) {
-    return (
-      <div className="p-6 text-center text-secondary">
-        {translation("datapoint.please_select_zone")}
-      </div>
-    );
+    return <div className="p-6 text-center text-secondary">{translation("datapoint.please_select_zone")}</div>;
   }
 
   if (loading) {
-    return (
-      <div className="p-6 text-center text-secondary">
-        {translation("datapoint.loading_parameters")}
-      </div>
-    );
+    return <div className="p-6 text-center text-secondary">{translation("datapoint.loading_parameters")}</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-6 text-center text-accent-primary">
-        {error}
-      </div>
-    );
+    return <div className="p-6 text-center text-accent-primary">{error}</div>;
   }
 
   return (
@@ -92,7 +80,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         isExpanded={showProjectSummary}
         onToggle={() => setShowProjectSummary(!showProjectSummary)}
         project={project}
-        manager={savedPeople?.find(p => p.id === project.managerId)}
+        manager={savedPeople?.find((p) => p.id === project.managerId)}
         company={undefined}
         savedPeople={savedPeople || []}
         currentTheme={currentTheme}

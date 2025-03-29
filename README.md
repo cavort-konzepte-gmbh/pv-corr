@@ -5,24 +5,28 @@ A modern web application for managing and analyzing soil data across multiple pr
 ## Features
 
 - 🏢 **Project Management**
+
   - Create and manage multiple projects
   - Organize projects into fields and zones
   - Track project locations and gate access points
   - Associate projects with companies and managers
 
 - 📊 **Data Collection**
+
   - Record and analyze soil parameters
   - Support for multiple measurement standards (e.g., DIN 50929-3)
   - Automatic rating calculations based on standards
   - Historical data tracking
 
 - 👥 **Contact Management**
+
   - Store company information
   - Manage people and their roles
   - Track addresses and contact details
   - Associate contacts with projects
 
 - 🌍 **Location Tracking**
+
   - GPS coordinates for projects, fields, and zones
   - Support for multiple address formats across different countries
   - Interactive map integration
@@ -37,6 +41,7 @@ A modern web application for managing and analyzing soil data across multiple pr
 ## Technology Stack
 
 - **Frontend:**
+
   - React 18
   - TypeScript
   - Tailwind CSS

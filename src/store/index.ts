@@ -1,21 +1,21 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import navigationReducer from './slices/navigationSlice';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import navigationReducer from "./slices/navigationSlice";
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['navigation'], // Only navigation will be persisted
+  whitelist: ["navigation"], // Only navigation will be persisted
   version: 1,
   migrate: (state: any) => {
     // Return a promise that resolves to the transformed state
     return Promise.resolve(state);
-  }
+  },
 };
 
 const rootReducer = combineReducers({
-  navigation: navigationReducer
+  navigation: navigationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -25,9 +25,9 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE']
-      }
-    })
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
 });
 
 export const persistor = persistStore(store);

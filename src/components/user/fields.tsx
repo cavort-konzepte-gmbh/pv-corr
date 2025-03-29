@@ -1,11 +1,11 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { Project } from '../../types/projects';
-import { Person } from '../../types/people';
-import { Company } from '../../types/companies';
-import ProjectSummary from './elements/fields/ProjectSummary';
-import FieldList from './elements/fields/FieldList';
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { Project } from "../../types/projects";
+import { Person } from "../../types/people";
+import { Company } from "../../types/companies";
+import ProjectSummary from "./elements/fields/ProjectSummary";
+import FieldList from "./elements/fields/FieldList";
 
 interface FieldsProps {
   currentTheme: Theme;
@@ -17,7 +17,7 @@ interface FieldsProps {
   onSelectField: (projectId: string, fieldId: string) => void;
   people: Person[];
   companies: Company[];
-  selectedCustomerId: string | null
+  selectedCustomerId: string | null;
 }
 
 const Fields: React.FC<FieldsProps> = ({
@@ -29,23 +29,17 @@ const Fields: React.FC<FieldsProps> = ({
   companies,
   onProjectsChange,
   currentLanguage,
-  selectedCustomerId
+  selectedCustomerId,
 }) => {
   const translation = useTranslation(currentLanguage);
-  const selectedProject = selectedProjectId 
-    ? projects.find(p => p.id === selectedProjectId)
-    : null;
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
 
   if (!selectedProject) {
-    return (
-      <div className="p-6 text-center text-secondary">
-        {translation("field.select_project")}
-      </div>
-    );
+    return <div className="p-6 text-center text-secondary">{translation("field.select_project")}</div>;
   }
 
-  const manager = people.find(person => person.id === selectedProject.managerId);
-  const company = companies.find(company => company.id === selectedProject.companyId);
+  const manager = people.find((person) => person.id === selectedProject.managerId);
+  const company = companies.find((company) => company.id === selectedProject.companyId);
 
   return (
     <div className="p-6">

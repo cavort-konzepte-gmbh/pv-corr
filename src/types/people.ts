@@ -13,48 +13,48 @@ export interface PersonField {
   id: string;
   hiddenId?: string;
   label: string;
-  type: 'text' | 'email' | 'tel' | 'select' | 'address';
+  type: "text" | "email" | "tel" | "select" | "address";
   required: boolean;
   options?: string[];
 }
 
 export const PERSON_FIELDS: PersonField[] = [
   {
-    id: 'salutation',
-    label: 'people.salutation',
-    type: 'select',
+    id: "salutation",
+    label: "people.salutation",
+    type: "select",
     required: true,
-    options: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.']
+    options: ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."],
   },
   {
-    id: 'title',
-    label: 'people.title',
-    type: 'select',
+    id: "title",
+    label: "people.title",
+    type: "select",
     required: false,
-    options: ['Dr.', 'Prof.']
+    options: ["Dr.", "Prof."],
   },
   {
-    id: 'firstName',
-    label: 'people.firstName',
-    type: 'text',
-    required: true
+    id: "firstName",
+    label: "people.firstName",
+    type: "text",
+    required: true,
   },
   {
-    id: 'lastName',
-    label: 'people.lastName',
-    type: 'text',
-    required: true
+    id: "lastName",
+    label: "people.lastName",
+    type: "text",
+    required: true,
   },
   {
-    id: 'email',
-    label: 'company.email',
-    type: 'email',
-    required: true
+    id: "email",
+    label: "company.email",
+    type: "email",
+    required: true,
   },
   {
-    id: 'phone',
-    label: 'company.phone',
-    type: 'tel',
-    required: false
-  }
+    id: "phone",
+    label: "company.phone",
+    type: "tel",
+    required: false,
+  },
 ];

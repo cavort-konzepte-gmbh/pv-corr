@@ -26,8 +26,7 @@ describe("FromCamelCaseToSnakeCase", () => {
 describe("toCase function from camelCase to snakeCase", () => {
   const testCases = [
     {
-      description:
-        "should convert an object with camelCase keys to snake_case keys",
+      description: "should convert an object with camelCase keys to snake_case keys",
       input: {
         camelCase: "value",
         fooBar: "baz",
@@ -40,8 +39,7 @@ describe("toCase function from camelCase to snakeCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with numeric values and camelCase keys to snake_case keys",
+      description: "should convert an object with numeric values and camelCase keys to snake_case keys",
       input: {
         id: 1,
         hiddenId: 2,
@@ -97,8 +95,7 @@ describe("toCase function from camelCase to snakeCase", () => {
 describe("toCase function from snakeCase to camelCase", () => {
   const testCases = [
     {
-      description:
-        "should convert an object with snake_case keys to camelCase keys",
+      description: "should convert an object with snake_case keys to camelCase keys",
       input: {
         snake_case: "value",
         foo_bar: "baz",
@@ -111,8 +108,7 @@ describe("toCase function from snakeCase to camelCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with mixed snake_case and camelCase keys to camelCase keys",
+      description: "should convert an object with mixed snake_case and camelCase keys to camelCase keys",
       input: {
         snake_case: "value",
         fooBar: "baz",
@@ -125,8 +121,7 @@ describe("toCase function from snakeCase to camelCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with numeric values and snake_case keys to camelCase keys",
+      description: "should convert an object with numeric values and snake_case keys to camelCase keys",
       input: {
         id: 1,
         hidden_id: 2,
@@ -145,8 +140,7 @@ describe("toCase function from snakeCase to camelCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with boolean values and snake_case keys to camelCase keys",
+      description: "should convert an object with boolean values and snake_case keys to camelCase keys",
       input: {
         is_active: true,
         has_access: false,
@@ -157,8 +151,7 @@ describe("toCase function from snakeCase to camelCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with nested objects with snake_case keys to camelCase keys",
+      description: "should convert an object with nested objects with snake_case keys to camelCase keys",
       input: {
         snake_case: {
           nested_key: "value",
@@ -216,8 +209,7 @@ describe("toCase function from snakeCase to camelCase", () => {
       },
     },
     {
-      description:
-        "should convert an object with arrays of objects with snake_case keys to camelCase keys",
+      description: "should convert an object with arrays of objects with snake_case keys to camelCase keys",
       input: {
         hiddenId: 2,
         fields: [
@@ -229,7 +221,7 @@ describe("toCase function from snakeCase to camelCase", () => {
               },
               {
                 hiddenId: 5,
-              }
+              },
             ],
             zones: [
               {
@@ -242,12 +234,12 @@ describe("toCase function from snakeCase to camelCase", () => {
                   {
                     hiddenId: 8,
                     sequentialId: 2,
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
-        ]
+        ],
       },
       expected: {
         hiddenId: 2,
@@ -260,7 +252,7 @@ describe("toCase function from snakeCase to camelCase", () => {
               },
               {
                 hiddenId: 5,
-              }
+              },
             ],
             zones: [
               {
@@ -273,14 +265,14 @@ describe("toCase function from snakeCase to camelCase", () => {
                   {
                     hiddenId: 8,
                     sequentialId: 2,
-                  }
-                ]
-              }
-            ]
+                  },
+                ],
+              },
+            ],
           },
-        ]
-      }
-    }
+        ],
+      },
+    },
   ];
   testCases.forEach(({ description, input, expected }) => {
     test(description, () => {

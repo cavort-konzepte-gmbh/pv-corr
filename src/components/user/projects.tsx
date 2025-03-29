@@ -1,12 +1,12 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Project } from '../../types/projects';
-import { Customer } from '../../types/customers';
-import { Person } from '../../types/people';
-import { Company } from '../../types/companies';
-import ProjectList from './elements/projects/ProjectList';
-import ProjectForm from './elements/projects/ProjectForm';
-import { Language } from '../../types/language';
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Project } from "../../types/projects";
+import { Customer } from "../../types/customers";
+import { Person } from "../../types/people";
+import { Company } from "../../types/companies";
+import ProjectList from "./elements/projects/ProjectList";
+import ProjectForm from "./elements/projects/ProjectForm";
+import { Language } from "../../types/language";
 
 interface ProjectsProps {
   currentTheme: Theme;
@@ -31,9 +31,8 @@ const Projects: React.FC<ProjectsProps> = ({
   onMoveProject,
   onSelectProject,
   currentLanguage,
-  onProjectsChange
+  onProjectsChange,
 }) => {
-
   return (
     <div className="p-6">
       <ProjectList
@@ -53,7 +52,7 @@ const Projects: React.FC<ProjectsProps> = ({
         savedCompanies={savedCompanies}
         currentLanguage={currentLanguage}
         selectedCustomerId={selectedCustomerId}
-        onProjectsChange={onProjectsChange} 
+        onProjectsChange={onProjectsChange}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from "../lib/supabase";
 
 export interface Version {
   id: string;
@@ -16,7 +16,7 @@ export interface Version {
 }
 
 export interface ChangelogEntry {
-  type: 'feature' | 'fix' | 'improvement' | 'breaking';
+  type: "feature" | "fix" | "improvement" | "breaking";
   title: string;
   description: string;
   component?: string;
@@ -24,16 +24,12 @@ export interface ChangelogEntry {
 
 export const getCurrentVersion = async (): Promise<Version | null> => {
   try {
-    const { data, error } = await supabase
-      .from('versions')
-      .select('*')
-      .eq('is_current', true)
-      .single();
+    const { data, error } = await supabase.from("versions").select("*").eq("is_current", true).single();
 
     if (error) throw error;
     return data;
   } catch (err) {
-    console.error('Error fetching current version:', err);
+    console.error("Error fetching current version:", err);
     return null;
   }
 };
@@ -41,16 +37,16 @@ export const getCurrentVersion = async (): Promise<Version | null> => {
 export const getAllVersions = async (): Promise<Version[]> => {
   try {
     const { data, error } = await supabase
-      .from('versions')
-      .select('*')
-      .order('major', { ascending: false })
-      .order('minor', { ascending: false })
-      .order('patch', { ascending: false });
+      .from("versions")
+      .select("*")
+      .order("major", { ascending: false })
+      .order("minor", { ascending: false })
+      .order("patch", { ascending: false });
 
     if (error) throw error;
     return data || [];
   } catch (err) {
-    console.error('Error fetching versions:', err);
+    console.error("Error fetching versions:", err);
     return [];
   }
 };
@@ -65,10 +61,10 @@ export const createVersion = async (version: {
 }) => {
   try {
     const { data, error } = await supabase
-      .from('versions')
+      .from("versions")
       .insert({
         ...version,
-        is_current: true // This will automatically set other versions to false
+        is_current: true, // This will automatically set other versions to false
       })
       .select()
       .single();
@@ -76,7 +72,7 @@ export const createVersion = async (version: {
     if (error) throw error;
     return data;
   } catch (err) {
-    console.error('Error creating version:', err);
+    console.error("Error creating version:", err);
     throw err;
   }
 };

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { Language, useTranslation } from '../../types/language';
-import { supabase } from '../../lib/supabase';
-import { Plus, Edit2, Save, X } from 'lucide-react';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { supabase } from "../../lib/supabase";
+import { Plus, Edit2, Save, X } from "lucide-react";
+import { generateHiddenId } from "../../utils/generateHiddenId";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 interface MaterialsPanelProps {
   currentTheme: Theme;
@@ -22,10 +22,7 @@ interface Material {
   molar_mass: number | null;
 }
 
-export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ 
-  currentTheme,
-  currentLanguage
-}) => {
+export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, currentLanguage }) => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,30 +39,27 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('materials')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from("materials").select("*").order("created_at", { ascending: true });
 
       if (error) throw error;
       setMaterials(data || []);
     } catch (err) {
-      console.error('Error loading materials:', err);
-      setError('Failed to load materials');
+      console.error("Error loading materials:", err);
+      setError("Failed to load materials");
     } finally {
       setLoading(false);
     }
   };
 
   const handleChangeEditingValues = (name: string, value: string) => {
-    setEditingValues(previous => ({
+    setEditingValues((previous) => ({
       ...previous,
       [name]: value,
     }));
   };
 
   const handleChangeMaterial = (name: string, value: string) => {
-    setNewMaterial(previous => ({
+    setNewMaterial((previous) => ({
       ...previous,
       [name]: value,
     }));
@@ -85,21 +79,21 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
         const molar_mass = editingValues.molar_mass ? parseFloat(editingValues.molar_mass) : null;
 
         const { error } = await supabase
-          .from('materials')
-          .update({ 
+          .from("materials")
+          .update({
             name: editingValues.name,
             e_potential,
             valency,
-            molar_mass
+            molar_mass,
           })
-          .eq('id', material.id);
+          .eq("id", material.id);
 
         if (error) throw error;
         await loadData();
         resetValues();
       } catch (err) {
-        console.error('Error updating material:', err);
-        setError('Failed to update material');
+        console.error("Error updating material:", err);
+        setError("Failed to update material");
       }
     } else {
       setEditingMaterial(material.id);
@@ -111,16 +105,13 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
 
   const handleDeleteMaterial = async (materialId: string) => {
     try {
-      const { error } = await supabase
-        .from('materials')
-        .delete()
-        .eq('id', materialId);
+      const { error } = await supabase.from("materials").delete().eq("id", materialId);
 
       if (error) throw error;
       await loadData();
     } catch (err) {
-      console.error('Error deleting material:', err);
-      setError('Failed to delete material');
+      console.error("Error deleting material:", err);
+      setError("Failed to delete material");
     }
   };
 
@@ -136,15 +127,13 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       const valency = newMaterial.valency ? parseFloat(newMaterial.valency) : null;
       const molar_mass = newMaterial.molar_mass ? parseFloat(newMaterial.molar_mass) : null;
 
-      const { error } = await supabase
-        .from('materials')
-        .insert({
-          name: newMaterial.name,
-          e_potential,
-          valency,
-          molar_mass,
-          hidden_id: generateHiddenId()
-        });
+      const { error } = await supabase.from("materials").insert({
+        name: newMaterial.name,
+        e_potential,
+        valency,
+        molar_mass,
+        hidden_id: generateHiddenId(),
+      });
 
       if (error) throw error;
       await loadData();
@@ -152,8 +141,8 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       setNewMaterial({});
       setIsNewMaterial(false);
     } catch (err) {
-      console.error('Error creating material:', err);
-      setError('Failed to create material');
+      console.error("Error creating material:", err);
+      setError("Failed to create material");
     }
   };
 
@@ -165,26 +154,15 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
 
   return (
     <div className="p-6">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {loading ? (
-        <div className="text-center p-4 text-primary">
-          Loading materials...
-        </div>
+        <div className="text-center p-4 text-primary">Loading materials...</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold">
-              Materials
-            </h3>
-            <Button
-              onClick={handleOpenMaterial}
-              className="px-3 py-1"
-            >
+            <h3 className="text-lg font-bold">Materials</h3>
+            <Button onClick={handleOpenMaterial} className="px-3 py-1">
               <Plus size={14} />
               Add Material
             </Button>
@@ -204,9 +182,6 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-
-            
-          
                   {materials.map((material) => (
                     <TableRow key={material.id}>
                       <TableCell className="p-2">
@@ -214,7 +189,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                           <Input
                             type="text"
                             name="name"
-                            value={editingValues.name || ''}
+                            value={editingValues.name || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                           />
@@ -227,7 +202,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                           <Input
                             type="number"
                             name="e_potential"
-                            value={editingValues.e_potential || ''}
+                            value={editingValues.e_potential || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -241,7 +216,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                           <Input
                             type="number"
                             name="valency"
-                            value={editingValues.valency || ''}
+                            value={editingValues.valency || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -255,7 +230,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                           <Input
                             type="number"
                             name="molar_mass"
-                            value={editingValues.molar_mass || ''}
+                            value={editingValues.molar_mass || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -271,11 +246,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                             className="p-1 rounded hover:bg-opacity-80"
                             variant="ghost"
                           >
-                            {editingMaterial === material.id ? (
-                              <Save size={14} />
-                            ) : (
-                              <Edit2 size={14} />
-                            )}
+                            {editingMaterial === material.id ? <Save size={14} /> : <Edit2 size={14} />}
                           </Button>
                           <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
                             <X size={14} />
@@ -290,7 +261,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         <Input
                           type="text"
                           name="name"
-                          value={newMaterial.name || ''}
+                          value={newMaterial.name || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter material name"
@@ -300,7 +271,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         <Input
                           type="number"
                           name="e_potential"
-                          value={newMaterial.e_potential || ''}
+                          value={newMaterial.e_potential || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter E-Potential"
@@ -311,7 +282,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         <Input
                           type="number"
                           name="valency"
-                          value={newMaterial.valency || ''}
+                          value={newMaterial.valency || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter Valency"
@@ -322,7 +293,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                         <Input
                           type="number"
                           name="molar_mass"
-                          value={newMaterial.molar_mass || ''}
+                          value={newMaterial.molar_mass || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter Molar Mass"
@@ -331,11 +302,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       </TableCell>
                       <TableCell className="p-2">
                         <div className="flex items-center justify-center gap-2">
-                          <Button
-                            onClick={handleAddNewMaterial}
-                            className="p-1 rounded hover:bg-opacity-80 text-primary"
-                            variant="ghost"
-                          >
+                          <Button onClick={handleAddNewMaterial} className="p-1 rounded hover:bg-opacity-80 text-primary" variant="ghost">
                             <Save size={14} />
                           </Button>
                           <Button

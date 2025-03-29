@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, Save, X } from 'lucide-react';
-import { FormHandler } from '../shared/FormHandler';
-import { useKeyAction } from '../../hooks/useKeyAction';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { supabase } from "../../lib/supabase";
+import { ArrowLeft, Plus, Edit2, Save, X } from "lucide-react";
+import { FormHandler } from "../shared/FormHandler";
+import { useKeyAction } from "../../hooks/useKeyAction";
+import { generateHiddenId } from "../../utils/generateHiddenId";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 interface ExpertsManagementProps {
   currentTheme: Theme;
@@ -34,7 +34,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   const [isNewExpert, setIsNewExpert] = useState(false);
   const [newExpert, setNewExpert] = useState<Partial<Expert>>({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [deleteConfirmName, setDeleteConfirmName] = useState('');
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
 
   useEffect(() => {
     loadData();
@@ -43,30 +43,27 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('experts')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from("experts").select("*").order("created_at", { ascending: true });
 
       if (error) throw error;
       setExperts(data || []);
     } catch (err) {
-      console.error('Error loading experts:', err);
-      setError('Failed to load experts');
+      console.error("Error loading experts:", err);
+      setError("Failed to load experts");
     } finally {
       setLoading(false);
     }
   };
 
   const handleChangeEditingValues = (field: keyof Expert, value: string) => {
-    setEditingValues(prev => ({
+    setEditingValues((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleChangeNewExpert = (field: keyof Expert, value: string) => {
-    setNewExpert(prev => ({
+    setNewExpert((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -81,21 +78,18 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
     if (editingExpert === expert.id) {
       try {
         if (!editingValues.name?.trim()) {
-          setError('Name is required');
+          setError("Name is required");
           return;
         }
 
-        const { error } = await supabase
-          .from('experts')
-          .update(editingValues)
-          .eq('id', expert.id);
+        const { error } = await supabase.from("experts").update(editingValues).eq("id", expert.id);
 
         if (error) throw error;
         await loadData();
         resetValues();
       } catch (err) {
-        console.error('Error updating expert:', err);
-        setError('Failed to update expert');
+        console.error("Error updating expert:", err);
+        setError("Failed to update expert");
       }
     } else {
       setEditingExpert(expert.id);
@@ -108,18 +102,16 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   const handleAddNewExpert = async () => {
     try {
       if (!newExpert.name?.trim()) {
-        setError('Name is required');
+        setError("Name is required");
         return;
       }
 
       const expertData = {
         ...newExpert,
-        hidden_id: generateHiddenId()
+        hidden_id: generateHiddenId(),
       };
 
-      const { error } = await supabase
-        .from('experts')
-        .insert(expertData);
+      const { error } = await supabase.from("experts").insert(expertData);
 
       if (error) throw error;
 
@@ -128,8 +120,8 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
       setNewExpert({});
       setIsNewExpert(false);
     } catch (err) {
-      console.error('Error saving expert:', err);
-      setError('Failed to save expert');
+      console.error("Error saving expert:", err);
+      setError("Failed to save expert");
     }
   };
 
@@ -141,56 +133,39 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('experts')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("experts").delete().eq("id", id);
 
       if (error) throw error;
       await loadData();
     } catch (err) {
-      console.error('Error deleting expert:', err);
-      setError('Failed to delete expert');
+      console.error("Error deleting expert:", err);
+      setError("Failed to delete expert");
     }
   };
 
-  useKeyAction(() => {
-    if (editingExpert) {
-      handleUpdateSaveExpert(experts.find(e => e.id === editingExpert)!);
-    }
-  }, editingExpert !== null || isNewExpert, "Enter", 500);
+  useKeyAction(
+    () => {
+      if (editingExpert) {
+        handleUpdateSaveExpert(experts.find((e) => e.id === editingExpert)!);
+      }
+    },
+    editingExpert !== null || isNewExpert,
+    "Enter",
+    500,
+  );
 
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <Button
-          onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          variant="ghost"
-        >
+        <Button onClick={onBack} className="p-2 rounded hover:bg-opacity-80" variant="ghost">
           <ArrowLeft size={20} />
         </Button>
-        <h2 
-          className="text-2xl font-bold"
-   
-        >
-          Experts Management
-        </h2>
+        <h2 className="text-2xl font-bold">Experts Management</h2>
       </div>
 
-      {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-     
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded">{error}</div>}
 
-      <Button
-        onClick={() => setIsNewExpert(true)}
-        className="w-full"        
-      >
+      <Button onClick={() => setIsNewExpert(true)} className="w-full">
         <Plus size={16} />
         Add New Expert
       </Button>
@@ -211,8 +186,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
               </TableRow>
             </TableHeader>
             <TableBody>
-
-              {experts.map(expert => (
+              {experts.map((expert) => (
                 <TableRow key={expert.id}>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
@@ -224,10 +198,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                           setEditingValues({});
                         }}
                       >
-                        <Input
-                          value={editingValues.name || ''}
-                          onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                        />
+                        <Input value={editingValues.name || ""} onChange={(e) => handleChangeEditingValues("name", e.target.value)} />
                       </FormHandler>
                     ) : (
                       expert.name
@@ -237,76 +208,64 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                     {editingExpert === expert.id ? (
                       <Input
                         type="url"
-                        value={editingValues.website || ''}
-                        onChange={(e) => handleChangeEditingValues('website', e.target.value)}
+                        value={editingValues.website || ""}
+                        onChange={(e) => handleChangeEditingValues("website", e.target.value)}
                       />
                     ) : (
-                      expert.website || '-'
+                      expert.website || "-"
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
                       <Input
                         type="email"
-                        value={editingValues.email || ''}
-                        onChange={(e) => handleChangeEditingValues('email', e.target.value)}
+                        value={editingValues.email || ""}
+                        onChange={(e) => handleChangeEditingValues("email", e.target.value)}
                       />
                     ) : (
-                      expert.email || '-'
+                      expert.email || "-"
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
                       <Input
                         type="tel"
-                        value={editingValues.phone || ''}
-                        onChange={(e) => handleChangeEditingValues('phone', e.target.value)}
+                        value={editingValues.phone || ""}
+                        onChange={(e) => handleChangeEditingValues("phone", e.target.value)}
                       />
                     ) : (
-                      expert.phone || '-'
+                      expert.phone || "-"
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
                       <Input
                         type="text"
-                        value={editingValues.vat_id || ''}
-                        onChange={(e) => handleChangeEditingValues('vat_id', e.target.value)}
+                        value={editingValues.vat_id || ""}
+                        onChange={(e) => handleChangeEditingValues("vat_id", e.target.value)}
                       />
                     ) : (
-                      expert.vat_id || '-'
+                      expert.vat_id || "-"
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
                       <Input
                         type="text"
-                        value={editingValues.registration_number || ''}
-                        onChange={(e) => handleChangeEditingValues('registration_number', e.target.value)}
+                        value={editingValues.registration_number || ""}
+                        onChange={(e) => handleChangeEditingValues("registration_number", e.target.value)}
                       />
                     ) : (
-                      expert.registration_number || '-'
+                      expert.registration_number || "-"
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
-                      <Button
-                        onClick={() => handleUpdateSaveExpert(expert)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        variant="ghost"
-                      >
-                        {editingExpert === expert.id ? (
-                          <Save size={14} />
-                        ) : (
-                          <Edit2 size={14} />
-                        )}
+                      <Button onClick={() => handleUpdateSaveExpert(expert)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
+                        {editingExpert === expert.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {!editingExpert && (
-                        <Button
-                          onClick={() => handleDelete(expert.id)}
-                          className="p-1 rounded hover:bg-opacity-80"
-                          variant="ghost"
-                        >
+                        <Button onClick={() => handleDelete(expert.id)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
                           <X size={14} />
                         </Button>
                       )}
@@ -317,15 +276,11 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
               {isNewExpert && (
                 <TableRow>
                   <TableCell className="p-2">
-                    <FormHandler
-                      isEditing={true}
-                      onSave={handleAddNewExpert}
-                      onCancel={handleCancelNewExpert}
-                    >
+                    <FormHandler isEditing={true} onSave={handleAddNewExpert} onCancel={handleCancelNewExpert}>
                       <Input
                         type="text"
-                        value={newExpert.name || ''}
-                        onChange={(e) => handleChangeNewExpert('name', e.target.value)}
+                        value={newExpert.name || ""}
+                        onChange={(e) => handleChangeNewExpert("name", e.target.value)}
                         placeholder="Enter expert name"
                       />
                     </FormHandler>
@@ -333,40 +288,40 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   <TableCell className="p-2">
                     <Input
                       type="url"
-                      value={newExpert.website || ''}
-                      onChange={(e) => handleChangeNewExpert('website', e.target.value)}
+                      value={newExpert.website || ""}
+                      onChange={(e) => handleChangeNewExpert("website", e.target.value)}
                       placeholder="Enter website URL"
                     />
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
                       type="email"
-                      value={newExpert.email || ''}
-                      onChange={(e) => handleChangeNewExpert('email', e.target.value)}
+                      value={newExpert.email || ""}
+                      onChange={(e) => handleChangeNewExpert("email", e.target.value)}
                       placeholder="Enter email"
                     />
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
                       type="tel"
-                      value={newExpert.phone || ''}
-                      onChange={(e) => handleChangeNewExpert('phone', e.target.value)}
+                      value={newExpert.phone || ""}
+                      onChange={(e) => handleChangeNewExpert("phone", e.target.value)}
                       placeholder="Enter phone"
                     />
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
                       type="text"
-                      value={newExpert.vat_id || ''}
-                      onChange={(e) => handleChangeNewExpert('vat_id', e.target.value)}
+                      value={newExpert.vat_id || ""}
+                      onChange={(e) => handleChangeNewExpert("vat_id", e.target.value)}
                       placeholder="Enter VAT ID"
                     />
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
                       type="text"
-                      value={newExpert.registration_number || ''}
-                      onChange={(e) => handleChangeNewExpert('registration_number', e.target.value)}
+                      value={newExpert.registration_number || ""}
+                      onChange={(e) => handleChangeNewExpert("registration_number", e.target.value)}
                       placeholder="Enter reg. no."
                     />
                   </TableCell>
@@ -382,7 +337,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   </TableCell>
                 </TableRow>
               )}
-        </TableBody>
+            </TableBody>
           </Table>
         </div>
       </section>

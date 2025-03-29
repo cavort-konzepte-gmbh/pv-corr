@@ -1,0 +1,14 @@
+# Artifacts
+node_modules
+dist
+coverage
+build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Files
+package-lock.json

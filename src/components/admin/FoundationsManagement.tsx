@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
-import { generateHiddenId } from '../../utils/generateHiddenId';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { supabase } from "../../lib/supabase";
+import { ArrowLeft, Plus, Edit2, X, Save } from "lucide-react";
+import { generateHiddenId } from "../../utils/generateHiddenId";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 interface FoundationsManagementProps {
   currentTheme: Theme;
@@ -34,30 +34,27 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('foundations')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from("foundations").select("*").order("created_at", { ascending: true });
 
       if (error) throw error;
       setFoundations(data || []);
     } catch (err) {
-      console.error('Error loading foundations:', err);
-      setError('Failed to load foundations');
+      console.error("Error loading foundations:", err);
+      setError("Failed to load foundations");
     } finally {
       setLoading(false);
     }
   };
 
   const handleChangeEditingValues = (name: string, value: string) => {
-    setEditingValues(previous => ({
+    setEditingValues((previous) => ({
       ...previous,
       [name]: value,
     }));
   };
 
   const handleChangeFoundation = (name: string, value: string) => {
-    setNewFoundation(previous => ({
+    setNewFoundation((previous) => ({
       ...previous,
       [name]: value,
     }));
@@ -72,18 +69,18 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
     if (editingFoundation === foundation.id) {
       try {
         const { error } = await supabase
-          .from('foundations')
-          .update({ 
-            name: editingValues.name
+          .from("foundations")
+          .update({
+            name: editingValues.name,
           })
-          .eq('id', foundation.id);
+          .eq("id", foundation.id);
 
         if (error) throw error;
         await loadData();
         resetValues();
       } catch (err) {
-        console.error('Error updating foundation:', err);
-        setError('Failed to update foundation');
+        console.error("Error updating foundation:", err);
+        setError("Failed to update foundation");
       }
     } else {
       setEditingFoundation(foundation.id);
@@ -95,16 +92,13 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
 
   const handleDeleteFoundation = async (foundationId: string) => {
     try {
-      const { error } = await supabase
-        .from('foundations')
-        .delete()
-        .eq('id', foundationId);
+      const { error } = await supabase.from("foundations").delete().eq("id", foundationId);
 
       if (error) throw error;
       await loadData();
     } catch (err) {
-      console.error('Error deleting foundation:', err);
-      setError('Failed to delete foundation');
+      console.error("Error deleting foundation:", err);
+      setError("Failed to delete foundation");
     }
   };
 
@@ -116,16 +110,14 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
   const handleAddNewFoundation = async () => {
     try {
       if (!newFoundation.name?.trim()) {
-        setError('Foundation name is required');
+        setError("Foundation name is required");
         return;
       }
 
-      const { error } = await supabase
-        .from('foundations')
-        .insert({
-          name: newFoundation.name.trim(),
-          hidden_id: generateHiddenId()
-        });
+      const { error } = await supabase.from("foundations").insert({
+        name: newFoundation.name.trim(),
+        hidden_id: generateHiddenId(),
+      });
 
       if (error) throw error;
       await loadData();
@@ -133,8 +125,8 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
       setNewFoundation({});
       setIsNewFoundation(false);
     } catch (err) {
-      console.error('Error creating foundation:', err);
-      setError('Failed to create foundation');
+      console.error("Error creating foundation:", err);
+      setError("Failed to create foundation");
     }
   };
 
@@ -146,38 +138,22 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
 
   return (
     <div className="p-8">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       <div className="flex items-center gap-4 mb-8">
-        <Button
-          onClick={onBack}
-          variant="ghost"
-        >
+        <Button onClick={onBack} variant="ghost">
           <ArrowLeft className="text-primary" size={20} />
         </Button>
-        <h2 className="text-2xl font-bold">
-          Foundations Management
-        </h2>
+        <h2 className="text-2xl font-bold">Foundations Management</h2>
       </div>
 
       {loading ? (
-        <div className="text-center p-4 text-primary">
-          Loading foundations...
-        </div>
+        <div className="text-center p-4 text-primary">Loading foundations...</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg text-primary">
-              Foundations
-            </h3>
-            <Button
-              onClick={handleOpenFoundation}
-              className="px-3 py-1"
-            >
+            <h3 className="text-lg text-primary">Foundations</h3>
+            <Button onClick={handleOpenFoundation} className="px-3 py-1">
               <Plus size={14} />
               Add Foundation
             </Button>
@@ -185,80 +161,70 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
               <Table>
-              <TableCaption>Foundations</TableCaption>
-              <TableHeader>
-                <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Actions</TableHead>
-                </TableRow>
-               
-              </TableHeader>
-              <TableBody>
-
-
-         
-         
-                {foundations.map((foundation) => (
-                  <TableRow key={foundation.id}>
-                    <TableCell className="p-2">
-                      {editingFoundation === foundation.id ? (
+                <TableCaption>Foundations</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {foundations.map((foundation) => (
+                    <TableRow key={foundation.id}>
+                      <TableCell className="p-2">
+                        {editingFoundation === foundation.id ? (
+                          <Input
+                            type="text"
+                            name="name"
+                            value={editingValues.name || ""}
+                            onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          />
+                        ) : (
+                          foundation.name
+                        )}
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex items-center justify-start gap-2">
+                          <Button
+                            onClick={() => handleUpdateSaveFoundation(foundation)}
+                            className="p-1 rounded hover:bg-opacity-80"
+                            variant="ghost"
+                          >
+                            {editingFoundation === foundation.id ? <Save size={14} /> : <Edit2 size={14} />}
+                          </Button>
+                          <Button onClick={() => handleDeleteFoundation(foundation.id)} variant="ghost">
+                            <X size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {isNewFoundation && (
+                    <TableRow>
+                      <TableCell className="p-2">
                         <Input
                           type="text"
                           name="name"
-                          value={editingValues.name || ''}
-                          onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
+                          value={newFoundation.name || ""}
+                          onChange={(e) => handleChangeFoundation(e.target.name, e.target.value)}
+                          className="w-full p-1"
+                          placeholder="Enter foundation name"
                         />
-                      ) : (
-                        foundation.name
-                      )}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex items-center justify-start gap-2">
-                        <Button
-                          onClick={() => handleUpdateSaveFoundation(foundation)}
-                          className="p-1 rounded hover:bg-opacity-80"
-                          variant="ghost"
-                        >
-                          {editingFoundation === foundation.id ? (
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex items-center justify-start gap-2">
+                          <Button onClick={handleAddNewFoundation} variant="ghost">
                             <Save size={14} />
-                          ) : (
-                            <Edit2 size={14} />
-                          )}
-                        </Button>
-                        <Button onClick={() => handleDeleteFoundation(foundation.id)} variant="ghost">
-                          <X size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {isNewFoundation && (
-                  <TableRow>
-                    <TableCell className="p-2">
-                      <Input
-                        type="text"
-                        name="name"
-                        value={newFoundation.name || ''}
-                        onChange={(e) => handleChangeFoundation(e.target.name, e.target.value)}
-                        className="w-full p-1"
-                        placeholder="Enter foundation name"
-                      />
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <div className="flex items-center justify-start gap-2">
-                        <Button onClick={handleAddNewFoundation} variant="ghost">
-                          <Save size={14} />
-                        </Button>
-                        <Button onClick={handleCancelNewFoundation} variant="ghost">
-                          <X size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-                 </TableBody>
-
-             </Table>
+                          </Button>
+                          <Button onClick={handleCancelNewFoundation} variant="ghost">
+                            <X size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </section>
         </div>

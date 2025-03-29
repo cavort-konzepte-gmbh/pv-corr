@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../types/theme';
-import { Plus, Edit2, Save, X, Clock } from 'lucide-react';
-import { NotificationDuration, DURATION_OPTIONS } from '../../../types/security';
-import { generateHiddenId } from '../../../utils/generateHiddenId';
+import React, { useState } from "react";
+import { Theme } from "../../../types/theme";
+import { Plus, Edit2, Save, X, Clock } from "lucide-react";
+import { NotificationDuration, DURATION_OPTIONS } from "../../../types/security";
+import { generateHiddenId } from "../../../utils/generateHiddenId";
 
 interface InfoNotificationsProps {
   currentTheme: Theme;
@@ -13,10 +13,10 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formValues, setFormValues] = useState({
-    name: '',
-    description: '',
-    duration: 'timed' as NotificationDuration,
-    timeout: 5
+    name: "",
+    description: "",
+    duration: "timed" as NotificationDuration,
+    timeout: 5,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,16 +24,16 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
     const notification = {
       id: `info-${notifications.length + 1}`,
       hidden_id: generateHiddenId(),
-      type: 'info',
-      ...formValues
+      type: "info",
+      ...formValues,
     };
     setNotifications([...notifications, notification]);
     setShowForm(false);
     setFormValues({
-      name: '',
-      description: '',
-      duration: 'timed',
-      timeout: 5
+      name: "",
+      description: "",
+      duration: "timed",
+      timeout: 5,
     });
   };
 
@@ -42,9 +42,9 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
       <button
         onClick={() => setShowForm(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
-        style={{ 
+        style={{
           backgroundColor: currentTheme.colors.accent.primary,
-          color: 'white'
+          color: "white",
         }}
       >
         <Plus size={16} />
@@ -54,10 +54,8 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-            <h3 className="text-lg mb-6 text-primary">
-              {editingId ? 'Edit Information Notification' : 'New Information Notification'}
-            </h3>
-            
+            <h3 className="text-lg mb-6 text-primary">{editingId ? "Edit Information Notification" : "New Information Notification"}</h3>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm mb-1 text-secondary">
@@ -94,13 +92,15 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                 </label>
                 <select
                   value={formValues.duration}
-                  onChange={(e) => setFormValues({ 
-                    ...formValues, 
-                    duration: e.target.value as NotificationDuration
-                  })}
+                  onChange={(e) =>
+                    setFormValues({
+                      ...formValues,
+                      duration: e.target.value as NotificationDuration,
+                    })
+                  }
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  {DURATION_OPTIONS.map(option => (
+                  {DURATION_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -108,7 +108,7 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                 </select>
               </div>
 
-              {formValues.duration === 'timed' && (
+              {formValues.duration === "timed" && (
                 <div>
                   <label className="block text-sm mb-1 text-secondary">
                     Timeout (seconds)
@@ -132,10 +132,10 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                     setShowForm(false);
                     setEditingId(null);
                     setFormValues({
-                      name: '',
-                      description: '',
-                      duration: 'timed',
-                      timeout: 5
+                      name: "",
+                      description: "",
+                      duration: "timed",
+                      timeout: 5,
                     });
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
@@ -147,7 +147,7 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                   className="px-4 py-2 rounded text-sm text-white"
                   style={{ backgroundColor: currentTheme.colors.accent.primary }}
                 >
-                  {editingId ? 'Save Changes' : 'Create Notification'}
+                  {editingId ? "Save Changes" : "Create Notification"}
                 </button>
               </div>
             </form>
@@ -156,7 +156,7 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
       )}
 
       <div className="space-y-4">
-        {notifications.map(notification => (
+        {notifications.map((notification) => (
           <div
             key={notification.id}
             className="p-4 rounded-lg border transition-all text-primary border-theme bg-surface"
@@ -177,7 +177,7 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                       name: notification.name,
                       description: notification.description,
                       duration: notification.duration,
-                      timeout: notification.timeout || 5
+                      timeout: notification.timeout || 5,
                     });
                     setShowForm(true);
                   }}
@@ -186,25 +186,22 @@ const InfoNotifications: React.FC<InfoNotificationsProps> = ({ currentTheme }) =
                   <Edit2 size={14} />
                 </button>
                 <button
-                  onClick={() => setNotifications(notifications.filter(n => n.id !== notification.id))}
+                  onClick={() => setNotifications(notifications.filter((n) => n.id !== notification.id))}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
                   <X size={14} />
                 </button>
               </div>
             </div>
-            <p className="text-sm text-secondary mb-2">
-              {notification.description}
-            </p>
+            <p className="text-sm text-secondary mb-2">{notification.description}</p>
             <div className="flex items-center gap-2 text-xs text-secondary">
               <Clock size={12} />
               <span>
-                {notification.duration === 'timed' 
+                {notification.duration === "timed"
                   ? `Auto-dismiss after ${notification.timeout}s`
-                  : notification.duration === 'acknowledge'
-                  ? 'Requires acknowledgment'
-                  : 'Persistent until dismissed'
-                }
+                  : notification.duration === "acknowledge"
+                    ? "Requires acknowledgment"
+                    : "Persistent until dismissed"}
               </span>
             </div>
           </div>

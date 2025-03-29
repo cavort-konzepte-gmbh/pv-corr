@@ -4,40 +4,40 @@ on:
 jobs:
   copy-to-timestamp-branch:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Configure Git
         run: |
           git config --global user.name 'GitHub Actions Bot'
           git config --global user.email 'actions@github.com'
-      
+
       - name: Generate timestamp branch name
         id: timestamp
         run: |
           echo "BRANCH_NAME=$(date +'%Y%m%d%H%M')" >> $GITHUB_ENV
-      
+
       - name: Clone source repository
         run: |
           git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git source-repo
-      
+
       - name: Clone destination repository
         run: |
           git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git dest-repo
-      
+
       - name: Create new branch in destination repository
         run: |
           cd dest-repo
           git checkout -b ${{ env.BRANCH_NAME }}
-          
+
           # Remove all content (except .git) to ensure clean state
           find . -mindepth 1 -not -path "./.git*" -exec rm -rf {} \; 2>/dev/null || true
-      
+
       - name: Copy files from source to destination
         run: |
           cd source-repo
           # Copy all files except .git, supabase, .backup directories, and copy-to-timestamp.yml
           find . -mindepth 1 -not -path "./.git*" -not -path "./supabase*" -not -path "./.backup*" -not -path "./.github/workflows/copy-to-timestamp.yml" -exec cp -r --parents {} ../dest-repo/ \;
-      
+
       - name: Commit and push to new branch
         run: |
           cd dest-repo
@@ -45,7 +45,7 @@ jobs:
           git add .
           git commit -m "Copy content from cvrt-jh/pv-corr as of $(date +'%Y-%m-%d %H:%M')"
           git push https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git ${{ env.BRANCH_NAME }}
-      
+
       - name: Cleanup
         if: always()
         run: |

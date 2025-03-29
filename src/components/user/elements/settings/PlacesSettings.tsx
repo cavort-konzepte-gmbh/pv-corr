@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Language, useTranslation } from '../../../../types/language';
-import { supabase } from '../../../../lib/supabase';
-import { Plus, ChevronRight, MapPin, Edit2, X } from 'lucide-react';
-import { generateHiddenId } from '../../../../utils/generateHiddenId';
-import { useKeyAction } from '../../../../hooks/useKeyAction';
-import { Button } from '@/components/ui/button';
-import { Label } from '@radix-ui/react-label';
-import { Input } from '@/components/ui/input';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../../../types/theme";
+import { Language, useTranslation } from "../../../../types/language";
+import { supabase } from "../../../../lib/supabase";
+import { Plus, ChevronRight, MapPin, Edit2, X } from "lucide-react";
+import { generateHiddenId } from "../../../../utils/generateHiddenId";
+import { useKeyAction } from "../../../../hooks/useKeyAction";
+import { Button } from "@/components/ui/button";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "@/components/ui/input";
 
 interface PlacesSettingsProps {
   currentTheme: Theme;
@@ -39,11 +39,7 @@ interface SavedPlace {
   [key: string]: any;
 }
 
-const PlacesSettings: React.FC<PlacesSettingsProps> = ({
-  currentTheme,
-  currentLanguage,
-  places
-}) => {
+const PlacesSettings: React.FC<PlacesSettingsProps> = ({ currentTheme, currentLanguage, places }) => {
   const [showNewPlaceForm, setShowNewPlaceForm] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -60,16 +56,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
   const loadCountries = async () => {
     try {
-      const { data: countriesData, error: countriesError } = await supabase
-        .from('countries')
-        .select('*')
-        .order('name');
+      const { data: countriesData, error: countriesError } = await supabase.from("countries").select("*").order("name");
 
       if (countriesError) throw countriesError;
       setCountries(countriesData);
     } catch (err) {
-      console.error('Error loading countries:', err);
-      setError('Failed to load countries');
+      console.error("Error loading countries:", err);
+      setError("Failed to load countries");
     } finally {
       setLoading(false);
     }
@@ -78,8 +71,9 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
   const loadAddressFields = async (countryId: string) => {
     try {
       const { data, error } = await supabase
-        .from('country_address_fields')
-        .select(`
+        .from("country_address_fields")
+        .select(
+          `
           field_id,
           required,
           display_order,
@@ -91,45 +85,46 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
           address_field_translations!inner (
             label
           )
-        `)
-        .eq('country_id', countryId)
-        .eq('address_field_translations.language', currentLanguage)
-        .eq('address_field_translations.field_id', 'address_fields.id')
-        .order('display_order');
+        `,
+        )
+        .eq("country_id", countryId)
+        .eq("address_field_translations.language", currentLanguage)
+        .eq("address_field_translations.field_id", "address_fields.id")
+        .order("display_order");
 
       if (error) throw error;
 
-      const fields = data.map(field => ({
+      const fields = data.map((field) => ({
         id: field.address_fields.id,
         code: field.address_fields.code,
         field_type: field.address_fields.field_type,
         required: field.required,
         display_order: field.display_order,
-        label: field.address_field_translations[0]?.label || field.address_fields.code
+        label: field.address_field_translations[0]?.label || field.address_fields.code,
       }));
 
       setAddressFields(fields);
     } catch (err) {
-      console.error('Error loading address fields:', err);
-      setError('Failed to load address fields');
+      console.error("Error loading address fields:", err);
+      setError("Failed to load address fields");
     }
   };
 
   const handleCountrySelect = async (country: Country) => {
     setSelectedCountry(country);
     await loadAddressFields(country.id);
-    setFormValues({ name: '', country: country.code });
+    setFormValues({ name: "", country: country.code });
   };
 
   const handleInputChange = (fieldId: string, value: string) => {
-    setFormValues(prev => ({
+    setFormValues((prev) => ({
       ...prev,
-      [fieldId]: value
+      [fieldId]: value,
     }));
   };
 
   const handleEditPlace = async (place: SavedPlace) => {
-    const country = countries.find(c => c.code === place.country);
+    const country = countries.find((c) => c.code === place.country);
     if (!country) return;
 
     setEditingPlace(place);
@@ -145,18 +140,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
     try {
       const data = {
-          hidden_id: generateHiddenId(),
-          ...formValues
+        hidden_id: generateHiddenId(),
+        ...formValues,
       };
 
       const { error } = editingPlace
-        ? await supabase
-            .from('places')
-            .update(data)
-            .eq('id', editingPlace.id)
-        : await supabase
-            .from('places')
-            .insert(data);
+        ? await supabase.from("places").update(data).eq("id", editingPlace.id)
+        : await supabase.from("places").insert(data);
 
       if (error) throw error;
 
@@ -165,14 +155,14 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
       setFormValues({});
       setEditingPlace(null);
     } catch (err) {
-      console.error('Error saving place:', err);
-      setError('Failed to save place');
+      console.error("Error saving place:", err);
+      setError("Failed to save place");
     }
   };
 
   useKeyAction(() => {
     if (showNewPlaceForm && selectedCountry) {
-      handleSubmit(new Event('submit') as any);
+      handleSubmit(new Event("submit") as any);
     }
   }, showNewPlaceForm && !!selectedCountry);
 
@@ -186,16 +176,10 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
         {translation("place.new")}
       </Button>
 
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
-          {translation("place.loading")}
-        </div>
+        <div className="text-center p-4 text-secondary">{translation("place.loading")}</div>
       ) : (
         <>
           {showNewPlaceForm ? (
@@ -204,10 +188,10 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                 <MapPin className="text-accent-primary" size={16} />
                 {selectedCountry ? `${translation("place.new_place")} ${selectedCountry.name}` : translation("place.select_country")}
               </h3>
-              
+
               {!selectedCountry ? (
                 <div className="grid grid-cols-2 gap-4">
-                  {countries.map(country => (
+                  {countries.map((country) => (
                     <Button
                       key={country.id}
                       onClick={() => handleCountrySelect(country)}
@@ -226,15 +210,15 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    {addressFields.map(field => (
+                    {addressFields.map((field) => (
                       <div key={field.id}>
                         <Label className="block text-sm mb-1 text-secondary">
                           {field.label}
                           {field.required && <span className="text-red-500 ml-1">*</span>}
                         </Label>
                         <Input
-                          type={field.field_type === 'number' ? 'number' : 'text'}
-                          value={formValues[field.code] || ''}
+                          type={field.field_type === "number" ? "number" : "text"}
+                          value={formValues[field.code] || ""}
                           onChange={(e) => handleInputChange(field.code, e.target.value)}
                           required={field.required}
                           className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -255,10 +239,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                     >
                       {translation("actions.cancel")}
                     </Button>
-                    <Button
-                      type="submit"
-                      className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                    >
+                    <Button type="submit" className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
                       {editingPlace ? translation("actions.save") : translation("place.add")}
                     </Button>
                   </div>
@@ -267,8 +248,8 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {places.map(place => {
-                const country = countries.find(c => c.code === place.country);
+              {places.map((place) => {
+                const country = countries.find((c) => c.code === place.country);
                 if (!country) return null;
 
                 return (
@@ -294,8 +275,10 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                         place.postal_code,
                         place.city,
                         place.state,
-                        place.province
-                      ].filter(Boolean).join(', ')}
+                        place.province,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
                     </div>
                   </div>
                 );

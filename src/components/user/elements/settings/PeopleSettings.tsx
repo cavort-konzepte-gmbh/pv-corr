@@ -1,8 +1,8 @@
-import React from 'react';
-import { Theme } from '../../../../types/theme';
-import { Language } from '../../../../types/language';
-import PeoplePanel from '../../../PeoplePanel';
-import { Person } from '../../../../types/people';
+import React from "react";
+import { Theme } from "../../../../types/theme";
+import { Language } from "../../../../types/language";
+import PeoplePanel from "../../../PeoplePanel";
+import { Person } from "../../../../types/people";
 
 interface PeopleSettingsProps {
   currentTheme: Theme;
@@ -12,13 +12,7 @@ interface PeopleSettingsProps {
   onCreateCustomer?: (personId: string, name: string) => void;
 }
 
-const PeopleSettings: React.FC<PeopleSettingsProps> = ({
-  currentTheme,
-  currentLanguage,
-  savedPeople,
-  onSavePeople,
-  onCreateCustomer
-}) => {
+const PeopleSettings: React.FC<PeopleSettingsProps> = ({ currentTheme, currentLanguage, savedPeople, onSavePeople, onCreateCustomer }) => {
   return (
     <PeoplePanel
       currentTheme={currentTheme}

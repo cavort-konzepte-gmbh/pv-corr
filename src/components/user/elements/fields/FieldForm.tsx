@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Theme } from '../../../../types/theme';
-import { Plus, Folder } from 'lucide-react';
-import { createField } from '../../../../services/fields';
-import { fetchProjects } from '../../../../services/projects';
-import { Language, useTranslation } from '../../../../types/language';
-import { Project } from '../../../../types/projects';
-import { Label } from '@radix-ui/react-label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Plus, Folder } from "lucide-react";
+import { createField } from "../../../../services/fields";
+import { fetchProjects } from "../../../../services/projects";
+import { Language, useTranslation } from "../../../../types/language";
+import { Project } from "../../../../types/projects";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const initialState = {
-  name: '',
-  latitude: '',
-  longitude: '',
-  has_fence: ''
-}
+  name: "",
+  latitude: "",
+  longitude: "",
+  has_fence: "",
+};
 
 interface FieldFormProps {
   currentTheme: Theme;
@@ -23,12 +23,7 @@ interface FieldFormProps {
   currentLanguage: Language;
 }
 
-const FieldForm: React.FC<FieldFormProps> = ({
-  currentTheme,
-  selectedProjectId,
-  onProjectsChange,
-  currentLanguage,
-}) => {
+const FieldForm: React.FC<FieldFormProps> = ({ currentTheme, selectedProjectId, onProjectsChange, currentLanguage }) => {
   const [showForm, setShowForm] = useState(false);
   const [newField, setNewField] = useState(initialState);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +31,9 @@ const FieldForm: React.FC<FieldFormProps> = ({
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
-    setNewField(previous => ({
+    setNewField((previous) => ({
       ...previous,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -49,7 +44,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if(!newField || !selectedProjectId) return;
+    if (!newField || !selectedProjectId) return;
     try {
       await createField(selectedProjectId, newField);
       // Fetch fresh projects data to ensure everything is in sync
@@ -58,15 +53,15 @@ const FieldForm: React.FC<FieldFormProps> = ({
         onProjectsChange(updatedProjects);
       }
     } catch (err) {
-      console.error('Error creating field:', err);
-      setError('Failed to create field');
+      console.error("Error creating field:", err);
+      setError("Failed to create field");
     }
     handleReset();
   };
 
   return (
     <>
-      <button 
+      <button
         className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
         onClick={() => setShowForm(true)}
       >
@@ -134,10 +129,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 >
                   {translation("actions.cancel")}
                 </Button>
-                <Button
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                  type="submit"
-                >
+                <Button className="px-4 py-2 rounded text-sm text-white bg-accent-primary" type="submit">
                   {translation("actions.save")}
                 </Button>
               </div>

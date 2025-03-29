@@ -1,10 +1,10 @@
-import React from 'react';
-import { Theme } from '../../types/theme';
-import { Customer } from '../../types/customers';
-import { ChevronRight } from 'lucide-react';
-import CustomerList from './elements/customers/CustomerList';
-import { Person } from '../../types/people';
-import { Company } from '../../types/companies';
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Customer } from "../../types/customers";
+import { ChevronRight } from "lucide-react";
+import CustomerList from "./elements/customers/CustomerList";
+import { Person } from "../../types/people";
+import { Company } from "../../types/companies";
 
 interface CustomersProps {
   currentTheme: Theme;
@@ -21,7 +21,7 @@ const Customers: React.FC<CustomersProps> = ({
   savedPeople,
   savedCompanies,
   onSelectCustomer,
-  onSelectUncategorized
+  onSelectUncategorized,
 }) => {
   return (
     <div className="p-6">
@@ -46,6 +46,6 @@ const Customers: React.FC<CustomersProps> = ({
       />
     </div>
   );
-}
+};
 
 export default Customers;

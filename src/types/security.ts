@@ -1,8 +1,8 @@
-export type NotificationDuration = 'timed' | 'acknowledge' | 'persistent';
+export type NotificationDuration = "timed" | "acknowledge" | "persistent";
 
 export interface Notification {
   id: string;
-  type: 'info' | 'warning' | 'error';
+  type: "info" | "warning" | "error";
   name: string;
   description: string;
   duration: NotificationDuration;
@@ -13,7 +13,7 @@ export interface Notification {
 }
 
 export const DURATION_OPTIONS = [
-  { value: 'timed', label: 'Timed (auto-dismisses after specified time)' },
-  { value: 'acknowledge', label: 'Acknowledge (requires user acknowledgment)' },
-  { value: 'persistent', label: 'Persistent (can be manually dismissed)' }
+  { value: "timed", label: "Timed (auto-dismisses after specified time)" },
+  { value: "acknowledge", label: "Acknowledge (requires user acknowledgment)" },
+  { value: "persistent", label: "Persistent (can be manually dismissed)" },
 ] as const;

@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface NavigationState {
-  view: 'customers' | 'projects' | 'fields' | 'zones' | 'datapoints' | 'analyse' | 'evaluation' | 'output' | 'settings';
+  view: "customers" | "projects" | "fields" | "zones" | "datapoints" | "analyse" | "evaluation" | "output" | "settings";
   selectedProjectId: string | undefined;
   selectedFieldId: string | undefined;
   selectedZoneId: string | undefined;
@@ -10,19 +10,19 @@ interface NavigationState {
 }
 
 const initialState: NavigationState = {
-  view: 'customers',
+  view: "customers",
   selectedProjectId: undefined,
   selectedFieldId: undefined,
   selectedZoneId: undefined,
   selectedCustomerId: null,
-  lastActive: Date.now()
+  lastActive: Date.now(),
 };
 
 const navigationSlice = createSlice({
-  name: 'navigation',
+  name: "navigation",
   initialState,
   reducers: {
-    setView: (state, action: PayloadAction<NavigationState['view']>) => {
+    setView: (state, action: PayloadAction<NavigationState["view"]>) => {
       state.view = action.payload;
     },
     setSelectedProjectId: (state, action: PayloadAction<string | undefined>) => {
@@ -44,8 +44,8 @@ const navigationSlice = createSlice({
     },
     updateLastActive: (state) => {
       state.lastActive = Date.now();
-    }
-  }
+    },
+  },
 });
 
 export const {
@@ -55,7 +55,7 @@ export const {
   setSelectedZoneId,
   setSelectedCustomerId,
   resetNavigation,
-  updateLastActive
+  updateLastActive,
 } = navigationSlice.actions;
 
 export default navigationSlice.reducer;

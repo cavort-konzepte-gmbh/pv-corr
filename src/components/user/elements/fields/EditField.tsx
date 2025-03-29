@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 interface EditFieldProps {
   field: {
-    id: string,
+    id: string;
     name: string;
     latitude: string;
     longitude: string;
@@ -17,22 +17,14 @@ interface EditFieldProps {
   isEditingCoordinates: boolean;
   setShowForm: Dispatch<SetStateAction<boolean>>;
   onProjectsChange: (projects: any[]) => void;
-  currentLanguage: Language
+  currentLanguage: Language;
 }
 
-export const EditField = ({ 
-  field, 
-  isEditingCoordinates, 
-  setShowForm, 
-  onProjectsChange,
-  currentLanguage,
-}: EditFieldProps) => {
+export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjectsChange, currentLanguage }: EditFieldProps) => {
   const [fields, setFields] = useState(field);
   const translation = useTranslation(currentLanguage);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFields((previous) => ({
       ...previous,
@@ -42,30 +34,27 @@ export const EditField = ({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const { id, ...data } = fields
+    const { id, ...data } = fields;
     try {
-      await updateField(id, data)
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
-    } catch(error) {
-      console.error('Error updating field:', error)
+      await updateField(id, data);
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+    } catch (error) {
+      console.error("Error updating field:", error);
     }
-    setShowForm(false)
-  }
+    setShowForm(false);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="p-6 rounded-lg max-w-md w-full bg-surface">
         <h3 className="flex gap-2 text-lg mb-4 text-primary">
           <Folder className="text-accent-primary" />
-          { isEditingCoordinates ? "Edit Coordinates" : "Edit Field"}
+          {isEditingCoordinates ? "Edit Coordinates" : "Edit Field"}
         </h3>
         <form onSubmit={handleSubmit}>
           {!isEditingCoordinates && (
-            <Label
-              className="block text-sm mb-1 text-secondary"
-              htmlFor="new-field"
-            >
+            <Label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
               {translation("field.name")}
               <input
                 className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
@@ -119,10 +108,7 @@ export const EditField = ({
             >
               {translation("actions.cancel")}
             </Button>
-            <Button
-              className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-              type="submit"
-            >
+            <Button className="px-4 py-2 rounded text-sm text-white bg-accent-primary" type="submit">
               {translation("actions.save")}
             </Button>
           </div>

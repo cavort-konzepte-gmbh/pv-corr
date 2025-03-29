@@ -17,7 +17,7 @@ export const fetchCompanies = async (): Promise<Company[]> => {
         registration_number,
         ceo_id,
         contact_person_id
-      `
+      `,
       )
       .order("created_at", { ascending: true });
     if (error) {

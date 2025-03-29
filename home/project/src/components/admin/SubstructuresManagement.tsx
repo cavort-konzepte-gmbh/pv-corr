@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Theme } from '../../types/theme';
-import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Link, Image } from 'lucide-react';
-import { generateHiddenId } from '../../utils/generateHiddenId';
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { supabase } from "../../lib/supabase";
+import { ArrowLeft, Plus, Edit2, X, Link, Image } from "lucide-react";
+import { generateHiddenId } from "../../utils/generateHiddenId";
 
 interface SubstructuresManagementProps {
   currentTheme: Theme;
@@ -14,7 +14,7 @@ interface Substructure {
   manufacturer: string;
   system: string;
   version: string;
-  type: 'roof' | 'field';
+  type: "roof" | "field";
   link?: string;
   schematic?: string;
   example?: string;
@@ -35,16 +35,13 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('substructures')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from("substructures").select("*").order("created_at", { ascending: true });
 
       if (error) throw error;
       setSubstructures(data || []);
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('Failed to load data');
+      console.error("Error loading data:", err);
+      setError("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -53,26 +50,21 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
   const handleSubmit = async () => {
     try {
       if (!formValues.manufacturer || !formValues.system || !formValues.version || !formValues.type) {
-        setError('Please fill in all required fields');
+        setError("Please fill in all required fields");
         return;
       }
 
       const data = {
         ...formValues,
-        hidden_id: generateHiddenId()
+        hidden_id: generateHiddenId(),
       };
 
       if (editingId) {
-        const { error } = await supabase
-          .from('substructures')
-          .update(data)
-          .eq('id', editingId);
+        const { error } = await supabase.from("substructures").update(data).eq("id", editingId);
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('substructures')
-          .insert(data);
+        const { error } = await supabase.from("substructures").insert(data);
 
         if (error) throw error;
       }
@@ -82,49 +74,37 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       setEditingId(null);
       setFormValues({});
     } catch (err) {
-      console.error('Error saving substructure:', err);
-      setError('Failed to save substructure');
+      console.error("Error saving substructure:", err);
+      setError("Failed to save substructure");
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('substructures')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("substructures").delete().eq("id", id);
 
       if (error) throw error;
       await loadData();
     } catch (err) {
-      console.error('Error deleting substructure:', err);
-      setError('Failed to delete substructure');
+      console.error("Error deleting substructure:", err);
+      setError("Failed to delete substructure");
     }
   };
 
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80 text-secondary"
-        >
+        <button onClick={onBack} className="p-2 rounded hover:bg-opacity-80 text-secondary">
           <ArrowLeft size={20} />
         </button>
-        <h2 className="text-2xl font-bold text-primary">
-          Substructures Management
-        </h2>
+        <h2 className="text-2xl font-bold text-primary">Substructures Management</h2>
       </div>
 
-      {error && (
-        <div className="p-4 mb-4 rounded text-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       <button
         onClick={() => setShowNewForm(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"        
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
         Add New Substructure
@@ -133,54 +113,44 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       {showNewForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-            <h3 className="text-lg mb-6 text-primary">
-              {editingId ? 'Edit Substructure' : 'New Substructure'}
-            </h3>
+            <h3 className="text-lg mb-6 text-primary">{editingId ? "Edit Substructure" : "New Substructure"}</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Manufacturer
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Manufacturer</label>
                 <input
                   type="text"
-                  value={formValues.manufacturer || ''}
+                  value={formValues.manufacturer || ""}
                   onChange={(e) => setFormValues({ ...formValues, manufacturer: e.target.value })}
                   className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  System
-                </label>
+                <label className="block text-sm mb-1 text-secondary">System</label>
                 <input
                   type="text"
-                  value={formValues.system || ''}
+                  value={formValues.system || ""}
                   onChange={(e) => setFormValues({ ...formValues, system: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme"                  
+                  className="w-full p-2 rounded text-sm text-primary border-theme"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Version
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Version</label>
                 <input
                   type="text"
-                  value={formValues.version || ''}
+                  value={formValues.version || ""}
                   onChange={(e) => setFormValues({ ...formValues, version: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme"                  
+                  className="w-full p-2 rounded text-sm text-primary border-theme"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Type
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Type</label>
                 <select
-                  value={formValues.type || ''}
-                  onChange={(e) => setFormValues({ ...formValues, type: e.target.value as 'roof' | 'field' })}
+                  value={formValues.type || ""}
+                  onChange={(e) => setFormValues({ ...formValues, type: e.target.value as "roof" | "field" })}
                   className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 >
                   <option value="">Select type</option>
@@ -190,38 +160,32 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Link
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Link</label>
                 <input
                   type="url"
-                  value={formValues.link || ''}
+                  value={formValues.link || ""}
                   onChange={(e) => setFormValues({ ...formValues, link: e.target.value })}
                   className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Schematic URL
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Schematic URL</label>
                 <input
                   type="url"
-                  value={formValues.schematic || ''}
+                  value={formValues.schematic || ""}
                   onChange={(e) => setFormValues({ ...formValues, schematic: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"                  
+                  className="w-full p-2 rounded text-sm text-primary border-theme bg-theme"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1 text-secondary">
-                  Example URL
-                </label>
+                <label className="block text-sm mb-1 text-secondary">Example URL</label>
                 <input
                   type="url"
-                  value={formValues.example || ''}
+                  value={formValues.example || ""}
                   onChange={(e) => setFormValues({ ...formValues, example: e.target.value })}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"                  
+                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
                 />
               </div>
 
@@ -232,15 +196,12 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                     setEditingId(null);
                     setFormValues({});
                   }}
-                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"                  
+                  className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={handleSubmit}
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"                
-                >
-                  {editingId ? 'Save Changes' : 'Create Substructure'}
+                <button onClick={handleSubmit} className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
+                  {editingId ? "Save Changes" : "Create Substructure"}
                 </button>
               </div>
             </div>
@@ -249,22 +210,19 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
       )}
 
       <div className="space-y-4">
-        {substructures.map(substructure => (
-          <div
-            key={substructure.id}
-            className="p-4 rounded-lg border-theme border-solid bg-surface"            
-          >
+        {substructures.map((substructure) => (
+          <div key={substructure.id} className="p-4 rounded-lg border-theme border-solid bg-surface">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <div className="flex items-center gap-2">
                   <span style={{ color: currentTheme.colors.text.primary }}>
                     {substructure.manufacturer} - {substructure.system} ({substructure.version})
                   </span>
-                  <span 
+                  <span
                     className="text-xs px-2 py-1 rounded"
-                    style={{ 
+                    style={{
                       backgroundColor: `${currentTheme.colors.accent.primary}20`,
-                      color: currentTheme.colors.accent.primary
+                      color: currentTheme.colors.accent.primary,
                     }}
                   >
                     {substructure.type}
@@ -282,10 +240,7 @@ const SubstructuresManagement: React.FC<SubstructuresManagementProps> = ({ curre
                 >
                   <Edit2 size={14} />
                 </button>
-                <button
-                  onClick={() => handleDelete(substructure.id)}
-                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                >
+                <button onClick={() => handleDelete(substructure.id)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
                   <X size={14} />
                 </button>
               </div>

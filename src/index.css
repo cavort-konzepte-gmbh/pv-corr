@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 .landing-page {
-  background-image: url('./media/index-background.jpg');
+  background-image: url("./media/index-background.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 * {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 14px;
 }
 
@@ -89,7 +89,6 @@
     --chart-5: 340 75% 55%;
   }
 
-
   html[data-theme="green"] {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -117,7 +116,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
   }
- 
+
   html[data-theme="green"].dark {
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
