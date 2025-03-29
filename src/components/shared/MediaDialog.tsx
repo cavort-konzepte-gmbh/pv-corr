@@ -1,148 +1,148 @@
-import React, { useState, useEffect } from 'react'
-import { Upload, X, Edit3, Eye, Image as ImageIcon, FileText, Video, Save } from 'lucide-react'
-import { Theme } from '../../types/theme'
-import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia, deleteMedia } from '../../services/media'
-import { DeleteConfirmDialog } from './FormHandler'
+import React, { useState, useEffect } from "react";
+import { Upload, X, Edit3, Eye, Image as ImageIcon, FileText, Video, Save } from "lucide-react";
+import { Theme } from "../../types/theme";
+import { fetchMediaUrlsByEntityId, useSupabaseMedia, updateMedia, deleteMedia } from "../../services/media";
+import { DeleteConfirmDialog } from "./FormHandler";
 
 interface MediaDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  entityId: string
-  currentTheme: Theme
-  entityType: string
+  isOpen: boolean;
+  onClose: () => void;
+  entityId: string;
+  currentTheme: Theme;
+  entityType: string;
 }
 
 const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, currentTheme, entityType }) => {
-  const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null)
-  const [mediaNotes, setMediaNotes] = useState<{ [key: string]: string }>({})
-  const [renamingMedia, setRenamingMedia] = useState<string | null>(null)
-  const [newMediaName, setNewMediaName] = useState<string>('')
-  const [showMedia, setShowMedia] = useState<boolean>(false)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [newMediaFile, setNewMediaFile] = useState<File | null>(null)
-  const [mediaData, setMediaData] = useState<{ url: string; title: string; description: string }[]>([])
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({})
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [deleteConfirmName, setDeleteConfirmName] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [isUploading, setIsUploading] = useState<boolean>(false)
-  const { uploadMedia } = useSupabaseMedia(entityType)
+  const [fullscreenMedia, setFullscreenMedia] = useState<string | null>(null);
+  const [mediaNotes, setMediaNotes] = useState<{ [key: string]: string }>({});
+  const [renamingMedia, setRenamingMedia] = useState<string | null>(null);
+  const [newMediaName, setNewMediaName] = useState<string>("");
+  const [showMedia, setShowMedia] = useState<boolean>(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [newMediaFile, setNewMediaFile] = useState<File | null>(null);
+  const [mediaData, setMediaData] = useState<{ url: string; title: string; description: string }[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const { uploadMedia } = useSupabaseMedia(entityType);
 
   useEffect(() => {
     if (isOpen) {
-      fetchMediaUrlsByEntityId(entityId).then(setMediaData)
+      fetchMediaUrlsByEntityId(entityId).then(setMediaData);
     }
-  }, [isOpen, entityId])
+  }, [isOpen, entityId]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const handleRename = async (url: string, newTitle: string, newDescription: string) => {
-    const media = mediaData.find((media) => media.url === url)
+    const media = mediaData.find((media) => media.url === url);
     if (media) {
-      await updateMedia(url, newTitle, newDescription)
+      await updateMedia(url, newTitle, newDescription);
       const updatedMediaData = mediaData.map((media) =>
         media.url === url ? { ...media, title: newTitle, description: newDescription } : media,
-      )
-      setMediaData(updatedMediaData)
-      setRenamingMedia(null)
-      setNewMediaName('')
+      );
+      setMediaData(updatedMediaData);
+      setRenamingMedia(null);
+      setNewMediaName("");
     }
-  }
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!entityId) return
+    if (!entityId) return;
 
     if (event.target.files) {
-      const files = Array.from(event.target.files)
-      setSelectedFiles(files)
+      const files = Array.from(event.target.files);
+      setSelectedFiles(files);
 
       // Create previews for the first file
       if (files[0]) {
-        const previewUrl = URL.createObjectURL(files[0])
-        setPreview(previewUrl)
-        setNewMediaFile(files[0])
+        const previewUrl = URL.createObjectURL(files[0]);
+        setPreview(previewUrl);
+        setNewMediaFile(files[0]);
       }
     }
-  }
+  };
 
   const handleUpload = async () => {
-    if (!selectedFiles.length || !entityId) return
+    if (!selectedFiles.length || !entityId) return;
 
     if (!newMediaName.trim()) {
-      setError('Media name is required')
-      return
+      setError("Media name is required");
+      return;
     }
 
-    setUploading(true)
-    setError(null)
+    setUploading(true);
+    setError(null);
 
     try {
-      const totalFiles = selectedFiles.length
-      let completedFiles = 0
+      const totalFiles = selectedFiles.length;
+      let completedFiles = 0;
 
       // Upload all selected files
       for (const file of selectedFiles) {
         // Initialize progress for this file
-        setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }))
+        setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
 
         // Upload with progress tracking
         await uploadMedia(
           file,
           entityId,
-          `${newMediaName} ${selectedFiles.length > 1 ? `(${selectedFiles.indexOf(file) + 1})` : ''}`,
-          mediaNotes[preview || ''] || '',
+          `${newMediaName} ${selectedFiles.length > 1 ? `(${selectedFiles.indexOf(file) + 1})` : ""}`,
+          mediaNotes[preview || ""] || "",
           (progress) => {
-            setUploadProgress((prev) => ({ ...prev, [file.name]: progress }))
+            setUploadProgress((prev) => ({ ...prev, [file.name]: progress }));
           },
-        )
+        );
         // Update completed files count
-        completedFiles++
-        setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }))
+        completedFiles++;
+        setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
       }
 
       // Refresh media list
-      const data = await fetchMediaUrlsByEntityId(entityId)
-      setMediaData(data)
+      const data = await fetchMediaUrlsByEntityId(entityId);
+      setMediaData(data);
 
       // Reset states
-      setSelectedFiles([])
-      setPreview(null)
-      setNewMediaFile(null)
-      setMediaNotes({})
-      setNewMediaName('')
-      setUploadProgress({})
+      setSelectedFiles([]);
+      setPreview(null);
+      setNewMediaFile(null);
+      setMediaNotes({});
+      setNewMediaName("");
+      setUploadProgress({});
     } catch (err) {
-      setError('Failed to upload media')
-      console.error(err)
+      setError("Failed to upload media");
+      console.error(err);
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   const handleCancelUpload = () => {
-    setPreview(null)
-    setNewMediaFile(null)
-    setSelectedFiles([])
-    setNewMediaName('')
-    setMediaNotes({})
-    setError(null)
-  }
+    setPreview(null);
+    setNewMediaFile(null);
+    setSelectedFiles([]);
+    setNewMediaName("");
+    setMediaNotes({});
+    setError(null);
+  };
 
   const getMediaIcon = (url: string) => {
-    const ext = url.split('.').pop()?.toLowerCase()
-    if (ext === 'pdf') return <FileText size={16} />
-    if (['mp4', 'webm', 'ogg'].includes(ext || '')) return <Video size={16} />
-    return <ImageIcon size={16} />
-  }
+    const ext = url.split(".").pop()?.toLowerCase();
+    if (ext === "pdf") return <FileText size={16} />;
+    if (["mp4", "webm", "ogg"].includes(ext || "")) return <Video size={16} />;
+    return <ImageIcon size={16} />;
+  };
 
   const handleDeleteMedia = async (url: string) => {
-    await deleteMedia(url)
-    const updatedMediaData = mediaData.filter((media) => media.url !== url)
-    setMediaData(updatedMediaData)
-    setDeleteConfirm(null)
-  }
+    await deleteMedia(url);
+    const updatedMediaData = mediaData.filter((media) => media.url !== url);
+    setMediaData(updatedMediaData);
+    setDeleteConfirm(null);
+  };
 
   const renderMediaBox = (media: { url: string; title: string; description: string }, index: number) => {
     return (
@@ -173,8 +173,8 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
                 <button
                   className="p-1 rounded hover:bg-opacity-80 text-white"
                   onClick={() => {
-                    setRenamingMedia(null)
-                    setNewMediaName('')
+                    setRenamingMedia(null);
+                    setNewMediaName("");
                   }}
                 >
                   <X size={14} />
@@ -185,8 +185,8 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
                 <button
                   className="p-1 rounded hover:bg-opacity-80 text-white"
                   onClick={() => {
-                    setRenamingMedia(media.url)
-                    setNewMediaName(media.title)
+                    setRenamingMedia(media.url);
+                    setNewMediaName(media.title);
                   }}
                 >
                   <Edit3 size={14} />
@@ -212,12 +212,12 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
           <label className="block text-sm mb-1 text-secondary overflow-y-auto max-h-24 break-words">{media.description}</label>
         )}
       </div>
-    )
-  }
+    );
+  };
 
-  const images = mediaData.filter((media) => media.url.match(/\.(jpeg|jpg|gif|png)$/))
-  const videos = mediaData.filter((media) => media.url.match(/\.(mp4|webm|ogg)$/))
-  const documents = mediaData.filter((media) => media.url.match(/\.pdf$/))
+  const images = mediaData.filter((media) => media.url.match(/\.(jpeg|jpg|gif|png)$/));
+  const videos = mediaData.filter((media) => media.url.match(/\.(mp4|webm|ogg)$/));
+  const documents = mediaData.filter((media) => media.url.match(/\.pdf$/));
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -234,7 +234,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
               onClick={() => setShowMedia(!showMedia)}
               className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary"
             >
-              {showMedia ? 'Hide Media' : 'View Media'}
+              {showMedia ? "Hide Media" : "View Media"}
             </button>
             <button onClick={onClose} className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary">
               Close
@@ -243,7 +243,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
           {preview && (
             <div className="flex flex-col items-center">
               <div className="text-sm text-secondary mb-2">
-                Selected {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''}
+                Selected {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}
               </div>
               {uploading && (
                 <div className="w-full space-y-2 mb-4">
@@ -263,11 +263,11 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
                   ))}
                 </div>
               )}
-              {newMediaFile?.type === 'application/pdf' ? (
+              {newMediaFile?.type === "application/pdf" ? (
                 <embed src={preview} type="application/pdf" className="w-full h-64 object-cover mb-4 bg-surface" />
-              ) : newMediaFile?.type.startsWith('video') ? (
+              ) : newMediaFile?.type.startsWith("video") ? (
                 <video controls className="w-full h-64 object-cover mb-4 bg-surface">
-                  <source src={preview} type={`video/${preview.split('.').pop()}`} />
+                  <source src={preview} type={`video/${preview.split(".").pop()}`} />
                   Your browser does not support the video tag.
                 </video>
               ) : (
@@ -276,7 +276,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
               <input
                 type="text"
                 placeholder="Enter media name"
-                value={newMediaName || ''}
+                value={newMediaName || ""}
                 onChange={(e) => setNewMediaName(e.target.value)}
                 className="border p-2 rounded mb-2 w-full border-theme border-solid bg-surface text-primary"
               />
@@ -285,7 +285,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
                 type="text"
                 className="w-full p-2 border rounded mb-2 border-theme border-solid bg-surface text-primary"
                 placeholder="Add notes..."
-                value={preview ? mediaNotes[preview] || '' : ''}
+                value={preview ? mediaNotes[preview] || "" : ""}
                 onChange={(e) => preview && setMediaNotes({ ...mediaNotes, [preview]: e.target.value })}
               />
               <div className="flex gap-2">
@@ -294,7 +294,7 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
                   className="px-4 py-2 rounded text-sm border-theme border-solid bg-transparent text-secondary"
                   disabled={isUploading}
                 >
-                  {isUploading ? 'Uploading...' : 'Upload'}
+                  {isUploading ? "Uploading..." : "Upload"}
                 </button>
                 <button
                   onClick={handleCancelUpload}
@@ -330,13 +330,13 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
           onClick={() => setFullscreenMedia(null)}
         >
-          {fullscreenMedia.endsWith('.pdf') ? (
+          {fullscreenMedia.endsWith(".pdf") ? (
             <div className="w-full h-full flex items-center justify-center">
               <embed src={fullscreenMedia} type="application/pdf" className="w-full h-full bg-surface" />
             </div>
-          ) : fullscreenMedia.endsWith('.mp4') || fullscreenMedia.endsWith('.webm') || fullscreenMedia.endsWith('.ogg') ? (
+          ) : fullscreenMedia.endsWith(".mp4") || fullscreenMedia.endsWith(".webm") || fullscreenMedia.endsWith(".ogg") ? (
             <video controls className="max-w-[90vw] max-h-[90vh] object-contain bg-surface">
-              <source src={fullscreenMedia} type={`video/${fullscreenMedia.split('.').pop()}`} />
+              <source src={fullscreenMedia} type={`video/${fullscreenMedia.split(".").pop()}`} />
               Your browser does not support the video tag.
             </video>
           ) : (
@@ -358,13 +358,13 @@ const MediaDialog: React.FC<MediaDialogProps> = ({ isOpen, onClose, entityId, cu
           onConfirmChange={setDeleteConfirmName}
           onConfirm={() => handleDeleteMedia(deleteConfirm!)}
           onCancel={() => {
-            setDeleteConfirm(null)
-            setDeleteConfirmName('')
+            setDeleteConfirm(null);
+            setDeleteConfirmName("");
           }}
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MediaDialog
+export default MediaDialog;

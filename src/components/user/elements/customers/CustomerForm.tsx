@@ -1,54 +1,54 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Plus } from 'lucide-react'
-import { createCustomer } from '../../../../services/customers'
-import { Person } from '../../../../types/people'
-import { Company } from '../../../../types/companies'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Plus } from "lucide-react";
+import { createCustomer } from "../../../../services/customers";
+import { Person } from "../../../../types/people";
+import { Company } from "../../../../types/companies";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface CustomerFormProps {
-  currentTheme: Theme
-  savedPeople: Person[]
-  savedCompanies: Company[]
+  currentTheme: Theme;
+  savedPeople: Person[];
+  savedCompanies: Company[];
 }
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, savedCompanies }) => {
-  const [showForm, setShowForm] = useState(false)
-  const [customerName, setCustomerName] = useState('')
-  const [selectedType, setSelectedType] = useState<'person' | 'company'>('person')
-  const [selectedId, setSelectedId] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [selectedType, setSelectedType] = useState<"person" | "company">("person");
+  const [selectedId, setSelectedId] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!customerName.trim()) {
-      setError('Customer name is required')
-      return
+      setError("Customer name is required");
+      return;
     }
     if (!selectedId) {
-      setError('Please select a person or company')
-      return
+      setError("Please select a person or company");
+      return;
     }
 
     try {
       await createCustomer({
         name: customerName.trim(),
-        personId: selectedType === 'person' ? selectedId : undefined,
-        companyId: selectedType === 'company' ? selectedId : undefined,
-      })
+        personId: selectedType === "person" ? selectedId : undefined,
+        companyId: selectedType === "company" ? selectedId : undefined,
+      });
 
-      setShowForm(false)
-      setCustomerName('')
-      setSelectedType('person')
-      setSelectedId('')
-      setError(null)
+      setShowForm(false);
+      setCustomerName("");
+      setSelectedType("person");
+      setSelectedId("");
+      setError(null);
     } catch (err) {
-      console.error('Error creating customer:', err)
-      setError('Failed to create customer')
+      console.error("Error creating customer:", err);
+      setError("Failed to create customer");
     }
-  }
+  };
 
   return (
     <>
@@ -87,10 +87,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
                   <Label className="flex items-center gap-2">
                     <Input
                       type="radio"
-                      checked={selectedType === 'person'}
+                      checked={selectedType === "person"}
                       onChange={() => {
-                        setSelectedType('person')
-                        setSelectedId('')
+                        setSelectedType("person");
+                        setSelectedId("");
                       }}
                     />
                     <span className="text-primary">Person</span>
@@ -98,10 +98,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
                   <Label className="flex items-center gap-2">
                     <Input
                       type="radio"
-                      checked={selectedType === 'company'}
+                      checked={selectedType === "company"}
                       onChange={() => {
-                        setSelectedType('company')
-                        setSelectedId('')
+                        setSelectedType("company");
+                        setSelectedId("");
                       }}
                     />
                     <span className="text-primary">Company</span>
@@ -111,7 +111,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
 
               <div>
                 <Label className="block text-sm mb-1 text-secondary">
-                  Select {selectedType === 'person' ? 'Person' : 'Company'}
+                  Select {selectedType === "person" ? "Person" : "Company"}
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
                 <select
@@ -120,8 +120,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
                   required
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  <option value="">Select {selectedType === 'person' ? 'a person' : 'a company'}</option>
-                  {selectedType === 'person'
+                  <option value="">Select {selectedType === "person" ? "a person" : "a company"}</option>
+                  {selectedType === "person"
                     ? savedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
@@ -140,10 +140,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
               <div className="flex justify-end gap-2">
                 <Button
                   onClick={() => {
-                    setShowForm(false)
-                    setCustomerName('')
-                    setSelectedType('person')
-                    setSelectedId('')
+                    setShowForm(false);
+                    setCustomerName("");
+                    setSelectedType("person");
+                    setSelectedId("");
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-surface"
                 >
@@ -158,7 +158,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default CustomerForm
+export default CustomerForm;

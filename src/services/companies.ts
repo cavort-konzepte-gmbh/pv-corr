@@ -1,10 +1,10 @@
-import { supabase } from '../lib/supabase'
-import { Company } from '../types/companies'
-import { toCase } from '../utils/cases'
+import { supabase } from "../lib/supabase";
+import { Company } from "../types/companies";
+import { toCase } from "../utils/cases";
 export const fetchCompanies = async (): Promise<Company[]> => {
   try {
     const { data, error } = await supabase
-      .from('companies')
+      .from("companies")
       .select(
         `
         id,
@@ -19,14 +19,14 @@ export const fetchCompanies = async (): Promise<Company[]> => {
         contact_person_id
       `,
       )
-      .order('created_at', { ascending: true })
+      .order("created_at", { ascending: true });
     if (error) {
-      console.error('Error fetching companies:', error)
-      throw error
+      console.error("Error fetching companies:", error);
+      throw error;
     }
-    return data.map((company) => toCase<Company>(company, 'camelCase'))
+    return data.map((company) => toCase<Company>(company, "camelCase"));
   } catch (error) {
-    console.error('Error in fetchCompanies:', error)
-    throw new Error('Failed to fetch companies')
+    console.error("Error in fetchCompanies:", error);
+    throw new Error("Failed to fetch companies");
   }
-}
+};

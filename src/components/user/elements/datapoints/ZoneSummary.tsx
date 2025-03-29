@@ -1,41 +1,41 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Zone } from '../../../../types/projects'
-import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react'
-import { Language, useTranslation } from '../../../../types/language'
-import { updateZone } from '../../../../services/zones'
-import { fetchProjects } from '../../../../services/projects'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Zone } from "../../../../types/projects";
+import { Edit2, Save, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Language, useTranslation } from "../../../../types/language";
+import { updateZone } from "../../../../services/zones";
+import { fetchProjects } from "../../../../services/projects";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ZoneSummaryProps {
-  zone: Zone
-  currentTheme: Theme
-  currentLanguage: Language
-  onProjectsChange: (projects: any[]) => void
+  zone: Zone;
+  currentTheme: Theme;
+  currentLanguage: Language;
+  onProjectsChange: (projects: any[]) => void;
 }
 
 const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLanguage, onProjectsChange }) => {
-  const translation = useTranslation(currentLanguage)
-  const [isEditing, setIsEditing] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(true)
+  const translation = useTranslation(currentLanguage);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [editValues, setEditValues] = useState({
     name: zone.name,
-    latitude: zone.latitude || '',
-    longitude: zone.longitude || '',
-  })
+    latitude: zone.latitude || "",
+    longitude: zone.longitude || "",
+  });
 
   const handleSave = async () => {
     try {
-      await updateZone(zone.id, editValues)
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
-      setIsEditing(false)
+      await updateZone(zone.id, editValues);
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+      setIsEditing(false);
     } catch (err) {
-      console.error('Error updating zone:', err)
+      console.error("Error updating zone:", err);
     }
-  }
+  };
 
   return (
     <div className="mb-8">
@@ -64,7 +64,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                       )}
                       <div className="flex items-center gap-2">
                         <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                          {zone.datapoints?.length || 0} {translation('datapoints').toLowerCase()}
+                          {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
                         </span>
                       </div>
                     </div>
@@ -73,8 +73,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              handleSave()
+                              e.stopPropagation();
+                              handleSave();
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
@@ -82,8 +82,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setIsEditing(false)
+                              e.stopPropagation();
+                              setIsEditing(false);
                             }}
                             className="p-1 rounded hover:bg-opacity-80 text-secondary"
                           >
@@ -93,8 +93,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                       ) : (
                         <Button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            setIsEditing(true)
+                            e.stopPropagation();
+                            setIsEditing(true);
                           }}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         >
@@ -110,7 +110,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
             {isExpanded && (
               <TableBody>
                 <TableRow>
-                  <TableCell className="p-2  w-1/6">{translation('zones.location')}</TableCell>
+                  <TableCell className="p-2  w-1/6">{translation("zones.location")}</TableCell>
                   <TableCell className="p-2 ">
                     {isEditing ? (
                       <div className="flex gap-2">
@@ -119,14 +119,14 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           value={editValues.latitude}
                           onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
                           className="w-1/2 p-1 rounded text-sm text-primary "
-                          placeholder={translation('project.latitude')}
+                          placeholder={translation("project.latitude")}
                         />
                         <Input
                           type="text"
                           value={editValues.longitude}
                           onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
                           className="w-1/2 p-1 rounded text-sm text-primary "
-                          placeholder={translation('project.longitude')}
+                          placeholder={translation("project.longitude")}
                         />
                       </div>
                     ) : zone.latitude && zone.longitude ? (
@@ -135,14 +135,14 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           {zone.latitude}, {zone.longitude}
                         </span>
                         <Button
-                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}
+                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")}
                           className="text-sm hover:underline text-accent-primary"
                         >
-                          {translation('general.view_on_map')}
+                          {translation("general.view_on_map")}
                         </Button>
                       </div>
                     ) : (
-                      <span>{translation('general.location_not_set')}</span>
+                      <span>{translation("general.location_not_set")}</span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -152,7 +152,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ZoneSummary
+export default ZoneSummary;

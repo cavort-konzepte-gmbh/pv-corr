@@ -1,27 +1,27 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Edit2, Save, X, ChevronDown, ChevronRight } from 'lucide-react'
-import { Language, useTranslation } from '../../../../types/language'
-import { updateField } from '../../../../services/fields'
-import { fetchProjects } from '../../../../services/projects'
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Edit2, Save, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Language, useTranslation } from "../../../../types/language";
+import { updateField } from "../../../../services/fields";
+import { fetchProjects } from "../../../../services/projects";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface FieldSummaryProps {
   field: {
-    id?: string
-    name: string
-    latitude?: string
-    longitude?: string
-    has_fence?: string
-    zones?: any[]
-  }
-  currentTheme: Theme
-  currentLanguage: Language
-  onProjectsChange: (projects: any[]) => void
-  isExpanded?: boolean
-  onToggle?: () => void
+    id?: string;
+    name: string;
+    latitude?: string;
+    longitude?: string;
+    has_fence?: string;
+    zones?: any[];
+  };
+  currentTheme: Theme;
+  currentLanguage: Language;
+  onProjectsChange: (projects: any[]) => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
 const FieldSummary: React.FC<FieldSummaryProps> = ({
@@ -32,27 +32,27 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
   isExpanded = true,
   onToggle,
 }) => {
-  const translation = useTranslation(currentLanguage)
-  const [isEditing, setIsEditing] = useState(false)
+  const translation = useTranslation(currentLanguage);
+  const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({
-    name: field.name || '',
-    latitude: field.latitude || '',
-    longitude: field.longitude || '',
-    has_fence: field.has_fence ? 'yes' : 'no',
-  })
+    name: field.name || "",
+    latitude: field.latitude || "",
+    longitude: field.longitude || "",
+    has_fence: field.has_fence ? "yes" : "no",
+  });
 
   const handleSave = async () => {
-    if (!field.id) return
+    if (!field.id) return;
 
     try {
-      await updateField(field.id, editValues)
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
-      setIsEditing(false)
+      await updateField(field.id, editValues);
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+      setIsEditing(false);
     } catch (err) {
-      console.error('Error updating field:', err)
+      console.error("Error updating field:", err);
     }
-  }
+  };
 
   return (
     <div className="mb-8">
@@ -76,10 +76,10 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                       )}
                       <div className="flex items-center gap-2">
                         <span className="text-xs px-2 py-0.5 rounded bg-opacity-20  ">
-                          {field.zones?.length || 0} {translation('zones')}
+                          {field.zones?.length || 0} {translation("zones")}
                         </span>
                         <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 ">
-                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation('datapoints')}
+                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints")}
                         </span>
                       </div>
                     </div>
@@ -104,9 +104,9 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className={isExpanded ? '' : 'hidden'}>
+            <TableBody className={isExpanded ? "" : "hidden"}>
               <TableRow>
-                <TableCell className="p-2 w-1/6 ">{translation('zones.location')}</TableCell>
+                <TableCell className="p-2 w-1/6 ">{translation("zones.location")}</TableCell>
                 <TableCell className="p-2">
                   {isEditing ? (
                     <div className="flex gap-2">
@@ -115,14 +115,14 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                         value={editValues.latitude}
                         onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
                         className="w-1/2 p-1"
-                        placeholder={translation('project.latitude')}
+                        placeholder={translation("project.latitude")}
                       />
                       <Input
                         type="text"
                         value={editValues.longitude}
                         onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
                         className="w-1/2 p-1"
-                        placeholder={translation('project.longitude')}
+                        placeholder={translation("project.longitude")}
                       />
                     </div>
                   ) : field.latitude && field.longitude ? (
@@ -130,17 +130,17 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                       <span>
                         {field.latitude}, {field.longitude}
                       </span>
-                      <Button onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, '_blank')}>
-                        {translation('general.view_on_map')}
+                      <Button onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, "_blank")}>
+                        {translation("general.view_on_map")}
                       </Button>
                     </div>
                   ) : (
-                    <span>{translation('general.location_not_set')}</span>
+                    <span>{translation("general.location_not_set")}</span>
                   )}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="p-2 w-1/6 ">{translation('field.has_fence')}</TableCell>
+                <TableCell className="p-2 w-1/6 ">{translation("field.has_fence")}</TableCell>
                 <TableCell className="p-2">
                   {isEditing ? (
                     <select
@@ -148,13 +148,13 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                       className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       defaultValue={editValues.has_fence}
                     >
-                      <option value="no">{translation('field.has_fence.no')}</option>
-                      <option value="yes">{translation('field.has_fence.yes')}</option>
+                      <option value="no">{translation("field.has_fence.no")}</option>
+                      <option value="yes">{translation("field.has_fence.yes")}</option>
                     </select>
                   ) : field.has_fence ? (
-                    translation('field.has_fence.yes')
+                    translation("field.has_fence.yes")
                   ) : (
-                    translation('field.has_fence.no')
+                    translation("field.has_fence.no")
                   )}
                 </TableCell>
               </TableRow>
@@ -163,7 +163,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default FieldSummary
+export default FieldSummary;

@@ -1,11 +1,11 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { Zap, BaselineIcon as PipelineIcon, Train, Cylinder, Radio, ShieldAlert } from 'lucide-react'
-import { Button } from '../ui/button'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Zap, BaselineIcon as PipelineIcon, Train, Cylinder, Radio, ShieldAlert } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface LandingPageProps {
-  currentTheme: Theme
-  onContinue: () => void
+  currentTheme: Theme;
+  onContinue: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) => {
@@ -86,7 +86,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ currentTheme, onContinue }) =
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

@@ -1,9 +1,9 @@
 ---
 name: Request
 about: request
-title: ''
-labels: ''
-assignees: ''
+title: ""
+labels: ""
+assignees: ""
 ---
 
 ## Name

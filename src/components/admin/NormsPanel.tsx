@@ -1,57 +1,57 @@
-import React, { useState, useEffect } from 'react'
-import { Theme } from '../../types/theme'
-import { Language, useTranslation } from '../../types/language'
-import { supabase } from '../../lib/supabase'
-import { Plus, Edit2, Save, X, Info, Code } from 'lucide-react'
-import { generateHiddenId } from '../../utils/generateHiddenId'
-import { Parameter } from '../../types/parameters'
-import { Button } from '../ui/button'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
-import { Table } from '../ui/table'
-import { Textarea } from '../ui/textarea'
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { supabase } from "../../lib/supabase";
+import { Plus, Edit2, Save, X, Info, Code } from "lucide-react";
+import { generateHiddenId } from "../../utils/generateHiddenId";
+import { Parameter } from "../../types/parameters";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Table } from "../ui/table";
+import { Textarea } from "../ui/textarea";
 
 interface OutputConfig {
-  id: string
-  name: string
-  formula: string
-  description: string
+  id: string;
+  name: string;
+  formula: string;
+  description: string;
 }
 
 interface OutputConfigDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  currentTheme: Theme
-  normId: string
-  initialOutputs: OutputConfig[]
-  onSave: (outputs: OutputConfig[]) => void
+  isOpen: boolean;
+  onClose: () => void;
+  currentTheme: Theme;
+  normId: string;
+  initialOutputs: OutputConfig[];
+  onSave: (outputs: OutputConfig[]) => void;
 }
 
 const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose, currentTheme, normId, initialOutputs, onSave }) => {
-  const [outputs, setOutputs] = useState<OutputConfig[]>(initialOutputs)
-  const [error, setError] = useState<string | null>(null)
+  const [outputs, setOutputs] = useState<OutputConfig[]>(initialOutputs);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAddOutput = () => {
     setOutputs([
       ...outputs,
       {
         id: generateHiddenId(),
-        name: '',
-        formula: '',
-        description: '',
+        name: "",
+        formula: "",
+        description: "",
       },
-    ])
-  }
+    ]);
+  };
 
   const handleRemoveOutput = (id: string) => {
-    setOutputs(outputs.filter((o) => o.id !== id))
-  }
+    setOutputs(outputs.filter((o) => o.id !== id));
+  };
 
   const handleUpdateOutput = (id: string, field: keyof OutputConfig, value: string) => {
-    setOutputs(outputs.map((o) => (o.id === id ? { ...o, [field]: value } : o)))
-  }
+    setOutputs(outputs.map((o) => (o.id === id ? { ...o, [field]: value } : o)));
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-card bg-opacity-50 flex items-center justify-center z-50">
@@ -65,7 +65,7 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose
                 <Input
                   type="text"
                   value={output.name}
-                  onChange={(e) => handleUpdateOutput(output.id, 'name', e.target.value)}
+                  onChange={(e) => handleUpdateOutput(output.id, "name", e.target.value)}
                   className="p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
                   placeholder="Output name (e.g. B0, B1)"
                 />
@@ -77,12 +77,12 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose
               <div className="space-y-2">
                 <Textarea
                   value={output.formula}
-                  onChange={(e) => handleUpdateOutput(output.id, 'formula', e.target.value)}
+                  onChange={(e) => handleUpdateOutput(output.id, "formula", e.target.value)}
                   placeholder="Enter JavaScript formula (e.g. values.Z1 + values.Z2)"
                 />
                 <Textarea
                   value={output.description}
-                  onChange={(e) => handleUpdateOutput(output.id, 'description', e.target.value)}
+                  onChange={(e) => handleUpdateOutput(output.id, "description", e.target.value)}
                   placeholder="Description of this output value"
                   rows={2}
                 />
@@ -105,201 +105,201 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 interface NormsPanelProps {
-  currentTheme: Theme
-  currentLanguage: Language
+  currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 interface Norm {
-  id: string
-  hidden_id: string
-  name: string
-  description?: string
-  version?: string
-  parameters?: Parameter[]
+  id: string;
+  hidden_id: string;
+  name: string;
+  description?: string;
+  version?: string;
+  parameters?: Parameter[];
 }
 
 interface NormParameter {
-  norm_id: string
-  parameter_id: string
-  parameter_code: string
-  rating_ranges: RatingRange[]
+  norm_id: string;
+  parameter_id: string;
+  parameter_code: string;
+  rating_ranges: RatingRange[];
 }
 
 interface RatingRange {
-  min: number | string | null
-  max?: number | string | null
-  rating: number
+  min: number | string | null;
+  max?: number | string | null;
+  rating: number;
 }
 
 export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLanguage }) => {
-  const [norms, setNorms] = useState<Norm[]>([])
-  const [parameters, setParameters] = useState<Parameter[]>([])
-  const [normParameters, setNormParameters] = useState<NormParameter[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [editingNorm, setEditingNorm] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [isNewNorm, setIsNewNorm] = useState(false)
-  const [newNorm, setNewNorm] = useState<Record<string, string>>({})
-  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>('user')
-  const [showNewNormForm, setShowNewNormForm] = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [editingOutputs, setEditingOutputs] = useState<string | null>(null)
-  const t = useTranslation(currentLanguage)
+  const [norms, setNorms] = useState<Norm[]>([]);
+  const [parameters, setParameters] = useState<Parameter[]>([]);
+  const [normParameters, setNormParameters] = useState<NormParameter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editingNorm, setEditingNorm] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [isNewNorm, setIsNewNorm] = useState(false);
+  const [newNorm, setNewNorm] = useState<Record<string, string>>({});
+  const [selectedRole, setSelectedRole] = useState<"super_admin" | "admin" | "user">("user");
+  const [showNewNormForm, setShowNewNormForm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [editingOutputs, setEditingOutputs] = useState<string | null>(null);
+  const t = useTranslation(currentLanguage);
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const [normsData, paramsData, normParamsData] = await Promise.all([
-        supabase.from('norms').select('*').order('created_at', { ascending: true }),
-        supabase.from('parameters').select('*').order('created_at', { ascending: true }),
-        supabase.from('norm_parameters').select('*'),
-      ])
+        supabase.from("norms").select("*").order("created_at", { ascending: true }),
+        supabase.from("parameters").select("*").order("created_at", { ascending: true }),
+        supabase.from("norm_parameters").select("*"),
+      ]);
 
-      if (normsData.error) throw normsData.error
-      if (paramsData.error) throw paramsData.error
-      if (normParamsData.error) throw normParamsData.error
+      if (normsData.error) throw normsData.error;
+      if (paramsData.error) throw paramsData.error;
+      if (normParamsData.error) throw normParamsData.error;
 
-      setNorms(normsData.data || [])
-      setParameters(paramsData.data || [])
-      setNormParameters(normParamsData.data || [])
+      setNorms(normsData.data || []);
+      setParameters(paramsData.data || []);
+      setNormParameters(normParamsData.data || []);
     } catch (err) {
-      console.error('Error loading data:', err)
-      setError('Failed to load data')
+      console.error("Error loading data:", err);
+      setError("Failed to load data");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleChangeEditingValues = (name: string, value: string) => {
     setEditingValues((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleChangeNorm = (name: string, value: string) => {
     setNewNorm((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const resetValues = () => {
-    setEditingValues({})
-    setEditingNorm(null)
-  }
+    setEditingValues({});
+    setEditingNorm(null);
+  };
 
   const handleUpdateSaveNorm = async (norm: Norm) => {
     if (editingNorm === norm.id) {
       try {
         const { error } = await supabase
-          .from('norms')
+          .from("norms")
           .update({
             name: editingValues.name,
             description: editingValues.description,
             version: editingValues.version,
           })
-          .eq('id', norm.id)
+          .eq("id", norm.id);
 
-        if (error) throw error
-        await loadData()
-        resetValues()
+        if (error) throw error;
+        await loadData();
+        resetValues();
       } catch (err) {
-        console.error('Error updating norm:', err)
-        setError('Failed to update norm')
+        console.error("Error updating norm:", err);
+        setError("Failed to update norm");
       }
     } else {
-      setEditingNorm(norm.id)
-      setEditingValues(norm as any)
-      setNewNorm({})
-      setIsNewNorm(false)
+      setEditingNorm(norm.id);
+      setEditingValues(norm as any);
+      setNewNorm({});
+      setIsNewNorm(false);
     }
-  }
+  };
 
   const handleDeleteNorm = async (normId: string) => {
     try {
-      const { error } = await supabase.from('norms').delete().eq('id', normId)
+      const { error } = await supabase.from("norms").delete().eq("id", normId);
 
-      if (error) throw error
-      await loadData()
+      if (error) throw error;
+      await loadData();
     } catch (err) {
-      console.error('Error deleting norm:', err)
-      setError('Failed to delete norm')
+      console.error("Error deleting norm:", err);
+      setError("Failed to delete norm");
     }
-  }
+  };
 
   const handleOpenNorm = () => {
-    resetValues()
-    setIsNewNorm(true)
-  }
+    resetValues();
+    setIsNewNorm(true);
+  };
 
   const handleAddNewNorm = async () => {
     try {
       if (!newNorm.name?.trim()) {
-        setError('Norm name is required')
-        return
+        setError("Norm name is required");
+        return;
       }
 
-      const { error } = await supabase.from('norms').insert({
+      const { error } = await supabase.from("norms").insert({
         name: newNorm.name.trim(),
         description: newNorm.description?.trim(),
         version: newNorm.version?.trim(),
         hidden_id: generateHiddenId(),
-      })
+      });
 
-      if (error) throw error
-      await loadData()
-      resetValues()
-      setNewNorm({})
-      setIsNewNorm(false)
+      if (error) throw error;
+      await loadData();
+      resetValues();
+      setNewNorm({});
+      setIsNewNorm(false);
     } catch (err) {
-      console.error('Error creating norm:', err)
-      setError('Failed to create norm')
+      console.error("Error creating norm:", err);
+      setError("Failed to create norm");
     }
-  }
+  };
 
   const handleCancelNewNorm = () => {
-    resetValues()
-    setNewNorm({})
-    setIsNewNorm(false)
-  }
+    resetValues();
+    setNewNorm({});
+    setIsNewNorm(false);
+  };
 
   const handleToggleParameter = async (normId: string, parameterId: string, parameterCode: string) => {
     try {
-      const existingAssociation = normParameters.find((np) => np.norm_id === normId && np.parameter_id === parameterId)
+      const existingAssociation = normParameters.find((np) => np.norm_id === normId && np.parameter_id === parameterId);
 
       if (existingAssociation) {
         // Remove association
-        const { error } = await supabase.from('norm_parameters').delete().eq('norm_id', normId).eq('parameter_id', parameterId)
+        const { error } = await supabase.from("norm_parameters").delete().eq("norm_id", normId).eq("parameter_id", parameterId);
 
-        if (error) throw error
+        if (error) throw error;
       } else {
         // Add association
-        const { error } = await supabase.from('norm_parameters').insert({
+        const { error } = await supabase.from("norm_parameters").insert({
           norm_id: normId,
           parameter_id: parameterId,
           parameter_code: parameterCode,
           rating_ranges: [],
-        })
+        });
 
-        if (error) throw error
+        if (error) throw error;
       }
 
-      await loadData()
+      await loadData();
     } catch (err) {
-      console.error('Error toggling parameter:', err)
-      setError('Failed to update parameter association')
+      console.error("Error toggling parameter:", err);
+      setError("Failed to update parameter association");
     }
-  }
+  };
 
   return (
     <div className="p-6">
@@ -307,7 +307,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
 
       <Button onClick={() => setIsNewNorm(true)} className="w-full mb-6">
         <Plus size={16} />
-        {t('standards.add')}
+        {t("standards.add")}
       </Button>
 
       {loading ? (
@@ -316,43 +316,43 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
         <div className="space-y-6">
           {isNewNorm ? (
             <div>
-              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">{t('standards.new')}</h3>
+              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">{t("standards.new")}</h3>
 
               <form className="text-card space-y-4">
                 <div>
                   <Label className="block text-sm mb-1 text-primary">
-                    {t('standards.name')}
+                    {t("standards.name")}
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
                     type="text"
-                    value={newNorm.name || ''}
-                    onChange={(e) => handleChangeNorm('name', e.target.value)}
+                    value={newNorm.name || ""}
+                    onChange={(e) => handleChangeNorm("name", e.target.value)}
                     className="w-full p-2"
                   />
                 </div>
 
                 <div>
                   <Label className="block text-sm mb-1 text-primary">Description</Label>
-                  <Textarea value={newNorm.description || ''} onChange={(e) => handleChangeNorm('description', e.target.value)} rows={3} />
+                  <Textarea value={newNorm.description || ""} onChange={(e) => handleChangeNorm("description", e.target.value)} rows={3} />
                 </div>
 
                 <div>
                   <Label className="block text-sm mb-1 text-primary">Version</Label>
                   <Input
                     type="text"
-                    value={newNorm.version || ''}
-                    onChange={(e) => handleChangeNorm('version', e.target.value)}
+                    value={newNorm.version || ""}
+                    onChange={(e) => handleChangeNorm("version", e.target.value)}
                     className="w-full p-2"
                   />
                 </div>
 
                 <div className="flex justify-end gap-2">
                   <Button type="button" onClick={handleCancelNewNorm} variant="destructive">
-                    {t('actions.cancel')}
+                    {t("actions.cancel")}
                   </Button>
                   <Button type="button" onClick={handleAddNewNorm} className="px-4 py-2">
-                    {t('actions.save')}
+                    {t("actions.save")}
                   </Button>
                 </div>
               </form>
@@ -367,20 +367,20 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                         <div className="space-y-2">
                           <Input
                             type="text"
-                            value={editingValues.name || ''}
-                            onChange={(e) => handleChangeEditingValues('name', e.target.value)}
+                            value={editingValues.name || ""}
+                            onChange={(e) => handleChangeEditingValues("name", e.target.value)}
                             className="w-full p-2"
                           />
                           <Input
                             type="text"
-                            value={editingValues.version || ''}
-                            onChange={(e) => handleChangeEditingValues('version', e.target.value)}
+                            value={editingValues.version || ""}
+                            onChange={(e) => handleChangeEditingValues("version", e.target.value)}
                             className="w-full p-2"
                             placeholder="Version"
                           />
                           <Textarea
-                            value={editingValues.description || ''}
-                            onChange={(e) => handleChangeEditingValues('description', e.target.value)}
+                            value={editingValues.description || ""}
+                            onChange={(e) => handleChangeEditingValues("description", e.target.value)}
                             className="w-full p-2"
                             placeholder="Description"
                             rows={3}
@@ -416,10 +416,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
 
                   {editingNorm === norm.id ? (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t('standards.select_parameter')}</h4>
+                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("standards.select_parameter")}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                         {parameters.map((param) => {
-                          const isSelected = normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id)
+                          const isSelected = normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id);
                           return (
                             <div key={param.id} className="flex items-center gap-2 p-2 rounded border">
                               <Input
@@ -441,7 +441,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                                 </div>
                               </div>
                             </div>
-                          )
+                          );
                         })}
                       </div>
                     </div>
@@ -462,10 +462,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                                 .filter((param) => normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id))
                                 .sort((a, b) => {
                                   const aOrder =
-                                    typeof a.orderNumber === 'number' ? a.orderNumber : parseFloat(a.orderNumber as string) || 0
+                                    typeof a.orderNumber === "number" ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
                                   const bOrder =
-                                    typeof b.orderNumber === 'number' ? b.orderNumber : parseFloat(b.orderNumber as string) || 0
-                                  return aOrder - bOrder
+                                    typeof b.orderNumber === "number" ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
+                                  return aOrder - bOrder;
                                 })
                                 .map((param) => (
                                   <tr key={param.id} className="border-t border-accent">
@@ -475,14 +475,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                                         <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
                                         <Button
                                           onClick={(e) => {
-                                            e.stopPropagation()
-                                            navigator.clipboard.writeText(param.id)
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(param.id);
                                             // Show temporary success indicator
-                                            const button = e.currentTarget
-                                            button.innerHTML = '✓'
+                                            const button = e.currentTarget;
+                                            button.innerHTML = "✓";
                                             setTimeout(() => {
-                                              button.innerHTML = 'Copy'
-                                            }, 1000)
+                                              button.innerHTML = "Copy";
+                                            }, 1000);
                                           }}
                                           className="text-xs px-2 py-1 rounded hover:bg-theme text-muted-foreground"
                                           variant="ghost"
@@ -513,31 +513,31 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
           currentTheme={currentTheme}
           normId={editingOutputs}
           initialOutputs={(() => {
-            const norm = norms.find((n) => n.id === editingOutputs)
-            return norm?.output_config || []
+            const norm = norms.find((n) => n.id === editingOutputs);
+            return norm?.output_config || [];
           })()}
           onSave={async (outputs) => {
             try {
-              const { error } = await supabase.from('norms').update({ output_config: outputs }).eq('id', editingOutputs)
+              const { error } = await supabase.from("norms").update({ output_config: outputs }).eq("id", editingOutputs);
 
-              if (error) throw error
+              if (error) throw error;
 
               // Refresh norms data
               const { data: updatedNorms, error: loadError } = await supabase
-                .from('norms')
-                .select('*')
-                .order('created_at', { ascending: true })
+                .from("norms")
+                .select("*")
+                .order("created_at", { ascending: true });
 
-              if (loadError) throw loadError
-              setNorms(updatedNorms || [])
-              setEditingOutputs(null)
+              if (loadError) throw loadError;
+              setNorms(updatedNorms || []);
+              setEditingOutputs(null);
             } catch (err) {
-              console.error('Error updating outputs:', err)
-              setError('Failed to update outputs')
+              console.error("Error updating outputs:", err);
+              setError("Failed to update outputs");
             }
           }}
         />
       )}
     </div>
-  )
-}
+  );
+};

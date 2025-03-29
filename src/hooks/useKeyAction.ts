@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
 /**
  * Executes the provided callback when the specified key is pressed.
@@ -11,23 +11,23 @@ import { useEffect, useRef } from 'react'
 export const useKeyAction = <T extends (...args: any[]) => void>(
   callback: T,
   isSend: boolean,
-  key: string = 'Enter',
+  key: string = "Enter",
   debounceTime: number = 500,
 ) => {
-  const lastExecuted = useRef<number>(0)
+  const lastExecuted = useRef<number>(0);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === key && isSend) {
-        const now = Date.now()
+        const now = Date.now();
         if (now - lastExecuted.current >= debounceTime) {
-          callback()
-          lastExecuted.current = now
+          callback();
+          lastExecuted.current = now;
         }
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [callback, isSend, key, debounceTime])
-}
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [callback, isSend, key, debounceTime]);
+};

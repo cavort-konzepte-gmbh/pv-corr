@@ -1,23 +1,23 @@
-import { supabase } from '../lib/supabase'
-import { generateHiddenId } from '../utils/generateHiddenId'
+import { supabase } from "../lib/supabase";
+import { generateHiddenId } from "../utils/generateHiddenId";
 
 interface CreateReportData {
-  projectId: string
-  zoneId: string
-  standardId: string
-  content: any
-  parameters: any
-  ratings: any
-  totalRating: number
-  classification: string
-  recommendations?: string
+  projectId: string;
+  zoneId: string;
+  standardId: string;
+  content: any;
+  parameters: any;
+  ratings: any;
+  totalRating: number;
+  classification: string;
+  recommendations?: string;
 }
 
 export const createReport = async (data: CreateReportData) => {
   try {
     // First create the report
     const { data: report, error: reportError } = await supabase
-      .from('analysis_reports')
+      .from("analysis_reports")
       .insert({
         hidden_id: generateHiddenId(),
         project_id: data.projectId,
@@ -26,13 +26,13 @@ export const createReport = async (data: CreateReportData) => {
         analyst_id: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
-      .single()
+      .single();
 
-    if (reportError) throw reportError
+    if (reportError) throw reportError;
 
     // Then create the first version
     const { data: version, error: versionError } = await supabase
-      .from('report_versions')
+      .from("report_versions")
       .insert({
         report_id: report.id,
         version_number: 1,
@@ -45,37 +45,37 @@ export const createReport = async (data: CreateReportData) => {
         created_by: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
-      .single()
+      .single();
 
-    if (versionError) throw versionError
+    if (versionError) throw versionError;
 
     return {
       report,
       version,
-    }
+    };
   } catch (err) {
-    console.error('Error creating report:', err)
-    throw err
+    console.error("Error creating report:", err);
+    throw err;
   }
-}
+};
 
-export const createReportVersion = async (reportId: string, data: Omit<CreateReportData, 'projectId' | 'zoneId' | 'standardId'>) => {
+export const createReportVersion = async (reportId: string, data: Omit<CreateReportData, "projectId" | "zoneId" | "standardId">) => {
   try {
     // Get the latest version number
     const { data: versions, error: versionsError } = await supabase
-      .from('report_versions')
-      .select('version_number')
-      .eq('report_id', reportId)
-      .order('version_number', { ascending: false })
-      .limit(1)
+      .from("report_versions")
+      .select("version_number")
+      .eq("report_id", reportId)
+      .order("version_number", { ascending: false })
+      .limit(1);
 
-    if (versionsError) throw versionsError
+    if (versionsError) throw versionsError;
 
-    const nextVersion = versions?.[0] ? versions[0].version_number + 1 : 1
+    const nextVersion = versions?.[0] ? versions[0].version_number + 1 : 1;
 
     // Create new version
     const { data: version, error: versionError } = await supabase
-      .from('report_versions')
+      .from("report_versions")
       .insert({
         report_id: reportId,
         version_number: nextVersion,
@@ -88,21 +88,21 @@ export const createReportVersion = async (reportId: string, data: Omit<CreateRep
         created_by: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
-      .single()
+      .single();
 
-    if (versionError) throw versionError
+    if (versionError) throw versionError;
 
-    return version
+    return version;
   } catch (err) {
-    console.error('Error creating report version:', err)
-    throw err
+    console.error("Error creating report version:", err);
+    throw err;
   }
-}
+};
 
 export const fetchReports = async () => {
   try {
     const { data, error } = await supabase
-      .from('analysis_outputs')
+      .from("analysis_outputs")
       .select(
         `
         *,
@@ -115,32 +115,32 @@ export const fetchReports = async () => {
         )
       `,
       )
-      .order('created_at', { ascending: false })
+      .order("created_at", { ascending: false });
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   } catch (err) {
-    console.error('Error fetching reports:', err)
-    throw err
+    console.error("Error fetching reports:", err);
+    throw err;
   }
-}
+};
 
 export const fetchReportVersion = async (reportId: string, versionNumber?: number) => {
   try {
-    let query = supabase.from('analysis_versions').select('*').eq('output_id', reportId)
+    let query = supabase.from("analysis_versions").select("*").eq("output_id", reportId);
 
     if (versionNumber) {
-      query = query.eq('version_number', versionNumber)
+      query = query.eq("version_number", versionNumber);
     } else {
-      query = query.order('version_number', { ascending: false }).limit(1)
+      query = query.order("version_number", { ascending: false }).limit(1);
     }
 
-    const { data, error } = await query.single()
+    const { data, error } = await query.single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   } catch (err) {
-    console.error('Error fetching report version:', err)
-    throw err
+    console.error("Error fetching report version:", err);
+    throw err;
   }
-}
+};

@@ -1,10 +1,10 @@
-import { supabase } from '../lib/supabase'
-import { Person } from '../types/people'
-import { toCase } from '../utils/cases'
+import { supabase } from "../lib/supabase";
+import { Person } from "../types/people";
+import { toCase } from "../utils/cases";
 export const fetchPeople = async (): Promise<Person[]> => {
   try {
     const { data, error } = await supabase
-      .from('people')
+      .from("people")
       .select(
         `
         id,
@@ -17,15 +17,15 @@ export const fetchPeople = async (): Promise<Person[]> => {
         phone
       `,
       )
-      .order('created_at', { ascending: true })
+      .order("created_at", { ascending: true });
 
     if (error) {
-      console.error('Error in fetchPeople:', error)
-      return []
+      console.error("Error in fetchPeople:", error);
+      return [];
     }
-    return data.map((person) => toCase<Person>(person, 'camelCase'))
+    return data.map((person) => toCase<Person>(person, "camelCase"));
   } catch (err) {
-    console.error('Error in fetchPeople:', err)
-    throw new Error('Failed to fetch people')
+    console.error("Error in fetchPeople:", err);
+    throw new Error("Failed to fetch people");
   }
-}
+};

@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { Theme } from '../types/theme'
-import { Company, COMPANY_FIELDS } from '../types/companies'
-import { Building2, Plus, ChevronRight, Trash2, User } from 'lucide-react'
-import { generateHiddenId } from '../utils/generateHiddenId'
-import { Person } from '../types/people'
-import { fetchPeople } from '../services/people'
-import { Language, useTranslation } from '../types/language'
-import { useKeyAction } from '../hooks/useKeyAction'
-import { fetchCompanies as fetchCompaniesService } from '../services/companies'
-import { toCase } from '../utils/cases'
-import { Input } from './ui/input'
-import { Label } from '@radix-ui/react-label'
-import { Button } from './ui/button'
+import React, { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { Theme } from "../types/theme";
+import { Company, COMPANY_FIELDS } from "../types/companies";
+import { Building2, Plus, ChevronRight, Trash2, User } from "lucide-react";
+import { generateHiddenId } from "../utils/generateHiddenId";
+import { Person } from "../types/people";
+import { fetchPeople } from "../services/people";
+import { Language, useTranslation } from "../types/language";
+import { useKeyAction } from "../hooks/useKeyAction";
+import { fetchCompanies as fetchCompaniesService } from "../services/companies";
+import { toCase } from "../utils/cases";
+import { Input } from "./ui/input";
+import { Label } from "@radix-ui/react-label";
+import { Button } from "./ui/button";
 
 interface CompaniesPanelProps {
-  currentTheme: Theme
-  currentLanguage: Language
-  savedPeople: Person[]
-  savedCompanies: Company[]
-  onSaveCompanies: (companies: Company[]) => void
-  onCreateCustomer?: (companyId: string, name: string) => void
+  currentTheme: Theme;
+  currentLanguage: Language;
+  savedPeople: Person[];
+  savedCompanies: Company[];
+  onSaveCompanies: (companies: Company[]) => void;
+  onCreateCustomer?: (companyId: string, name: string) => void;
 }
 
 const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
@@ -31,132 +31,132 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   onSaveCompanies,
   onCreateCustomer,
 }) => {
-  const [showNewCompanyForm, setShowNewCompanyForm] = useState(false)
-  const [editingCompany, setEditingCompany] = useState<Company | null>(null)
-  const [formValues, setFormValues] = useState<Record<string, string>>({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedCeoId, setSelectedCeoId] = useState<string>('')
-  const [selectedContactId, setSelectedContactId] = useState<string>('')
-  const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || [])
-  const [availablePeople, setAvailablePeople] = useState<Person[]>([])
-  const translation = useTranslation(currentLanguage)
+  const [showNewCompanyForm, setShowNewCompanyForm] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCeoId, setSelectedCeoId] = useState<string>("");
+  const [selectedContactId, setSelectedContactId] = useState<string>("");
+  const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [_, people] = await Promise.all([fetchCompanies(), fetchPeople()])
-        setAvailablePeople(people)
+        const [_, people] = await Promise.all([fetchCompanies(), fetchPeople()]);
+        setAvailablePeople(people);
       } catch (err) {
-        console.error('Error loading data:', err)
-        setError('Failed to load data')
+        console.error("Error loading data:", err);
+        setError("Failed to load data");
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const fetchCompanies = async () => {
     try {
-      const companies = await fetchCompaniesService()
-      onSaveCompanies(companies)
+      const companies = await fetchCompaniesService();
+      onSaveCompanies(companies);
     } catch (err) {
-      console.error('Error fetching companies:', err)
-      setError('Failed to load companies')
+      console.error("Error fetching companies:", err);
+      setError("Failed to load companies");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const updateSelectedCompany = async () => {
-    setError(null)
+    setError(null);
 
     try {
       const companyData = {
-        ...toCase(formValues, 'snakeCase'),
+        ...toCase(formValues, "snakeCase"),
         ceo_id: selectedCeoId || null,
         contact_person_id: selectedContactId || null,
-      }
+      };
 
       if (editingCompany) {
-        const { error } = await supabase.from('companies').update(companyData).eq('id', editingCompany.id)
+        const { error } = await supabase.from("companies").update(companyData).eq("id", editingCompany.id);
 
-        if (error) throw error
+        if (error) throw error;
       } else {
-        const { error } = await supabase.from('companies').insert({
+        const { error } = await supabase.from("companies").insert({
           ...companyData,
           hidden_id: generateHiddenId(),
-        })
+        });
 
-        if (error) throw error
+        if (error) throw error;
       }
 
-      await fetchCompanies()
-      setShowNewCompanyForm(false)
-      setEditingCompany(null)
-      setFormValues({})
-      setSelectedCeoId('')
-      setSelectedContactId('')
+      await fetchCompanies();
+      setShowNewCompanyForm(false);
+      setEditingCompany(null);
+      setFormValues({});
+      setSelectedCeoId("");
+      setSelectedContactId("");
     } catch (err) {
-      console.error('Error saving company:', err)
-      setError(err instanceof Error ? err.message : 'Failed to save company')
+      console.error("Error saving company:", err);
+      setError(err instanceof Error ? err.message : "Failed to save company");
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    updateSelectedCompany()
-  }
+    e.preventDefault();
+    updateSelectedCompany();
+  };
 
   const handleDelete = async (companyId: string) => {
     try {
-      const { error } = await supabase.from('companies').delete().eq('id', companyId)
+      const { error } = await supabase.from("companies").delete().eq("id", companyId);
 
-      if (error) throw error
-      await fetchCompanies()
+      if (error) throw error;
+      await fetchCompanies();
     } catch (err) {
-      console.error('Error deleting company:', err)
-      setError('Failed to delete company')
+      console.error("Error deleting company:", err);
+      setError("Failed to delete company");
     }
-  }
+  };
 
   const handleEdit = (company: Company) => {
-    setEditingCompany(company)
+    setEditingCompany(company);
     setFormValues({
       name: company.name,
-      website: company.website || '',
-      email: company.email || '',
-      phone: company.phone || '',
-      vatId: company.vatId || '',
-      registrationNumber: company.registrationNumber || '',
-    })
-    setSelectedCeoId(company.ceoId || '')
-    setSelectedContactId(company.contactPersonId || '')
-    setShowNewCompanyForm(true)
-  }
+      website: company.website || "",
+      email: company.email || "",
+      phone: company.phone || "",
+      vatId: company.vatId || "",
+      registrationNumber: company.registrationNumber || "",
+    });
+    setSelectedCeoId(company.ceoId || "");
+    setSelectedContactId(company.contactPersonId || "");
+    setShowNewCompanyForm(true);
+  };
 
   useKeyAction(() => {
-    updateSelectedCompany()
-  }, showNewCompanyForm)
+    updateSelectedCompany();
+  }, showNewCompanyForm);
 
   return (
     <div className="p-6">
       {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border border-solid">{error}</div>}
 
       {loading ? (
-        <div className="text-center p-4 text-primary-foreground">{translation('company.loading')}</div>
+        <div className="text-center p-4 text-primary-foreground">{translation("company.loading")}</div>
       ) : (
         <>
           <Button onClick={() => setShowNewCompanyForm(true)} className="w-full px-4 py-3 duration-200 mb-6">
             <Plus size={16} />
-            {translation('company.add')}
+            {translation("company.add")}
           </Button>
 
           {showNewCompanyForm ? (
             <div>
               <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
                 <Building2 className="text-accent-primary" size={16} />
-                {editingCompany ? translation('company.edit') : translation('company.add')}
+                {editingCompany ? translation("company.edit") : translation("company.add")}
               </h3>
 
               <form onSubmit={handleSubmit} className="text-card-foreground space-y-4">
@@ -168,7 +168,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                     </Label>
                     <Input
                       type={field.type}
-                      value={formValues[field.id] || ''}
+                      value={formValues[field.id] || ""}
                       onChange={(e) =>
                         setFormValues((prev) => ({
                           ...prev,
@@ -191,7 +191,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       <option value="">Select CEO</option>
                       {availablePeople.map((person) => (
                         <option key={person.id} value={person.id}>
-                          {person.salutation} {person.title ? `${person.title} ` : ''}
+                          {person.salutation} {person.title ? `${person.title} ` : ""}
                           {person.firstName} {person.lastName}
                         </option>
                       ))}
@@ -203,7 +203,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   </div>
                 </div>
                 <div>
-                  <Label className="block text-sm mb-1 text-secondary">{translation('company.contact_person')}</Label>
+                  <Label className="block text-sm mb-1 text-secondary">{translation("company.contact_person")}</Label>
                   <div className="relative">
                     <select
                       value={selectedContactId}
@@ -213,7 +213,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       <option value="">Select Contact Person</option>
                       {availablePeople.map((person) => (
                         <option key={person.id} value={person.id}>
-                          {person.salutation} {person.title ? `${person.title} ` : ''}
+                          {person.salutation} {person.title ? `${person.title} ` : ""}
                           {person.firstName} {person.lastName}
                         </option>
                       ))}
@@ -228,18 +228,18 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                   <Button
                     type="button"
                     onClick={() => {
-                      setShowNewCompanyForm(false)
-                      setEditingCompany(null)
-                      setFormValues({})
-                      setSelectedCeoId('')
-                      setSelectedContactId('')
+                      setShowNewCompanyForm(false);
+                      setEditingCompany(null);
+                      setFormValues({});
+                      setSelectedCeoId("");
+                      setSelectedContactId("");
                     }}
                     variant="destructive"
                   >
-                    {translation('actions.cancel')}
+                    {translation("actions.cancel")}
                   </Button>
                   <Button type="submit" className="px-4 py-2 rounded">
-                    {editingCompany ? translation('general.save_changes') : 'Create Company'}
+                    {editingCompany ? translation("general.save_changes") : "Create Company"}
                   </Button>
                 </div>
               </form>
@@ -260,8 +260,8 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       {onCreateCustomer && (
                         <Button
                           onClick={(e) => {
-                            e.stopPropagation()
-                            onCreateCustomer(company.id, company.name)
+                            e.stopPropagation();
+                            onCreateCustomer(company.id, company.name);
                           }}
                           className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white"
                         >
@@ -275,22 +275,22 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                     {company.ceoId && (
                       <div className="flex items-center gap-2">
                         <User size={14} />
-                        CEO:{' '}
+                        CEO:{" "}
                         {(() => {
-                          const manager = availablePeople.find((p) => p.id === company.ceoId)
-                          if (!manager) return 'Unknown manager'
-                          return `${manager.salutation} ${manager.title ? `${manager.title} ` : ''}${manager.firstName} ${manager.lastName}`
+                          const manager = availablePeople.find((p) => p.id === company.ceoId);
+                          if (!manager) return "Unknown manager";
+                          return `${manager.salutation} ${manager.title ? `${manager.title} ` : ""}${manager.firstName} ${manager.lastName}`;
                         })()}
                       </div>
                     )}
                     {company.contactPersonId && (
                       <div className="flex items-center gap-2">
                         <User size={14} />
-                        Contact:{' '}
+                        Contact:{" "}
                         {(() => {
-                          const contact = availablePeople.find((p) => p.id === company.contactPersonId)
-                          if (!contact) return 'Unknown contact'
-                          return `${contact.salutation} ${contact.title ? `${contact.title} ` : ''}${contact.firstName} ${contact.lastName}`
+                          const contact = availablePeople.find((p) => p.id === company.contactPersonId);
+                          if (!contact) return "Unknown contact";
+                          return `${contact.salutation} ${contact.title ? `${contact.title} ` : ""}${contact.firstName} ${contact.lastName}`;
                         })()}
                       </div>
                     )}
@@ -325,7 +325,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CompaniesPanel
+export default CompaniesPanel;

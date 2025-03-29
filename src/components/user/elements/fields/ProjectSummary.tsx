@@ -1,27 +1,27 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Project } from '../../../../types/projects'
-import { Person } from '../../../../types/people'
-import { Company } from '../../../../types/companies'
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from 'lucide-react'
-import MediaDialog from '../../../shared/MediaDialog'
-import { Language, useTranslation } from '../../../../types/language'
-import { updateProject, fetchProjects } from '../../../../services/projects'
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Project } from "../../../../types/projects";
+import { Person } from "../../../../types/people";
+import { Company } from "../../../../types/companies";
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from "lucide-react";
+import MediaDialog from "../../../shared/MediaDialog";
+import { Language, useTranslation } from "../../../../types/language";
+import { updateProject, fetchProjects } from "../../../../services/projects";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface ProjectSummaryProps {
-  project: Project
-  manager?: Person
-  company?: Company
-  currentTheme: Theme
-  currentLanguage: Language
-  savedPeople: Person[]
-  onProjectsChange: (projects: Project[]) => void
-  isExpanded?: boolean
-  onToggle?: () => void
-  selectedCustomerId: string | null
+  project: Project;
+  manager?: Person;
+  company?: Company;
+  currentTheme: Theme;
+  currentLanguage: Language;
+  savedPeople: Person[];
+  onProjectsChange: (projects: Project[]) => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
+  selectedCustomerId: string | null;
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
@@ -36,15 +36,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   onToggle,
   selectedCustomerId,
 }) => {
-  const translation = useTranslation(currentLanguage)
-  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const translation = useTranslation(currentLanguage);
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({
-    managerId: project.managerId || '',
-    typeProject: project.typeProject || 'field',
-    latitude: project.latitude || '',
-    longitude: project.longitude || '',
-  })
+    managerId: project.managerId || "",
+    typeProject: project.typeProject || "field",
+    latitude: project.latitude || "",
+    longitude: project.longitude || "",
+  });
 
   const handleSave = async () => {
     try {
@@ -54,15 +54,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         typeProject: editValues.typeProject,
         latitude: editValues.latitude,
         longitude: editValues.longitude,
-      })
+      });
 
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
-      setIsEditing(false)
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+      setIsEditing(false);
     } catch (err) {
-      console.error('Error updating project:', err)
+      console.error("Error updating project:", err);
     }
-  }
+  };
 
   return (
     <div className="mb-8">
@@ -79,20 +79,20 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <span>{project.name}</span>
                         <div className="flex items-center gap-2">
                           <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.typeProject === 'field' ? translation('project.type.field') : translation('project.type.roof')}
+                            {project.typeProject === "field" ? translation("project.type.field") : translation("project.type.roof")}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.fields.length} {translation('fields')}
+                            {project.fields.length} {translation("fields")}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border ">
-                            {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation('zones')}
+                            {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-opacity-20">
                             {project.fields.reduce(
                               (acc, field) => acc + field.zones.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0),
                               0,
-                            )}{' '}
-                            {translation('datapoints')}
+                            )}{" "}
+                            {translation("datapoints")}
                           </span>
                         </div>
                       </div>
@@ -102,8 +102,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              handleSave()
+                              e.stopPropagation();
+                              handleSave();
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -111,8 +111,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setIsEditing(false)
+                              e.stopPropagation();
+                              setIsEditing(false);
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -123,8 +123,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setShowMediaDialog(project.id)
+                              e.stopPropagation();
+                              setShowMediaDialog(project.id);
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -132,8 +132,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                           </Button>
                           <Button
                             onClick={(e) => {
-                              e.stopPropagation()
-                              setIsEditing(true)
+                              e.stopPropagation();
+                              setIsEditing(true);
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -148,9 +148,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               </TableRow>
             </TableHeader>
 
-            <TableBody className={isExpanded ? '' : 'hidden'}>
+            <TableBody className={isExpanded ? "" : "hidden"}>
               <TableRow>
-                <TableCell className="p-2 border-b border-r border-accent w-1/6">{translation('project.type')}</TableCell>
+                <TableCell className="p-2 border-b border-r border-accent w-1/6">{translation("project.type")}</TableCell>
                 <TableCell className="p-2">
                   {isEditing ? (
                     <select
@@ -158,16 +158,16 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       onChange={(e) => setEditValues({ ...editValues, typeProject: e.target.value })}
                       className="w-full p-1 rounded text-sm border border-input shadow-sm bg-accent"
                     >
-                      <option value="field">{translation('project.type.field')}</option>
-                      <option value="roof">{translation('project.type.roof')}</option>
+                      <option value="field">{translation("project.type.field")}</option>
+                      <option value="roof">{translation("project.type.roof")}</option>
                     </select>
                   ) : (
-                    translation(project.typeProject === 'field' ? 'project.type.field' : 'project.type.roof')
+                    translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")
                   )}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="p-2 w-1/6">{translation('project.manager')}</TableCell>
+                <TableCell className="p-2 w-1/6">{translation("project.manager")}</TableCell>
                 <TableCell className="p-2">
                   {isEditing ? (
                     <select
@@ -175,7 +175,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       onChange={(e) => setEditValues({ ...editValues, managerId: e.target.value })}
                       className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
-                      <option value="">{translation('project.manager.not_assigned')}</option>
+                      <option value="">{translation("project.manager.not_assigned")}</option>
                       {savedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
@@ -185,12 +185,12 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                   ) : manager ? (
                     `${manager.firstName} ${manager.lastName}`
                   ) : (
-                    translation('project.manager.not_assigned')
+                    translation("project.manager.not_assigned")
                   )}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="p-2 w-1/6">{translation('zones.location')}</TableCell>
+                <TableCell className="p-2 w-1/6">{translation("zones.location")}</TableCell>
                 <TableCell className="p-2">
                   {isEditing ? (
                     <div className="flex gap-2">
@@ -199,14 +199,14 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         value={editValues.latitude}
                         onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
                         className="w-1/2 p-1"
-                        placeholder={translation('project.latitude')}
+                        placeholder={translation("project.latitude")}
                       />
                       <Input
                         type="text"
                         value={editValues.longitude}
                         onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
                         className="w-1/2 p-1"
-                        placeholder={translation('project.longitude')}
+                        placeholder={translation("project.longitude")}
                       />
                     </div>
                   ) : project.latitude && project.longitude ? (
@@ -215,13 +215,13 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         {project.latitude}, {project.longitude}
                       </span>
                       <Button
-                        onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, '_blank')}
+                        onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank")}
                       >
-                        {translation('general.view_on_map')}
+                        {translation("general.view_on_map")}
                       </Button>
                     </div>
                   ) : (
-                    <span className="text-primary">{translation('general.location_not_set')}</span>
+                    <span className="text-primary">{translation("general.location_not_set")}</span>
                   )}
                 </TableCell>
               </TableRow>
@@ -240,7 +240,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProjectSummary
+export default ProjectSummary;

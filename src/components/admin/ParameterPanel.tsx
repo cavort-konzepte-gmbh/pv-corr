@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
-import { Language, useTranslation } from '../../types/language'
-import { Theme } from '../../types/theme'
-import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from '../../services/parameters'
-import { Edit2, Plus, Save, X, Code, Check } from 'lucide-react'
-import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { supabase } from '@/lib/supabase'
-import { Label } from '../ui/label'
-import { Button } from '../ui/button'
+import { useEffect, useState } from "react";
+import { Language, useTranslation } from "../../types/language";
+import { Theme } from "../../types/theme";
+import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from "../../services/parameters";
+import { Edit2, Plus, Save, X, Code, Check } from "lucide-react";
+import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from "../shared/FormHandler";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { supabase } from "@/lib/supabase";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 
 interface RatingLogicDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  currentTheme: Theme
-  parameterId: string
-  initialCode: string
-  initialTestCases: string
-  onSave: (code: string, testCases: string) => void
+  isOpen: boolean;
+  onClose: () => void;
+  currentTheme: Theme;
+  parameterId: string;
+  initialCode: string;
+  initialTestCases: string;
+  onSave: (code: string, testCases: string) => void;
 }
 
 const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
@@ -28,24 +28,24 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
   initialTestCases,
   onSave,
 }) => {
-  const [code, setCode] = useState(initialCode || '')
-  const [testCases, setTestCases] = useState(initialTestCases || '')
-  const [error, setError] = useState<string | null>(null)
+  const [code, setCode] = useState(initialCode || "");
+  const [testCases, setTestCases] = useState(initialTestCases || "");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = () => {
     try {
       // Validate test cases JSON
       if (testCases) {
-        JSON.parse(testCases)
+        JSON.parse(testCases);
       }
-      onSave(code, testCases)
-      onClose()
+      onSave(code, testCases);
+      onClose();
     } catch (err) {
-      setError('Invalid JSON format for test cases')
+      setError("Invalid JSON format for test cases");
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -86,61 +86,61 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 interface ParameterPanelProps {
-  currentTheme: Theme
-  currentLanguage: Language
+  currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, currentLanguage }) => {
-  const t = useTranslation(currentLanguage)
-  const [parameters, setParameters] = useState<Parameter[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editingParameter, setEditingParameter] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [isNewParameter, setIsNewParameter] = useState<boolean>(false)
-  const [editingRatingLogic, setEditingRatingLogic] = useState<string | null>(null)
-  const [newParameter, setNewParameter] = useState<Record<string, string>>({})
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [deleteConfirmName, setDeleteConfirmName] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const translation = useTranslation(currentLanguage)
+  const t = useTranslation(currentLanguage);
+  const [parameters, setParameters] = useState<Parameter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingParameter, setEditingParameter] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [isNewParameter, setIsNewParameter] = useState<boolean>(false);
+  const [editingRatingLogic, setEditingRatingLogic] = useState<string | null>(null);
+  const [newParameter, setNewParameter] = useState<Record<string, string>>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true)
-        const fetchedParameters = await fetchParameters()
-        setParameters(fetchedParameters)
+        setLoading(true);
+        const fetchedParameters = await fetchParameters();
+        setParameters(fetchedParameters);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    load()
-  }, [])
+    };
+    load();
+  }, []);
 
   const handleChangeEditingValues = (name: string, value: string) => {
     setEditingValues((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleChangeParameter = (name: string, value: string) => {
     setNewParameter((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const resetValues = () => {
-    setEditingValues({})
-    setEditingParameter(null)
-  }
+    setEditingValues({});
+    setEditingParameter(null);
+  };
 
   const handleUpdateSaveParameter = async (parameter: any) => {
     if (editingParameter === parameter.id) {
@@ -148,81 +148,81 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         const updateData = {
           ...editingValues,
           orderNumber: parseFloat(editingValues.orderNumber) || 0,
-        }
-        await updateParameter(parameter.id, updateData)
-        const updatedParameters = await fetchParameters()
-        setParameters(updatedParameters)
+        };
+        await updateParameter(parameter.id, updateData);
+        const updatedParameters = await fetchParameters();
+        setParameters(updatedParameters);
       } catch (err) {
-        console.error('Error updating parameter:', err)
-        setError('Failed to update parameter')
+        console.error("Error updating parameter:", err);
+        setError("Failed to update parameter");
       }
-      const updatedParameters = await fetchParameters()
-      setParameters(updatedParameters)
-      resetValues()
+      const updatedParameters = await fetchParameters();
+      setParameters(updatedParameters);
+      resetValues();
     } else {
-      setEditingParameter(parameter.id)
-      setEditingValues(parameter)
-      setNewParameter({})
-      setIsNewParameter(false)
+      setEditingParameter(parameter.id);
+      setEditingValues(parameter);
+      setNewParameter({});
+      setIsNewParameter(false);
     }
-  }
+  };
 
   const handleDeleteParameter = async (parameterId: string) => {
     // Get parameter name for confirmation
-    const parameter = parameters.find((p) => p.id === parameterId)
-    if (!parameter) return
+    const parameter = parameters.find((p) => p.id === parameterId);
+    if (!parameter) return;
 
     // Only proceed if name matches
     if (deleteConfirmName !== parameter.name) {
-      setError('Parameter name does not match')
-      return
+      setError("Parameter name does not match");
+      return;
     }
 
-    await deleteParameter(parameterId)
-    const updatedParameters = await fetchParameters()
-    setParameters(updatedParameters)
-    setDeleteConfirm(null)
-    setDeleteConfirmName('')
-  }
+    await deleteParameter(parameterId);
+    const updatedParameters = await fetchParameters();
+    setParameters(updatedParameters);
+    setDeleteConfirm(null);
+    setDeleteConfirmName("");
+  };
 
   const handleOpenParameter = () => {
-    resetValues()
-    setIsNewParameter(true)
-  }
+    resetValues();
+    setIsNewParameter(true);
+  };
 
   const handleAddNewParameter = async () => {
     try {
       if (!newParameter.rangeType) {
-        setError('Range type is required')
-        return
+        setError("Range type is required");
+        return;
       }
 
       const createData = {
         ...newParameter,
         orderNumber: parseFloat(newParameter.orderNumber) || 0,
-      }
+      };
 
-      await createParameter(createData as any)
-      const updatedParameters = await fetchParameters()
-      setParameters(updatedParameters)
-      resetValues()
-      setNewParameter({})
-      setIsNewParameter(false)
+      await createParameter(createData as any);
+      const updatedParameters = await fetchParameters();
+      setParameters(updatedParameters);
+      resetValues();
+      setNewParameter({});
+      setIsNewParameter(false);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   const handleCancelNewParameter = () => {
-    resetValues()
-    setNewParameter({})
-    setIsNewParameter(false)
-  }
+    resetValues();
+    setNewParameter({});
+    setIsNewParameter(false);
+  };
 
   return (
     <div className="p-6">
       {loading ? (
-        <div className="text-center p-4 ">{t('datapoint.loading')}</div>
+        <div className="text-center p-4 ">{t("datapoint.loading")}</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -256,8 +256,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <FormInput
                             type="number"
                             name="orderNumber"
-                            value={editingValues.orderNumber || '0'}
-                            onChange={(e) => handleChangeEditingValues('orderNumber', e.target.value)}
+                            value={editingValues.orderNumber || "0"}
+                            onChange={(e) => handleChangeEditingValues("orderNumber", e.target.value)}
                             min="0"
                             step="0.01"
                           />
@@ -272,8 +272,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <FormInput
                               type="text"
                               name="name"
-                              value={editingValues.name || ''}
-                              onChange={(e) => handleChangeEditingValues('name', e.target.value)}
+                              value={editingValues.name || ""}
+                              onChange={(e) => handleChangeEditingValues("name", e.target.value)}
                               className="w-full p-1 rounded text-sm text-primary"
                             />
                           </FormHandler>
@@ -287,12 +287,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <FormInput
                             type="text"
                             name="shortName"
-                            value={editingValues.shortName || ''}
-                            onChange={(e) => handleChangeEditingValues('shortName', e.target.value)}
+                            value={editingValues.shortName || ""}
+                            onChange={(e) => handleChangeEditingValues("shortName", e.target.value)}
                             className="w-full p-1 rounded text-sm text-primary"
                           />
                         ) : (
-                          parameter.shortName || '-'
+                          parameter.shortName || "-"
                         )}
                       </TableCell>
 
@@ -300,8 +300,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="unit"
-                            value={editingValues.unit || ''}
-                            onChange={(e) => handleChangeEditingValues('unit', e.target.value)}
+                            value={editingValues.unit || ""}
+                            onChange={(e) => handleChangeEditingValues("unit", e.target.value)}
                             className="w-full p-1 rounded text-sm"
                           >
                             <option value="">No unit</option>
@@ -319,7 +319,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <option value="mA">mA</option>
                           </FormSelect>
                         ) : (
-                          parameter.unit || '-'
+                          parameter.unit || "-"
                         )}
                       </TableCell>
 
@@ -327,8 +327,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="rangeType"
-                            value={editingValues.rangeType || ''}
-                            onChange={(e) => handleChangeEditingValues('rangeType', e.target.value)}
+                            value={editingValues.rangeType || ""}
+                            onChange={(e) => handleChangeEditingValues("rangeType", e.target.value)}
                             className="w-full p-1 rounded text-sm text-primary"
                           >
                             <option value="">Select Range Type</option>
@@ -350,12 +350,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <FormInput
                             type="text"
                             name="rangeValue"
-                            value={editingValues.rangeValue || ''}
-                            onChange={(e) => handleChangeEditingValues('rangeValue', e.target.value)}
+                            value={editingValues.rangeValue || ""}
+                            onChange={(e) => handleChangeEditingValues("rangeValue", e.target.value)}
                             className="w-full p-1 rounded text-sm text-primary"
                           />
                         ) : (
-                          parameter.rangeValue || '-'
+                          parameter.rangeValue || "-"
                         )}
                       </TableCell>
 
@@ -382,8 +382,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           {!editingParameter && (
                             <Button
                               onClick={() => {
-                                setDeleteConfirm(parameter.id)
-                                setDeleteConfirmName('')
+                                setDeleteConfirm(parameter.id);
+                                setDeleteConfirmName("");
                               }}
                               className="p-1 rounded hover:bg-opacity-80 "
                               variant="ghost"
@@ -401,8 +401,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         <FormInput
                           type="number"
                           name="orderNumber"
-                          value={newParameter.orderNumber || '0'}
-                          onChange={(e) => handleChangeParameter('orderNumber', e.target.value)}
+                          value={newParameter.orderNumber || "0"}
+                          onChange={(e) => handleChangeParameter("orderNumber", e.target.value)}
                           className="w-16 p-1 rounded text-sm text-primary text-center"
                           min="0"
                           step="0.01"
@@ -414,7 +414,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <FormInput
                               type="text"
                               name="name"
-                              value={newParameter.name || ''}
+                              value={newParameter.name || ""}
                               onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
                               className="w-full p-1 rounded text-sm text-primary"
                             />
@@ -427,7 +427,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <FormInput
                             type="text"
                             name="shortName"
-                            value={newParameter.shortName || ''}
+                            value={newParameter.shortName || ""}
                             onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
                             className="w-full p-1 rounded text-sm "
                           />
@@ -438,7 +438,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         {isNewParameter ? (
                           <FormSelect
                             name="unit"
-                            value={newParameter.unit || ''}
+                            value={newParameter.unit || ""}
                             onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
                             className="w-full p-1 rounded text-sm text-primary"
                           >
@@ -462,8 +462,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       <TableCell className="p-2">
                         {isNewParameter ? (
                           <FormSelect
-                            value={newParameter.rangeType || ''}
-                            onChange={(e) => handleChangeParameter('rangeType', e.target.value)}
+                            value={newParameter.rangeType || ""}
+                            onChange={(e) => handleChangeParameter("rangeType", e.target.value)}
                             required
                             className="w-full p-1 rounded text-sm text-primary"
                           >
@@ -484,7 +484,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           <FormInput
                             type="text"
                             name="rangeValue"
-                            value={newParameter.rangeValue || ''}
+                            value={newParameter.rangeValue || ""}
                             onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
                             className="w-full p-1 rounded text-sm text-primary"
                           />
@@ -516,34 +516,34 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
           onClose={() => setEditingRatingLogic(null)}
           currentTheme={currentTheme}
           parameterId={editingRatingLogic}
-          initialCode={parameters.find((p) => p.id === editingRatingLogic)?.rating_logic_code || ''}
+          initialCode={parameters.find((p) => p.id === editingRatingLogic)?.rating_logic_code || ""}
           initialTestCases={(() => {
-            const param = parameters.find((p) => p.id === editingRatingLogic)
-            if (!param?.rating_logic_test_cases) return ''
+            const param = parameters.find((p) => p.id === editingRatingLogic);
+            if (!param?.rating_logic_test_cases) return "";
             try {
-              return JSON.stringify(param.rating_logic_test_cases, null, 2)
+              return JSON.stringify(param.rating_logic_test_cases, null, 2);
             } catch (err) {
-              console.error('Error parsing test cases:', err)
-              return ''
+              console.error("Error parsing test cases:", err);
+              return "";
             }
           })()}
           onSave={async (code, testCases) => {
             try {
               const { error } = await supabase
-                .from('parameters')
+                .from("parameters")
                 .update({
                   rating_logic_code: code,
                   rating_logic_test_cases: testCases ? JSON.parse(testCases) : null,
                 })
-                .eq('id', editingRatingLogic)
+                .eq("id", editingRatingLogic);
 
-              if (error) throw error
-              const updatedParameters = await fetchParameters()
-              setParameters(updatedParameters)
-              setEditingRatingLogic(null)
+              if (error) throw error;
+              const updatedParameters = await fetchParameters();
+              setParameters(updatedParameters);
+              setEditingRatingLogic(null);
             } catch (err) {
-              console.error('Error updating rating logic:', err)
-              setError('Failed to update rating logic')
+              console.error("Error updating rating logic:", err);
+              setError("Failed to update rating logic");
             }
           }}
         />
@@ -556,10 +556,10 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         onConfirmChange={setDeleteConfirmName}
         onConfirm={() => handleDeleteParameter(deleteConfirm!)}
         onCancel={() => {
-          setDeleteConfirm(null)
-          setDeleteConfirmName('')
+          setDeleteConfirm(null);
+          setDeleteConfirmName("");
         }}
       />
     </div>
-  )
-}
+  );
+};

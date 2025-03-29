@@ -1,69 +1,69 @@
-import React, { useState, useEffect } from 'react'
-import { Theme } from '../../types/theme'
-import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react'
-import { AdminUser, createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers'
-import { supabaseAdmin } from '../../lib/supabase'
-import { Button } from '@/components/ui/button'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { DeleteConfirmDialog } from '../shared/FormHandler'
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from "lucide-react";
+import { AdminUser, createUser, deleteUser, listUsers, updateUser } from "../../services/adminUsers";
+import { supabaseAdmin } from "../../lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { DeleteConfirmDialog } from "../shared/FormHandler";
 
 const initialNewUserState = {
-  email: '',
-  password: '',
-  displayName: '',
-}
+  email: "",
+  password: "",
+  displayName: "",
+};
 
 interface UserManagementProps {
-  currentTheme: Theme
-  onBack: () => void
+  currentTheme: Theme;
+  onBack: () => void;
 }
 
 const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack }) => {
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [editingUser, setEditingUser] = useState<string | null>(null)
-  const [selectedRole, setSelectedRole] = useState<'super_admin' | 'admin' | 'user'>('user')
-  const [showNewUserForm, setShowNewUserForm] = useState(false)
-  const [newUser, setNewUser] = useState(initialNewUserState)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<"super_admin" | "admin" | "user">("user");
+  const [showNewUserForm, setShowNewUserForm] = useState(false);
+  const [newUser, setNewUser] = useState(initialNewUserState);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true)
-      const users = await listUsers()
-      setUsers(users)
+      setLoading(true);
+      const users = await listUsers();
+      setUsers(users);
     } catch (err) {
-      console.error('Error fetching users:', err)
-      setError('Failed to load users')
+      console.error("Error fetching users:", err);
+      setError("Failed to load users");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, []);
 
   const handleUpdateRole = async (userId: string) => {
     try {
-      setError(null)
+      setError(null);
       await updateUser(userId, {
         adminLevel: selectedRole,
-      })
+      });
 
       // Refresh user list and reset state
-      await fetchUsers()
-      setEditingUser(null)
-      setError(null)
+      await fetchUsers();
+      setEditingUser(null);
+      setError(null);
     } catch (err) {
-      console.error('Error updating user role:', err)
-      setError(err instanceof Error ? err.message : 'Failed to update user role')
+      console.error("Error updating user role:", err);
+      setError(err instanceof Error ? err.message : "Failed to update user role");
     }
-  }
+  };
 
   const handleUpdateUser = async (userId: string, data: { firstName?: string; lastName?: string }) => {
     try {
@@ -72,78 +72,78 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
         user_metadata: {
           admin_level: selectedRole,
         },
-      })
+      });
 
-      if (error) throw error
-      await fetchUsers()
-      setEditingUser(null)
+      if (error) throw error;
+      await fetchUsers();
+      setEditingUser(null);
     } catch (err) {
-      console.error('Error updating user:', err)
-      setError('Failed to update user')
+      console.error("Error updating user:", err);
+      setError("Failed to update user");
     }
-  }
+  };
 
   const handleDeleteUser = async (userId: string) => {
     try {
-      setError(null)
-      await deleteUser(userId)
+      setError(null);
+      await deleteUser(userId);
       // Refresh user list
-      await fetchUsers()
-      setError(null)
+      await fetchUsers();
+      setError(null);
     } catch (err) {
-      console.error('Error deleting user:', err)
-      setError(err instanceof Error ? err.message : 'Failed to delete user')
+      console.error("Error deleting user:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete user");
     }
-  }
+  };
 
   const handleCreateUser = async () => {
     try {
-      setError(null)
+      setError(null);
       if (!newUser.email || !newUser.password) {
-        setError('Email and password are required')
-        return
+        setError("Email and password are required");
+        return;
       }
 
       await createUser({
         email: newUser.email,
         password: newUser.password,
         displayName: newUser.displayName,
-      })
+      });
 
-      await fetchUsers()
-      setShowNewUserForm(false)
-      setNewUser(initialNewUserState)
+      await fetchUsers();
+      setShowNewUserForm(false);
+      setNewUser(initialNewUserState);
     } catch (err) {
-      console.error('Error creating user:', err)
-      setError(err instanceof Error ? err.message : 'Failed to create user')
+      console.error("Error creating user:", err);
+      setError(err instanceof Error ? err.message : "Failed to create user");
     }
-  }
+  };
 
-  const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleEdit = (user: AdminUser) => {
-    if (loading) return
-    setEditingUser(user.id)
-    setSelectedRole(user.adminLevel)
-  }
+    if (loading) return;
+    setEditingUser(user.id);
+    setSelectedRole(user.adminLevel);
+  };
 
   const handleDelete = (userId: string) => {
-    if (loading) return
-    handleDeleteUser(userId)
-  }
+    if (loading) return;
+    handleDeleteUser(userId);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
+    const { name, value } = event.target;
     setNewUser({
       ...newUser,
       [name]: value,
-    })
-  }
+    });
+  };
 
   const handleCancel = () => {
-    setNewUser(initialNewUserState)
-    setShowNewUserForm(false)
-  }
+    setNewUser(initialNewUserState);
+    setShowNewUserForm(false);
+  };
 
   return (
     <div className="p-8">
@@ -209,11 +209,11 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                       <div className="flex items-center gap-2">
                         <Shield className="text-accent-primary" size={16} />
                         <span className="text-muted-foreground">
-                          {user.adminLevel === 'super_admin' ? 'Super Admin' : user.adminLevel === 'admin' ? 'Admin' : 'User'}
+                          {user.adminLevel === "super_admin" ? "Super Admin" : user.adminLevel === "admin" ? "Admin" : "User"}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</TableCell>
+                    <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""}</TableCell>
                     <TableCell>
                       {editingUser === user.id ? (
                         <div className="flex items-center justify-start gap-2">
@@ -229,7 +229,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                           <Button className="disabled:opacity-50" variant="ghost" disabled={loading} onClick={() => handleEdit(user)}>
                             <Edit2 size={16} />
                           </Button>
-                          {user.adminLevel !== 'super_admin' && (
+                          {user.adminLevel !== "super_admin" && (
                             <Button
                               className="disabled:opacity-50"
                               variant="ghost"
@@ -286,7 +286,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default UserManagement
+export default UserManagement;

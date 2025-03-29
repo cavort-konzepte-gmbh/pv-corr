@@ -1,118 +1,118 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Project, Zone } from '../../../../types/projects'
-import { ChevronRight, Edit2, Save, X, Building2, Wrench, Plus } from 'lucide-react'
-import { updateZone, deleteZone } from '../../../../services/zones'
-import { fetchProjects } from '../../../../services/projects'
-import { useEffect } from 'react'
-import { supabase } from '../../../../lib/supabase'
-import { Language, useTranslation } from '../../../../types/language'
-import { FormHandler } from '../../../shared/FormHandler'
-import { createZone } from '../../../../services/zones'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Project, Zone } from "../../../../types/projects";
+import { ChevronRight, Edit2, Save, X, Building2, Wrench, Plus } from "lucide-react";
+import { updateZone, deleteZone } from "../../../../services/zones";
+import { fetchProjects } from "../../../../services/projects";
+import { useEffect } from "react";
+import { supabase } from "../../../../lib/supabase";
+import { Language, useTranslation } from "../../../../types/language";
+import { FormHandler } from "../../../shared/FormHandler";
+import { createZone } from "../../../../services/zones";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface ZoneListProps {
-  currentTheme: Theme
-  zones: Zone[]
-  onSelectZone: (zoneId: string) => void
-  onProjectsChange: (projects: Project[]) => void
-  currentLanguage: Language
-  selectedFieldId: string
+  currentTheme: Theme;
+  zones: Zone[];
+  onSelectZone: (zoneId: string) => void;
+  onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language;
+  selectedFieldId: string;
 }
 
 const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, onProjectsChange, currentLanguage, selectedFieldId }) => {
-  const [editingZoneId, setEditingZoneId] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [updatingZone, setUpdatingZone] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedSubstructure, setSelectedSubstructure] = useState<any>(null)
-  const [selectedFoundation, setSelectedFoundation] = useState<any>(null)
-  const [isAdding, setIsAdding] = useState(false)
+  const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [updatingZone, setUpdatingZone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedSubstructure, setSelectedSubstructure] = useState<any>(null);
+  const [selectedFoundation, setSelectedFoundation] = useState<any>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [newValues, setNewValues] = useState({
-    name: '',
-    latitude: '',
-    longitude: '',
-    substructureId: '',
-    foundationId: '',
-  })
-  const [substructures, setSubstructures] = useState<any[]>([])
-  const [foundations, setFoundations] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const translation = useTranslation(currentLanguage)
+    name: "",
+    latitude: "",
+    longitude: "",
+    substructureId: "",
+    foundationId: "",
+  });
+  const [substructures, setSubstructures] = useState<any[]>([]);
+  const [foundations, setFoundations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const [{ data: subData }, { data: foundData }] = await Promise.all([
-          supabase.from('substructures_view').select('*'),
-          supabase.from('foundations').select('*'),
-        ])
+          supabase.from("substructures_view").select("*"),
+          supabase.from("foundations").select("*"),
+        ]);
 
-        setSubstructures(subData || [])
-        setFoundations(foundData || [])
+        setSubstructures(subData || []);
+        setFoundations(foundData || []);
       } catch (err) {
-        console.error('Error loading data:', err)
+        console.error("Error loading data:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const handleUpdateZone = async (zoneId: string, values: Record<string, string>) => {
-    if (updatingZone) return
+    if (updatingZone) return;
     try {
-      setError(null)
-      setUpdatingZone(true)
+      setError(null);
+      setUpdatingZone(true);
 
       // Prepare update data
       const updateData = {
         name: values.name,
         latitude: values.latitude || null,
         longitude: values.longitude || null,
-        substructureId: values.substructureId === '' ? null : values.substructureId,
-        foundationId: values.foundationId === '' ? null : values.foundationId,
-      }
+        substructureId: values.substructureId === "" ? null : values.substructureId,
+        foundationId: values.foundationId === "" ? null : values.foundationId,
+      };
 
-      await updateZone(zoneId, updateData)
+      await updateZone(zoneId, updateData);
 
       // Wait a moment before refreshing to ensure DB update is complete
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
 
       // Reset editing state
-      setEditingZoneId(null)
-      setEditingValues({})
-      setError(null)
+      setEditingZoneId(null);
+      setEditingValues({});
+      setError(null);
     } catch (err) {
-      console.error('Error updating zone:', err)
-      setError(err instanceof Error ? err.message : 'Failed to update zone')
+      console.error("Error updating zone:", err);
+      setError(err instanceof Error ? err.message : "Failed to update zone");
     } finally {
-      setUpdatingZone(false)
+      setUpdatingZone(false);
     }
-  }
+  };
 
   const handleDeleteZone = async (zoneId: string) => {
     try {
-      await deleteZone(zoneId)
-      const updatedProjects = await fetchProjects()
+      await deleteZone(zoneId);
+      const updatedProjects = await fetchProjects();
       if (updatedProjects) {
-        onProjectsChange(updatedProjects)
+        onProjectsChange(updatedProjects);
       }
     } catch (err) {
-      console.error('Error deleting zone:', err)
+      console.error("Error deleting zone:", err);
     }
-  }
+  };
 
   const handleAddZone = async () => {
     if (!newValues.name?.trim()) {
-      setError('Zone name is required')
-      return
+      setError("Zone name is required");
+      return;
     }
 
     try {
@@ -122,43 +122,43 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
         longitude: newValues.longitude || undefined,
         substructureId: newValues.substructureId || undefined,
         foundationId: newValues.foundationId || undefined,
-      })
+      });
 
-      const updatedProjects = await fetchProjects()
+      const updatedProjects = await fetchProjects();
       if (updatedProjects) {
-        onProjectsChange(updatedProjects)
+        onProjectsChange(updatedProjects);
       }
 
-      setIsAdding(false)
+      setIsAdding(false);
       setNewValues({
-        name: '',
-        latitude: '',
-        longitude: '',
-        substructureId: '',
-        foundationId: '',
-      })
+        name: "",
+        latitude: "",
+        longitude: "",
+        substructureId: "",
+        foundationId: "",
+      });
     } catch (err) {
-      console.error('Error creating zone:', err)
-      setError('Failed to create zone')
+      console.error("Error creating zone:", err);
+      setError("Failed to create zone");
     }
-  }
+  };
 
   return (
     <div>
       <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
         <Plus size={16} />
-        {translation('zones.add')}
+        {translation("zones.add")}
       </Button>
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{translation('zones.short_name')}</TableHead>
-                <TableHead>{translation('zones.location')}</TableHead>
+                <TableHead>{translation("zones.short_name")}</TableHead>
+                <TableHead>{translation("zones.location")}</TableHead>
                 <TableHead>Substructure</TableHead>
                 <TableHead>Foundation</TableHead>
-                <TableHead>{translation('zones.actions')}</TableHead>
+                <TableHead>{translation("zones.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -169,14 +169,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       isEditing={true}
                       onSave={handleAddZone}
                       onCancel={() => {
-                        setIsAdding(false)
+                        setIsAdding(false);
                         setNewValues({
-                          name: '',
-                          latitude: '',
-                          longitude: '',
-                          substructureId: '',
-                          foundationId: '',
-                        })
+                          name: "",
+                          latitude: "",
+                          longitude: "",
+                          substructureId: "",
+                          foundationId: "",
+                        });
                       }}
                     >
                       <Input
@@ -241,14 +241,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       </Button>
                       <Button
                         onClick={() => {
-                          setIsAdding(false)
+                          setIsAdding(false);
                           setNewValues({
-                            name: '',
-                            latitude: '',
-                            longitude: '',
-                            substructureId: '',
-                            foundationId: '',
-                          })
+                            name: "",
+                            latitude: "",
+                            longitude: "",
+                            substructureId: "",
+                            foundationId: "",
+                          });
                         }}
                         className="size-8"
                       >
@@ -279,31 +279,31 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       <div className="flex gap-2">
                         <Input
                           type="text"
-                          value={editingValues.latitude || zone.latitude || ''}
+                          value={editingValues.latitude || zone.latitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                           placeholder="Latitude"
                           className="w-full p-1"
                         />
                         <Input
                           type="text"
-                          value={editingValues.longitude || zone.longitude || ''}
+                          value={editingValues.longitude || zone.longitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
                           placeholder="Longitude"
                           className="w-full p-1"
                         />
                       </div>
                     ) : zone.latitude && zone.longitude ? (
-                      <Button onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, '_blank')}>
+                      <Button onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")}>
                         View on map
                       </Button>
                     ) : (
-                      <span>{translation('general.location_not_set')}</span>
+                      <span>{translation("general.location_not_set")}</span>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     {editingZoneId === zone.id ? (
                       <select
-                        value={editingValues.substructureId || zone.substructureId || ''}
+                        value={editingValues.substructureId || zone.substructureId || ""}
                         onChange={(e) => setEditingValues({ ...editingValues, substructureId: e.target.value })}
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                       >
@@ -319,14 +319,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         <Wrench size={14} className="text-primary" />
                         {zone.substructureId ? (
                           (() => {
-                            const sub = substructures.find((s) => s.id === zone.substructureId)
+                            const sub = substructures.find((s) => s.id === zone.substructureId);
                             return sub ? (
                               <span>
                                 {sub.manufacturer} - {sub.system}
                               </span>
                             ) : (
                               <span className="text-primary">Not set</span>
-                            )
+                            );
                           })()
                         ) : (
                           <span className="text-primary">Not set</span>
@@ -337,7 +337,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                   <TableCell className="p-2">
                     {editingZoneId === zone.id ? (
                       <select
-                        value={editingValues.foundationId || zone.foundationId || ''}
+                        value={editingValues.foundationId || zone.foundationId || ""}
                         onChange={(e) => setEditingValues({ ...editingValues, foundationId: e.target.value })}
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                       >
@@ -353,8 +353,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         <Building2 size={14} className="text-primary" />
                         {zone.foundationId ? (
                           (() => {
-                            const foundation = foundations.find((f) => f.id === zone.foundationId)
-                            return foundation ? <span>{foundation.name}</span> : <span className="text-primary">Not set</span>
+                            const foundation = foundations.find((f) => f.id === zone.foundationId);
+                            return foundation ? <span>{foundation.name}</span> : <span className="text-primary">Not set</span>;
                           })()
                         ) : (
                           <span className="text-primary">Not set</span>
@@ -369,14 +369,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           editingZoneId === zone.id
                             ? handleUpdateZone(zone.id, editingValues)
                             : (() => {
-                                setEditingZoneId(zone.id)
+                                setEditingZoneId(zone.id);
                                 setEditingValues({
                                   name: zone.name,
-                                  latitude: zone.latitude || '',
-                                  longitude: zone.longitude || '',
-                                  substructureId: zone.substructureId || '',
-                                  foundationId: zone.foundationId || '',
-                                })
+                                  latitude: zone.latitude || "",
+                                  longitude: zone.longitude || "",
+                                  substructureId: zone.substructureId || "",
+                                  foundationId: zone.foundationId || "",
+                                });
                               })()
                         }
                         className="size-8"
@@ -388,12 +388,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       {editingZoneId === zone.id && (
                         <>
                           <Button onClick={() => handleDeleteZone(zone.id)} variant="ghost">
-                            {translation('actions.delete')}
+                            {translation("actions.delete")}
                           </Button>
                           <Button
                             onClick={() => {
-                              setEditingZoneId(null)
-                              setEditingValues({})
+                              setEditingZoneId(null);
+                              setEditingValues({});
                             }}
                             className="size-8"
                             variant="ghost"
@@ -414,7 +414,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ZoneList
+export default ZoneList;

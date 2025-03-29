@@ -1,103 +1,103 @@
-import React, { useState, useEffect } from 'react'
-import { Theme } from '../../../types/theme'
-import { Language, LANGUAGES } from '../../../types/language'
-import { Plus, Save, X, Edit2, Search } from 'lucide-react'
-import { fetchAllTranslations, fetchLanguages, updateTranslation, deleteTranslation } from '../../../services/translations'
-import { FormHandler } from '../../shared/FormHandler'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@radix-ui/react-label'
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../../types/theme";
+import { Language, LANGUAGES } from "../../../types/language";
+import { Plus, Save, X, Edit2, Search } from "lucide-react";
+import { fetchAllTranslations, fetchLanguages, updateTranslation, deleteTranslation } from "../../../services/translations";
+import { FormHandler } from "../../shared/FormHandler";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@radix-ui/react-label";
 
 interface TranslationsPanelProps {
-  currentTheme: Theme
-  currentLanguage: Language
+  currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, currentLanguage }) => {
-  const [translations, setTranslations] = useState<Record<string, Record<Language, string>>>({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [editingKey, setEditingKey] = useState<string | null>(null)
-  const [editValues, setEditValues] = useState<Record<string, string>>({})
-  const [isAdding, setIsAdding] = useState(false)
+  const [translations, setTranslations] = useState<Record<string, Record<Language, string>>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Record<string, string>>({});
+  const [isAdding, setIsAdding] = useState(false);
   const [newValues, setNewValues] = useState<{
-    key: string
-    translations: Record<Language, string>
+    key: string;
+    translations: Record<Language, string>;
   }>({
-    key: '',
+    key: "",
     translations: {},
-  })
+  });
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true)
-      const translationsData = await fetchAllTranslations()
-      setTranslations(translationsData)
+      setLoading(true);
+      const translationsData = await fetchAllTranslations();
+      setTranslations(translationsData);
     } catch (err) {
-      console.error('Error loading translations:', err)
-      setError('Failed to load translations')
+      console.error("Error loading translations:", err);
+      setError("Failed to load translations");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSave = async (key: string) => {
     try {
-      setError(null)
-      const promises = Object.entries(editValues).map(([langId, value]) => updateTranslation(key, langId, value))
-      await Promise.all(promises)
-      await loadData()
-      setEditingKey(null)
-      setEditValues({})
+      setError(null);
+      const promises = Object.entries(editValues).map(([langId, value]) => updateTranslation(key, langId, value));
+      await Promise.all(promises);
+      await loadData();
+      setEditingKey(null);
+      setEditValues({});
     } catch (err) {
-      console.error('Error saving translations:', err)
-      setError('Failed to save translations')
+      console.error("Error saving translations:", err);
+      setError("Failed to save translations");
     }
-  }
+  };
 
   const handleAddNew = async () => {
     try {
-      setError(null)
+      setError(null);
       if (!newValues.key.trim()) {
-        setError('Translation key is required')
-        return
+        setError("Translation key is required");
+        return;
       }
 
       const promises = Object.entries(newValues.translations).map(([langId, value]) =>
         updateTranslation(newValues.key.trim(), langId, value),
-      )
-      await Promise.all(promises)
-      await loadData()
-      setIsAdding(false)
+      );
+      await Promise.all(promises);
+      await loadData();
+      setIsAdding(false);
       setNewValues({
-        key: '',
+        key: "",
         translations: {},
-      })
+      });
     } catch (err) {
-      console.error('Error adding translation:', err)
-      setError('Failed to add translation')
+      console.error("Error adding translation:", err);
+      setError("Failed to add translation");
     }
-  }
+  };
 
   const handleDelete = async (key: string) => {
     try {
-      await deleteTranslation(key)
-      await loadData()
+      await deleteTranslation(key);
+      await loadData();
     } catch (err) {
-      console.error('Error deleting translation:', err)
-      setError('Failed to delete translation')
+      console.error("Error deleting translation:", err);
+      setError("Failed to delete translation");
     }
-  }
+  };
 
   const filteredTranslations = Object.entries(translations)
     .filter(([key]) => key.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort(([a], [b]) => a.localeCompare(b))
+    .sort(([a], [b]) => a.localeCompare(b));
 
   return (
     <div className="p-6">
@@ -141,11 +141,11 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                       isEditing={true}
                       onSave={handleAddNew}
                       onCancel={() => {
-                        setIsAdding(false)
+                        setIsAdding(false);
                         setNewValues({
-                          key: '',
+                          key: "",
                           translations: {},
-                        })
+                        });
                       }}
                     >
                       <Input
@@ -166,7 +166,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                     <TableCell key={lang.id} className="p-2">
                       <Input
                         type="text"
-                        value={newValues.translations[lang.id] || ''}
+                        value={newValues.translations[lang.id] || ""}
                         onChange={(e) =>
                           setNewValues((prev) => ({
                             ...prev,
@@ -190,11 +190,11 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                       <Button
                         variant="ghost"
                         onClick={() => {
-                          setIsAdding(false)
+                          setIsAdding(false);
                           setNewValues({
-                            key: '',
+                            key: "",
                             translations: {},
-                          })
+                          });
                         }}
                       >
                         <X size={14} />
@@ -213,7 +213,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                       {editingKey === key ? (
                         <Input
                           type="text"
-                          value={editValues[lang.id] || values[lang.id] || ''}
+                          value={editValues[lang.id] || values[lang.id] || ""}
                           onChange={(e) =>
                             setEditValues((prev) => ({
                               ...prev,
@@ -224,7 +224,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                           dir={lang.direction}
                         />
                       ) : (
-                        <div dir={lang.direction}>{values[lang.id] || '-'}</div>
+                        <div dir={lang.direction}>{values[lang.id] || "-"}</div>
                       )}
                     </TableCell>
                   ))}
@@ -233,10 +233,10 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                       <Button
                         onClick={() => {
                           if (editingKey === key) {
-                            handleSave(key)
+                            handleSave(key);
                           } else {
-                            setEditingKey(key)
-                            setEditValues(values)
+                            setEditingKey(key);
+                            setEditValues(values);
                           }
                         }}
                         variant="ghost"
@@ -246,8 +246,8 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
                       {editingKey === key ? (
                         <Button
                           onClick={() => {
-                            setEditingKey(null)
-                            setEditValues({})
+                            setEditingKey(null);
+                            setEditValues({});
                           }}
                           variant="ghost"
                         >
@@ -267,7 +267,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default TranslationsPanel
+export default TranslationsPanel;

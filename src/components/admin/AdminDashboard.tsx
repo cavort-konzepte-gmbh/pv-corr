@@ -1,45 +1,45 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { Users, Database, Settings, LogOut, BellRing } from 'lucide-react'
-import DatabaseManagement from './DatabaseManagement'
-import UserManagement from './UserManagement'
-import AdminSettings from './AdminSettings'
-import NotificationsPanel from './notifications/NotificationsPanel'
-import TranslationsPanel from './settings/TranslationsPanel'
-import { Language } from '../../types/language'
-import { supabase } from '../../lib/supabase'
-import { Button } from '../ui/button'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Users, Database, Settings, LogOut, BellRing } from "lucide-react";
+import DatabaseManagement from "./DatabaseManagement";
+import UserManagement from "./UserManagement";
+import AdminSettings from "./AdminSettings";
+import NotificationsPanel from "./notifications/NotificationsPanel";
+import TranslationsPanel from "./settings/TranslationsPanel";
+import { Language } from "../../types/language";
+import { supabase } from "../../lib/supabase";
+import { Button } from "../ui/button";
 
 interface AdminDashboardProps {
-  currentTheme: Theme
-  currentLanguage: Language
+  currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
-  const [activeView, setActiveView] = React.useState<'overview' | 'database' | 'users' | 'notifications' | 'settings' | 'translations'>(
-    'overview',
-  )
+  const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings" | "translations">(
+    "overview",
+  );
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut()
+      await supabase.auth.signOut();
       // The AuthProvider will handle the redirect after sign out
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error("Error signing out:", error);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen">
-      {activeView === 'database' ? (
-        <DatabaseManagement currentTheme={currentTheme} currentLanguage={currentLanguage} onBack={() => setActiveView('overview')} />
-      ) : activeView === 'users' ? (
-        <UserManagement currentTheme={currentTheme} onBack={() => setActiveView('overview')} />
-      ) : activeView === 'settings' ? (
-        <AdminSettings currentTheme={currentTheme} onBack={() => setActiveView('overview')} />
-      ) : activeView === 'notifications' ? (
-        <NotificationsPanel currentTheme={currentTheme} onBack={() => setActiveView('overview')} />
-      ) : activeView === 'translations' ? (
+      {activeView === "database" ? (
+        <DatabaseManagement currentTheme={currentTheme} currentLanguage={currentLanguage} onBack={() => setActiveView("overview")} />
+      ) : activeView === "users" ? (
+        <UserManagement currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
+      ) : activeView === "settings" ? (
+        <AdminSettings currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
+      ) : activeView === "notifications" ? (
+        <NotificationsPanel currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
+      ) : activeView === "translations" ? (
         <TranslationsPanel currentTheme={currentTheme} currentLanguage={currentLanguage} />
       ) : (
         <div className="p-8">
@@ -54,7 +54,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* User Management */}
             <div
-              onClick={() => setActiveView('users')}
+              onClick={() => setActiveView("users")}
               className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -70,7 +70,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
 
             {/* Database Management */}
             <div
-              onClick={() => setActiveView('database')}
+              onClick={() => setActiveView("database")}
               className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -86,7 +86,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
 
             {/* Notifications Management */}
             <div
-              onClick={() => setActiveView('notifications')}
+              onClick={() => setActiveView("notifications")}
               className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -102,7 +102,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
 
             {/* System Settings */}
             <div
-              onClick={() => setActiveView('settings')}
+              onClick={() => setActiveView("settings")}
               className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
             >
               <div className="flex items-center gap-4 mb-4">
@@ -119,7 +119,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

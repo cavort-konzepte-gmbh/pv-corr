@@ -1,25 +1,25 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Field, Project } from '../../../../types/projects'
-import { ChevronRight, Edit2, X, MoreVertical, Save, Plus } from 'lucide-react'
-import { googleMaps } from '../../../../utils/google-maps'
-import { deleteField, updateField } from '../../../../services/fields'
-import { fetchProjects } from '../../../../services/projects'
-import { Language, useTranslation } from '../../../../types/language'
-import { FormHandler } from '../../../shared/FormHandler'
-import { createField } from '../../../../services/fields'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Field, Project } from "../../../../types/projects";
+import { ChevronRight, Edit2, X, MoreVertical, Save, Plus } from "lucide-react";
+import { googleMaps } from "../../../../utils/google-maps";
+import { deleteField, updateField } from "../../../../services/fields";
+import { fetchProjects } from "../../../../services/projects";
+import { Language, useTranslation } from "../../../../types/language";
+import { FormHandler } from "../../../shared/FormHandler";
+import { createField } from "../../../../services/fields";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface FieldListProps {
-  currentTheme: Theme
-  fields?: Field[]
-  onSelectField: (fieldId: string) => void
-  onProjectsChange: (projects: Project[]) => void
-  currentLanguage: Language
-  selectedProjectId: string
-  selectedCustomerId: string | null
+  currentTheme: Theme;
+  fields?: Field[];
+  onSelectField: (fieldId: string) => void;
+  onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language;
+  selectedProjectId: string;
+  selectedCustomerId: string | null;
 }
 
 const FieldList: React.FC<FieldListProps> = ({
@@ -31,35 +31,35 @@ const FieldList: React.FC<FieldListProps> = ({
   selectedProjectId,
   selectedCustomerId,
 }) => {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [updatingField, setUpdatingField] = useState(false)
-  const [localFields, setLocalFields] = useState(initialFields || [])
-  const [isAdding, setIsAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [updatingField, setUpdatingField] = useState(false);
+  const [localFields, setLocalFields] = useState(initialFields || []);
+  const [isAdding, setIsAdding] = useState(false);
   const [newValues, setNewValues] = useState({
-    name: '',
-    latitude: '',
-    longitude: '',
-    has_fence: '',
-  })
-  const [error, setError] = useState<string | null>(null)
-  const translation = useTranslation(currentLanguage)
+    name: "",
+    latitude: "",
+    longitude: "",
+    has_fence: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
 
   const handleSave = async (field: Field) => {
-    if (updatingField && !field.id) return
+    if (updatingField && !field.id) return;
     try {
-      setUpdatingField(true)
-      setError(null)
+      setUpdatingField(true);
+      setError(null);
 
       // Get the current has_fence value
-      const hasFence = editingValues.has_fence ?? field.has_fence ?? null
+      const hasFence = editingValues.has_fence ?? field.has_fence ?? null;
 
       // Update local state immediately for better UX
       const updatedField = {
         ...editingValues,
-      }
+      };
 
-      setLocalFields((prevFields) => prevFields.map((f) => (f.id === field.id ? updatedField : f)))
+      setLocalFields((prevFields) => prevFields.map((f) => (f.id === field.id ? updatedField : f)));
 
       // Send update to server
       await updateField(field.id, {
@@ -67,79 +67,79 @@ const FieldList: React.FC<FieldListProps> = ({
         latitude: editingValues.latitude || field.latitude,
         longitude: editingValues.longitude || field.longitude,
         has_fence: hasFence,
-      })
+      });
 
       // Refresh projects to ensure sync - wait for the update to complete
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
 
-      setEditingId(null)
-      setEditingValues({})
-      setError(null)
+      setEditingId(null);
+      setEditingValues({});
+      setError(null);
     } catch (err) {
-      console.error('Error saving field:', err)
-      setError(err instanceof Error ? err.message : 'Failed to save field')
+      console.error("Error saving field:", err);
+      setError(err instanceof Error ? err.message : "Failed to save field");
     } finally {
-      setUpdatingField(false)
+      setUpdatingField(false);
     }
-  }
+  };
 
   const handleAddField = async () => {
     if (!newValues.name?.trim()) {
-      setError('Field name is required')
-      return
+      setError("Field name is required");
+      return;
     }
 
     // Validate has_fence value
-    if (!['yes', 'no'].includes(newValues.has_fence)) {
-      setError('Invalid fence value')
-      return
+    if (!["yes", "no"].includes(newValues.has_fence)) {
+      setError("Invalid fence value");
+      return;
     }
 
     try {
-      setError(null)
+      setError(null);
       await createField(selectedProjectId, {
         name: newValues.name.trim(),
         latitude: newValues.latitude || undefined,
         longitude: newValues.longitude || undefined,
-        has_fence: newValues.has_fence as 'yes' | 'no',
-      })
+        has_fence: newValues.has_fence as "yes" | "no",
+      });
 
       // Fetch fresh project data
-      const updatedProjects = await fetchProjects(null)
-      onProjectsChange(updatedProjects)
+      const updatedProjects = await fetchProjects(null);
+      onProjectsChange(updatedProjects);
 
-      setIsAdding(false)
+      setIsAdding(false);
       setNewValues({
-        name: '',
-        latitude: '',
-        longitude: '',
-        has_fence: 'no',
-      })
-      setError(null)
+        name: "",
+        latitude: "",
+        longitude: "",
+        has_fence: "no",
+      });
+      setError(null);
     } catch (err) {
-      console.error('Error creating field:', err)
-      setError(err instanceof Error ? err.message : 'Failed to create field')
+      console.error("Error creating field:", err);
+      setError(err instanceof Error ? err.message : "Failed to create field");
     }
-  }
+  };
 
   const handleOpenGoogleMaps = (event: React.MouseEvent, latitude: number, longitude: number) => {
-    event.stopPropagation()
-    googleMaps(latitude, longitude)
-  }
+    event.stopPropagation();
+    googleMaps(latitude, longitude);
+  };
 
   const handleRemoveField = async (event: React.MouseEvent, field: Field) => {
-    event.stopPropagation()
-    await deleteField(field.id)
-    const updatedProjects = await fetchProjects()
-    onProjectsChange(updatedProjects)
-  }
+    event.stopPropagation();
+    await deleteField(field.id);
+    const updatedProjects = await fetchProjects();
+    onProjectsChange(updatedProjects);
+  };
 
   return (
     <div>
       <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
         <Plus size={16} />
-        {translation('field.add')}
+        {translation("field.add")}
       </Button>
 
       <section className="border border-input rounded-md bg-card">
@@ -148,10 +148,10 @@ const FieldList: React.FC<FieldListProps> = ({
             <TableCaption>List fields</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead> {translation('field.name')}</TableHead>
-                <TableHead> {translation('field.has_fence')}</TableHead>
-                <TableHead> {translation('zones.location')}</TableHead>
-                <TableHead> {translation('actions')}</TableHead>
+                <TableHead> {translation("field.name")}</TableHead>
+                <TableHead> {translation("field.has_fence")}</TableHead>
+                <TableHead> {translation("zones.location")}</TableHead>
+                <TableHead> {translation("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -162,13 +162,13 @@ const FieldList: React.FC<FieldListProps> = ({
                       isEditing={true}
                       onSave={handleAddField}
                       onCancel={() => {
-                        setIsAdding(false)
+                        setIsAdding(false);
                         setNewValues({
-                          name: '',
-                          latitude: '',
-                          longitude: '',
-                          has_fence: 'no',
-                        })
+                          name: "",
+                          latitude: "",
+                          longitude: "",
+                          has_fence: "no",
+                        });
                       }}
                     >
                       <Input
@@ -187,8 +187,8 @@ const FieldList: React.FC<FieldListProps> = ({
                       className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                       required
                     >
-                      <option value="no">{translation('field.has_fence.no')}</option>
-                      <option value="yes">{translation('field.has_fence.yes')}</option>
+                      <option value="no">{translation("field.has_fence.no")}</option>
+                      <option value="yes">{translation("field.has_fence.yes")}</option>
                     </select>
                   </TableCell>
                   <TableCell>
@@ -197,13 +197,13 @@ const FieldList: React.FC<FieldListProps> = ({
                         type="text"
                         value={newValues.latitude}
                         onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
-                        placeholder={translation('project.latitude')}
+                        placeholder={translation("project.latitude")}
                       />
                       <Input
                         type="text"
                         value={newValues.longitude}
                         onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
-                        placeholder={translation('project.longitude')}
+                        placeholder={translation("project.longitude")}
                       />
                     </div>
                   </TableCell>
@@ -214,13 +214,13 @@ const FieldList: React.FC<FieldListProps> = ({
                       </Button>
                       <Button
                         onClick={() => {
-                          setIsAdding(false)
+                          setIsAdding(false);
                           setNewValues({
-                            name: '',
-                            latitude: '',
-                            longitude: '',
-                            has_fence: 'no',
-                          })
+                            name: "",
+                            latitude: "",
+                            longitude: "",
+                            has_fence: "no",
+                          });
                         }}
                         className="size-8"
                         variant="ghost"
@@ -259,15 +259,15 @@ const FieldList: React.FC<FieldListProps> = ({
                         disabled={updatingField}
                       >
                         <option value="">Not set</option>
-                        <option value="no">{translation('field.has_fence.no')}</option>
-                        <option value="yes">{translation('field.has_fence.yes')}</option>
+                        <option value="no">{translation("field.has_fence.no")}</option>
+                        <option value="yes">{translation("field.has_fence.yes")}</option>
                       </select>
                     ) : (
                       <span>
                         {field.has_fence === null
-                          ? 'Not set'
+                          ? "Not set"
                           : translation(
-                              field.has_fence === 'yes' || field.has_fence === true ? 'field.has_fence.yes' : 'field.has_fence.no',
+                              field.has_fence === "yes" || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no",
                             )}
                       </span>
                     )}
@@ -277,41 +277,41 @@ const FieldList: React.FC<FieldListProps> = ({
                       <div className="flex gap-2">
                         <Input
                           type="text"
-                          value={editingValues.latitude || field.latitude || ''}
+                          value={editingValues.latitude || field.latitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
-                          placeholder={translation('project.latitude')}
+                          placeholder={translation("project.latitude")}
                         />
                         <Input
                           type="text"
-                          value={editingValues.longitude || field.longitude || ''}
+                          value={editingValues.longitude || field.longitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
-                          placeholder={translation('project.longitude')}
+                          placeholder={translation("project.longitude")}
                         />
                       </div>
                     ) : field.latitude && field.longitude ? (
                       <Button onClick={(event) => handleOpenGoogleMaps(event, field.latitude, field.longitude)}>
-                        {translation('general.view_on_map')}
+                        {translation("general.view_on_map")}
                       </Button>
                     ) : (
-                      <span>{translation('general.location_not_set')}</span>
+                      <span>{translation("general.location_not_set")}</span>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
                       <Button
                         onClick={async (event) => {
-                          event.stopPropagation()
+                          event.stopPropagation();
                           if (editingId === field.id) {
-                            handleSave(field)
+                            handleSave(field);
                           } else {
-                            setEditingId(field.id)
+                            setEditingId(field.id);
                             setEditingValues({
                               name: field.name,
-                              latitude: field.latitude || '',
-                              longitude: field.longitude || '',
+                              latitude: field.latitude || "",
+                              longitude: field.longitude || "",
                               has_fence:
-                                field.has_fence === null ? '' : field.has_fence === true || field.has_fence === 'yes' ? 'yes' : 'no',
-                            })
+                                field.has_fence === null ? "" : field.has_fence === true || field.has_fence === "yes" ? "yes" : "no",
+                            });
                           }
                         }}
                         className="size-8"
@@ -340,7 +340,7 @@ const FieldList: React.FC<FieldListProps> = ({
         <div className="mt-2 p-2 rounded text-sm text-destructive-foreground border border-destructive bg-destructive">{error}</div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default FieldList
+export default FieldList;

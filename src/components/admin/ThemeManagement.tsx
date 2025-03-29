@@ -1,110 +1,110 @@
-import React, { useState } from 'react'
-import { Theme, THEMES } from '../../types/theme'
-import { Palette, Plus, Edit2, X, ArrowLeft } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { Button } from '../ui/button'
-import { Label } from '../ui/label'
-import { Input } from '../ui/input'
+import React, { useState } from "react";
+import { Theme, THEMES } from "../../types/theme";
+import { Palette, Plus, Edit2, X, ArrowLeft } from "lucide-react";
+import { supabase } from "../../lib/supabase";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 interface ThemeManagementProps {
-  currentTheme: Theme
-  onBack: () => void
+  currentTheme: Theme;
+  onBack: () => void;
 }
 
 interface ThemeData {
-  id: string
-  name: string
+  id: string;
+  name: string;
   colors: {
-    background: string
-    surface: string
-    border: string
+    background: string;
+    surface: string;
+    border: string;
     text: {
-      primary: string
-      secondary: string
-      accent: string
-    }
+      primary: string;
+      secondary: string;
+      accent: string;
+    };
     accent: {
-      primary: string
-      hover: string
-    }
-  }
+      primary: string;
+      hover: string;
+    };
+  };
 }
 
 const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack }) => {
-  const [themes, setThemes] = useState<ThemeData[]>(THEMES)
-  const [editingTheme, setEditingTheme] = useState<string | null>(null)
-  const [themeForm, setThemeForm] = useState<ThemeData | null>(null)
-  const [showNewThemeForm, setShowNewThemeForm] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [themes, setThemes] = useState<ThemeData[]>(THEMES);
+  const [editingTheme, setEditingTheme] = useState<string | null>(null);
+  const [themeForm, setThemeForm] = useState<ThemeData | null>(null);
+  const [showNewThemeForm, setShowNewThemeForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleEditTheme = (theme: ThemeData) => {
-    setThemeForm(theme)
-    setEditingTheme(theme.id)
-  }
+    setThemeForm(theme);
+    setEditingTheme(theme.id);
+  };
 
   const handleNewTheme = () => {
     setThemeForm({
-      id: '',
-      name: '',
+      id: "",
+      name: "",
       colors: {
-        background: '#000000',
-        surface: '#111111',
-        border: '#222222',
+        background: "#000000",
+        surface: "#111111",
+        border: "#222222",
         text: {
-          primary: '#ffffff',
-          secondary: '#999999',
-          accent: '#ffffff',
+          primary: "#ffffff",
+          secondary: "#999999",
+          accent: "#ffffff",
         },
         accent: {
-          primary: '#0066cc',
-          hover: '#0055aa',
+          primary: "#0066cc",
+          hover: "#0055aa",
         },
       },
-    })
-    setShowNewThemeForm(true)
-  }
+    });
+    setShowNewThemeForm(true);
+  };
 
   const handleSaveTheme = async () => {
-    if (!themeForm) return
+    if (!themeForm) return;
 
     try {
-      const { error } = await supabase.from('themes').upsert({
+      const { error } = await supabase.from("themes").upsert({
         id: themeForm.id || undefined,
         name: themeForm.name,
         colors: themeForm.colors,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       // Refresh themes list
-      const { data: updatedThemes } = await supabase.from('themes').select('*')
+      const { data: updatedThemes } = await supabase.from("themes").select("*");
 
       if (updatedThemes) {
-        setThemes(updatedThemes)
+        setThemes(updatedThemes);
       }
 
-      setEditingTheme(null)
-      setShowNewThemeForm(false)
-      setThemeForm(null)
+      setEditingTheme(null);
+      setShowNewThemeForm(false);
+      setThemeForm(null);
     } catch (err) {
-      console.error('Error saving theme:', err)
-      setError('Failed to save theme')
+      console.error("Error saving theme:", err);
+      setError("Failed to save theme");
     }
-  }
+  };
 
   const handleDeleteTheme = async (themeId: string) => {
     try {
-      const { error } = await supabase.from('themes').delete().eq('id', themeId)
+      const { error } = await supabase.from("themes").delete().eq("id", themeId);
 
-      if (error) throw error
+      if (error) throw error;
 
       // Remove theme from local state
-      setThemes((prev) => prev.filter((t) => t.id !== themeId))
+      setThemes((prev) => prev.filter((t) => t.id !== themeId));
     } catch (err) {
-      console.error('Error deleting theme:', err)
-      setError('Failed to delete theme')
+      console.error("Error deleting theme:", err);
+      setError("Failed to delete theme");
     }
-  }
+  };
 
   return (
     <div className="p-8">
@@ -128,7 +128,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent-primary">
-                  <Palette size={16} style={{ color: 'white' }} />
+                  <Palette size={16} style={{ color: "white" }} />
                 </div>
                 <div>
                   <h3 className="font-medium text-primary">{theme.name}</h3>
@@ -164,7 +164,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
       {(editingTheme || showNewThemeForm) && themeForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="p-6 rounded-lg max-w-2xl w-full bg-surface">
-            <h3 className="text-lg mb-6 text-primary">{editingTheme ? 'Edit Theme' : 'New Theme'}</h3>
+            <h3 className="text-lg mb-6 text-primary">{editingTheme ? "Edit Theme" : "New Theme"}</h3>
 
             <div className="space-y-4">
               <div>
@@ -317,16 +317,16 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
               <div className="flex justify-end gap-2 mt-6">
                 <Button
                   onClick={() => {
-                    setEditingTheme(null)
-                    setShowNewThemeForm(false)
-                    setThemeForm(null)
+                    setEditingTheme(null);
+                    setShowNewThemeForm(false);
+                    setThemeForm(null);
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
                   Cancel
                 </Button>
                 <Button onClick={handleSaveTheme} className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
-                  {editingTheme ? 'Save Changes' : 'Create Theme'}
+                  {editingTheme ? "Save Changes" : "Create Theme"}
                 </Button>
               </div>
             </div>
@@ -334,7 +334,7 @@ const ThemeManagement: React.FC<ThemeManagementProps> = ({ currentTheme, onBack 
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ThemeManagement
+export default ThemeManagement;

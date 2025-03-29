@@ -1,34 +1,34 @@
-import { supabase } from '../lib/supabase'
-import { Project } from '../types/projects'
-import { toCase } from '../utils/cases'
-import { generateHiddenId } from '../utils/generateHiddenId'
+import { supabase } from "../lib/supabase";
+import { Project } from "../types/projects";
+import { toCase } from "../utils/cases";
+import { generateHiddenId } from "../utils/generateHiddenId";
 
 interface CreateProjectOptions {
-  createDefaultField?: boolean
-  defaultFieldName?: string
-  createDefaultZone?: boolean
-  defaultZoneName?: string
+  createDefaultField?: boolean;
+  defaultFieldName?: string;
+  createDefaultZone?: boolean;
+  defaultZoneName?: string;
 }
 
 export const createProject = async (
-  project: Omit<Project, 'id' | 'fields'>,
+  project: Omit<Project, "id" | "fields">,
   options: CreateProjectOptions = {
     createDefaultField: true,
-    defaultFieldName: 'Field 1',
+    defaultFieldName: "Field 1",
     createDefaultZone: true,
-    defaultZoneName: 'Zone 1',
+    defaultZoneName: "Zone 1",
   },
 ) => {
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
   if (!user) {
-    throw new Error('User not authenticated')
+    throw new Error("User not authenticated");
   }
 
   try {
     const { data: projectData, error: projectError } = await supabase
-      .from('projects')
+      .from("projects")
       .insert([
         {
           name: project.name,
@@ -38,7 +38,7 @@ export const createProject = async (
           image_url: project.imageUrl || null,
           company_id: project.companyId || null,
           manager_id: project.managerId || null,
-          type_project: project.typeProject || 'field',
+          type_project: project.typeProject || "field",
           customer_id: project.customerId || null,
           hidden_id: generateHiddenId(),
         },
@@ -65,59 +65,59 @@ export const createProject = async (
         )
       `,
       )
-      .single()
+      .single();
 
     if (projectError) {
-      console.error('Project creation error:', projectError)
-      throw new Error(projectError.message)
+      console.error("Project creation error:", projectError);
+      throw new Error(projectError.message);
     }
     if (!projectData) {
-      throw new Error('No project data returned after creation')
+      throw new Error("No project data returned after creation");
     }
 
     // Create default field if requested
     if (options.createDefaultField) {
       const { data: fieldData, error: fieldError } = await supabase
-        .from('fields')
+        .from("fields")
         .insert([
           {
             project_id: projectData.id,
-            name: options.defaultFieldName || 'Field 1',
+            name: options.defaultFieldName || "Field 1",
             hidden_id: generateHiddenId(),
-            has_fence: 'no',
+            has_fence: "no",
           },
         ])
         .select()
-        .single()
+        .single();
 
       if (fieldError) {
-        console.error('Field creation error:', fieldError)
-        throw new Error(fieldError.message)
+        console.error("Field creation error:", fieldError);
+        throw new Error(fieldError.message);
       }
 
       // Create default zone if requested
       if (options.createDefaultZone && fieldData) {
-        const { error: zoneError } = await supabase.from('zones').insert([
+        const { error: zoneError } = await supabase.from("zones").insert([
           {
             field_id: fieldData.id,
-            name: options.defaultZoneName || 'Zone 1',
+            name: options.defaultZoneName || "Zone 1",
             hidden_id: generateHiddenId(),
           },
-        ])
+        ]);
 
         if (zoneError) {
-          console.error('Zone creation error:', zoneError)
-          throw new Error(zoneError.message)
+          console.error("Zone creation error:", zoneError);
+          throw new Error(zoneError.message);
         }
       }
     }
 
-    return toCase<Project>(projectData, 'camelCase')
+    return toCase<Project>(projectData, "camelCase");
   } catch (err) {
-    console.error('Error creating project:', err)
-    throw err instanceof Error ? err : new Error('Failed to create project')
+    console.error("Error creating project:", err);
+    throw err instanceof Error ? err : new Error("Failed to create project");
   }
-}
+};
 
 export const updateProject = async (project: Project) => {
   // Extract only the fields that belong to the projects table
@@ -129,21 +129,21 @@ export const updateProject = async (project: Project) => {
     image_url: project.imageUrl || null,
     company_id: project.companyId || null,
     manager_id: project.managerId || null,
-    type_project: project.typeProject || 'field',
+    type_project: project.typeProject || "field",
     customer_id: project.customerId || null,
-  }
+  };
 
   // First update the project
-  const { error: updateError } = await supabase.from('projects').update(updateData).eq('id', project.id).select()
+  const { error: updateError } = await supabase.from("projects").update(updateData).eq("id", project.id).select();
 
   if (updateError) {
-    console.error('Error updating project:', updateError)
-    throw updateError
+    console.error("Error updating project:", updateError);
+    throw updateError;
   }
 
   // Fetch the complete project data after update
   const { data: completeProject, error: fetchError } = await supabase
-    .from('projects')
+    .from("projects")
     .select(
       `
       *,
@@ -165,59 +165,59 @@ export const updateProject = async (project: Project) => {
         )
       )`,
     )
-    .eq('id', project.id)
-    .single()
+    .eq("id", project.id)
+    .single();
 
   if (fetchError) {
-    console.error('Error fetching updated project:', fetchError)
-    throw fetchError
+    console.error("Error fetching updated project:", fetchError);
+    throw fetchError;
   }
 
-  return toCase<Project>(completeProject, 'camelCase')
-}
+  return toCase<Project>(completeProject, "camelCase");
+};
 
 export const moveProject = async (projectId: string, customerId: string | null) => {
   try {
-    const { error } = await supabase.from('projects').update({ customer_id: customerId }).eq('id', projectId)
+    const { error } = await supabase.from("projects").update({ customer_id: customerId }).eq("id", projectId);
 
-    if (error) throw error
+    if (error) throw error;
   } catch (err) {
-    console.error('Error moving project:', err)
-    throw err
+    console.error("Error moving project:", err);
+    throw err;
   }
-}
+};
 export const deleteProject = async (projectId: string) => {
   try {
     // Verify project exists before deletion
-    const { data: project, error: fetchError } = await supabase.from('projects').select('id').eq('id', projectId).single()
+    const { data: project, error: fetchError } = await supabase.from("projects").select("id").eq("id", projectId).single();
 
     if (fetchError) {
-      throw new Error('Project not found')
+      throw new Error("Project not found");
     }
 
     if (!project) {
-      throw new Error('Project does not exist')
+      throw new Error("Project does not exist");
     }
 
-    const { error: deleteProjectError } = await supabase.from('projects').delete().eq('id', projectId)
+    const { error: deleteProjectError } = await supabase.from("projects").delete().eq("id", projectId);
 
     if (deleteProjectError) {
-      console.error('Error deleting project:', deleteProjectError)
-      throw new Error(deleteProjectError.message)
+      console.error("Error deleting project:", deleteProjectError);
+      throw new Error(deleteProjectError.message);
     }
 
-    return true
+    return true;
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to delete project'
-    console.error('Error deleting project:', message)
-    throw new Error(message)
+    const message = err instanceof Error ? err.message : "Failed to delete project";
+    console.error("Error deleting project:", message);
+    throw new Error(message);
   }
-}
+};
 
 export const fetchProjects = async (customerId?: string): Promise<Project[]> => {
   try {
     const { data, error } = await supabase
-      .from('projects')
+      .from("projects")
       .select(
         `*,
         fields (
@@ -229,15 +229,15 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           )
         )`,
       )
-      .order('created_at', { ascending: true })
+      .order("created_at", { ascending: true });
 
     if (error) {
-      console.error('Error fetching projects:', error)
-      throw new Error(error.message)
+      console.error("Error fetching projects:", error);
+      throw new Error(error.message);
     }
 
     if (!data) {
-      return []
+      return [];
     }
 
     // Filter projects based on customerId after fetching
@@ -287,20 +287,20 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           })),
         })),
       })),
-    }))
+    }));
 
     // Filter projects based on customerId
     return projects.filter((project) => {
       if (customerId === null) {
-        return !project.customerId
+        return !project.customerId;
       }
       if (customerId) {
-        return project.customerId === customerId
+        return project.customerId === customerId;
       }
-      return true
-    })
+      return true;
+    });
   } catch (err) {
-    console.error('Error fetching projects:', err)
-    throw new Error('Failed to load projects')
+    console.error("Error fetching projects:", err);
+    throw new Error("Failed to load projects");
   }
-}
+};

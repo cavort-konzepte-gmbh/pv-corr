@@ -1,24 +1,24 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { Project } from '../../types/projects'
-import { Customer } from '../../types/customers'
-import { Person } from '../../types/people'
-import { Company } from '../../types/companies'
-import ProjectList from './elements/projects/ProjectList'
-import ProjectForm from './elements/projects/ProjectForm'
-import { Language } from '../../types/language'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Project } from "../../types/projects";
+import { Customer } from "../../types/customers";
+import { Person } from "../../types/people";
+import { Company } from "../../types/companies";
+import ProjectList from "./elements/projects/ProjectList";
+import ProjectForm from "./elements/projects/ProjectForm";
+import { Language } from "../../types/language";
 
 interface ProjectsProps {
-  currentTheme: Theme
-  projects: Project[]
-  savedPeople: Person[]
-  savedCompanies: Company[]
-  customers: Customer[]
-  selectedCustomerId: string | null
-  onMoveProject: (projectId: string, customerId: string | null) => void
-  onSelectProject: (projectId: string) => void
-  currentLanguage: Language
-  onProjectsChange: (projects: Project[]) => void
+  currentTheme: Theme;
+  projects: Project[];
+  savedPeople: Person[];
+  savedCompanies: Company[];
+  customers: Customer[];
+  selectedCustomerId: string | null;
+  onMoveProject: (projectId: string, customerId: string | null) => void;
+  onSelectProject: (projectId: string) => void;
+  currentLanguage: Language;
+  onProjectsChange: (projects: Project[]) => void;
 }
 
 const Projects: React.FC<ProjectsProps> = ({
@@ -55,7 +55,7 @@ const Projects: React.FC<ProjectsProps> = ({
         onProjectsChange={onProjectsChange}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Projects
+export default Projects;

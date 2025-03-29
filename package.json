@@ -53,8 +53,8 @@
     "vitest": "^3.0.6"
   },
   "prettier": {
-    "semi": false,
-    "singleQuote": true,
+    "semi": true,
+    "singleQuote": false,
     "printWidth": 140
   }
 }

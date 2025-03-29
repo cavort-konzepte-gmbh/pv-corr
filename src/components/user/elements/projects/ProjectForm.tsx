@@ -1,23 +1,23 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Person } from '../../../../types/people'
-import { Company } from '../../../../types/companies'
-import { Plus } from 'lucide-react'
-import { createProject } from '../../../../services/projects'
-import { fetchProjects } from '../../../../services/projects'
-import { Language, useTranslation } from '../../../../types/language'
-import { Project } from '../../../../types/projects'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import React, { useState } from "react";
+import { Theme } from "../../../../types/theme";
+import { Person } from "../../../../types/people";
+import { Company } from "../../../../types/companies";
+import { Plus } from "lucide-react";
+import { createProject } from "../../../../services/projects";
+import { fetchProjects } from "../../../../services/projects";
+import { Language, useTranslation } from "../../../../types/language";
+import { Project } from "../../../../types/projects";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ProjectFormProps extends React.PropsWithChildren {
-  currentTheme: Theme
-  savedPeople: Person[]
-  savedCompanies: Company[]
-  onProjectsChange: (projects: Project[]) => void
-  currentLanguage: Language
-  selectedCustomerId: string | null
+  currentTheme: Theme;
+  savedPeople: Person[];
+  savedCompanies: Company[];
+  onProjectsChange: (projects: Project[]) => void;
+  currentLanguage: Language;
+  selectedCustomerId: string | null;
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({
@@ -28,30 +28,30 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   selectedCustomerId,
   onProjectsChange,
 }) => {
-  const [showForm, setShowForm] = useState(false)
-  const [projectName, setProjectName] = useState('')
-  const [clientRef, setClientRef] = useState('')
-  const [latitude, setLatitude] = useState('')
-  const [longitude, setLongitude] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null)
-  const [typeProject, setTypeProject] = useState<'roof' | 'field'>('field')
-  const [error, setError] = useState<string | null>(null)
-  const [createDefaultField, setCreateDefaultField] = useState(true)
-  const [defaultFieldName, setDefaultFieldName] = useState('Field 1')
-  const [createDefaultZone, setCreateDefaultZone] = useState(true)
-  const [defaultZoneName, setDefaultZoneName] = useState('Zone 1')
-  const translation = useTranslation(currentLanguage)
+  const [showForm, setShowForm] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [clientRef, setClientRef] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
+  const [typeProject, setTypeProject] = useState<"roof" | "field">("field");
+  const [error, setError] = useState<string | null>(null);
+  const [createDefaultField, setCreateDefaultField] = useState(true);
+  const [defaultFieldName, setDefaultFieldName] = useState("Field 1");
+  const [createDefaultZone, setCreateDefaultZone] = useState(true);
+  const [defaultZoneName, setDefaultZoneName] = useState("Zone 1");
+  const translation = useTranslation(currentLanguage);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!projectName.trim()) {
-      setError('Project name is required')
-      return
+      setError("Project name is required");
+      return;
     }
 
     try {
-      setError(null)
+      setError(null);
       const newProject = await createProject(
         {
           name: projectName.trim(),
@@ -69,43 +69,43 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           createDefaultZone,
           defaultZoneName: defaultZoneName.trim(),
         },
-      )
+      );
 
       // Update projects list with new project
-      const updatedProjects = await fetchProjects(selectedCustomerId as string)
-      onProjectsChange(updatedProjects)
+      const updatedProjects = await fetchProjects(selectedCustomerId as string);
+      onProjectsChange(updatedProjects);
 
-      setShowForm(false)
-      setProjectName('')
-      setClientRef('')
-      setLatitude('')
-      setLongitude('')
-      setImageUrl('')
-      setSelectedManagerId(null)
-      setTypeProject('field')
-      setError(null)
+      setShowForm(false);
+      setProjectName("");
+      setClientRef("");
+      setLatitude("");
+      setLongitude("");
+      setImageUrl("");
+      setSelectedManagerId(null);
+      setTypeProject("field");
+      setError(null);
     } catch (err) {
-      console.error('Error creating project:', err)
+      console.error("Error creating project:", err);
       // Keep form open if there's an error
-      setError(err instanceof Error ? err.message : 'Failed to create project')
+      setError(err instanceof Error ? err.message : "Failed to create project");
     }
-  }
+  };
 
   return (
     <>
       <Button onClick={() => setShowForm(true)}>
         <Plus size={16} />
-        {translation('project.add')}
+        {translation("project.add")}
       </Button>
 
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-card">
-            <h3 className="text-lg mb-6 text-primary">{translation('project.new')}</h3>
+            <h3 className="text-lg mb-6 text-primary">{translation("project.new")}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label className="block text-sm mb-1">
-                  {translation('project.name')}
+                  {translation("project.name")}
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Input
@@ -118,16 +118,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1">{translation('project.manager')}</Label>
+                <Label className="block text-sm mb-1">{translation("project.manager")}</Label>
                 <select
-                  value={selectedManagerId || ''}
+                  value={selectedManagerId || ""}
                   onChange={(e) => setSelectedManagerId(e.target.value || null)}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  <option value="">{translation('project.manager.not_assigned')}</option>
+                  <option value="">{translation("project.manager.not_assigned")}</option>
                   {savedPeople.map((person) => (
                     <option key={person.id} value={person.id}>
-                      {person.title ? `${person.title} ` : ''}
+                      {person.title ? `${person.title} ` : ""}
                       {person.firstName} {person.lastName}
                     </option>
                   ))}
@@ -135,14 +135,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation('project.type')}</Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.type")}</Label>
                 <select
                   value={typeProject}
-                  onChange={(e) => setTypeProject(e.target.value as 'roof' | 'field')}
+                  onChange={(e) => setTypeProject(e.target.value as "roof" | "field")}
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
-                  <option value="field">{translation('project.type.field')}</option>
-                  <option value="roof">{translation('project.type.roof')}</option>
+                  <option value="field">{translation("project.type.field")}</option>
+                  <option value="roof">{translation("project.type.roof")}</option>
                 </select>
               </div>
 
@@ -199,22 +199,22 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation('project.client_ref')}</Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.client_ref")}</Label>
                 <Input type="text" value={clientRef} onChange={(e) => setClientRef(e.target.value)} placeholder="Enter client reference" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation('project.latitude')}</Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.latitude")}</Label>
                 <Input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Enter latitude" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation('project.longitude')}</Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.longitude")}</Label>
                 <Input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Enter longitude" />
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation('project.image_url')}</Label>
+                <Label className="block text-sm mb-1 text-secondary">{translation("project.image_url")}</Label>
                 <Input
                   type="url"
                   value={imageUrl}
@@ -230,20 +230,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   type="button"
                   variant="destructive"
                   onClick={() => {
-                    setShowForm(false)
-                    setProjectName('')
+                    setShowForm(false);
+                    setProjectName("");
                   }}
                 >
-                  {translation('actions.cancel')}
+                  {translation("actions.cancel")}
                 </Button>
-                <Button type="submit">{translation('project.create')}</Button>
+                <Button type="submit">{translation("project.create")}</Button>
               </div>
             </form>
           </div>
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default ProjectForm
+export default ProjectForm;

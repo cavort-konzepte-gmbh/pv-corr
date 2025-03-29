@@ -1,33 +1,33 @@
-import React from 'react'
-import { Theme, THEMES } from '../../types/theme'
-import { Language } from '../../types/language'
-import { Company } from '../../types/companies'
-import { Standard } from '../../types/standards'
-import GeneralSettings from './elements/settings/GeneralSettings'
-import CompaniesSettings from './elements/settings/CompaniesSettings'
-import PeopleSettings from './elements/settings/PeopleSettings'
-import DatapointsSettings from './elements/settings/DatapointsSettings'
-import { Person } from '../../types/people'
+import React from "react";
+import { Theme, THEMES } from "../../types/theme";
+import { Language } from "../../types/language";
+import { Company } from "../../types/companies";
+import { Standard } from "../../types/standards";
+import GeneralSettings from "./elements/settings/GeneralSettings";
+import CompaniesSettings from "./elements/settings/CompaniesSettings";
+import PeopleSettings from "./elements/settings/PeopleSettings";
+import DatapointsSettings from "./elements/settings/DatapointsSettings";
+import { Person } from "../../types/people";
 
 interface SettingsProps {
-  view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations'
-  onViewChange: (view: 'general' | 'theme' | 'people' | 'companies' | 'datapoints' | 'translations') => void
-  showHiddenIds: boolean
-  currentLanguage: Language
-  onLanguageChange: (language: Language) => void
-  onShowHiddenIdsChange: (show: boolean) => void
-  decimalSeparator: ',' | '.'
-  onDecimalSeparatorChange: (separator: ',' | '.') => void
-  currentTheme: Theme
-  onThemeChange: (theme: Theme) => void
-  onClose: () => void
-  standards: Standard[]
-  onStandardsChange: (standards: Standard[]) => void
-  savedCompanies: Company[]
-  onSaveCompanies: (companies: Company[]) => void
-  savedPeople: Person[]
-  onSavePeople: (people: Person[]) => void
-  onCreateCustomer: (...args: any) => void
+  view: "general" | "theme" | "people" | "companies" | "datapoints" | "translations";
+  onViewChange: (view: "general" | "theme" | "people" | "companies" | "datapoints" | "translations") => void;
+  showHiddenIds: boolean;
+  currentLanguage: Language;
+  onLanguageChange: (language: Language) => void;
+  onShowHiddenIdsChange: (show: boolean) => void;
+  decimalSeparator: "," | ".";
+  onDecimalSeparatorChange: (separator: "," | ".") => void;
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
+  onClose: () => void;
+  standards: Standard[];
+  onStandardsChange: (standards: Standard[]) => void;
+  savedCompanies: Company[];
+  onSaveCompanies: (companies: Company[]) => void;
+  savedPeople: Person[];
+  onSavePeople: (people: Person[]) => void;
+  onCreateCustomer: (...args: any) => void;
 }
 
 const Settings: React.FC<SettingsProps> = ({
@@ -52,7 +52,7 @@ const Settings: React.FC<SettingsProps> = ({
 }) => {
   return (
     <div className="flex-1 p-6 overflow-auto">
-      {view === 'general' && (
+      {view === "general" && (
         <GeneralSettings
           currentLanguage={currentLanguage}
           onLanguageChange={onLanguageChange}
@@ -65,27 +65,27 @@ const Settings: React.FC<SettingsProps> = ({
         />
       )}
 
-      {view === 'companies' && (
+      {view === "companies" && (
         <CompaniesSettings
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
           savedCompanies={savedCompanies}
           onSaveCompanies={onSaveCompanies}
-          onCreateCustomer={(companyId, name) => onCreateCustomer(companyId, name, 'company')}
+          onCreateCustomer={(companyId, name) => onCreateCustomer(companyId, name, "company")}
         />
       )}
 
-      {view === 'people' && (
+      {view === "people" && (
         <PeopleSettings
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
           savedPeople={savedPeople}
           onSavePeople={onSavePeople}
-          onCreateCustomer={(personId, name) => onCreateCustomer(personId, name, 'person')}
+          onCreateCustomer={(personId, name) => onCreateCustomer(personId, name, "person")}
         />
       )}
 
-      {view === 'datapoints' && (
+      {view === "datapoints" && (
         <DatapointsSettings
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
@@ -94,7 +94,7 @@ const Settings: React.FC<SettingsProps> = ({
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

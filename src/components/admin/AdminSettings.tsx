@@ -1,21 +1,21 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { ArrowLeft, Palette, Globe, ChevronLeft } from 'lucide-react'
-import ThemeManagement from './ThemeManagement'
-import TranslationsPanel from './settings/TranslationsPanel'
-import { Button } from '../ui/button'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { ArrowLeft, Palette, Globe, ChevronLeft } from "lucide-react";
+import ThemeManagement from "./ThemeManagement";
+import TranslationsPanel from "./settings/TranslationsPanel";
+import { Button } from "../ui/button";
 
 interface AdminSettingsProps {
-  currentTheme: Theme
-  onBack: () => void
+  currentTheme: Theme;
+  onBack: () => void;
 }
 
 const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) => {
-  const [activeView, setActiveView] = React.useState<'overview' | 'themes' | 'translations'>('overview')
+  const [activeView, setActiveView] = React.useState<"overview" | "themes" | "translations">("overview");
 
   return (
     <div className="p-8">
-      {activeView !== 'overview' ? (
+      {activeView !== "overview" ? (
         <div className="flex items-center gap-4 mb-8">
           {/* <Button
             variant="ghost"
@@ -34,9 +34,9 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
         </div>
       )}
 
-      {activeView === 'themes' ? (
-        <ThemeManagement currentTheme={currentTheme} onBack={() => setActiveView('overview')} />
-      ) : activeView === 'translations' ? (
+      {activeView === "themes" ? (
+        <ThemeManagement currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
+      ) : activeView === "translations" ? (
         <TranslationsPanel currentTheme={currentTheme} currentLanguage="en" />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -58,7 +58,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
  */}
           {/* Translations Management */}
           <div
-            onClick={() => setActiveView('translations')}
+            onClick={() => setActiveView("translations")}
             className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer bg-card"
           >
             <div className="flex flex-col gap-2">
@@ -70,7 +70,7 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default AdminSettings
+export default AdminSettings;

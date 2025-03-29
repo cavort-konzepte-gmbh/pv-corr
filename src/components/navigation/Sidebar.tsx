@@ -1,22 +1,22 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { Project } from '../../types/projects'
-import { ChevronRight, ChevronDown } from 'lucide-react'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Project } from "../../types/projects";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
 interface SidebarProps {
-  projects: Project[]
-  expandedItems: Set<string>
-  showHiddenIds: boolean
-  selectedItem: any
-  currentTheme: Theme
-  onToggleExpand: (id: string) => void
-  onSelectItem: (item: any) => void
+  projects: Project[];
+  expandedItems: Set<string>;
+  showHiddenIds: boolean;
+  selectedItem: any;
+  currentTheme: Theme;
+  onToggleExpand: (id: string) => void;
+  onSelectItem: (item: any) => void;
 }
 
 const ensureArray = <T,>(value: T | T[] | null | undefined): T[] => {
-  if (Array.isArray(value)) return value
-  return []
-}
+  if (Array.isArray(value)) return value;
+  return [];
+};
 
 const Sidebar: React.FC<SidebarProps> = ({
   projects,
@@ -36,11 +36,11 @@ const Sidebar: React.FC<SidebarProps> = ({
               className="flex items-center h-7 px-2 cursor-pointer hover:bg-opacity-10 group text-primary"
               style={{
                 backgroundColor:
-                  selectedItem?.type === 'project' && selectedItem?.id === project.id ? currentTheme.colors.background : 'transparent',
+                  selectedItem?.type === "project" && selectedItem?.id === project.id ? currentTheme.colors.background : "transparent",
               }}
               onClick={() => {
-                onSelectItem({ type: 'project', id: project.id })
-                onToggleExpand(project.id)
+                onSelectItem({ type: "project", id: project.id });
+                onToggleExpand(project.id);
               }}
             >
               <div className="flex items-center justify-between w-full">
@@ -48,8 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <span
                     className="w-4 flex items-center justify-center"
                     onClick={(e) => {
-                      e.stopPropagation()
-                      onToggleExpand(project.id)
+                      e.stopPropagation();
+                      onToggleExpand(project.id);
                     }}
                   >
                     {expandedItems.has(project.id) ? (
@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     )}
                   </span>
                   <span className="ml-1 font-mono text-xs truncate">
-                    {project.name.length > 28 ? project.name.substring(0, 28) + '...' : project.name}
+                    {project.name.length > 28 ? project.name.substring(0, 28) + "..." : project.name}
                   </span>
                 </div>
                 <div className="text-[10px] opacity-60 ml-1 text-secondary">{project.fields.length}f</div>
@@ -74,19 +74,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                       className="flex items-center h-7 pl-6 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                       style={{
                         backgroundColor:
-                          selectedItem?.type === 'field' && selectedItem?.id === field.id ? currentTheme.colors.background : 'transparent',
+                          selectedItem?.type === "field" && selectedItem?.id === field.id ? currentTheme.colors.background : "transparent",
                       }}
                       onClick={() => {
-                        onSelectItem({ type: 'field', projectId: project.id, id: field.id })
-                        onToggleExpand(field.id)
+                        onSelectItem({ type: "field", projectId: project.id, id: field.id });
+                        onToggleExpand(field.id);
                       }}
                     >
                       <div className="flex items-center flex-1 min-w-0">
                         <span
                           className="w-4 flex items-center justify-center"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            onToggleExpand(field.id)
+                            e.stopPropagation();
+                            onToggleExpand(field.id);
                           }}
                         >
                           {expandedItems.has(field.id) ? (
@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           )}
                         </span>
                         <span className="ml-1 font-mono text-xs truncate">
-                          {field.name.length > 26 ? field.name.substring(0, 26) + '...' : field.name}
+                          {field.name.length > 26 ? field.name.substring(0, 26) + "..." : field.name}
                         </span>
                       </div>
                       <div className="text-[10px] opacity-60 ml-1 text-secondary">{field.zones.length}z</div>
@@ -110,13 +110,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                             className="flex items-center h-7 pl-10 pr-2 cursor-pointer hover:bg-opacity-10 group text-primary"
                             style={{
                               backgroundColor:
-                                selectedItem?.type === 'zone' && selectedItem?.id === zone.id
+                                selectedItem?.type === "zone" && selectedItem?.id === zone.id
                                   ? currentTheme.colors.background
-                                  : 'transparent',
+                                  : "transparent",
                             }}
                             onClick={() =>
                               onSelectItem({
-                                type: 'zone',
+                                type: "zone",
                                 projectId: project.id,
                                 fieldId: field.id,
                                 id: zone.id,
@@ -124,7 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                             }
                           >
                             <span className="font-mono text-xs truncate flex-1">
-                              {zone.name.length > 24 ? zone.name.substring(0, 24) + '...' : zone.name}
+                              {zone.name.length > 24 ? zone.name.substring(0, 24) + "..." : zone.name}
                             </span>
                             <span className="text-[10px] opacity-60 ml-1 text-secondary">{zone.datapoints?.length || 0}dp</span>
                           </div>
@@ -139,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

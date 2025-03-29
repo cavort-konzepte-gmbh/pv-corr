@@ -1,45 +1,45 @@
-import { describe, test, expect } from 'vitest'
-import { fromCamelCaseToSnakeCase, toCase } from '../src/utils/cases'
+import { describe, test, expect } from "vitest";
+import { fromCamelCaseToSnakeCase, toCase } from "../src/utils/cases";
 
-describe('FromCamelCaseToSnakeCase', () => {
+describe("FromCamelCaseToSnakeCase", () => {
   const testCases = [
     {
-      input: 'camelCase',
-      expected: 'camel_case',
+      input: "camelCase",
+      expected: "camel_case",
     },
     {
-      input: 'snakeCase',
-      expected: 'snake_case',
+      input: "snakeCase",
+      expected: "snake_case",
     },
     {
-      input: 'kebab-case',
-      expected: 'kebab-case',
+      input: "kebab-case",
+      expected: "kebab-case",
     },
-  ]
+  ];
   testCases.forEach(({ input, expected }) => {
     test(`should convert ${input} to ${expected}`, () => {
-      expect(fromCamelCaseToSnakeCase(input)).toBe(expected)
-    })
-  })
-})
+      expect(fromCamelCaseToSnakeCase(input)).toBe(expected);
+    });
+  });
+});
 
-describe('toCase function from camelCase to snakeCase', () => {
+describe("toCase function from camelCase to snakeCase", () => {
   const testCases = [
     {
-      description: 'should convert an object with camelCase keys to snake_case keys',
+      description: "should convert an object with camelCase keys to snake_case keys",
       input: {
-        camelCase: 'value',
-        fooBar: 'baz',
-        fooFooBar: 'baz',
+        camelCase: "value",
+        fooBar: "baz",
+        fooFooBar: "baz",
       },
       expected: {
-        camel_case: 'value',
-        foo_bar: 'baz',
-        foo_foo_bar: 'baz',
+        camel_case: "value",
+        foo_bar: "baz",
+        foo_foo_bar: "baz",
       },
     },
     {
-      description: 'should convert an object with numeric values and camelCase keys to snake_case keys',
+      description: "should convert an object with numeric values and camelCase keys to snake_case keys",
       input: {
         id: 1,
         hiddenId: 2,
@@ -58,70 +58,70 @@ describe('toCase function from camelCase to snakeCase', () => {
       },
     },
     {
-      description: '',
+      description: "",
       input: {
-        name: 'value',
+        name: "value",
         hiddenId: 2,
-        clientRef: 'value',
+        clientRef: "value",
         latitude: 4,
         longitude: 5,
-        imageUrl: 'value',
+        imageUrl: "value",
         placeId: 6,
         companyId: 7,
         managerId: 8,
-        typeProject: 'value',
+        typeProject: "value",
       },
       expected: {
-        name: 'value',
+        name: "value",
         hidden_id: 2,
-        client_ref: 'value',
+        client_ref: "value",
         latitude: 4,
         longitude: 5,
-        image_url: 'value',
+        image_url: "value",
         place_id: 6,
         company_id: 7,
         manager_id: 8,
-        type_project: 'value',
+        type_project: "value",
       },
     },
-  ]
+  ];
   testCases.forEach(({ description, input, expected }) => {
     test(description, () => {
-      expect(toCase(input, 'snakeCase')).toEqual(expected)
-    })
-  })
-})
+      expect(toCase(input, "snakeCase")).toEqual(expected);
+    });
+  });
+});
 
-describe('toCase function from snakeCase to camelCase', () => {
+describe("toCase function from snakeCase to camelCase", () => {
   const testCases = [
     {
-      description: 'should convert an object with snake_case keys to camelCase keys',
+      description: "should convert an object with snake_case keys to camelCase keys",
       input: {
-        snake_case: 'value',
-        foo_bar: 'baz',
-        foo_foo_bar: 'baz',
+        snake_case: "value",
+        foo_bar: "baz",
+        foo_foo_bar: "baz",
       },
       expected: {
-        snakeCase: 'value',
-        fooBar: 'baz',
-        fooFooBar: 'baz',
+        snakeCase: "value",
+        fooBar: "baz",
+        fooFooBar: "baz",
       },
     },
     {
-      description: 'should convert an object with mixed snake_case and camelCase keys to camelCase keys',
+      description: "should convert an object with mixed snake_case and camelCase keys to camelCase keys",
       input: {
-        snake_case: 'value',
-        fooBar: 'baz',
-        foo_foo_bar: 'baz',
+        snake_case: "value",
+        fooBar: "baz",
+        foo_foo_bar: "baz",
       },
       expected: {
-        snakeCase: 'value',
-        fooBar: 'baz',
-        fooFooBar: 'baz',
+        snakeCase: "value",
+        fooBar: "baz",
+        fooFooBar: "baz",
       },
     },
     {
-      description: 'should convert an object with numeric values and snake_case keys to camelCase keys',
+      description: "should convert an object with numeric values and snake_case keys to camelCase keys",
       input: {
         id: 1,
         hidden_id: 2,
@@ -140,7 +140,7 @@ describe('toCase function from snakeCase to camelCase', () => {
       },
     },
     {
-      description: 'should convert an object with boolean values and snake_case keys to camelCase keys',
+      description: "should convert an object with boolean values and snake_case keys to camelCase keys",
       input: {
         is_active: true,
         has_access: false,
@@ -151,42 +151,42 @@ describe('toCase function from snakeCase to camelCase', () => {
       },
     },
     {
-      description: 'should convert an object with nested objects with snake_case keys to camelCase keys',
+      description: "should convert an object with nested objects with snake_case keys to camelCase keys",
       input: {
         snake_case: {
-          nested_key: 'value',
-          nested_nested_key: 'value',
+          nested_key: "value",
+          nested_nested_key: "value",
         },
         foo_bar: {
-          nested_key: 'value',
-          nested_nested_key: 'value',
+          nested_key: "value",
+          nested_nested_key: "value",
         },
       },
       expected: {
         snakeCase: {
-          nestedKey: 'value',
-          nestedNestedKey: 'value',
+          nestedKey: "value",
+          nestedNestedKey: "value",
         },
         fooBar: {
-          nestedKey: 'value',
-          nestedNestedKey: 'value',
+          nestedKey: "value",
+          nestedNestedKey: "value",
         },
       },
     },
     {
-      description: '',
+      description: "",
       input: {
         foo_bar: {
           bar_foo: {
             foo_foo: {
-              bar_bar: 'value',
+              bar_bar: "value",
             },
           },
         },
         snake_case: {
           nested_key: {
             nested_nested_key: {
-              nested_nested_nested_key: 'value',
+              nested_nested_nested_key: "value",
             },
           },
         },
@@ -195,21 +195,21 @@ describe('toCase function from snakeCase to camelCase', () => {
         fooBar: {
           barFoo: {
             fooFoo: {
-              barBar: 'value',
+              barBar: "value",
             },
           },
         },
         snakeCase: {
           nestedKey: {
             nestedNestedKey: {
-              nestedNestedNestedKey: 'value',
+              nestedNestedNestedKey: "value",
             },
           },
         },
       },
     },
     {
-      description: 'should convert an object with arrays of objects with snake_case keys to camelCase keys',
+      description: "should convert an object with arrays of objects with snake_case keys to camelCase keys",
       input: {
         hiddenId: 2,
         fields: [
@@ -273,10 +273,10 @@ describe('toCase function from snakeCase to camelCase', () => {
         ],
       },
     },
-  ]
+  ];
   testCases.forEach(({ description, input, expected }) => {
     test(description, () => {
-      expect(toCase(input, 'camelCase')).toEqual(expected)
-    })
-  })
-})
+      expect(toCase(input, "camelCase")).toEqual(expected);
+    });
+  });
+});

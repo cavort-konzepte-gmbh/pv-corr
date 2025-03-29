@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       source_branch:
-        description: 'Branch to copy from cavort-konzepte-gmbh/pv-corr'
+        description: "Branch to copy from cavort-konzepte-gmbh/pv-corr"
         required: true
-        default: 'main'
+        default: "main"
         type: string
 jobs:
   copy-to-cvrt-jh:

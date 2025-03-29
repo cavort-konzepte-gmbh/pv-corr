@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from 'react'
-import { Theme } from '../../../../types/theme'
-import { Language, useTranslation } from '../../../../types/language'
-import { Parameter } from '../../../../types/parameters'
-import { Datapoint } from '../../../../types/projects'
-import { Edit2, Save, X, Upload, Clock, Plus } from 'lucide-react'
-import MediaDialog from '../../../shared/MediaDialog'
-import { fetchProjects } from '../../../../services/projects'
-import { updateDatapoint } from '../../../../services/datapoints'
-import { FormHandler } from '../../../shared/FormHandler'
-import { createDatapoint } from '../../../../services/datapoints'
-import { deleteDatapoint } from '../../../../services/datapoints'
-import { ParameterInput } from '../../../DatapointForm'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../../../types/theme";
+import { Language, useTranslation } from "../../../../types/language";
+import { Parameter } from "../../../../types/parameters";
+import { Datapoint } from "../../../../types/projects";
+import { Edit2, Save, X, Upload, Clock, Plus } from "lucide-react";
+import MediaDialog from "../../../shared/MediaDialog";
+import { fetchProjects } from "../../../../services/projects";
+import { updateDatapoint } from "../../../../services/datapoints";
+import { FormHandler } from "../../../shared/FormHandler";
+import { createDatapoint } from "../../../../services/datapoints";
+import { deleteDatapoint } from "../../../../services/datapoints";
+import { ParameterInput } from "../../../DatapointForm";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface DatapointListProps {
-  currentTheme: Theme
-  currentLanguage: Language
-  datapoints: Datapoint[]
-  parameters: Parameter[]
-  zoneId: string
-  onProjectsChange: (projects: any[]) => void
+  currentTheme: Theme;
+  currentLanguage: Language;
+  datapoints: Datapoint[];
+  parameters: Parameter[];
+  zoneId: string;
+  onProjectsChange: (projects: any[]) => void;
 }
 
 const DatapointList: React.FC<DatapointListProps> = ({
@@ -32,107 +32,107 @@ const DatapointList: React.FC<DatapointListProps> = ({
   zoneId,
   onProjectsChange,
 }) => {
-  const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null)
-  const [editingName, setEditingName] = useState<string>('')
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({})
-  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null)
-  const translation = useTranslation(currentLanguage)
-  const [isAdding, setIsAdding] = useState(false)
-  const [newValues, setNewValues] = useState<Record<string, string>>({})
-  const [newName, setNewName] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState<string>("");
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({});
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
+  const translation = useTranslation(currentLanguage);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newValues, setNewValues] = useState<Record<string, string>>({});
+  const [newName, setNewName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Create a map of parameter id to parameter object for easier lookup
     const map = parameters.reduce(
       (acc, param) => {
-        acc[param.id] = param
-        return acc
+        acc[param.id] = param;
+        return acc;
       },
       {} as Record<string, Parameter>,
-    )
-    setParameterMap(map)
-  }, [parameters])
+    );
+    setParameterMap(map);
+  }, [parameters]);
 
   const handleAddDatapoint = async () => {
     if (!newName.trim()) {
-      setError('Datapoint name is required')
-      return
+      setError("Datapoint name is required");
+      return;
     }
     if (Object.keys(newValues).length === 0) {
-      setError('Please enter at least one value')
-      return
+      setError("Please enter at least one value");
+      return;
     }
 
     try {
       await createDatapoint(zoneId, {
-        type: 'measurement',
+        type: "measurement",
         name: newName.trim(),
         values: newValues,
         ratings: {},
-      })
+      });
 
-      setIsAdding(false)
-      setNewName('')
-      setNewValues({})
-      setError(null)
-      const projects = await fetchProjects()
-      onProjectsChange(projects)
+      setIsAdding(false);
+      setNewName("");
+      setNewValues({});
+      setError(null);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
     } catch (err) {
-      console.error('Error creating datapoint:', err)
-      setError('Failed to create datapoint')
+      console.error("Error creating datapoint:", err);
+      setError("Failed to create datapoint");
     }
-  }
+  };
 
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
     if (editingDatapoint === datapoint.id) {
       // Save changes
       if (!editingName?.trim()) {
-        setError('Name is required')
-        return
+        setError("Name is required");
+        return;
       }
 
       const updateData = {
         values: editingValues,
         name: editingName.trim(),
-      }
+      };
 
-      setEditingDatapoint(null)
-      setEditingName('')
-      setEditingValues({})
+      setEditingDatapoint(null);
+      setEditingName("");
+      setEditingValues({});
       try {
-        await updateDatapoint(editingDatapoint, updateData)
-        const projects = await fetchProjects()
-        onProjectsChange(projects)
+        await updateDatapoint(editingDatapoint, updateData);
+        const projects = await fetchProjects();
+        onProjectsChange(projects);
       } catch (err) {
-        console.error('Error updating datapoint:', err)
-        setError('Failed to update datapoint')
+        console.error("Error updating datapoint:", err);
+        setError("Failed to update datapoint");
       }
     } else {
       // Start editing
-      setEditingDatapoint(datapoint.id)
-      setEditingName(datapoint.name)
-      setEditingValues(datapoint.values)
+      setEditingDatapoint(datapoint.id);
+      setEditingName(datapoint.name);
+      setEditingValues(datapoint.values);
     }
-  }
+  };
 
   const handleDeleteDatapoint = async (datapointId: string) => {
     try {
-      await deleteDatapoint(datapointId)
-      const projects = await fetchProjects()
-      onProjectsChange(projects)
+      await deleteDatapoint(datapointId);
+      const projects = await fetchProjects();
+      onProjectsChange(projects);
     } catch (err) {
-      console.error('Error deleting datapoint:', err)
-      setError('Failed to delete datapoint')
+      console.error("Error deleting datapoint:", err);
+      setError("Failed to delete datapoint");
     }
-  }
+  };
 
   return (
     <div>
       <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
         <Plus size={16} />
-        {translation('datapoint.add_new')}
+        {translation("datapoint.add_new")}
       </Button>
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
@@ -140,11 +140,11 @@ const DatapointList: React.FC<DatapointListProps> = ({
             <TableCaption>Datapoints</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead>{translation('datapoint.short_name')}</TableHead>
+                <TableHead>{translation("datapoint.short_name")}</TableHead>
                 {parameters.map((param) => (
                   <TableHead key={param.id}>{param.shortName || param.name}</TableHead>
                 ))}
-                <TableHead>{translation('actions')}</TableHead>
+                <TableHead>{translation("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -155,9 +155,9 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       isEditing={true}
                       onSave={handleAddDatapoint}
                       onCancel={() => {
-                        setIsAdding(false)
-                        setNewName('')
-                        setNewValues({})
+                        setIsAdding(false);
+                        setNewName("");
+                        setNewValues({});
                       }}
                     >
                       <Input
@@ -176,7 +176,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           ...param,
                           parameterCode: param.shortName || param.name,
                         }}
-                        value={newValues[param.id] || ''}
+                        value={newValues[param.id] || ""}
                         onChange={(value) =>
                           setNewValues((prev) => ({
                             ...prev,
@@ -194,9 +194,9 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       </Button>
                       <Button
                         onClick={() => {
-                          setIsAdding(false)
-                          setNewName('')
-                          setNewValues({})
+                          setIsAdding(false);
+                          setNewName("");
+                          setNewValues({});
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                       >
@@ -212,7 +212,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     {editingDatapoint === datapoint.id ? (
                       <Input
                         type="text"
-                        value={editingName || ''}
+                        value={editingName || ""}
                         onChange={(e) => setEditingName(e.target.value)}
                         className="w-full p-1 "
                         placeholder="Enter name"
@@ -231,7 +231,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                             rangeType: param.rangeType,
                             rangeValue: param.rangeValue,
                           }}
-                          value={editingValues[param.id] || datapoint.values[param.id] || ''}
+                          value={editingValues[param.id] || datapoint.values[param.id] || ""}
                           onChange={(value) =>
                             setEditingValues((prev) => ({
                               ...prev,
@@ -241,7 +241,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           currentTheme={currentTheme}
                         />
                       ) : (
-                        <span>{datapoint.values[param.id] || '-'}</span>
+                        <span>{datapoint.values[param.id] || "-"}</span>
                       )}
                     </TableCell>
                   ))}
@@ -287,7 +287,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DatapointList
+export default DatapointList;

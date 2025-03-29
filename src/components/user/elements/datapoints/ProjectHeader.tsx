@@ -1,25 +1,25 @@
-import React from 'react'
-import { Theme } from '../../../../types/theme'
-import { Project, Zone } from '../../../../types/projects'
-import { ArrowLeft, ChevronDown, Table } from 'lucide-react'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import React from "react";
+import { Theme } from "../../../../types/theme";
+import { Project, Zone } from "../../../../types/projects";
+import { ArrowLeft, ChevronDown, Table } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ProjectHeaderProps {
-  project: Project
+  project: Project;
   field: {
-    name: string
-    latitude?: string
-    longitude?: string
-  }
-  zone: Zone
-  onBack: () => void
-  currentTheme: Theme
+    name: string;
+    latitude?: string;
+    longitude?: string;
+  };
+  zone: Zone;
+  onBack: () => void;
+  currentTheme: Theme;
 }
 
 const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, field, zone, onBack, currentTheme }) => {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <Table>
@@ -56,11 +56,11 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, field, zone, onB
           </TableRow>
           <TableRow>
             <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">Project Manager</TableCell>
-            <TableCell className="p-2 border-theme">{project.managerName || 'Not assigned'}</TableCell>
+            <TableCell className="p-2 border-theme">{project.managerName || "Not assigned"}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="p-2 border-r border-theme w-1/6 text-secondary">Company</TableCell>
-            <TableCell className="p-2 border-theme">{project.companyName || 'Not assigned'}</TableCell>
+            <TableCell className="p-2 border-theme">{project.companyName || "Not assigned"}</TableCell>
           </TableRow>
           {project.managerEmail && (
             <TableRow>
@@ -85,7 +85,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, field, zone, onB
         </TableBody>
       )}
     </Table>
-  )
-}
+  );
+};
 
-export default ProjectHeader
+export default ProjectHeader;

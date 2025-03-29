@@ -1,156 +1,156 @@
-import React, { useState, useEffect } from 'react'
-import { Theme } from '../../types/theme'
-import { Language, useTranslation } from '../../types/language'
-import { supabase } from '../../lib/supabase'
-import { Plus, Edit2, Save, X } from 'lucide-react'
-import { generateHiddenId } from '../../utils/generateHiddenId'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
+import React, { useState, useEffect } from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { supabase } from "../../lib/supabase";
+import { Plus, Edit2, Save, X } from "lucide-react";
+import { generateHiddenId } from "../../utils/generateHiddenId";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 interface MaterialsPanelProps {
-  currentTheme: Theme
-  currentLanguage: Language
+  currentTheme: Theme;
+  currentLanguage: Language;
 }
 
 interface Material {
-  id: string
-  hidden_id: string
-  name: string
-  e_potential: number | null
-  valency: number | null
-  molar_mass: number | null
+  id: string;
+  hidden_id: string;
+  name: string;
+  e_potential: number | null;
+  valency: number | null;
+  molar_mass: number | null;
 }
 
 export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, currentLanguage }) => {
-  const [materials, setMaterials] = useState<Material[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [editingMaterial, setEditingMaterial] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<Record<string, string>>({})
-  const [isNewMaterial, setIsNewMaterial] = useState<boolean>(false)
-  const [newMaterial, setNewMaterial] = useState<Record<string, string>>({})
-  const t = useTranslation(currentLanguage)
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editingMaterial, setEditingMaterial] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<Record<string, string>>({});
+  const [isNewMaterial, setIsNewMaterial] = useState<boolean>(false);
+  const [newMaterial, setNewMaterial] = useState<Record<string, string>>({});
+  const t = useTranslation(currentLanguage);
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const loadData = async () => {
     try {
-      setLoading(true)
-      const { data, error } = await supabase.from('materials').select('*').order('created_at', { ascending: true })
+      setLoading(true);
+      const { data, error } = await supabase.from("materials").select("*").order("created_at", { ascending: true });
 
-      if (error) throw error
-      setMaterials(data || [])
+      if (error) throw error;
+      setMaterials(data || []);
     } catch (err) {
-      console.error('Error loading materials:', err)
-      setError('Failed to load materials')
+      console.error("Error loading materials:", err);
+      setError("Failed to load materials");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleChangeEditingValues = (name: string, value: string) => {
     setEditingValues((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleChangeMaterial = (name: string, value: string) => {
     setNewMaterial((previous) => ({
       ...previous,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const resetValues = () => {
-    setEditingValues({})
-    setEditingMaterial(null)
-  }
+    setEditingValues({});
+    setEditingMaterial(null);
+  };
 
   const handleUpdateSaveMaterial = async (material: Material) => {
     if (editingMaterial === material.id) {
       try {
         // Validate numeric fields
-        const e_potential = editingValues.e_potential ? parseFloat(editingValues.e_potential) : null
-        const valency = editingValues.valency ? parseFloat(editingValues.valency) : null
-        const molar_mass = editingValues.molar_mass ? parseFloat(editingValues.molar_mass) : null
+        const e_potential = editingValues.e_potential ? parseFloat(editingValues.e_potential) : null;
+        const valency = editingValues.valency ? parseFloat(editingValues.valency) : null;
+        const molar_mass = editingValues.molar_mass ? parseFloat(editingValues.molar_mass) : null;
 
         const { error } = await supabase
-          .from('materials')
+          .from("materials")
           .update({
             name: editingValues.name,
             e_potential,
             valency,
             molar_mass,
           })
-          .eq('id', material.id)
+          .eq("id", material.id);
 
-        if (error) throw error
-        await loadData()
-        resetValues()
+        if (error) throw error;
+        await loadData();
+        resetValues();
       } catch (err) {
-        console.error('Error updating material:', err)
-        setError('Failed to update material')
+        console.error("Error updating material:", err);
+        setError("Failed to update material");
       }
     } else {
-      setEditingMaterial(material.id)
-      setEditingValues(material as any)
-      setNewMaterial({})
-      setIsNewMaterial(false)
+      setEditingMaterial(material.id);
+      setEditingValues(material as any);
+      setNewMaterial({});
+      setIsNewMaterial(false);
     }
-  }
+  };
 
   const handleDeleteMaterial = async (materialId: string) => {
     try {
-      const { error } = await supabase.from('materials').delete().eq('id', materialId)
+      const { error } = await supabase.from("materials").delete().eq("id", materialId);
 
-      if (error) throw error
-      await loadData()
+      if (error) throw error;
+      await loadData();
     } catch (err) {
-      console.error('Error deleting material:', err)
-      setError('Failed to delete material')
+      console.error("Error deleting material:", err);
+      setError("Failed to delete material");
     }
-  }
+  };
 
   const handleOpenMaterial = () => {
-    resetValues()
-    setIsNewMaterial(true)
-  }
+    resetValues();
+    setIsNewMaterial(true);
+  };
 
   const handleAddNewMaterial = async () => {
     try {
       // Validate numeric fields
-      const e_potential = newMaterial.e_potential ? parseFloat(newMaterial.e_potential) : null
-      const valency = newMaterial.valency ? parseFloat(newMaterial.valency) : null
-      const molar_mass = newMaterial.molar_mass ? parseFloat(newMaterial.molar_mass) : null
+      const e_potential = newMaterial.e_potential ? parseFloat(newMaterial.e_potential) : null;
+      const valency = newMaterial.valency ? parseFloat(newMaterial.valency) : null;
+      const molar_mass = newMaterial.molar_mass ? parseFloat(newMaterial.molar_mass) : null;
 
-      const { error } = await supabase.from('materials').insert({
+      const { error } = await supabase.from("materials").insert({
         name: newMaterial.name,
         e_potential,
         valency,
         molar_mass,
         hidden_id: generateHiddenId(),
-      })
+      });
 
-      if (error) throw error
-      await loadData()
-      resetValues()
-      setNewMaterial({})
-      setIsNewMaterial(false)
+      if (error) throw error;
+      await loadData();
+      resetValues();
+      setNewMaterial({});
+      setIsNewMaterial(false);
     } catch (err) {
-      console.error('Error creating material:', err)
-      setError('Failed to create material')
+      console.error("Error creating material:", err);
+      setError("Failed to create material");
     }
-  }
+  };
 
   const handleCancelNewMaterial = () => {
-    resetValues()
-    setNewMaterial({})
-    setIsNewMaterial(false)
-  }
+    resetValues();
+    setNewMaterial({});
+    setIsNewMaterial(false);
+  };
 
   return (
     <div className="p-6">
@@ -189,7 +189,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                           <Input
                             type="text"
                             name="name"
-                            value={editingValues.name || ''}
+                            value={editingValues.name || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                           />
@@ -202,7 +202,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                           <Input
                             type="number"
                             name="e_potential"
-                            value={editingValues.e_potential || ''}
+                            value={editingValues.e_potential || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -216,7 +216,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                           <Input
                             type="number"
                             name="valency"
-                            value={editingValues.valency || ''}
+                            value={editingValues.valency || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -230,7 +230,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                           <Input
                             type="number"
                             name="molar_mass"
-                            value={editingValues.molar_mass || ''}
+                            value={editingValues.molar_mass || ""}
                             onChange={(e) => handleChangeEditingValues(e.target.name, e.target.value)}
                             className="w-full p-1"
                             step="any"
@@ -261,7 +261,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                         <Input
                           type="text"
                           name="name"
-                          value={newMaterial.name || ''}
+                          value={newMaterial.name || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter material name"
@@ -271,7 +271,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                         <Input
                           type="number"
                           name="e_potential"
-                          value={newMaterial.e_potential || ''}
+                          value={newMaterial.e_potential || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter E-Potential"
@@ -282,7 +282,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                         <Input
                           type="number"
                           name="valency"
-                          value={newMaterial.valency || ''}
+                          value={newMaterial.valency || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter Valency"
@@ -293,7 +293,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                         <Input
                           type="number"
                           name="molar_mass"
-                          value={newMaterial.molar_mass || ''}
+                          value={newMaterial.molar_mass || ""}
                           onChange={(e) => handleChangeMaterial(e.target.name, e.target.value)}
                           className="w-full p-1"
                           placeholder="Enter Molar Mass"
@@ -323,5 +323,5 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
         </div>
       )}
     </div>
-  )
-}
+  );
+};

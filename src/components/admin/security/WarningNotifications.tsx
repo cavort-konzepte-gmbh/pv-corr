@@ -1,41 +1,41 @@
-import React, { useState } from 'react'
-import { Theme } from '../../../types/theme'
-import { Plus, Edit2, Save, X, Clock } from 'lucide-react'
-import { NotificationDuration, DURATION_OPTIONS } from '../../../types/security'
-import { generateHiddenId } from '../../../utils/generateHiddenId'
+import React, { useState } from "react";
+import { Theme } from "../../../types/theme";
+import { Plus, Edit2, Save, X, Clock } from "lucide-react";
+import { NotificationDuration, DURATION_OPTIONS } from "../../../types/security";
+import { generateHiddenId } from "../../../utils/generateHiddenId";
 
 interface WarningNotificationsProps {
-  currentTheme: Theme
+  currentTheme: Theme;
 }
 
 const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentTheme }) => {
-  const [notifications, setNotifications] = useState<any[]>([])
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formValues, setFormValues] = useState({
-    name: '',
-    description: '',
-    duration: 'timed' as NotificationDuration,
+    name: "",
+    description: "",
+    duration: "timed" as NotificationDuration,
     timeout: 5,
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     const notification = {
       id: `warn-${notifications.length + 1}`,
       hidden_id: generateHiddenId(),
-      type: 'warning',
+      type: "warning",
       ...formValues,
-    }
-    setNotifications([...notifications, notification])
-    setShowForm(false)
+    };
+    setNotifications([...notifications, notification]);
+    setShowForm(false);
     setFormValues({
-      name: '',
-      description: '',
-      duration: 'timed',
+      name: "",
+      description: "",
+      duration: "timed",
       timeout: 5,
-    })
-  }
+    });
+  };
 
   return (
     <div className="p-6">
@@ -43,8 +43,8 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
         onClick={() => setShowForm(true)}
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6"
         style={{
-          backgroundColor: '#f59e0b', // Amber color for warnings
-          color: 'white',
+          backgroundColor: "#f59e0b", // Amber color for warnings
+          color: "white",
         }}
       >
         <Plus size={16} />
@@ -54,7 +54,7 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-            <h3 className="text-lg mb-6 text-primary">{editingId ? 'Edit Warning Notification' : 'New Warning Notification'}</h3>
+            <h3 className="text-lg mb-6 text-primary">{editingId ? "Edit Warning Notification" : "New Warning Notification"}</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -108,7 +108,7 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
                 </select>
               </div>
 
-              {formValues.duration === 'timed' && (
+              {formValues.duration === "timed" && (
                 <div>
                   <label className="block text-sm mb-1 text-secondary">
                     Timeout (seconds)
@@ -129,21 +129,21 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
                 <button
                   type="button"
                   onClick={() => {
-                    setShowForm(false)
-                    setEditingId(null)
+                    setShowForm(false);
+                    setEditingId(null);
                     setFormValues({
-                      name: '',
-                      description: '',
-                      duration: 'timed',
+                      name: "",
+                      description: "",
+                      duration: "timed",
                       timeout: 5,
-                    })
+                    });
                   }}
                   className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 rounded text-sm text-white" style={{ backgroundColor: '#f59e0b' }}>
-                  {editingId ? 'Save Changes' : 'Create Notification'}
+                <button type="submit" className="px-4 py-2 rounded text-sm text-white" style={{ backgroundColor: "#f59e0b" }}>
+                  {editingId ? "Save Changes" : "Create Notification"}
                 </button>
               </div>
             </form>
@@ -156,26 +156,26 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
           <div
             key={notification.id}
             className="p-4 rounded-lg border transition-all text-primary border-theme bg-surface"
-            style={{ borderColor: '#f59e0b' }}
+            style={{ borderColor: "#f59e0b" }}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{notification.name}</span>
-                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: '#f59e0b20' }}>
+                <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: "#f59e0b20" }}>
                   {notification.id}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    setEditingId(notification.id)
+                    setEditingId(notification.id);
                     setFormValues({
                       name: notification.name,
                       description: notification.description,
                       duration: notification.duration,
                       timeout: notification.timeout || 5,
-                    })
-                    setShowForm(true)
+                    });
+                    setShowForm(true);
                   }}
                   className="p-1 rounded hover:bg-opacity-80 text-secondary"
                 >
@@ -193,18 +193,18 @@ const WarningNotifications: React.FC<WarningNotificationsProps> = ({ currentThem
             <div className="flex items-center gap-2 text-xs text-secondary">
               <Clock size={12} />
               <span>
-                {notification.duration === 'timed'
+                {notification.duration === "timed"
                   ? `Auto-dismiss after ${notification.timeout}s`
-                  : notification.duration === 'acknowledge'
-                    ? 'Requires acknowledgment'
-                    : 'Persistent until dismissed'}
+                  : notification.duration === "acknowledge"
+                    ? "Requires acknowledgment"
+                    : "Persistent until dismissed"}
               </span>
             </div>
           </div>
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WarningNotifications
+export default WarningNotifications;

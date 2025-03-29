@@ -1,25 +1,25 @@
-import React from 'react'
-import { Theme } from '../../types/theme'
-import { Language, useTranslation } from '../../types/language'
-import { Project } from '../../types/projects'
-import { Person } from '../../types/people'
-import { Company } from '../../types/companies'
-import { useState } from 'react'
-import FieldSummary from './elements/zones/FieldSummary'
-import ZoneList from './elements/zones/ZoneList'
-import ZoneForm from './elements/zones/ZoneForm'
-import ProjectSummary from './elements/fields/ProjectSummary'
+import React from "react";
+import { Theme } from "../../types/theme";
+import { Language, useTranslation } from "../../types/language";
+import { Project } from "../../types/projects";
+import { Person } from "../../types/people";
+import { Company } from "../../types/companies";
+import { useState } from "react";
+import FieldSummary from "./elements/zones/FieldSummary";
+import ZoneList from "./elements/zones/ZoneList";
+import ZoneForm from "./elements/zones/ZoneForm";
+import ProjectSummary from "./elements/fields/ProjectSummary";
 
 interface ZonesProps {
-  currentTheme: Theme
-  currentLanguage: Language
-  projects: Project[]
-  onProjectsChange: (projects: Project[]) => void
-  selectedProjectId?: string
-  selectedFieldId?: string
-  onSelectZone: (zoneId: string) => void
-  people: Person[]
-  companies: Company[]
+  currentTheme: Theme;
+  currentLanguage: Language;
+  projects: Project[];
+  onProjectsChange: (projects: Project[]) => void;
+  selectedProjectId?: string;
+  selectedFieldId?: string;
+  onSelectZone: (zoneId: string) => void;
+  people: Person[];
+  companies: Company[];
 }
 
 const Zones: React.FC<ZonesProps> = ({
@@ -33,20 +33,20 @@ const Zones: React.FC<ZonesProps> = ({
   onProjectsChange,
   currentLanguage,
 }) => {
-  const transition = useTranslation(currentLanguage)
+  const transition = useTranslation(currentLanguage);
 
-  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
 
-  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
 
   if (!selectedProject || !selectedField) {
-    return <div className="p-6 text-center">{transition('zones.please_select_field')}</div>
+    return <div className="p-6 text-center">{transition("zones.please_select_field")}</div>;
   }
 
-  const manager = people.find((person) => person.id === selectedProject.managerId)
-  const company = companies.find((company) => company.id === selectedProject.companyId)
+  const manager = people.find((person) => person.id === selectedProject.managerId);
+  const company = companies.find((company) => company.id === selectedProject.companyId);
 
-  const [showProjectSummary, setShowProjectSummary] = useState(false)
+  const [showProjectSummary, setShowProjectSummary] = useState(false);
 
   return (
     <div className="p-6">
@@ -79,7 +79,7 @@ const Zones: React.FC<ZonesProps> = ({
         currentLanguage={currentLanguage}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Zones
+export default Zones;
