@@ -23,7 +23,10 @@ export interface UserProfile {
 export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promise<boolean> => {
   try {
     // Get current user metadata first
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
     if (userError) throw userError;
     if (!user) throw new Error('No user found');
 
@@ -37,12 +40,12 @@ export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promi
       ...(metadata.language && { language: metadata.language }),
       ...(metadata.decimal_separator && { decimal_separator: metadata.decimal_separator }),
       ...(metadata.show_hidden_ids !== undefined && { show_hidden_ids: metadata.show_hidden_ids }),
-      ...(metadata.theme_id && { theme_id: metadata.theme_id })
+      ...(metadata.theme_id && { theme_id: metadata.theme_id }),
     };
 
     // Update user metadata
     const { error } = await supabase.auth.updateUser({
-      data: snakeCaseMetadata
+      data: snakeCaseMetadata,
     });
 
     if (error) {
@@ -51,9 +54,11 @@ export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promi
     }
 
     // Dispatch event with updated settings
-    window.dispatchEvent(new CustomEvent('userSettingsLoaded', { 
-      detail: snakeCaseMetadata
-    }));
+    window.dispatchEvent(
+      new CustomEvent('userSettingsLoaded', {
+        detail: snakeCaseMetadata,
+      }),
+    );
 
     return true;
   } catch (err) {
@@ -64,20 +69,23 @@ export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promi
 
 export const getUsersByMetadata = async (key: keyof UserMetadata, value: any): Promise<UserProfile[]> => {
   try {
-    const { data: { users }, error } = await supabase.auth.admin.listUsers();
-    
+    const {
+      data: { users },
+      error,
+    } = await supabase.auth.admin.listUsers();
+
     if (error) throw error;
 
     // Convert snake_case metadata to camelCase for consistency
     return users
-      .filter(user => user.user_metadata?.[key] === value)
-      .map(user => ({
+      .filter((user) => user.user_metadata?.[key] === value)
+      .map((user) => ({
         id: user.id,
         email: user.email || '',
         firstName: user.user_metadata?.firstName || user.user_metadata?.first_name || '',
         lastName: user.user_metadata?.lastName || user.user_metadata?.last_name || '',
         displayName: user.user_metadata?.displayName || user.user_metadata?.display_name || user.email || '',
-        adminLevel: user.user_metadata?.admin_level || 'user'
+        adminLevel: user.user_metadata?.admin_level || 'user',
       }));
   } catch (err) {
     console.error('Error in getUsersByMetadata:', err);
@@ -87,19 +95,19 @@ export const getUsersByMetadata = async (key: keyof UserMetadata, value: any): P
 
 export const getAdminUsers = async (): Promise<UserProfile[]> => {
   const [admin, superAdmin] = await Promise.all([
-    getUsersByMetadata('admin_level', 'admin'), 
-    getUsersByMetadata('admin_level', 'super_admin')
+    getUsersByMetadata('admin_level', 'admin'),
+    getUsersByMetadata('admin_level', 'super_admin'),
   ]);
   return admin.concat(superAdmin);
 };
 
-export const updateUserProfile = async (
-  userId: string, 
-  profile: Partial<UserProfile>
-): Promise<boolean> => {
+export const updateUserProfile = async (userId: string, profile: Partial<UserProfile>): Promise<boolean> => {
   try {
     // Get current user metadata
-    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.admin.getUserById(userId);
     if (userError) throw userError;
     if (!user) throw new Error('User not found');
 
@@ -109,21 +117,18 @@ export const updateUserProfile = async (
       firstName: profile.firstName,
       lastName: profile.lastName,
       displayName: profile.displayName || `${profile.firstName} ${profile.lastName}`.trim(),
-      admin_level: profile.adminLevel || user.user_metadata?.admin_level || 'user'
+      admin_level: profile.adminLevel || user.user_metadata?.admin_level || 'user',
     };
 
     // Update user
-    const { error } = await supabase.auth.admin.updateUserById(
-      userId,
-      { 
-        user_metadata: {
-          ...metadata,
-          first_name: metadata.firstName,
-          last_name: metadata.lastName,
-          display_name: metadata.displayName
-        }
-      }
-    );
+    const { error } = await supabase.auth.admin.updateUserById(userId, {
+      user_metadata: {
+        ...metadata,
+        first_name: metadata.firstName,
+        last_name: metadata.lastName,
+        display_name: metadata.displayName,
+      },
+    });
 
     if (error) throw error;
     return true;
@@ -135,7 +140,10 @@ export const updateUserProfile = async (
 
 export const isAdmin = async (): Promise<boolean> => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     if (error) throw error;
     if (!user) return false;
 
@@ -149,7 +157,10 @@ export const isAdmin = async (): Promise<boolean> => {
 
 export const isSuperAdmin = async (): Promise<boolean> => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
     if (error) throw error;
     if (!user) return false;
 

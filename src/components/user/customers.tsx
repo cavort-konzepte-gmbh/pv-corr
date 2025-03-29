@@ -21,7 +21,7 @@ const Customers: React.FC<CustomersProps> = ({
   savedPeople,
   savedCompanies,
   onSelectCustomer,
-  onSelectUncategorized
+  onSelectUncategorized,
 }) => {
   return (
     <div className="p-6">
@@ -46,6 +46,6 @@ const Customers: React.FC<CustomersProps> = ({
       />
     </div>
   );
-}
+};
 
 export default Customers;

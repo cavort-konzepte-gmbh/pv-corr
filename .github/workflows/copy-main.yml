@@ -6,7 +6,7 @@ on:
 jobs:
   copy-main:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Configure Git
         run: |

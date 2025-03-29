@@ -27,34 +27,28 @@ interface OutputConfigDialogProps {
   onSave: (outputs: OutputConfig[]) => void;
 }
 
-const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
-  isOpen,
-  onClose,
-  currentTheme,
-  normId,
-  initialOutputs,
-  onSave
-}) => {
+const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose, currentTheme, normId, initialOutputs, onSave }) => {
   const [outputs, setOutputs] = useState<OutputConfig[]>(initialOutputs);
   const [error, setError] = useState<string | null>(null);
 
   const handleAddOutput = () => {
-    setOutputs([...outputs, {
-      id: generateHiddenId(),
-      name: '',
-      formula: '',
-      description: ''
-    }]);
+    setOutputs([
+      ...outputs,
+      {
+        id: generateHiddenId(),
+        name: '',
+        formula: '',
+        description: '',
+      },
+    ]);
   };
 
   const handleRemoveOutput = (id: string) => {
-    setOutputs(outputs.filter(o => o.id !== id));
+    setOutputs(outputs.filter((o) => o.id !== id));
   };
 
   const handleUpdateOutput = (id: string, field: keyof OutputConfig, value: string) => {
-    setOutputs(outputs.map(o => 
-      o.id === id ? { ...o, [field]: value } : o
-    ));
+    setOutputs(outputs.map((o) => (o.id === id ? { ...o, [field]: value } : o)));
   };
 
   if (!isOpen) return null;
@@ -63,9 +57,9 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
     <div className="fixed inset-0 bg-card bg-opacity-50 flex items-center justify-center z-50">
       <div className="p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-card">
         <h3 className="text-lg mb-6 text-primary">Configure Output Values</h3>
-        
+
         <div className="space-y-4">
-          {outputs.map(output => (
+          {outputs.map((output) => (
             <div key={output.id} className="p-4 rounded border border-theme">
               <div className="flex items-center justify-between mb-4">
                 <Input
@@ -75,14 +69,11 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
                   className="p-2 rounded text-sm text-primary border-theme border-solid bg-theme"
                   placeholder="Output name (e.g. B0, B1)"
                 />
-                <Button
-                  onClick={() => handleRemoveOutput(output.id)}
-                  className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                >
+                <Button onClick={() => handleRemoveOutput(output.id)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
                   <X size={14} />
                 </Button>
               </div>
-              
+
               <div className="space-y-2">
                 <Textarea
                   value={output.formula}
@@ -99,24 +90,15 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({
             </div>
           ))}
 
-          <Button
-            onClick={handleAddOutput}
-            className="w-full py-2 rounded text-sm text-white bg-accent-primary"
-          >
+          <Button onClick={handleAddOutput} className="w-full py-2 rounded text-sm text-white bg-accent-primary">
             Add Output
           </Button>
 
           <div className="flex justify-end gap-2 mt-4">
-            <Button
-              onClick={onClose}
-              className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
-            >
+            <Button onClick={onClose} className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent">
               Cancel
             </Button>
-            <Button
-              onClick={() => onSave(outputs)}
-              className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-            >
+            <Button onClick={() => onSave(outputs)} className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
               Save Changes
             </Button>
           </div>
@@ -153,10 +135,7 @@ interface RatingRange {
   rating: number;
 }
 
-export const NormsPanel: React.FC<NormsPanelProps> = ({
-  currentTheme,
-  currentLanguage
-}) => {
+export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLanguage }) => {
   const [norms, setNorms] = useState<Norm[]>([]);
   const [parameters, setParameters] = useState<Parameter[]>([]);
   const [normParameters, setNormParameters] = useState<NormParameter[]>([]);
@@ -182,7 +161,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
       const [normsData, paramsData, normParamsData] = await Promise.all([
         supabase.from('norms').select('*').order('created_at', { ascending: true }),
         supabase.from('parameters').select('*').order('created_at', { ascending: true }),
-        supabase.from('norm_parameters').select('*')
+        supabase.from('norm_parameters').select('*'),
       ]);
 
       if (normsData.error) throw normsData.error;
@@ -201,14 +180,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
   };
 
   const handleChangeEditingValues = (name: string, value: string) => {
-    setEditingValues(previous => ({
+    setEditingValues((previous) => ({
       ...previous,
       [name]: value,
     }));
   };
 
   const handleChangeNorm = (name: string, value: string) => {
-    setNewNorm(previous => ({
+    setNewNorm((previous) => ({
       ...previous,
       [name]: value,
     }));
@@ -224,10 +203,10 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
       try {
         const { error } = await supabase
           .from('norms')
-          .update({ 
+          .update({
             name: editingValues.name,
             description: editingValues.description,
-            version: editingValues.version
+            version: editingValues.version,
           })
           .eq('id', norm.id);
 
@@ -248,10 +227,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
   const handleDeleteNorm = async (normId: string) => {
     try {
-      const { error } = await supabase
-        .from('norms')
-        .delete()
-        .eq('id', normId);
+      const { error } = await supabase.from('norms').delete().eq('id', normId);
 
       if (error) throw error;
       await loadData();
@@ -273,14 +249,12 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
         return;
       }
 
-      const { error } = await supabase
-        .from('norms')
-        .insert({
-          name: newNorm.name.trim(),
-          description: newNorm.description?.trim(),
-          version: newNorm.version?.trim(),
-          hidden_id: generateHiddenId()
-        });
+      const { error } = await supabase.from('norms').insert({
+        name: newNorm.name.trim(),
+        description: newNorm.description?.trim(),
+        version: newNorm.version?.trim(),
+        hidden_id: generateHiddenId(),
+      });
 
       if (error) throw error;
       await loadData();
@@ -301,29 +275,21 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
   const handleToggleParameter = async (normId: string, parameterId: string, parameterCode: string) => {
     try {
-      const existingAssociation = normParameters.find(
-        np => np.norm_id === normId && np.parameter_id === parameterId
-      );
+      const existingAssociation = normParameters.find((np) => np.norm_id === normId && np.parameter_id === parameterId);
 
       if (existingAssociation) {
         // Remove association
-        const { error } = await supabase
-          .from('norm_parameters')
-          .delete()
-          .eq('norm_id', normId)
-          .eq('parameter_id', parameterId);
+        const { error } = await supabase.from('norm_parameters').delete().eq('norm_id', normId).eq('parameter_id', parameterId);
 
         if (error) throw error;
       } else {
         // Add association
-        const { error } = await supabase
-          .from('norm_parameters')
-          .insert({
-            norm_id: normId,
-            parameter_id: parameterId,
-            parameter_code: parameterCode,
-            rating_ranges: []
-          });
+        const { error } = await supabase.from('norm_parameters').insert({
+          norm_id: normId,
+          parameter_id: parameterId,
+          parameter_code: parameterCode,
+          rating_ranges: [],
+        });
 
         if (error) throw error;
       }
@@ -337,36 +303,25 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
   return (
     <div className="p-6">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-card">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-card">{error}</div>}
 
-      <Button
-        onClick={() => setIsNewNorm(true)}
-        className="w-full mb-6"
-      >
+      <Button onClick={() => setIsNewNorm(true)} className="w-full mb-6">
         <Plus size={16} />
-        {t("standards.add")}
+        {t('standards.add')}
       </Button>
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
-          Loading norms...
-        </div>
+        <div className="text-center p-4 text-secondary">Loading norms...</div>
       ) : (
         <div className="space-y-6">
           {isNewNorm ? (
             <div>
-              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
-                {t("standards.new")}
-              </h3>
-              
+              <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">{t('standards.new')}</h3>
+
               <form className="text-card space-y-4">
                 <div>
                   <Label className="block text-sm mb-1 text-primary">
-                    {t("standards.name")}
+                    {t('standards.name')}
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
@@ -378,20 +333,12 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 </div>
 
                 <div>
-                  <Label className="block text-sm mb-1 text-primary">
-                    Description
-                  </Label>
-                  <Textarea
-                    value={newNorm.description || ''}
-                    onChange={(e) => handleChangeNorm('description', e.target.value)}
-                    rows={3}
-                  />
+                  <Label className="block text-sm mb-1 text-primary">Description</Label>
+                  <Textarea value={newNorm.description || ''} onChange={(e) => handleChangeNorm('description', e.target.value)} rows={3} />
                 </div>
 
                 <div>
-                  <Label className="block text-sm mb-1 text-primary">
-                    Version
-                  </Label>
+                  <Label className="block text-sm mb-1 text-primary">Version</Label>
                   <Input
                     type="text"
                     value={newNorm.version || ''}
@@ -401,30 +348,19 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    onClick={handleCancelNewNorm}
-                    variant="destructive"
-                  >
-                    {t("actions.cancel")}
+                  <Button type="button" onClick={handleCancelNewNorm} variant="destructive">
+                    {t('actions.cancel')}
                   </Button>
-                  <Button
-                    type="button"
-                    onClick={handleAddNewNorm}
-                    className="px-4 py-2"
-                  >
-                    {t("actions.save")}
+                  <Button type="button" onClick={handleAddNewNorm} className="px-4 py-2">
+                    {t('actions.save')}
                   </Button>
                 </div>
               </form>
             </div>
           ) : (
             <div className="space-y-4">
-              {norms.map(norm => (
-                <div
-                  key={norm.id}
-                  className="p-4 rounded-lg border transition-all text-card-foreground border-accent bg-card"
-                >
+              {norms.map((norm) => (
+                <div key={norm.id} className="p-4 rounded-lg border transition-all text-card-foreground border-accent bg-card">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       {editingNorm === norm.id ? (
@@ -454,37 +390,17 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                         <div>
                           <h3 className="font-medium text-lg">
                             {norm.name}
-                            {norm.version && (
-                              <span className="ml-2 text-sm text-muted-foreground">
-                                v{norm.version}
-                              </span>
-                            )}
+                            {norm.version && <span className="ml-2 text-sm text-muted-foreground">v{norm.version}</span>}
                           </h3>
-                          {norm.description && (
-                            <p className="text-sm mt-1 text-muted-foreground">
-                              {norm.description}
-                            </p>
-                          )}
+                          {norm.description && <p className="text-sm mt-1 text-muted-foreground">{norm.description}</p>}
                         </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Button
-                        onClick={() => handleUpdateSaveNorm(norm)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        variant="ghost"
-                      >
-                        {editingNorm === norm.id ? (
-                          <Save size={14} />
-                        ) : (
-                          <Edit2 size={14} />
-                        )}
+                      <Button onClick={() => handleUpdateSaveNorm(norm)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
+                        {editingNorm === norm.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
-                      <Button
-                        onClick={() => handleDeleteNorm(norm.id)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        variant="ghost"
-                      >
+                      <Button onClick={() => handleDeleteNorm(norm.id)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
                         <X size={14} />
                       </Button>
                       <Button
@@ -500,19 +416,12 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
 
                   {editingNorm === norm.id ? (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-                        {t("standards.select_parameter")}
-                      </h4>
+                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t('standards.select_parameter')}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {parameters.map(param => {
-                          const isSelected = normParameters.some(
-                            np => np.norm_id === norm.id && np.parameter_id === param.id
-                          );
+                        {parameters.map((param) => {
+                          const isSelected = normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id);
                           return (
-                            <div
-                              key={param.id}
-                              className="flex items-center gap-2 p-2 rounded border"
-                            >
+                            <div key={param.id} className="flex items-center gap-2 p-2 rounded border">
                               <Input
                                 type="checkbox"
                                 checked={isSelected}
@@ -521,14 +430,8 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                               />
                               <div className="flex-1">
                                 <div className="flex items-center gap-1">
-                                  <span className="text-sm">
-                                    {param.shortName || param.name}
-                                  </span>
-                                  {param.unit && (
-                                    <span className="text-xs text-muted-foreground">
-                                      ({param.unit})
-                                    </span>
-                                  )}
+                                  <span className="text-sm">{param.shortName || param.name}</span>
+                                  {param.unit && <span className="text-xs text-muted-foreground">({param.unit})</span>}
                                   <div className="relative group">
                                     <Info size={12} className="text-muted-foreground cursor-help" />
                                     <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">
@@ -544,9 +447,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                     </div>
                   ) : (
                     <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">
-                        Selected Parameters
-                      </h4>
+                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">Selected Parameters</h4>
                       <section className="border border-input rounded-md bg-card">
                         <div className="w-full relative overflow-auto">
                           <Table>
@@ -558,19 +459,17 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                             </thead>
                             <tbody>
                               {parameters
-                                .filter(param => normParameters.some(
-                                  np => np.norm_id === norm.id && np.parameter_id === param.id
-                                ))
+                                .filter((param) => normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id))
                                 .sort((a, b) => {
-                                  const aOrder = typeof a.orderNumber === 'number' ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
-                                  const bOrder = typeof b.orderNumber === 'number' ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
+                                  const aOrder =
+                                    typeof a.orderNumber === 'number' ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
+                                  const bOrder =
+                                    typeof b.orderNumber === 'number' ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
                                   return aOrder - bOrder;
                                 })
-                                .map(param => (
+                                .map((param) => (
                                   <tr key={param.id} className="border-t border-accent">
-                                    <td className="p-2 text-sm">
-                                      {param.shortName || param.name}
-                                    </td>
+                                    <td className="p-2 text-sm">{param.shortName || param.name}</td>
                                     <td className="p-2 text-sm text-muted-foreground">
                                       <div className="flex items-center gap-2">
                                         <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
@@ -593,8 +492,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
                                       </div>
                                     </td>
                                   </tr>
-                                ))
-                              }
+                                ))}
                             </tbody>
                           </Table>
                         </div>
@@ -607,7 +505,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
           )}
         </div>
       )}
-      
+
       {editingOutputs && (
         <OutputConfigDialog
           isOpen={true}
@@ -615,18 +513,15 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({
           currentTheme={currentTheme}
           normId={editingOutputs}
           initialOutputs={(() => {
-            const norm = norms.find(n => n.id === editingOutputs);
+            const norm = norms.find((n) => n.id === editingOutputs);
             return norm?.output_config || [];
           })()}
           onSave={async (outputs) => {
             try {
-              const { error } = await supabase
-                .from('norms')
-                .update({ output_config: outputs })
-                .eq('id', editingOutputs);
+              const { error } = await supabase.from('norms').update({ output_config: outputs }).eq('id', editingOutputs);
 
               if (error) throw error;
-              
+
               // Refresh norms data
               const { data: updatedNorms, error: loadError } = await supabase
                 .from('norms')

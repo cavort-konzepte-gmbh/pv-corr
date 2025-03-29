@@ -14,11 +14,7 @@ interface CustomerFormProps {
   savedCompanies: Company[];
 }
 
-const CustomerForm: React.FC<CustomerFormProps> = ({
-  currentTheme,
-  savedPeople,
-  savedCompanies
-}) => {
+const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, savedCompanies }) => {
   const [showForm, setShowForm] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [selectedType, setSelectedType] = useState<'person' | 'company'>('person');
@@ -40,7 +36,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
       await createCustomer({
         name: customerName.trim(),
         personId: selectedType === 'person' ? selectedId : undefined,
-        companyId: selectedType === 'company' ? selectedId : undefined
+        companyId: selectedType === 'company' ? selectedId : undefined,
       });
 
       setShowForm(false);
@@ -68,7 +64,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
             <h3 className="text-lg mb-6 text-primary">New Customer</h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label className="block text-sm mb-1 text-secondary">
@@ -86,9 +82,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               </div>
 
               <div>
-                <Label className="block text-sm mb-1 text-secondary">
-                  Customer Type
-                </Label>
+                <Label className="block text-sm mb-1 text-secondary">Customer Type</Label>
                 <div className="flex gap-4">
                   <Label className="flex items-center gap-2">
                     <Input
@@ -127,31 +121,24 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="">Select {selectedType === 'person' ? 'a person' : 'a company'}</option>
-                  {selectedType === 'person' ? (
-                    savedPeople.map(person => (
-                      <option key={person.id} value={person.id}>
-                        {person.firstName} {person.lastName}
-                      </option>
-                    ))
-                  ) : (
-                    savedCompanies.map(company => (
-                      <option key={company.id} value={company.id}>
-                        {company.name}
-                      </option>
-                    ))
-                  )}
+                  {selectedType === 'person'
+                    ? savedPeople.map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.firstName} {person.lastName}
+                        </option>
+                      ))
+                    : savedCompanies.map((company) => (
+                        <option key={company.id} value={company.id}>
+                          {company.name}
+                        </option>
+                      ))}
                 </select>
               </div>
 
-              {error && (
-                <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-                  {error}
-                </div>
-              )}
+              {error && <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
               <div className="flex justify-end gap-2">
                 <Button
-          
                   onClick={() => {
                     setShowForm(false);
                     setCustomerName('');
@@ -162,10 +149,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                >
+                <Button type="submit" className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
                   Create Customer
                 </Button>
               </div>

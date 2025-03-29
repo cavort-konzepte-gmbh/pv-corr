@@ -31,9 +31,8 @@ const Projects: React.FC<ProjectsProps> = ({
   onMoveProject,
   onSelectProject,
   currentLanguage,
-  onProjectsChange
+  onProjectsChange,
 }) => {
-
   return (
     <div className="p-6">
       <ProjectList
@@ -53,7 +52,7 @@ const Projects: React.FC<ProjectsProps> = ({
         savedCompanies={savedCompanies}
         currentLanguage={currentLanguage}
         selectedCustomerId={selectedCustomerId}
-        onProjectsChange={onProjectsChange} 
+        onProjectsChange={onProjectsChange}
       />
     </div>
   );

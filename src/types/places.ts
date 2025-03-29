@@ -25,8 +25,8 @@ export const COUNTRIES: Country[] = [
       { id: 'apartment', label: 'Apartment/Unit Number', type: 'text', required: false },
       { id: 'city', label: 'City', type: 'text', required: true },
       { id: 'state', label: 'State', type: 'text', required: true },
-      { id: 'zip', label: 'ZIP Code', type: 'text', required: true }
-    ]
+      { id: 'zip', label: 'ZIP Code', type: 'text', required: true },
+    ],
   },
   {
     id: 'germany',
@@ -37,8 +37,8 @@ export const COUNTRIES: Country[] = [
       { id: 'street_name', label: 'Street Name', type: 'text', required: true },
       { id: 'house_number', label: 'House Number', type: 'text', required: true },
       { id: 'postal_code', label: 'Postal Code', type: 'text', required: true },
-      { id: 'city', label: 'City', type: 'text', required: true }
-    ]
+      { id: 'city', label: 'City', type: 'text', required: true },
+    ],
   },
   {
     id: 'france',
@@ -49,8 +49,8 @@ export const COUNTRIES: Country[] = [
       { id: 'street_number', label: 'Street Number', type: 'text', required: true },
       { id: 'street_name', label: 'Street Name', type: 'text', required: true },
       { id: 'postal_code', label: 'Postal Code', type: 'text', required: true },
-      { id: 'city', label: 'City', type: 'text', required: true }
-    ]
+      { id: 'city', label: 'City', type: 'text', required: true },
+    ],
   },
   {
     id: 'italy',
@@ -62,8 +62,8 @@ export const COUNTRIES: Country[] = [
       { id: 'street_number', label: 'Street Number', type: 'text', required: true },
       { id: 'postal_code', label: 'Postal Code', type: 'text', required: true },
       { id: 'city', label: 'City', type: 'text', required: true },
-      { id: 'province', label: 'Province Abbreviation', type: 'text', required: true }
-    ]
+      { id: 'province', label: 'Province Abbreviation', type: 'text', required: true },
+    ],
   },
   {
     id: 'china',
@@ -78,7 +78,7 @@ export const COUNTRIES: Country[] = [
       { id: 'district', label: 'District', type: 'text', required: true },
       { id: 'city', label: 'City', type: 'text', required: true },
       { id: 'province', label: 'Province', type: 'text', required: true },
-      { id: 'postal_code', label: 'Postal Code', type: 'text', required: true }
-    ]
-  }
+      { id: 'postal_code', label: 'Postal Code', type: 'text', required: true },
+    ],
+  },
 ];

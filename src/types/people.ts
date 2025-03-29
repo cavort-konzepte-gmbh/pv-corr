@@ -24,37 +24,37 @@ export const PERSON_FIELDS: PersonField[] = [
     label: 'people.salutation',
     type: 'select',
     required: true,
-    options: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.']
+    options: ['Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Prof.'],
   },
   {
     id: 'title',
     label: 'people.title',
     type: 'select',
     required: false,
-    options: ['Dr.', 'Prof.']
+    options: ['Dr.', 'Prof.'],
   },
   {
     id: 'firstName',
     label: 'people.firstName',
     type: 'text',
-    required: true
+    required: true,
   },
   {
     id: 'lastName',
     label: 'people.lastName',
     type: 'text',
-    required: true
+    required: true,
   },
   {
     id: 'email',
     label: 'company.email',
     type: 'email',
-    required: true
+    required: true,
   },
   {
     id: 'phone',
     label: 'company.phone',
     type: 'tel',
-    required: false
-  }
+    required: false,
+  },
 ];

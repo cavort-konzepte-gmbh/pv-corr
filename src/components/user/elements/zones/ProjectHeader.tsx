@@ -11,29 +11,20 @@ interface ProjectHeaderProps {
   currentTheme: Theme;
 }
 
-const ProjectHeader: React.FC<ProjectHeaderProps> = ({
-  project,
-  manager,
-  company,
-  currentTheme
-}) => {
+const ProjectHeader: React.FC<ProjectHeaderProps> = ({ project, manager, company, currentTheme }) => {
   return (
     <div className="h-14 border-b flex items-center px-4 border-theme bg-surface">
       <div className="flex-1 flex items-center gap-2">
         <span className="text-primary font-medium">{project.name}</span>
-        {project.typeProject && (
-          <span className="text-secondary">({project.typeProject})</span>
-        )}
+        {project.typeProject && <span className="text-secondary">({project.typeProject})</span>}
       </div>
       <div className="flex items-center gap-4">
-        {project.clientRef && (
-          <span className="text-secondary">#{project.clientRef}</span>
-        )}
-        {company && (
-          <span className="text-secondary">{company.name}</span>
-        )}
+        {project.clientRef && <span className="text-secondary">#{project.clientRef}</span>}
+        {company && <span className="text-secondary">{company.name}</span>}
         {manager && (
-          <span className="text-secondary">{manager.firstName} {manager.lastName}</span>
+          <span className="text-secondary">
+            {manager.firstName} {manager.lastName}
+          </span>
         )}
       </div>
     </div>

@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loginType: null,
   viewMode: 'user',
-  toggleViewMode: () => {}
+  toggleViewMode: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -59,7 +59,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
     });
 
     // Listen for changes on auth state (sign in, sign out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setUser(null);
         setIsAdmin(false);
@@ -77,23 +79,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
     if (session?.user) {
       const metadata = session.user.user_metadata || {};
 
-      // Set user and admin status 
+      // Set user and admin status
       setUser(session.user);
       setIsAdmin(metadata.admin_level === 'admin' || metadata.admin_level === 'super_admin');
-      
+
       // Dispatch settings event with complete metadata
-      window.dispatchEvent(new CustomEvent('userSettingsLoaded', { 
-        detail: metadata
-      }));
+      window.dispatchEvent(
+        new CustomEvent('userSettingsLoaded', {
+          detail: metadata,
+        }),
+      );
 
       // Apply theme from metadata
       const themeId = metadata.theme_id || 'zinc';
-      const split = themeId.split(".")
+      const split = themeId.split('.');
       document.documentElement.setAttribute('data-theme', split[0]);
-      if(split[1]) {
-        document.documentElement.classList.add("dark")
+      if (split[1]) {
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.remove("dark")
+        document.documentElement.classList.remove('dark');
       }
     }
   };
@@ -109,15 +113,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   };
 
   const toggleViewMode = () => {
-    setViewMode(prev => prev === 'user' ? 'admin' : 'user');
+    setViewMode((prev) => (prev === 'user' ? 'admin' : 'user'));
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-theme">
-        <div className="text-sm text-secondary">
-          Loading...
-        </div>
+        <div className="text-sm text-secondary">Loading...</div>
       </div>
     );
   }
@@ -134,9 +136,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
     return <AdminDashboard currentTheme={currentTheme} currentLanguage={currentLanguage} />;
   }
 
-  return (
-    <AuthContext.Provider value={{ user, signOut, isAdmin, loginType, viewMode, toggleViewMode }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, signOut, isAdmin, loginType, viewMode, toggleViewMode }}>{children}</AuthContext.Provider>;
 };

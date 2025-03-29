@@ -16,7 +16,7 @@ export const createField = async (projectId: string, field: Omit<Field, 'id' | '
       name: field.name,
       latitude: field.latitude,
       longitude: field.longitude,
-      has_fence: field.has_fence === '' ? null : field.has_fence === 'yes' ? 'yes' : field.has_fence === 'no' ? 'no' : null
+      has_fence: field.has_fence === '' ? null : field.has_fence === 'yes' ? 'yes' : field.has_fence === 'no' ? 'no' : null,
     })
     .select()
     .single();
@@ -25,18 +25,20 @@ export const createField = async (projectId: string, field: Omit<Field, 'id' | '
     console.error('Error creating field:', error);
     throw error;
   }
-  
+
   // Fetch complete field data after creation
   const { data: completeField, error: fetchError } = await supabase
     .from('fields')
-    .select(`
+    .select(
+      `
       *,
       gates (*),
       zones (
         *,
         datapoints (*)
       )
-    `)
+    `,
+    )
     .eq('id', newField.id)
     .single();
 
@@ -54,11 +56,7 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
   }
   try {
     // Prepare update data while preserving existing data
-    const { data: existingField, error: fetchError } = await supabase
-      .from('fields')
-      .select('*')
-      .eq('id', fieldId)
-      .single();
+    const { data: existingField, error: fetchError } = await supabase.from('fields').select('*').eq('id', fieldId).single();
 
     if (fetchError) throw fetchError;
 
@@ -66,16 +64,11 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
       name: field.name ?? existingField.name,
       latitude: field.latitude ?? existingField.latitude,
       longitude: field.longitude ?? existingField.longitude,
-      has_fence: field.has_fence === '' || field.has_fence === undefined ? null : field.has_fence
+      has_fence: field.has_fence === '' || field.has_fence === undefined ? null : field.has_fence,
     };
 
     // Update the field
-    const { data, error } = await supabase
-      .from('fields')
-      .update(updateData)
-      .eq('id', fieldId)
-      .select()
-      .single();
+    const { data, error } = await supabase.from('fields').update(updateData).eq('id', fieldId).select().single();
 
     if (error) {
       console.error('Update error:', error);
@@ -85,17 +78,12 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
     return data;
   } catch (error) {
     console.error('Error updating field:', error);
-    throw error instanceof Error 
-      ? error 
-      : new Error('An unexpected error occurred while updating the field');
+    throw error instanceof Error ? error : new Error('An unexpected error occurred while updating the field');
   }
 };
 
 export const deleteField = async (fieldId: string) => {
-  const { error } = await supabase
-    .from('fields')
-    .delete()
-    .eq('id', fieldId);
+  const { error } = await supabase.from('fields').delete().eq('id', fieldId);
 
   if (error) {
     console.error('Error deleting field:', error);
@@ -106,11 +94,7 @@ export const deleteField = async (fieldId: string) => {
 export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hiddenId'>) => {
   try {
     // First check if field exists
-    const { data: field, error: fieldError } = await supabase
-      .from('fields')
-      .select('id')
-      .eq('id', fieldId)
-      .single();
+    const { data: field, error: fieldError } = await supabase.from('fields').select('id').eq('id', fieldId).single();
 
     if (fieldError) {
       console.error('Error finding field:', fieldError);
@@ -125,7 +109,7 @@ export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hidde
         hidden_id: generateHiddenId(),
         name: gate.name,
         latitude: gate.latitude || null,
-        longitude: gate.longitude || null
+        longitude: gate.longitude || null,
       })
       .select()
       .single();
@@ -144,11 +128,7 @@ export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hidde
 
 export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
   // First get the field_id
-  const { data: gateData, error: gateError } = await supabase
-    .from('gates')
-    .select('field_id')
-    .eq('id', gateId)
-    .single();
+  const { data: gateData, error: gateError } = await supabase.from('gates').select('field_id').eq('id', gateId).single();
 
   if (gateError) {
     console.error('Error finding gate:', gateError);
@@ -161,7 +141,7 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
     .update({
       name: gate.name,
       latitude: gate.latitude,
-      longitude: gate.longitude
+      longitude: gate.longitude,
     })
     .eq('id', gateId)
     .select()
@@ -175,10 +155,12 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
   // Return the complete field data with gates
   const { data: updatedField, error: refreshError } = await supabase
     .from('fields')
-    .select(`
+    .select(
+      `
       *,
       gates (*)
-    `)
+    `,
+    )
     .eq('id', gateData.field_id)
     .single();
 
@@ -192,11 +174,7 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
 
 export const deleteGate = async (gateId: string) => {
   // First get the field_id
-  const { data: gateData, error: gateError } = await supabase
-    .from('gates')
-    .select('field_id')
-    .eq('id', gateId)
-    .single();
+  const { data: gateData, error: gateError } = await supabase.from('gates').select('field_id').eq('id', gateId).single();
 
   if (gateError) {
     console.error('Error finding gate:', gateError);
@@ -204,10 +182,7 @@ export const deleteGate = async (gateId: string) => {
   }
 
   // Then delete the gate
-  const { error } = await supabase
-    .from('gates')
-    .delete()
-    .eq('id', gateId);
+  const { error } = await supabase.from('gates').delete().eq('id', gateId);
 
   if (error) {
     console.error('Error deleting gate:', error);
@@ -217,10 +192,12 @@ export const deleteGate = async (gateId: string) => {
   // Return the complete field data with remaining gates
   const { data: updatedField, error: refreshError } = await supabase
     .from('fields')
-    .select(`
+    .select(
+      `
       *,
       gates (*)
-    `)
+    `,
+    )
     .eq('id', gateData.field_id)
     .single();
 

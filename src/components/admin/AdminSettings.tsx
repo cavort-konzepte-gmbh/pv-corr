@@ -27,28 +27,17 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
         </div>
       ) : (
         <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="ghost"
-            onClick={onBack}
-          >
+          <Button variant="ghost" onClick={onBack}>
             <ArrowLeft size={20} />
           </Button>
-          <h2 className="text-2xl font-bold">
-            System Configuration
-          </h2>
+          <h2 className="text-2xl font-bold">System Configuration</h2>
         </div>
       )}
 
       {activeView === 'themes' ? (
-        <ThemeManagement
-          currentTheme={currentTheme}
-          onBack={() => setActiveView('overview')}
-        />
+        <ThemeManagement currentTheme={currentTheme} onBack={() => setActiveView('overview')} />
       ) : activeView === 'translations' ? (
-        <TranslationsPanel
-          currentTheme={currentTheme}
-          currentLanguage="en"
-        />
+        <TranslationsPanel currentTheme={currentTheme} currentLanguage="en" />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Theme Management */}
@@ -68,18 +57,14 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
           </div>
  */}
           {/* Translations Management */}
-          <div 
+          <div
             onClick={() => setActiveView('translations')}
             className="p-6 rounded-lg border border-accent text-card-foreground hover:bg-opacity-80 transition-colors cursor-pointer bg-card"
           >
             <div className="flex flex-col gap-2">
               <Globe className="text-accent-primary" size={24} />
-              <h3 className="text-lg font-medium mt-2">
-                Translations Management
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Manage system translations
-              </p>
+              <h3 className="text-lg font-medium mt-2">Translations Management</h3>
+              <p className="text-sm text-muted-foreground">Manage system translations</p>
             </div>
           </div>
         </div>

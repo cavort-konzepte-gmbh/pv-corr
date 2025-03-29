@@ -4,10 +4,7 @@ import { Datapoint } from '../types/projects';
 
 export const deleteDatapoint = async (datapointId: string) => {
   try {
-    const { error } = await supabase
-      .from('datapoints')
-      .delete()
-      .eq('id', datapointId);
+    const { error } = await supabase.from('datapoints').delete().eq('id', datapointId);
 
     if (error) {
       throw error;
@@ -18,10 +15,13 @@ export const deleteDatapoint = async (datapointId: string) => {
   }
 };
 
-export const updateDatapoint = async (datapointId: string, data: {
-  values: Record<string, string>;
-  name?: string;
-}) => {
+export const updateDatapoint = async (
+  datapointId: string,
+  data: {
+    values: Record<string, string>;
+    name?: string;
+  },
+) => {
   try {
     if (!data.name?.trim()) {
       throw new Error('Name is required');
@@ -30,15 +30,10 @@ export const updateDatapoint = async (datapointId: string, data: {
     const updateData = {
       values: data.values,
       name: data.name.trim(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
-    const { data: updatedDatapoint, error } = await supabase
-      .from('datapoints')
-      .update(updateData)
-      .eq('id', datapointId)
-      .select()
-      .single();
+    const { data: updatedDatapoint, error } = await supabase.from('datapoints').update(updateData).eq('id', datapointId).select().single();
 
     if (error) {
       throw error;
@@ -51,19 +46,18 @@ export const updateDatapoint = async (datapointId: string, data: {
   }
 };
 
-export const createDatapoint = async (zoneId: string, data: {
-  type: string;
-  name: string;
-  values: Record<string, string>;
-  ratings: Record<string, number>;
-}) => {
+export const createDatapoint = async (
+  zoneId: string,
+  data: {
+    type: string;
+    name: string;
+    values: Record<string, string>;
+    ratings: Record<string, number>;
+  },
+) => {
   try {
     // First verify the zone exists
-    const { data: zone, error: zoneError } = await supabase
-      .from('zones')
-      .select('id')
-      .eq('id', zoneId)
-      .single();
+    const { data: zone, error: zoneError } = await supabase.from('zones').select('id').eq('id', zoneId).single();
 
     if (zoneError) {
       throw new Error('Zone not found');
@@ -78,7 +72,7 @@ export const createDatapoint = async (zoneId: string, data: {
         type: data.type,
         values: data.values,
         ratings: data.ratings,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
       .select()
       .single();
@@ -95,13 +89,9 @@ export const createDatapoint = async (zoneId: string, data: {
   }
 };
 
-
- export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {
+export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {
   try {
-    const { data, error } = await supabase
-      .from('datapoints')
-      .select()
-      .eq('zone_id', zoneId);
+    const { data, error } = await supabase.from('datapoints').select().eq('zone_id', zoneId);
 
     if (error) {
       throw error;
@@ -111,4 +101,5 @@ export const createDatapoint = async (zoneId: string, data: {
   } catch (err) {
     console.error('Error fetching datapoints:', err);
     throw err;
-  }}
+  }
+};

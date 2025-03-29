@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Theme } from '../../types/theme';
 import { supabase } from '../../lib/supabase';
-import { ArrowLeft, Plus, Edit2, X, Save} from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, X, Save } from 'lucide-react';
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
 import { useKeyAction } from '../../hooks/useKeyAction';
 import { generateHiddenId } from '../../utils/generateHiddenId';
-import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table} from '../ui/table';
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '../ui/table';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 
@@ -28,7 +28,7 @@ interface NeighboringStructuresManagementProps {
 
 const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementProps> = ({ currentTheme, onBack }) => {
   const [structures, setStructures] = useState<NeighboringStructure[]>([]);
-  const [materials, setMaterials] = useState<{ id: string; name: string; }[]>([]);
+  const [materials, setMaterials] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingStructure, setEditingStructure] = useState<string | null>(null);
@@ -48,10 +48,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
 
   const loadMaterials = async () => {
     try {
-      const { data, error } = await supabase
-        .from('materials')
-        .select('id, name')
-        .order('name', { ascending: true });
+      const { data, error } = await supabase.from('materials').select('id, name').order('name', { ascending: true });
 
       if (error) throw error;
       setMaterials(data || []);
@@ -64,10 +61,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('neighboring_structures')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from('neighboring_structures').select('*').order('created_at', { ascending: true });
 
       if (error) throw error;
       setStructures(data || []);
@@ -80,14 +74,14 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
   };
 
   const handleChangeEditingValues = (field: keyof NeighboringStructure, value: string) => {
-    setEditingValues(prev => ({
+    setEditingValues((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleChangeNewStructure = (field: keyof NeighboringStructure, value: string) => {
-    setNewStructure(prev => ({
+    setNewStructure((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -115,13 +109,10 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
           coating_material_id: editingValues.coating_material_id || null,
           coating_thickness: editingValues.coating_thickness ? parseFloat(editingValues.coating_thickness.toString()) : null,
           coating_thickness_unit: editingValues.coating_thickness_unit || null,
-          construction_year: editingValues.construction_year ? parseInt(editingValues.construction_year.toString()) : null
+          construction_year: editingValues.construction_year ? parseInt(editingValues.construction_year.toString()) : null,
         };
 
-        const { error } = await supabase
-          .from('neighboring_structures')
-          .update(updateData)
-          .eq('id', structure.id);
+        const { error } = await supabase.from('neighboring_structures').update(updateData).eq('id', structure.id);
 
         if (error) throw error;
         await loadData();
@@ -141,7 +132,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
   const handleDeleteStructure = async (structureId: string) => {
     try {
       // Get structure name for confirmation
-      const structure = structures.find(s => s.id === structureId);
+      const structure = structures.find((s) => s.id === structureId);
       if (!structure) return;
 
       // Only proceed if name matches
@@ -150,10 +141,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
         return;
       }
 
-      const { error } = await supabase
-        .from('neighboring_structures')
-        .delete()
-        .eq('id', structureId);
+      const { error } = await supabase.from('neighboring_structures').delete().eq('id', structureId);
 
       if (error) throw error;
       setDeleteConfirm(null);
@@ -187,12 +175,10 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
         coating_thickness: newStructure.coating_thickness ? parseFloat(newStructure.coating_thickness.toString()) : null,
         coating_thickness_unit: newStructure.coating_thickness_unit || null,
         construction_year: newStructure.construction_year ? parseInt(newStructure.construction_year.toString()) : null,
-        hidden_id: generateHiddenId()
+        hidden_id: generateHiddenId(),
       };
 
-      const { error } = await supabase
-        .from('neighboring_structures')
-        .insert(structureData);
+      const { error } = await supabase.from('neighboring_structures').insert(structureData);
 
       if (error) throw error;
       await loadData();
@@ -211,49 +197,37 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
     setIsNewStructure(false);
   };
 
-  useKeyAction(() => {
-    if (editingStructure) {
-      handleUpdateSaveStructure(structures.find(s => s.id === editingStructure)!);
-    } else if (isNewStructure) {
-      handleAddNewStructure();
-    }
-  }, editingStructure !== null || isNewStructure, "Enter", 500);
+  useKeyAction(
+    () => {
+      if (editingStructure) {
+        handleUpdateSaveStructure(structures.find((s) => s.id === editingStructure)!);
+      } else if (isNewStructure) {
+        handleAddNewStructure();
+      }
+    },
+    editingStructure !== null || isNewStructure,
+    'Enter',
+    500,
+  );
 
   return (
     <div className="p-8">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       <div className="flex items-center gap-4 mb-8">
-        <Button
-          onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          variant="ghost"
-        >
+        <Button onClick={onBack} className="p-2 rounded hover:bg-opacity-80" variant="ghost">
           <ArrowLeft size={20} />
         </Button>
-        <h2 className="text-2xl font-bold">
-          Neighboring Structures Management
-        </h2>
+        <h2 className="text-2xl font-bold">Neighboring Structures Management</h2>
       </div>
 
       {loading ? (
-        <div className="text-center p-4">
-          Loading neighboring structures...
-        </div>
+        <div className="text-center p-4">Loading neighboring structures...</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg">
-              Neighboring Structures
-            </h3>
-            <Button
-              onClick={handleOpenNewStructure}
-              className="px-3 py-1"
-            >
+            <h3 className="text-lg">Neighboring Structures</h3>
+            <Button onClick={handleOpenNewStructure} className="px-3 py-1">
               <Plus size={14} />
               Add Structure
             </Button>
@@ -265,18 +239,15 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                 <TableCaption>Neighboring Structures</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead> 
+                    <TableHead>Name</TableHead>
                     <TableHead>Depth (m)</TableHead>
                     <TableHead>Height (m)</TableHead>
                     <TableHead>Coating</TableHead>
                     <TableHead>Construction Year</TableHead>
                     <TableHead>Actions</TableHead>
-
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-
-            
                   {structures.map((structure) => (
                     <TableRow key={structure.id}>
                       <TableCell className="p-2">
@@ -289,11 +260,11 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               setEditingValues({});
                             }}
                           >
-                          <Input
-                            value={editingValues.name || ''}
-                            onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                            className="w-full p-1"
-                          />
+                            <Input
+                              value={editingValues.name || ''}
+                              onChange={(e) => handleChangeEditingValues('name', e.target.value)}
+                              className="w-full p-1"
+                            />
                           </FormHandler>
                         ) : (
                           structure.name
@@ -338,7 +309,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               className="flex-1 p-1"
                             >
                               <option value="">Select coating material</option>
-                              {materials.map(material => (
+                              {materials.map((material) => (
                                 <option key={material.id} value={material.id}>
                                   {material.name}
                                 </option>
@@ -362,17 +333,17 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                               <option value="μm">μm</option>
                             </FormSelect>
                           </div>
+                        ) : structure.coating_material_id ? (
+                          <div>
+                            {materials.find((m) => m.id === structure.coating_material_id)?.name}
+                            {structure.coating_thickness && (
+                              <span className="ml-2">
+                                ({structure.coating_thickness} {structure.coating_thickness_unit || 'mm'})
+                              </span>
+                            )}
+                          </div>
                         ) : (
-                          structure.coating_material_id ? (
-                            <div>
-                              {materials.find(m => m.id === structure.coating_material_id)?.name}
-                              {structure.coating_thickness && (
-                                <span className="ml-2">
-                                  ({structure.coating_thickness} {structure.coating_thickness_unit || 'mm'})
-                                </span>
-                              )}
-                            </div>
-                          ) : '-'
+                          '-'
                         )}
                       </TableCell>
                       <TableCell className="p-2">
@@ -399,16 +370,14 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           >
                             {editingStructure === structure.id ? (
                               <Save size={14} />
+                            ) : editingStructure ? (
+                              <X size={14} />
                             ) : (
-                              editingStructure ? (
-                                <X size={14} />
-                              ) : (
-                                <Edit2 size={14} />
-                              )
+                              <Edit2 size={14} />
                             )}
                           </Button>
                           {!editingStructure && (
-                            <Button 
+                            <Button
                               onClick={() => {
                                 setDeleteConfirm(structure.id);
                                 setDeleteConfirmName('');
@@ -426,18 +395,14 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                   {isNewStructure && (
                     <TableRow>
                       <TableCell className="p-2">
-                        <FormHandler
-                          isEditing={true}
-                          onSave={handleAddNewStructure}
-                          onCancel={handleCancelNewStructure}
-                        >
-                        <Input
-                          type="text"
-                          value={newStructure.name || ''}
-                          onChange={(e) => handleChangeNewStructure('name', e.target.value)}
-                          className="w-full p-1"
-                          placeholder="Enter structure name"
-                        />
+                        <FormHandler isEditing={true} onSave={handleAddNewStructure} onCancel={handleCancelNewStructure}>
+                          <Input
+                            type="text"
+                            value={newStructure.name || ''}
+                            onChange={(e) => handleChangeNewStructure('name', e.target.value)}
+                            className="w-full p-1"
+                            placeholder="Enter structure name"
+                          />
                         </FormHandler>
                       </TableCell>
                       <TableCell className="p-2">
@@ -470,7 +435,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                             className="w-[60%] p-2"
                           >
                             <option value="">Select coating material</option>
-                            {materials.map(material => (
+                            {materials.map((material) => (
                               <option key={material.id} value={material.id}>
                                 {material.name}
                               </option>
@@ -518,7 +483,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       </TableCell>
                     </TableRow>
                   )}
-                  </TableBody>
+                </TableBody>
               </Table>
             </div>
           </section>

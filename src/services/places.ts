@@ -7,7 +7,8 @@ export const fetchPlaces = async (): Promise<SavedPlace[]> => {
   try {
     const { data, error } = await supabase
       .from('places')
-      .select(`
+      .select(
+        `
         id,
         hidden_id,
         name,
@@ -23,7 +24,8 @@ export const fetchPlaces = async (): Promise<SavedPlace[]> => {
         room,
         province,
         house_number
-      `)
+      `,
+      )
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -31,15 +33,15 @@ export const fetchPlaces = async (): Promise<SavedPlace[]> => {
       throw error;
     }
 
-    return data.map(place => {
-      const toCamelCase = toCase<SavedPlace>(place, "camelCase")
+    return data.map((place) => {
+      const toCamelCase = toCase<SavedPlace>(place, 'camelCase');
       return {
         ...toCamelCase,
         street_number: toCamelCase.street_number,
         house_number: toCamelCase.house_number,
         street_name: toCamelCase.street_name,
         postal_code: toCamelCase.postal_code,
-      }
+      };
     });
   } catch (err) {
     console.error('Error in fetchPlaces:', err);
@@ -65,7 +67,7 @@ export const createPlace = async (place: Omit<SavedPlace, 'id'>) => {
         building: place.building || null,
         room: place.room || null,
         province: place.province || null,
-        house_number: place.house_number || null
+        house_number: place.house_number || null,
       })
       .select()
       .single();
@@ -94,7 +96,7 @@ export const updatePlace = async (id: string, place: Partial<SavedPlace>) => {
         building: place.building || null,
         room: place.room || null,
         province: place.province || null,
-        house_number: place.house_number || null
+        house_number: place.house_number || null,
       })
       .eq('id', id)
       .select()
@@ -110,10 +112,7 @@ export const updatePlace = async (id: string, place: Partial<SavedPlace>) => {
 
 export const deletePlace = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from('places')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('places').delete().eq('id', id);
 
     if (error) throw error;
   } catch (err) {

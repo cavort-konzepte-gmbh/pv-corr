@@ -23,7 +23,7 @@ const mapUserToAdminUser = (user: User): AdminUser => ({
   displayName: user.user_metadata?.display_name || user.email || '',
   adminLevel: user.user_metadata?.admin_level || 'user',
   createdAt: user.created_at || '',
-  emailConfirmed: !!user.email_confirmed_at
+  emailConfirmed: !!user.email_confirmed_at,
 });
 
 export const createUser = async (userData: CreateUserData) => {
@@ -34,14 +34,17 @@ export const createUser = async (userData: CreateUserData) => {
   const displayName = userData.displayName?.trim() || userData.email;
 
   // Create user directly through Auth API
-  const { data: { user }, error } = await supabaseAdmin.auth.admin.createUser({
+  const {
+    data: { user },
+    error,
+  } = await supabaseAdmin.auth.admin.createUser({
     email: userData.email,
     password: userData.password,
     email_confirm: true,
     user_metadata: {
       admin_level: userData.adminLevel || 'user',
-      display_name: displayName
-    }
+      display_name: displayName,
+    },
   });
 
   if (error) {
@@ -52,16 +55,22 @@ export const createUser = async (userData: CreateUserData) => {
   return user ? mapUserToAdminUser(user) : null;
 };
 
-export const updateUser = async (userId: string, userData: {
-  displayName?: string;
-  adminLevel?: 'super_admin' | 'admin' | 'user';
-}) => {
+export const updateUser = async (
+  userId: string,
+  userData: {
+    displayName?: string;
+    adminLevel?: 'super_admin' | 'admin' | 'user';
+  },
+) => {
   if (!supabaseAdmin) {
     throw new Error('Admin client not configured');
   }
 
   // Get current user data first
-  const { data: { user: currentUser }, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
+  const {
+    data: { user: currentUser },
+    error: fetchError,
+  } = await supabaseAdmin.auth.admin.getUserById(userId);
   if (fetchError) throw fetchError;
   if (!currentUser) throw new Error('User not found');
 
@@ -73,16 +82,16 @@ export const updateUser = async (userId: string, userData: {
   const displayName = userData.displayName?.trim() || currentUser.email;
 
   // Update user metadata through Auth API
-  const { data: { user }, error } = await supabaseAdmin.auth.admin.updateUserById(
-    userId,
-    {
-      user_metadata: {
-        ...currentUser.user_metadata,
-        admin_level: userData.adminLevel || currentUser.user_metadata?.admin_level || 'user',
-        display_name: displayName
-      }
-    }
-  );
+  const {
+    data: { user },
+    error,
+  } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    user_metadata: {
+      ...currentUser.user_metadata,
+      admin_level: userData.adminLevel || currentUser.user_metadata?.admin_level || 'user',
+      display_name: displayName,
+    },
+  });
 
   if (error) {
     console.error('Error updating user:', error);
@@ -98,7 +107,10 @@ export const deleteUser = async (userId: string) => {
   }
 
   try {
-    const { data: { user: currentUser }, error: fetchError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const {
+      data: { user: currentUser },
+      error: fetchError,
+    } = await supabaseAdmin.auth.admin.getUserById(userId);
     if (fetchError) {
       console.error('Error fetching user:', fetchError);
       throw fetchError;
@@ -114,7 +126,7 @@ export const deleteUser = async (userId: string) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
       userId,
       // Force delete even if user has data
-      { shouldDeallocateId: true }
+      { shouldDeallocateId: true },
     );
 
     if (deleteError) {
@@ -136,7 +148,10 @@ export const listUsers = async (): Promise<AdminUser[]> => {
     throw new Error('Admin client not configured');
   }
 
-  const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers();
+  const {
+    data: { users },
+    error,
+  } = await supabaseAdmin.auth.admin.listUsers();
   if (error) throw error;
 
   return users.map(mapUserToAdminUser);

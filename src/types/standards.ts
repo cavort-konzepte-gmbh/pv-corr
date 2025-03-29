@@ -32,8 +32,8 @@ export const STANDARDS: Standard[] = [
           { min: 10, max: 30, rating: 2 },
           { min: 30, max: 50, rating: 0 },
           { min: 50, max: 80, rating: -2 },
-          { min: 80, max: null, rating: -4 }
-        ]
+          { min: 80, max: null, rating: -4 },
+        ],
       },
       {
         parameterId: 'z2',
@@ -44,8 +44,8 @@ export const STANDARDS: Standard[] = [
           { min: 50, max: 200, rating: 0 },
           { min: 20, max: 50, rating: -2 },
           { min: 10, max: 20, rating: -4 },
-          { min: 0, max: 10, rating: -6 }
-        ]
+          { min: 0, max: 10, rating: -6 },
+        ],
       },
       {
         parameterId: 'z3',
@@ -53,8 +53,8 @@ export const STANDARDS: Standard[] = [
         ratingRanges: [
           { min: 0, max: 20, rating: 0 },
           { min: 20, max: 40, rating: -1 },
-          { min: 40, max: null, rating: -2 }
-        ]
+          { min: 40, max: null, rating: -2 },
+        ],
       },
       {
         parameterId: 'z4',
@@ -64,8 +64,8 @@ export const STANDARDS: Standard[] = [
           { min: 4, max: 5, rating: -1 },
           { min: 5, max: 8, rating: 0 },
           { min: 8, max: 9, rating: -1 },
-          { min: 9, max: null, rating: -2 }
-        ]
+          { min: 9, max: null, rating: -2 },
+        ],
       },
       {
         parameterId: 'z5',
@@ -74,11 +74,11 @@ export const STANDARDS: Standard[] = [
           { min: 0, max: 2, rating: 0 },
           { min: 2, max: 10, rating: -1 },
           { min: 10, max: 20, rating: -2 },
-          { min: 20, max: null, rating: -3 }
-        ]
-      }
-    ]
-  }
+          { min: 20, max: null, rating: -3 },
+        ],
+      },
+    ],
+  },
 ];
 
 export const DEFAULT_STANDARDS: Standard[] = [
@@ -95,8 +95,8 @@ export const DEFAULT_STANDARDS: Standard[] = [
           { min: 10, max: 30, rating: 2 },
           { min: 30, max: 50, rating: 0 },
           { min: 50, max: 80, rating: -2 },
-          { min: 80, max: null, rating: -4 }
-        ]
+          { min: 80, max: null, rating: -4 },
+        ],
       },
       {
         parameterId: 'z2',
@@ -107,8 +107,8 @@ export const DEFAULT_STANDARDS: Standard[] = [
           { min: 50, max: 200, rating: 0 },
           { min: 20, max: 50, rating: -2 },
           { min: 10, max: 20, rating: -4 },
-          { min: 0, max: 10, rating: -6 }
-        ]
+          { min: 0, max: 10, rating: -6 },
+        ],
       },
       {
         parameterId: 'z3',
@@ -116,8 +116,8 @@ export const DEFAULT_STANDARDS: Standard[] = [
         ratingRanges: [
           { min: 0, max: 20, rating: 0 },
           { min: 20, max: 40, rating: -1 },
-          { min: 40, max: null, rating: -2 }
-        ]
+          { min: 40, max: null, rating: -2 },
+        ],
       },
       {
         parameterId: 'z4',
@@ -127,8 +127,8 @@ export const DEFAULT_STANDARDS: Standard[] = [
           { min: 4, max: 5, rating: -1 },
           { min: 5, max: 8, rating: 0 },
           { min: 8, max: 9, rating: -1 },
-          { min: 9, max: null, rating: -2 }
-        ]
+          { min: 9, max: null, rating: -2 },
+        ],
       },
       {
         parameterId: 'z5',
@@ -137,9 +137,9 @@ export const DEFAULT_STANDARDS: Standard[] = [
           { min: 0, max: 2, rating: 0 },
           { min: 2, max: 10, rating: -1 },
           { min: 10, max: 20, rating: -2 },
-          { min: 20, max: null, rating: -3 }
-        ]
-      }
-    ]
-  }
+          { min: 20, max: null, rating: -3 },
+        ],
+      },
+    ],
+  },
 ];

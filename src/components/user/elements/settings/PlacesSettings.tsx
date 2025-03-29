@@ -39,11 +39,7 @@ interface SavedPlace {
   [key: string]: any;
 }
 
-const PlacesSettings: React.FC<PlacesSettingsProps> = ({
-  currentTheme,
-  currentLanguage,
-  places
-}) => {
+const PlacesSettings: React.FC<PlacesSettingsProps> = ({ currentTheme, currentLanguage, places }) => {
   const [showNewPlaceForm, setShowNewPlaceForm] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -60,10 +56,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
   const loadCountries = async () => {
     try {
-      const { data: countriesData, error: countriesError } = await supabase
-        .from('countries')
-        .select('*')
-        .order('name');
+      const { data: countriesData, error: countriesError } = await supabase.from('countries').select('*').order('name');
 
       if (countriesError) throw countriesError;
       setCountries(countriesData);
@@ -79,7 +72,8 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
     try {
       const { data, error } = await supabase
         .from('country_address_fields')
-        .select(`
+        .select(
+          `
           field_id,
           required,
           display_order,
@@ -91,7 +85,8 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
           address_field_translations!inner (
             label
           )
-        `)
+        `,
+        )
         .eq('country_id', countryId)
         .eq('address_field_translations.language', currentLanguage)
         .eq('address_field_translations.field_id', 'address_fields.id')
@@ -99,13 +94,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
       if (error) throw error;
 
-      const fields = data.map(field => ({
+      const fields = data.map((field) => ({
         id: field.address_fields.id,
         code: field.address_fields.code,
         field_type: field.address_fields.field_type,
         required: field.required,
         display_order: field.display_order,
-        label: field.address_field_translations[0]?.label || field.address_fields.code
+        label: field.address_field_translations[0]?.label || field.address_fields.code,
       }));
 
       setAddressFields(fields);
@@ -122,14 +117,14 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
   };
 
   const handleInputChange = (fieldId: string, value: string) => {
-    setFormValues(prev => ({
+    setFormValues((prev) => ({
       ...prev,
-      [fieldId]: value
+      [fieldId]: value,
     }));
   };
 
   const handleEditPlace = async (place: SavedPlace) => {
-    const country = countries.find(c => c.code === place.country);
+    const country = countries.find((c) => c.code === place.country);
     if (!country) return;
 
     setEditingPlace(place);
@@ -145,18 +140,13 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
 
     try {
       const data = {
-          hidden_id: generateHiddenId(),
-          ...formValues
+        hidden_id: generateHiddenId(),
+        ...formValues,
       };
 
       const { error } = editingPlace
-        ? await supabase
-            .from('places')
-            .update(data)
-            .eq('id', editingPlace.id)
-        : await supabase
-            .from('places')
-            .insert(data);
+        ? await supabase.from('places').update(data).eq('id', editingPlace.id)
+        : await supabase.from('places').insert(data);
 
       if (error) throw error;
 
@@ -183,31 +173,25 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded text-sm transition-all duration-200 mb-6 text-white bg-accent-primary"
       >
         <Plus size={16} />
-        {translation("place.new")}
+        {translation('place.new')}
       </Button>
 
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {loading ? (
-        <div className="text-center p-4 text-secondary">
-          {translation("place.loading")}
-        </div>
+        <div className="text-center p-4 text-secondary">{translation('place.loading')}</div>
       ) : (
         <>
           {showNewPlaceForm ? (
             <div>
               <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
                 <MapPin className="text-accent-primary" size={16} />
-                {selectedCountry ? `${translation("place.new_place")} ${selectedCountry.name}` : translation("place.select_country")}
+                {selectedCountry ? `${translation('place.new_place')} ${selectedCountry.name}` : translation('place.select_country')}
               </h3>
-              
+
               {!selectedCountry ? (
                 <div className="grid grid-cols-2 gap-4">
-                  {countries.map(country => (
+                  {countries.map((country) => (
                     <Button
                       key={country.id}
                       onClick={() => handleCountrySelect(country)}
@@ -226,7 +210,7 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    {addressFields.map(field => (
+                    {addressFields.map((field) => (
                       <div key={field.id}>
                         <Label className="block text-sm mb-1 text-secondary">
                           {field.label}
@@ -253,13 +237,10 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                       }}
                       className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
                     >
-                      {translation("actions.cancel")}
+                      {translation('actions.cancel')}
                     </Button>
-                    <Button
-                      type="submit"
-                      className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                    >
-                      {editingPlace ? translation("actions.save") : translation("place.add")}
+                    <Button type="submit" className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
+                      {editingPlace ? translation('actions.save') : translation('place.add')}
                     </Button>
                   </div>
                 </form>
@@ -267,8 +248,8 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {places.map(place => {
-                const country = countries.find(c => c.code === place.country);
+              {places.map((place) => {
+                const country = countries.find((c) => c.code === place.country);
                 if (!country) return null;
 
                 return (
@@ -294,8 +275,10 @@ const PlacesSettings: React.FC<PlacesSettingsProps> = ({
                         place.postal_code,
                         place.city,
                         place.state,
-                        place.province
-                      ].filter(Boolean).join(', ')}
+                        place.province,
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
                     </div>
                   </div>
                 );

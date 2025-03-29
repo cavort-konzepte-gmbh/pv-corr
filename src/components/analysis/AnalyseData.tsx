@@ -17,13 +17,7 @@ interface AnalyseDataProps {
 type SortField = 'name' | 'timestamp';
 type SortOrder = 'asc' | 'desc';
 
-const AnalyseData: React.FC<AnalyseDataProps> = ({
-  currentTheme,
-  currentLanguage,
-  datapoints,
-  selectedDatapoints,
-  onToggleDatapoint
-}) => {
+const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage, datapoints, selectedDatapoints, onToggleDatapoint }) => {
   const t = useTranslation(currentLanguage);
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -43,13 +37,9 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
   };
 
   const sortedDatapoints = [...datapoints].sort((a, b) => {
-    const aValue = sortField === 'name' 
-      ? getDatapointName(a).toLowerCase()
-      : a.timestamp;
-    const bValue = sortField === 'name'
-      ? getDatapointName(b).toLowerCase()
-      : b.timestamp;
-    
+    const aValue = sortField === 'name' ? getDatapointName(a).toLowerCase() : a.timestamp;
+    const bValue = sortField === 'name' ? getDatapointName(b).toLowerCase() : b.timestamp;
+
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
@@ -58,9 +48,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium ">
-          {t("analysis.select_datapoints")}
-        </h3>
+        <h3 className="text-lg font-medium ">{t('analysis.select_datapoints')}</h3>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => handleSort('name')}
@@ -84,26 +72,20 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-        {sortedDatapoints.map(datapoint => {
+        {sortedDatapoints.map((datapoint) => {
           return (
             <Button
               key={datapoint.id}
               onClick={() => onToggleDatapoint(datapoint.id)}
               className={`px-3 py-1 rounded text-sm transition-colors ${
-                selectedDatapoints.includes(datapoint.id)
-                     ? 'bg-accent-primary text-primary' 
-                : 'text-primary-foreground hover:bg-theme'
+                selectedDatapoints.includes(datapoint.id) ? 'bg-accent-primary text-primary' : 'text-primary-foreground hover:bg-theme'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm ">
-                    {getDatapointName(datapoint)}
-                  </div>
+                  <div className="text-sm ">{getDatapointName(datapoint)}</div>
                 </div>
-                {selectedDatapoints.includes(datapoint.id) && (
-                  <Check size={12} className="text-accent-primary" />
-                )}
+                {selectedDatapoints.includes(datapoint.id) && <Check size={12} className="text-accent-primary" />}
               </div>
             </Button>
           );

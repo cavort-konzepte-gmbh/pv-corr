@@ -15,5 +15,5 @@ export interface Notification {
 export const DURATION_OPTIONS = [
   { value: 'timed', label: 'Timed (auto-dismisses after specified time)' },
   { value: 'acknowledge', label: 'Acknowledge (requires user acknowledgment)' },
-  { value: 'persistent', label: 'Persistent (can be manually dismissed)' }
+  { value: 'persistent', label: 'Persistent (can be manually dismissed)' },
 ] as const;

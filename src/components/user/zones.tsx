@@ -33,29 +33,18 @@ const Zones: React.FC<ZonesProps> = ({
   onProjectsChange,
   currentLanguage,
 }) => {
-  const transition = useTranslation(currentLanguage)
+  const transition = useTranslation(currentLanguage);
 
-  const selectedProject = selectedProjectId 
-    ? projects.find(p => p.id === selectedProjectId)
-    : null;
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
 
-  const selectedField = selectedProject && selectedFieldId
-    ? selectedProject.fields.find(f => f.id === selectedFieldId)
-    : null;
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
 
   if (!selectedProject || !selectedField) {
-    return (
-      <div 
-        className="p-6 text-center"
-        
-      >
-        {transition("zones.please_select_field")}
-      </div>
-    );
+    return <div className="p-6 text-center">{transition('zones.please_select_field')}</div>;
   }
 
-  const manager = people.find(person => person.id === selectedProject.managerId);
-  const company = companies.find(company => company.id === selectedProject.companyId);
+  const manager = people.find((person) => person.id === selectedProject.managerId);
+  const company = companies.find((company) => company.id === selectedProject.companyId);
 
   const [showProjectSummary, setShowProjectSummary] = useState(false);
 

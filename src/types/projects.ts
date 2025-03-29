@@ -22,6 +22,6 @@ export interface Datapoint {
  * These types are are imported from others files in the project however
  * these types are not defined in the project.
  */
-export type Project = any
-export type Gate = any
-export type Field = any
+export type Project = any;
+export type Gate = any;
+export type Field = any;

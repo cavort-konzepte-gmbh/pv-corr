@@ -24,11 +24,7 @@ export interface ChangelogEntry {
 
 export const getCurrentVersion = async (): Promise<Version | null> => {
   try {
-    const { data, error } = await supabase
-      .from('versions')
-      .select('*')
-      .eq('is_current', true)
-      .single();
+    const { data, error } = await supabase.from('versions').select('*').eq('is_current', true).single();
 
     if (error) throw error;
     return data;
@@ -68,7 +64,7 @@ export const createVersion = async (version: {
       .from('versions')
       .insert({
         ...version,
-        is_current: true // This will automatically set other versions to false
+        is_current: true, // This will automatically set other versions to false
       })
       .select()
       .single();

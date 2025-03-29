@@ -23,7 +23,7 @@ export const createReport = async (data: CreateReportData) => {
         project_id: data.projectId,
         zone_id: data.zoneId,
         standard_id: data.standardId,
-        analyst_id: (await supabase.auth.getUser()).data.user?.id
+        analyst_id: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
       .single();
@@ -42,7 +42,7 @@ export const createReport = async (data: CreateReportData) => {
         total_rating: data.totalRating,
         classification: data.classification,
         recommendations: data.recommendations,
-        created_by: (await supabase.auth.getUser()).data.user?.id
+        created_by: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
       .single();
@@ -51,7 +51,7 @@ export const createReport = async (data: CreateReportData) => {
 
     return {
       report,
-      version
+      version,
     };
   } catch (err) {
     console.error('Error creating report:', err);
@@ -85,7 +85,7 @@ export const createReportVersion = async (reportId: string, data: Omit<CreateRep
         total_rating: data.totalRating,
         classification: data.classification,
         recommendations: data.recommendations,
-        created_by: (await supabase.auth.getUser()).data.user?.id
+        created_by: (await supabase.auth.getUser()).data.user?.id,
       })
       .select()
       .single();
@@ -103,7 +103,8 @@ export const fetchReports = async () => {
   try {
     const { data, error } = await supabase
       .from('analysis_outputs')
-      .select(`
+      .select(
+        `
         *,
         versions:analysis_versions (
           id,
@@ -112,7 +113,8 @@ export const fetchReports = async () => {
           classification,
           created_at
         )
-      `)
+      `,
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -125,10 +127,7 @@ export const fetchReports = async () => {
 
 export const fetchReportVersion = async (reportId: string, versionNumber?: number) => {
   try {
-    let query = supabase
-      .from('analysis_versions')
-      .select('*')
-      .eq('output_id', reportId);
+    let query = supabase.from('analysis_versions').select('*').eq('output_id', reportId);
 
     if (versionNumber) {
       query = query.eq('version_number', versionNumber);

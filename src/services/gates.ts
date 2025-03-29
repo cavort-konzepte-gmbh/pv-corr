@@ -5,11 +5,7 @@ import { generateHiddenId } from '../utils/generateHiddenId';
 export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hiddenId'>) => {
   try {
     // First check if field exists
-    const { data: field, error: fieldError } = await supabase
-      .from('fields')
-      .select('id')
-      .eq('id', fieldId)
-      .single();
+    const { data: field, error: fieldError } = await supabase.from('fields').select('id').eq('id', fieldId).single();
 
     if (fieldError) {
       console.error('Error finding field:', fieldError);
@@ -24,7 +20,7 @@ export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hidde
         hidden_id: generateHiddenId(),
         name: gate.name,
         latitude: gate.latitude,
-        longitude: gate.longitude
+        longitude: gate.longitude,
       })
       .select()
       .single();
@@ -43,11 +39,7 @@ export const createGate = async (fieldId: string, gate: Omit<Gate, 'id' | 'hidde
 
 export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
   // First get the field_id
-  const { data: gateData, error: gateError } = await supabase
-    .from('gates')
-    .select('field_id')
-    .eq('id', gateId)
-    .single();
+  const { data: gateData, error: gateError } = await supabase.from('gates').select('field_id').eq('id', gateId).single();
 
   if (gateError) {
     console.error('Error finding gate:', gateError);
@@ -60,7 +52,7 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
     .update({
       name: gate.name,
       latitude: gate.latitude,
-      longitude: gate.longitude
+      longitude: gate.longitude,
     })
     .eq('id', gateId)
     .select()
@@ -74,10 +66,12 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
   // Return the complete field data with gates
   const { data: updatedField, error: refreshError } = await supabase
     .from('fields')
-    .select(`
+    .select(
+      `
       *,
       gates (*)
-    `)
+    `,
+    )
     .eq('id', gateData.field_id)
     .single();
 
@@ -91,11 +85,7 @@ export const updateGate = async (gateId: string, gate: Partial<Gate>) => {
 
 export const deleteGate = async (gateId: string) => {
   // First get the field_id
-  const { data: gateData, error: gateError } = await supabase
-    .from('gates')
-    .select('field_id')
-    .eq('id', gateId)
-    .single();
+  const { data: gateData, error: gateError } = await supabase.from('gates').select('field_id').eq('id', gateId).single();
 
   if (gateError) {
     console.error('Error finding gate:', gateError);
@@ -103,10 +93,7 @@ export const deleteGate = async (gateId: string) => {
   }
 
   // Then delete the gate
-  const { error } = await supabase
-    .from('gates')
-    .delete()
-    .eq('id', gateId);
+  const { error } = await supabase.from('gates').delete().eq('id', gateId);
 
   if (error) {
     console.error('Error deleting gate:', error);
@@ -116,10 +103,12 @@ export const deleteGate = async (gateId: string) => {
   // Return the complete field data with remaining gates
   const { data: updatedField, error: refreshError } = await supabase
     .from('fields')
-    .select(`
+    .select(
+      `
       *,
       gates (*)
-    `)
+    `,
+    )
     .eq('id', gateData.field_id)
     .single();
 

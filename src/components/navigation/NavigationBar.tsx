@@ -12,13 +12,7 @@ interface NavigationBarProps {
   onViewChange: (view: 'projects' | 'settings') => void;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({
-  view,
-  currentTheme,
-  currentLanguage,
-  onSignOut,
-  onViewChange
-}) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({ view, currentTheme, currentLanguage, onSignOut, onViewChange }) => {
   const t = useTranslation(currentLanguage);
   const { isAdmin, loginType } = useAuth();
 
@@ -27,35 +21,27 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       <div className="flex-1 flex flex-col items-center space-y-2">
         <button
           onClick={() => onViewChange('projects')}
-          className={`p-2 rounded transition-colors ${
-            view === 'projects' ? 'bg-opacity-10' : ''
-          }`}
+          className={`p-2 rounded transition-colors ${view === 'projects' ? 'bg-opacity-10' : ''}`}
           title={t('nav.projects')}
           style={{
             backgroundColor: view === 'projects' ? currentTheme.colors.background : 'transparent',
-            color: view === 'projects' ? 'white' : currentTheme.colors.text.secondary
+            color: view === 'projects' ? 'white' : currentTheme.colors.text.secondary,
           }}
         >
           <Home size={20} />
         </button>
       </div>
       <div className="mt-auto">
-        <button
-          onClick={onSignOut}
-          className="p-2 rounded transition-colors mb-2 text-secondary bg-transparent"
-          title={t('nav.sign_out')}          
-        >
+        <button onClick={onSignOut} className="p-2 rounded transition-colors mb-2 text-secondary bg-transparent" title={t('nav.sign_out')}>
           <LogOut size={20} />
         </button>
         <button
           onClick={() => onViewChange('settings')}
-          className={`p-2 rounded transition-colors ${
-            view === 'settings' ? 'bg-opacity-20' : ''
-          }`}
+          className={`p-2 rounded transition-colors ${view === 'settings' ? 'bg-opacity-20' : ''}`}
           title={t('nav.settings')}
           style={{
             backgroundColor: view === 'settings' ? currentTheme.colors.background : 'transparent',
-            color: view === 'settings' ? currentTheme.colors.accent.primary : currentTheme.colors.text.secondary
+            color: view === 'settings' ? currentTheme.colors.accent.primary : currentTheme.colors.text.secondary,
           }}
         >
           <Settings size={20} />

@@ -12,13 +12,13 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     //debug: import.meta.env.DEV
-  }
+  },
 });
 
 // Create admin client with service role key for admin operations
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });

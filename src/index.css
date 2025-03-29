@@ -89,8 +89,7 @@
     --chart-5: 340 75% 55%;
   }
 
-
-  html[data-theme="green"] {
+  html[data-theme='green'] {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -117,8 +116,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
   }
- 
-  html[data-theme="green"].dark {
+
+  html[data-theme='green'].dark {
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
     --card: 24 9.8% 10%;

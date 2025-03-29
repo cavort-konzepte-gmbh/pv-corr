@@ -16,8 +16,8 @@ export const createNotification = async (notification: Omit<Notification, 'id' |
     const { data, error } = await supabase
       .from('notifications')
       .insert({
-        ...toCase(notification, "snakeCase"),
-        hidden_id: generateHiddenId()
+        ...toCase(notification, 'snakeCase'),
+        hidden_id: generateHiddenId(),
       })
       .select()
       .single();
@@ -43,7 +43,7 @@ export const updateNotification = async (id: string, notification: Partial<Notif
     const { data, error } = await supabase
       .from('notifications')
       .update({
-        ...toCase(notification, "snakeCase")
+        ...toCase(notification, 'snakeCase'),
       })
       .eq('id', id)
       .select()
@@ -59,10 +59,7 @@ export const updateNotification = async (id: string, notification: Partial<Notif
 
 export const deleteNotification = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from('notifications')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabase.from('notifications').delete().eq('id', id);
 
     if (error) throw error;
   } catch (err) {
@@ -73,8 +70,7 @@ export const deleteNotification = async (id: string) => {
 
 export const acknowledgeNotification = async (id: string) => {
   try {
-    const { data, error } = await supabase
-      .rpc('acknowledge_notification', { notification_id: id });
+    const { data, error } = await supabase.rpc('acknowledge_notification', { notification_id: id });
 
     if (error) throw error;
     return data;
@@ -86,8 +82,7 @@ export const acknowledgeNotification = async (id: string) => {
 
 export const dismissNotification = async (id: string) => {
   try {
-    const { data, error } = await supabase
-      .rpc('dismiss_notification', { notification_id: id });
+    const { data, error } = await supabase.rpc('dismiss_notification', { notification_id: id });
 
     if (error) throw error;
     return data;
@@ -99,8 +94,7 @@ export const dismissNotification = async (id: string) => {
 
 export const getActiveNotifications = async () => {
   try {
-    const { data, error } = await supabase
-      .rpc('get_active_notifications');
+    const { data, error } = await supabase.rpc('get_active_notifications');
 
     if (error) throw error;
     return data;
@@ -112,11 +106,7 @@ export const getActiveNotifications = async () => {
 
 export const getNotificationsByType = async (type: 'info' | 'warning' | 'error') => {
   try {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('type', type)
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('notifications').select('*').eq('type', type).order('created_at', { ascending: false });
 
     if (error) throw error;
     return data;

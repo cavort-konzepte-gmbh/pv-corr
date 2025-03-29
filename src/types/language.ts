@@ -9,7 +9,7 @@ export const LANGUAGES: { id: Language; name: string; direction: 'ltr' | 'rtl' }
   { id: 'de', name: 'Deutsch', direction: 'ltr' },
   { id: 'es', name: 'Español', direction: 'ltr' },
   { id: 'fr', name: 'Français', direction: 'ltr' },
-  { id: 'ar', name: 'العربية', direction: 'rtl' }
+  { id: 'ar', name: 'العربية', direction: 'rtl' },
 ];
 
 let translations: TranslationMap = {};

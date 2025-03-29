@@ -5,7 +5,8 @@ export const fetchPeople = async (): Promise<Person[]> => {
   try {
     const { data, error } = await supabase
       .from('people')
-      .select(`
+      .select(
+        `
         id,
         hidden_id,
         salutation,
@@ -14,14 +15,15 @@ export const fetchPeople = async (): Promise<Person[]> => {
         last_name,
         email,
         phone
-      `)
+      `,
+      )
       .order('created_at', { ascending: true });
 
-    if(error) {
+    if (error) {
       console.error('Error in fetchPeople:', error);
-      return []
+      return [];
     }
-    return data.map(person => toCase<Person>(person, "camelCase"));
+    return data.map((person) => toCase<Person>(person, 'camelCase'));
   } catch (err) {
     console.error('Error in fetchPeople:', err);
     throw new Error('Failed to fetch people');

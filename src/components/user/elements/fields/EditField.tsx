@@ -1,14 +1,14 @@
-import { Folder } from "lucide-react";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { updateField } from "../../../../services/fields";
-import { fetchProjects } from "../../../../services/projects";
-import { Language, useTranslation } from "../../../../types/language";
-import { Label } from "@radix-ui/react-label";
-import { Button } from "@/components/ui/button";
+import { Folder } from 'lucide-react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import { updateField } from '../../../../services/fields';
+import { fetchProjects } from '../../../../services/projects';
+import { Language, useTranslation } from '../../../../types/language';
+import { Label } from '@radix-ui/react-label';
+import { Button } from '@/components/ui/button';
 
 interface EditFieldProps {
   field: {
-    id: string,
+    id: string;
     name: string;
     latitude: string;
     longitude: string;
@@ -17,22 +17,14 @@ interface EditFieldProps {
   isEditingCoordinates: boolean;
   setShowForm: Dispatch<SetStateAction<boolean>>;
   onProjectsChange: (projects: any[]) => void;
-  currentLanguage: Language
+  currentLanguage: Language;
 }
 
-export const EditField = ({ 
-  field, 
-  isEditingCoordinates, 
-  setShowForm, 
-  onProjectsChange,
-  currentLanguage,
-}: EditFieldProps) => {
+export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjectsChange, currentLanguage }: EditFieldProps) => {
   const [fields, setFields] = useState(field);
   const translation = useTranslation(currentLanguage);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFields((previous) => ({
       ...previous,
@@ -42,31 +34,28 @@ export const EditField = ({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const { id, ...data } = fields
+    const { id, ...data } = fields;
     try {
-      await updateField(id, data)
-      const updatedProjects = await fetchProjects()
-      onProjectsChange(updatedProjects)
-    } catch(error) {
-      console.error('Error updating field:', error)
+      await updateField(id, data);
+      const updatedProjects = await fetchProjects();
+      onProjectsChange(updatedProjects);
+    } catch (error) {
+      console.error('Error updating field:', error);
     }
-    setShowForm(false)
-  }
+    setShowForm(false);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="p-6 rounded-lg max-w-md w-full bg-surface">
         <h3 className="flex gap-2 text-lg mb-4 text-primary">
           <Folder className="text-accent-primary" />
-          { isEditingCoordinates ? "Edit Coordinates" : "Edit Field"}
+          {isEditingCoordinates ? 'Edit Coordinates' : 'Edit Field'}
         </h3>
         <form onSubmit={handleSubmit}>
           {!isEditingCoordinates && (
-            <Label
-              className="block text-sm mb-1 text-secondary"
-              htmlFor="new-field"
-            >
-              {translation("field.name")}
+            <Label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
+              {translation('field.name')}
               <input
                 className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 type="text"
@@ -78,7 +67,7 @@ export const EditField = ({
             </Label>
           )}
           <Label className="block text-sm mb-1 text-secondary">
-            {translation("project.latitude")}
+            {translation('project.latitude')}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               type="text"
@@ -88,7 +77,7 @@ export const EditField = ({
             />
           </Label>
           <Label className="block text-sm mb-1 text-secondary">
-            {translation("project.longitude")}
+            {translation('project.longitude')}
             <input
               className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               type="text"
@@ -99,15 +88,15 @@ export const EditField = ({
           </Label>
           {!isEditingCoordinates && (
             <div className="block text-sm mb-1 text-secondary">
-              <Label>{translation("field.has_fence")}</Label>
+              <Label>{translation('field.has_fence')}</Label>
               <select
                 name="has_fence"
                 value={fields.has_fence}
                 onChange={handleChange}
                 className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
               >
-                <option value="no">{translation("field.has_fence.no")}</option>
-                <option value="yes">{translation("field.has_fence.yes")}</option>
+                <option value="no">{translation('field.has_fence.no')}</option>
+                <option value="yes">{translation('field.has_fence.yes')}</option>
               </select>
             </div>
           )}
@@ -117,13 +106,10 @@ export const EditField = ({
               type="button"
               onClick={() => setShowForm(false)}
             >
-              {translation("actions.cancel")}
+              {translation('actions.cancel')}
             </Button>
-            <Button
-              className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-              type="submit"
-            >
-              {translation("actions.save")}
+            <Button className="px-4 py-2 rounded text-sm text-white bg-accent-primary" type="submit">
+              {translation('actions.save')}
             </Button>
           </div>
         </form>

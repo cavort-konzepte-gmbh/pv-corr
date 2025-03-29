@@ -3,7 +3,7 @@ import { Theme } from '../../types/theme';
 import { Shield, User, Search, Edit2, Save, X, ArrowLeft, Trash2, Plus } from 'lucide-react';
 import { AdminUser, createUser, deleteUser, listUsers, updateUser } from '../../services/adminUsers';
 import { supabaseAdmin } from '../../lib/supabase';
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
@@ -12,8 +12,8 @@ import { DeleteConfirmDialog } from '../shared/FormHandler';
 const initialNewUserState = {
   email: '',
   password: '',
-  displayName: ''
-}
+  displayName: '',
+};
 
 interface UserManagementProps {
   currentTheme: Theme;
@@ -52,7 +52,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
     try {
       setError(null);
       await updateUser(userId, {
-        adminLevel: selectedRole
+        adminLevel: selectedRole,
       });
 
       // Refresh user list and reset state
@@ -68,14 +68,11 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
   const handleUpdateUser = async (userId: string, data: { firstName?: string; lastName?: string }) => {
     try {
       // Get current user data
-      const { error } = await supabaseAdmin.auth.admin.updateUserById(
-        userId,
-        {
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
         user_metadata: {
-          admin_level: selectedRole
-        }
-      }
-      );
+          admin_level: selectedRole,
+        },
+      });
 
       if (error) throw error;
       await fetchUsers();
@@ -110,7 +107,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
       await createUser({
         email: newUser.email,
         password: newUser.password,
-        displayName: newUser.displayName
+        displayName: newUser.displayName,
       });
 
       await fetchUsers();
@@ -122,71 +119,58 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleEdit = (user: AdminUser) => {
     if (loading) return;
     setEditingUser(user.id);
     setSelectedRole(user.adminLevel);
-  }
+  };
 
   const handleDelete = (userId: string) => {
     if (loading) return;
     handleDeleteUser(userId);
-  }
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setNewUser({
       ...newUser,
-      [name]: value
+      [name]: value,
     });
-  }
+  };
 
   const handleCancel = () => {
     setNewUser(initialNewUserState);
     setShowNewUserForm(false);
-  }
+  };
 
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-        >
+        <Button variant="ghost" onClick={onBack}>
           <ArrowLeft className="text-card-foreground" size={20} />
         </Button>
-        <h2 className="text-2xl font-bold text-card-foreground">
-          User Management
-        </h2>
+        <h2 className="text-2xl font-bold text-card-foreground">User Management</h2>
       </div>
 
       {error && (
         <div className="p-4 mb-4 rounded border text-accent-primary border-accent-primary bg-surface">
           {error}
-          <button 
-            onClick={() => setError(null)} 
-            className="ml-2 text-accent-primary hover:text-accent-hover"
-          >
+          <button onClick={() => setError(null)} className="ml-2 text-accent-primary hover:text-accent-hover">
             <X size={16} />
           </button>
         </div>
       )}
 
-      <Button
-        className="mb-6"
-        onClick={() => setShowNewUserForm(true)}
-      >
+      <Button className="mb-6" onClick={() => setShowNewUserForm(true)}>
         <Plus size={16} />
         Add New User
       </Button>
 
       <Label className="mb-6 flex items-center gap-x-4 relative">
         <Search className="text-primary absolute left-4" size={20} />
-        <Input 
+        <Input
           className="h-12 indent-10 bg-card"
           type="text"
           placeholder="Search users..."
@@ -194,14 +178,9 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </Label>
-      
 
       <div className="rounded-lg overflow-hidden">
-        {loading && (
-          <div className="text-center p-4 text-secondary">
-            Loading...
-          </div>
-        )}
+        {loading && <div className="text-center p-4 text-secondary">Loading...</div>}
         <section className="border border-input rounded-md bg-card">
           <div className="w-full relative overflow-auto">
             <Table>
@@ -215,7 +194,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.map(user => (
+                {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="flex items-center gap-x-4">
                       <figure className="w-8 h-8 rounded-full flex items-center justify-center">
@@ -230,45 +209,24 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                       <div className="flex items-center gap-2">
                         <Shield className="text-accent-primary" size={16} />
                         <span className="text-muted-foreground">
-                          {user.adminLevel === 'super_admin' 
-                            ? 'Super Admin' 
-                            : user.adminLevel === 'admin' 
-                              ? 'Admin' 
-                              : 'User'
-                          }
+                          {user.adminLevel === 'super_admin' ? 'Super Admin' : user.adminLevel === 'admin' ? 'Admin' : 'User'}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}
-                    </TableCell>
+                    <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</TableCell>
                     <TableCell>
                       {editingUser === user.id ? (
                         <div className="flex items-center justify-start gap-2">
-                          <Button                       
-                            variant="ghost"
-                            onClick={() => handleUpdateRole(user.id)}
-                            disabled={loading}
-                          >
+                          <Button variant="ghost" onClick={() => handleUpdateRole(user.id)} disabled={loading}>
                             <Save size={16} />
                           </Button>
-                          <Button
-                            className="disabled:opacity-50"
-                            variant="ghost"
-                            disabled={loading}
-                            onClick={() => setEditingUser(null)}
-                          >
+                          <Button className="disabled:opacity-50" variant="ghost" disabled={loading} onClick={() => setEditingUser(null)}>
                             <X size={16} />
                           </Button>
                         </div>
                       ) : (
                         <div className="flex items-center justify-start gap-2">
-                          <Button
-                            className="disabled:opacity-50"
-                            variant="ghost"
-                            disabled={loading}
-                            onClick={() => handleEdit(user)}
-                          >
+                          <Button className="disabled:opacity-50" variant="ghost" disabled={loading} onClick={() => handleEdit(user)}>
                             <Edit2 size={16} />
                           </Button>
                           {user.adminLevel !== 'super_admin' && (
@@ -288,7 +246,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>        
+            </Table>
           </div>
         </section>
       </div>
@@ -300,53 +258,28 @@ const UserManagement: React.FC<UserManagementProps> = ({ currentTheme, onBack })
               <User size={20} />
               Add New User
             </h3>
-            
+
             <div className="space-y-4">
               <Label className="block">
                 Email Address
                 <span className="text-red-500 ml-1">*</span>
-                <Input 
-                  className="mt-1.5"
-                  type="email"
-                  name="email"
-                  value={newUser.email}
-                  onChange={handleChange}
-                />
+                <Input className="mt-1.5" type="email" name="email" value={newUser.email} onChange={handleChange} />
               </Label>
               <Label className="block">
                 Password
                 <span className="text-red-500 ml-1">*</span>
-                <Input 
-                  className="mt-1.5"
-                  type="password"
-                  name="password"
-                  value={newUser.password}
-                  onChange={handleChange}
-                />
+                <Input className="mt-1.5" type="password" name="password" value={newUser.password} onChange={handleChange} />
               </Label>
               <Label className="block">
                 Display Name
-                <Input 
-                  className="mt-1.5"
-                  type="text"
-                  name="displayName"
-                  value={newUser.displayName}
-                  onChange={handleChange}
-                />
+                <Input className="mt-1.5" type="text" name="displayName" value={newUser.displayName} onChange={handleChange} />
               </Label>
 
               <div className="flex justify-end gap-2 mt-6">
-                <Button
-                  variant="destructive"
-                  onClick={handleCancel}
-                >
+                <Button variant="destructive" onClick={handleCancel}>
                   Cancel
                 </Button>
-                <Button
-                  onClick={handleCreateUser}
-                >
-                  Create User
-                </Button>
+                <Button onClick={handleCreateUser}>Create User</Button>
               </div>
             </div>
           </div>

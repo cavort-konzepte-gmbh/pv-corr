@@ -28,7 +28,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   selectedProjectId,
   selectedFieldId,
   selectedZoneId,
-  onBack
+  onBack,
 }) => {
   const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([]);
@@ -47,14 +47,16 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       try {
         const { data, error } = await supabase
           .from('norms')
-          .select(`
+          .select(
+            `
             *,
             parameters:norm_parameters (
               parameter_id,
               parameter_code,
               rating_ranges
             )
-          `)
+          `,
+          )
           .eq('id', selectedNormId)
           .single();
 
@@ -76,7 +78,9 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
     try {
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
       const { data: output, error: outputError } = await supabase
@@ -86,33 +90,30 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           project_id: selectedProject.id,
           zone_id: selectedZone.id,
           norm_id: selectedNorm.id,
-          analyst_id: user.id
+          analyst_id: user.id,
         })
         .select()
         .single();
 
       if (outputError) throw outputError;
 
-      const selectedDps = selectedZone.datapoints.filter(dp => selectedDatapoints.includes(dp.id));
-      const totalRating = selectedDps.reduce((sum, dp) => 
-        sum + Object.values(dp.ratings).reduce((a, b) => a + b, 0), 0);
+      const selectedDps = selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id));
+      const totalRating = selectedDps.reduce((sum, dp) => sum + Object.values(dp.ratings).reduce((a, b) => a + b, 0), 0);
 
-      const { error: versionError } = await supabase
-        .from('analysis_versions')
-        .insert({
-          output_id: output.id,
-          version_number: 1,
-          parameters: selectedDps.map(dp => ({
-            id: dp.id,
-            values: dp.values,
-            ratings: dp.ratings
-          })),
-          ratings: selectedDps.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
-          total_rating: totalRating,
-          classification: totalRating > 0 ? 'Good' : 'Poor',
-          recommendations: 'Based on the analysis results...',
-          created_by: user.id
-        });
+      const { error: versionError } = await supabase.from('analysis_versions').insert({
+        output_id: output.id,
+        version_number: 1,
+        parameters: selectedDps.map((dp) => ({
+          id: dp.id,
+          values: dp.values,
+          ratings: dp.ratings,
+        })),
+        ratings: selectedDps.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
+        total_rating: totalRating,
+        classification: totalRating > 0 ? 'Good' : 'Poor',
+        recommendations: 'Based on the analysis results...',
+        created_by: user.id,
+      });
 
       if (versionError) throw versionError;
 
@@ -124,21 +125,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   };
 
   // Get selected project and zone from navigation state
-  const selectedProject = selectedProjectId ? projects.find(p => p.id === selectedProjectId) : null;
-  const selectedField = selectedProject && selectedFieldId 
-    ? selectedProject.fields.find(f => f.id === selectedFieldId)
-    : null;
-  const selectedZone = selectedField && selectedZoneId
-    ? selectedField.zones.find(z => z.id === selectedZoneId)
-    : null;
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+  const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
 
   useEffect(() => {
     const loadAnalysisData = async () => {
       try {
-        const { data, error } = await supabase
-          .from('analysis_parameters')
-          .select('*')
-          .order('created_at', { ascending: true });
+        const { data, error } = await supabase.from('analysis_parameters').select('*').order('created_at', { ascending: true });
 
         if (error) throw error;
         setParameters(data || []);
@@ -151,11 +145,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   }, []);
 
   const toggleDatapoint = (datapointId: string) => {
-    setSelectedDatapoints(prev => 
-      prev.includes(datapointId) 
-        ? prev.filter(id => id !== datapointId)
-        : [...prev, datapointId]
-    );
+    setSelectedDatapoints((prev) => (prev.includes(datapointId) ? prev.filter((id) => id !== datapointId) : [...prev, datapointId]));
   };
 
   if (showReport && selectedProject && selectedZone && selectedNorm) {
@@ -166,28 +156,28 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         project={selectedProject}
         zone={selectedZone}
         norm={selectedNorm}
-        analyst={user ? {
-          name: user.user_metadata?.display_name || user.email || '',
-          title: user.user_metadata?.title || '',
-          email: user.email || ''
-        } : undefined}
+        analyst={
+          user
+            ? {
+                name: user.user_metadata?.display_name || user.email || '',
+                title: user.user_metadata?.title || '',
+                email: user.email || '',
+              }
+            : undefined
+        }
         onBack={() => setShowReport(false)}
       />
     );
   }
 
   if (!selectedZone) {
-    return (
-      <div className="p-6 text-center text-secondary">
-        {t("datapoint.please_select_zone")}
-      </div>
-    );
+    return <div className="p-6 text-center text-secondary">{t('datapoint.please_select_zone')}</div>;
   }
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-primary mb-6">
-        {t("analysis.title")}
+        {t('analysis.title')}
         {selectedProject && (
           <span className="text-sm El text-secondary-foreground ml-2">
             {selectedProject.name} {selectedField && `→ ${selectedField.name}`} {selectedZone && `→ ${selectedZone.name}`}
@@ -218,7 +208,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           <AnalyseResult
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
-            selectedDatapoints={selectedZone.datapoints.filter(dp => selectedDatapoints.includes(dp.id))}
+            selectedDatapoints={selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
             selectedNorm={selectedNorm}
             project={selectedProject}
             zone={selectedZone}

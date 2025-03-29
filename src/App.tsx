@@ -4,7 +4,7 @@ import { Theme, THEMES } from './types/theme';
 import { Language } from './types/language';
 
 // Use ferra as default theme
-const defaultTheme = THEMES.find(theme => theme.id === 'ferra') || THEMES[0];
+const defaultTheme = THEMES.find((theme) => theme.id === 'ferra') || THEMES[0];
 
 // Use English as default language
 const currentLanguage: Language = 'en';

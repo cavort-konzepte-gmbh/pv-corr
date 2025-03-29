@@ -11,11 +11,11 @@ const persistConfig = {
   migrate: (state: any) => {
     // Return a promise that resolves to the transformed state
     return Promise.resolve(state);
-  }
+  },
 };
 
 const rootReducer = combineReducers({
-  navigation: navigationReducer
+  navigation: navigationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -25,9 +25,9 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE']
-      }
-    })
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
+    }),
 });
 
 export const persistor = persistStore(store);

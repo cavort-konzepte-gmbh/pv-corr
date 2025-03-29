@@ -17,7 +17,7 @@ const CompaniesSettings: React.FC<CompaniesSettingsProps> = ({
   currentLanguage,
   savedCompanies,
   onSaveCompanies,
-  onCreateCustomer
+  onCreateCustomer,
 }) => {
   return (
     <CompaniesPanel

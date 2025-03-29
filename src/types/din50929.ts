@@ -22,7 +22,7 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Soil type/Proportion of components that can be sloughed off',
       es: 'Tipo de suelo/Porcentaje de componentes drenables',
-      de: 'Bodenart/Anteil an abschlämmbaren Bestandteilen'
+      de: 'Bodenart/Anteil an abschlämmbaren Bestandteilen',
     },
     unit: '%',
     ranges: [
@@ -31,9 +31,9 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
       { min: 30, max: 50, rating: 0 },
       { min: 50, max: 80, rating: -2 },
       { min: 80, rating: -4 },
-      { min: 'impurities', rating: -12 }
+      { min: 'impurities', rating: -12 },
     ],
-    minMax: '0-100%'
+    minMax: '0-100%',
   },
   {
     id: 'z2',
@@ -41,7 +41,7 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Specific soil resistivity',
       es: 'Resistividad específica del suelo',
-      de: 'Spezifischer Bodenwiderstand'
+      de: 'Spezifischer Bodenwiderstand',
     },
     unit: 'Ω⋅m',
     ranges: [
@@ -50,9 +50,9 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
       { min: 50, max: 200, rating: 0 },
       { min: 20, max: 50, rating: -2 },
       { min: 10, max: 20, rating: -4 },
-      { min: 0, max: 10, rating: -6 }
+      { min: 0, max: 10, rating: -6 },
     ],
-    minMax: '0-10,000'
+    minMax: '0-10,000',
   },
   {
     id: 'z3',
@@ -60,15 +60,15 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Water content',
       es: 'Contenido de agua',
-      de: 'Wassergehalt'
+      de: 'Wassergehalt',
     },
     unit: '%',
     ranges: [
       { min: 0, max: 20, rating: 0 },
       { min: 20, max: 40, rating: -1 },
-      { min: 40, rating: -2 }
+      { min: 40, rating: -2 },
     ],
-    minMax: '0-100'
+    minMax: '0-100',
   },
   {
     id: 'z4',
@@ -76,7 +76,7 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'pH value',
       es: 'Valor de pH',
-      de: 'pH-Wert'
+      de: 'pH-Wert',
     },
     unit: '-',
     ranges: [
@@ -86,9 +86,9 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
       { min: 6, max: 7, rating: 0 },
       { min: 7, max: 8, rating: 0 },
       { min: 8, max: 9, rating: -1 },
-      { min: 9, rating: -2 }
+      { min: 9, rating: -2 },
     ],
-    minMax: '0-14'
+    minMax: '0-14',
   },
   {
     id: 'z5',
@@ -96,16 +96,16 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Buffering capacity',
       es: 'Capacidad de amortiguación',
-      de: 'Pufferkapazität'
+      de: 'Pufferkapazität',
     },
     unit: 'ml/kg',
     ranges: [
       { min: 0, max: 2, rating: 0 },
       { min: 2, max: 10, rating: -1 },
       { min: 10, max: 20, rating: -2 },
-      { min: 20, rating: -3 }
+      { min: 20, rating: -3 },
     ],
-    minMax: '0-100'
+    minMax: '0-100',
   },
   {
     id: 'z6',
@@ -113,16 +113,16 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Carbonate content',
       es: 'Contenido de carbonatos',
-      de: 'Karbonatgehalt'
+      de: 'Karbonatgehalt',
     },
     unit: '%',
     ranges: [
       { min: 0, max: 1, rating: -2 },
       { min: 1, max: 5, rating: -1 },
       { min: 5, max: 10, rating: 0 },
-      { min: 10, rating: +1 }
+      { min: 10, rating: +1 },
     ],
-    minMax: '0-100'
+    minMax: '0-100',
   },
   {
     id: 'z7',
@@ -130,15 +130,15 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Sulphate reducing bacteria/Sulphide content',
       es: 'Bacterias reductoras de azufre / Contenido de sulfuros',
-      de: 'Sulfatreduzierende Bakterien/Sulfid-Gehalt'
+      de: 'Sulfatreduzierende Bakterien/Sulfid-Gehalt',
     },
     unit: 'mg/kg',
     ranges: [
       { min: 0, max: 5, rating: 0 },
       { min: 5, max: 10, rating: -3 },
-      { min: 10, rating: -6 }
+      { min: 10, rating: -6 },
     ],
-    minMax: '0-50'
+    minMax: '0-50',
   },
   {
     id: 'z8',
@@ -146,16 +146,16 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Sulphate content',
       es: 'Contenido de Sulfatos',
-      de: 'Sulfat-Gehalt'
+      de: 'Sulfat-Gehalt',
     },
     unit: 'mmol/kg',
     ranges: [
       { min: 0, max: 2, rating: 0 },
       { min: 2, max: 5, rating: -1 },
       { min: 5, max: 10, rating: -2 },
-      { min: 10, rating: -3 }
+      { min: 10, rating: -3 },
     ],
-    minMax: '0-50'
+    minMax: '0-50',
   },
   {
     id: 'z9',
@@ -163,7 +163,7 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Neutral salts/Chlorides and sulphates in aqueous extract',
       es: 'Sales neutras/Cloruros y sulfatos en extracto acuoso',
-      de: 'Neutralsalze/Chloride und Sulfate in wässrigen Auszug'
+      de: 'Neutralsalze/Chloride und Sulfate in wässrigen Auszug',
     },
     unit: 'mmol/kg',
     ranges: [
@@ -171,9 +171,9 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
       { min: 3, max: 10, rating: -1 },
       { min: 10, max: 30, rating: -2 },
       { min: 30, max: 100, rating: -3 },
-      { min: 100, rating: -4 }
+      { min: 100, rating: -4 },
     ],
-    minMax: '0-500'
+    minMax: '0-500',
   },
   {
     id: 'z10',
@@ -181,14 +181,14 @@ export const DIN50929_PARAMETERS: DIN50929Parameter[] = [
     name: {
       en: 'Location of the object in relation to the groundwater',
       es: 'Presencia de agua bajo tierra',
-      de: 'Lage des Objektes zum Grundwasser'
+      de: 'Lage des Objektes zum Grundwasser',
     },
     unit: '-',
     ranges: [
       { min: 'never', rating: 0 },
       { min: 'constant', rating: -1 },
-      { min: 'intermittent', rating: -2 }
+      { min: 'intermittent', rating: -2 },
     ],
-    minMax: 'n.a.'
-  }
+    minMax: 'n.a.',
+  },
 ];

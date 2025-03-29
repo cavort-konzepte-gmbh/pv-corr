@@ -8,11 +8,7 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
   }
 
   // First check if field exists
-  const { data: field, error: fieldError } = await supabase
-    .from('fields')
-    .select('id')
-    .eq('id', fieldId)
-    .single();
+  const { data: field, error: fieldError } = await supabase.from('fields').select('id').eq('id', fieldId).single();
 
   if (fieldError) {
     console.error('Error finding field:', fieldError);
@@ -26,7 +22,7 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
       hidden_id: generateHiddenId(),
       name: zone.name,
       latitude: zone.latitude,
-      longitude: zone.longitude
+      longitude: zone.longitude,
     })
     .select()
     .single();
@@ -35,14 +31,16 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, 'id' | 'hidde
     console.error('Error creating zone:', error);
     throw error;
   }
-  
+
   // Fetch complete zone data after creation
   const { data: completeZone, error: fetchError } = await supabase
     .from('zones')
-    .select(`
+    .select(
+      `
       *,
       datapoints (*)
-    `)
+    `,
+    )
     .eq('id', data.id)
     .single();
 
@@ -58,7 +56,7 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
   if (!zoneId) {
     throw new Error('Zone ID is required for update');
   }
-  
+
   try {
     // Prepare update data - ensure name is preserved
     const updateData: Record<string, any> = {
@@ -66,7 +64,7 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       latitude: zone.latitude || null,
       longitude: zone.longitude || null,
       substructure_id: zone.substructureId === '' ? null : zone.substructureId || null,
-      foundation_id: zone.foundationId === '' ? null : zone.foundationId || null
+      foundation_id: zone.foundationId === '' ? null : zone.foundationId || null,
     };
 
     // Update zone
@@ -74,10 +72,12 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       .from('zones')
       .update(updateData)
       .eq('id', zoneId)
-      .select(`
+      .select(
+        `
         *,
         datapoints (*)
-      `)
+      `,
+      )
       .single();
 
     if (error) throw error;
@@ -89,10 +89,7 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
 };
 
 export const deleteZone = async (zoneId: string) => {
-  const { error } = await supabase
-    .from('zones')
-    .delete()
-    .eq('id', zoneId);
+  const { error } = await supabase.from('zones').delete().eq('id', zoneId);
 
   if (error) {
     console.error('Error deleting zone:', error);

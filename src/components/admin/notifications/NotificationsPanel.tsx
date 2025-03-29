@@ -3,7 +3,7 @@ import { Theme } from '../../../types/theme';
 import { ArrowLeft, BellRing, AlertTriangle, AlertOctagon, Plus, Edit2, Save, X, Clock } from 'lucide-react';
 import { NotificationDuration, Notification, DURATION_OPTIONS } from '../../../types/security';
 import { createNotification, updateNotification, deleteNotification, getNotificationsByType } from '../../../services/notifications';
-import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow , Table } from '@/components/ui/table';
+import { TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, Table } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,7 +28,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
   useEffect(() => {
     const loadNotifications = async () => {
       if (!selectedType) return;
-      
+
       try {
         setLoading(true);
         const data = await getNotificationsByType(selectedType);
@@ -45,7 +45,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
   }, [selectedType]);
 
   const getTypeColor = (type: NotificationType) => {
-    return ""
+    return '';
     // skip this for now
     switch (type) {
       case 'info':
@@ -74,7 +74,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
         name: editingValues.name,
         description: editingValues.description,
         duration: editingValues.duration || 'timed',
-        timeout: editingValues.duration === 'timed' ? editingValues.timeout || 5 : undefined
+        timeout: editingValues.duration === 'timed' ? editingValues.timeout || 5 : undefined,
       };
 
       if (isNewRow) {
@@ -101,7 +101,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
 
   const handleDelete = async (id: string) => {
     if (!selectedType) return;
-    
+
     try {
       setLoading(true);
       setError(null);
@@ -122,85 +122,60 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
   return (
     <div className="p-8 text-card-foreground">
       <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-        >
+        <button onClick={onBack} className="p-2 rounded hover:bg-opacity-80">
           <ArrowLeft size={20} />
         </button>
-        <h2 
-          className="text-2xl font-bold"
-        >
-          Notifications Management
-        </h2>
+        <h2 className="text-2xl font-bold">Notifications Management</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Information Notifications */}
-        <div 
+        <div
           onClick={() => setSelectedType(selectedType === 'info' ? null : 'info')}
           className="p-6 rounded-lg border border-accent cursor-pointer"
         >
           <div className="flex items-center gap-4">
-            <div 
+            <div
               className="w-10 h-10 rounded-lg flex items-center justify-center"
               //style={{ backgroundColor: `${currentTheme.colors.accent.primary}20` }}
             >
               <BellRing size={20} />
             </div>
             <div>
-              <h3 className="font-medium">
-                Information
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {notifications.filter(n => n.type === 'info').length} notifications
-              </p>
+              <h3 className="font-medium">Information</h3>
+              <p className="text-sm text-muted-foreground">{notifications.filter((n) => n.type === 'info').length} notifications</p>
             </div>
           </div>
         </div>
 
         {/* Warning Notifications */}
-        <div 
+        <div
           onClick={() => setSelectedType(selectedType === 'warning' ? null : 'warning')}
           className="p-6 rounded-lg border border-accent cursor-pointer"
         >
           <div className="flex items-center gap-4">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: '#f59e0b20' }}
-            >
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#f59e0b20' }}>
               <AlertTriangle style={{ color: '#f59e0b' }} size={20} />
             </div>
             <div>
-              <h3 className="font-medium">
-                Warnings
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {notifications.filter(n => n.type === 'warning').length} notifications
-              </p>
+              <h3 className="font-medium">Warnings</h3>
+              <p className="text-sm text-muted-foreground">{notifications.filter((n) => n.type === 'warning').length} notifications</p>
             </div>
           </div>
         </div>
 
         {/* Error Notifications */}
-        <div 
+        <div
           onClick={() => setSelectedType(selectedType === 'error' ? null : 'error')}
           className="p-6 rounded-lg border border-accent cursor-pointer"
         >
           <div className="flex items-center gap-4">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: '#ef444420' }}
-            >
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ef444420' }}>
               <AlertOctagon style={{ color: '#ef4444' }} size={20} />
             </div>
             <div>
-              <h3 className="font-medium">
-                Errors
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {notifications.filter(n => n.type === 'error').length} notifications
-              </p>
+              <h3 className="font-medium">Errors</h3>
+              <p className="text-sm text-muted-foreground">{notifications.filter((n) => n.type === 'error').length} notifications</p>
             </div>
           </div>
         </div>
@@ -220,19 +195,18 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                   name: '',
                   description: '',
                   duration: 'timed',
-                  timeout: 5
+                  timeout: 5,
                 });
               }}
-              style={{ 
+              style={{
                 backgroundColor: getTypeColor(selectedType),
-                color: 'white'
+                color: 'white',
               }}
             >
               <Plus size={14} />
               Add {selectedType === 'info' ? 'Information' : selectedType === 'warning' ? 'Warning' : 'Error'}
             </Button>
           </div>
-
 
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
@@ -245,7 +219,6 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                     <TableHead>Duration</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
-
                 </TableHeader>
                 <TableBody>
                   {isNewRow && (
@@ -282,14 +255,16 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                         <div className="flex gap-2">
                           <select
                             value={editingValues.duration || 'timed'}
-                            onChange={(e) => setEditingValues({ 
-                              ...editingValues, 
-                              duration: e.target.value,
-                              timeout: e.target.value === 'timed' ? 5 : undefined
-                            })}
+                            onChange={(e) =>
+                              setEditingValues({
+                                ...editingValues,
+                                duration: e.target.value,
+                                timeout: e.target.value === 'timed' ? 5 : undefined,
+                              })
+                            }
                             className="w-full h-8 px-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                           >
-                            {DURATION_OPTIONS.map(option => (
+                            {DURATION_OPTIONS.map((option) => (
                               <option key={option.value} value={option.value}>
                                 {option.label}
                               </option>
@@ -307,11 +282,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                       </TableCell>
                       <TableCell className="h-10 px-2">
                         <div className="flex items-center justify-center gap-2">
-                          <Button
-                            onClick={handleSave}
-                            disabled={loading}
-                            variant="ghost"
-                          >
+                          <Button onClick={handleSave} disabled={loading} variant="ghost">
                             <Save size={14} />
                           </Button>
                           <Button
@@ -328,8 +299,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                     </TableRow>
                   )}
                   {notifications
-                    .filter(n => n.type === selectedType)
-                    .map(notification => (
+                    .filter((n) => n.type === selectedType)
+                    .map((notification) => (
                       <TableRow className="text-card-foreground" key={notification.id}>
                         <TableCell className="h-10 px-2">
                           {editingId === notification.id ? (
@@ -358,9 +329,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                               }}
                             />
                           ) : (
-                            <div className="whitespace-pre-wrap break-words">
-                              {notification.description}
-                            </div>
+                            <div className="whitespace-pre-wrap break-words">{notification.description}</div>
                           )}
                         </TableCell>
                         <TableCell className="h-10 px-2">
@@ -368,14 +337,16 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                             <div className="flex gap-2">
                               <select
                                 value={editingValues.duration || notification.duration}
-                                onChange={(e) => setEditingValues({ 
-                                  ...editingValues, 
-                                  duration: e.target.value,
-                                  timeout: e.target.value === 'timed' ? notification.timeout || 5 : undefined
-                                })}
+                                onChange={(e) =>
+                                  setEditingValues({
+                                    ...editingValues,
+                                    duration: e.target.value,
+                                    timeout: e.target.value === 'timed' ? notification.timeout || 5 : undefined,
+                                  })
+                                }
                                 className="w-full h-8 px-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                               >
-                                {DURATION_OPTIONS.map(option => (
+                                {DURATION_OPTIONS.map((option) => (
                                   <option key={option.value} value={option.value}>
                                     {option.label}
                                   </option>
@@ -395,12 +366,11 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                             <div className="flex items-center gap-2">
                               <Clock size={12} className="text-secondary" />
                               <span>
-                                {notification.duration === 'timed' 
+                                {notification.duration === 'timed'
                                   ? `Auto-dismiss after ${notification.timeout}s`
                                   : notification.duration === 'acknowledge'
-                                  ? 'Requires acknowledgment'
-                                  : 'Persistent until dismissed'
-                                }
+                                    ? 'Requires acknowledgment'
+                                    : 'Persistent until dismissed'}
                               </span>
                             </div>
                           )}
@@ -409,11 +379,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                           <div className="flex items-center justify-center gap-2">
                             {editingId === notification.id ? (
                               <>
-                                <Button
-                                  onClick={handleSave}
-                                  variant="ghost"
-                                  disabled={loading}
-                                >
+                                <Button onClick={handleSave} variant="ghost" disabled={loading}>
                                   <Save size={14} />
                                 </Button>
                                 <Button
@@ -436,16 +402,13 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ currentTheme, o
                                       name: notification.name,
                                       description: notification.description,
                                       duration: notification.duration,
-                                      timeout: notification.timeout
+                                      timeout: notification.timeout,
                                     });
                                   }}
                                 >
                                   <Edit2 size={14} />
                                 </Button>
-                                <Button
-                                  onClick={() => handleDelete(notification.id)}
-                                  variant="ghost"
-                                >
+                                <Button onClick={() => handleDelete(notification.id)} variant="ghost">
                                   <X size={14} />
                                 </Button>
                               </>

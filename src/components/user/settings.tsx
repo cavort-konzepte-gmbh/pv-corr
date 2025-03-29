@@ -27,7 +27,7 @@ interface SettingsProps {
   onSaveCompanies: (companies: Company[]) => void;
   savedPeople: Person[];
   onSavePeople: (people: Person[]) => void;
-  onCreateCustomer: (...args: any) => void
+  onCreateCustomer: (...args: any) => void;
 }
 
 const Settings: React.FC<SettingsProps> = ({
@@ -48,52 +48,52 @@ const Settings: React.FC<SettingsProps> = ({
   onSaveCompanies,
   savedPeople,
   onSavePeople,
-  onCreateCustomer
+  onCreateCustomer,
 }) => {
   return (
     <div className="flex-1 p-6 overflow-auto">
-        {view === 'general' && (
-          <GeneralSettings
-            currentLanguage={currentLanguage}
-            onLanguageChange={onLanguageChange}
-            decimalSeparator={decimalSeparator}
-            onDecimalSeparatorChange={onDecimalSeparatorChange}
-            showHiddenIds={showHiddenIds}
-            onShowHiddenIdsChange={onShowHiddenIdsChange}
-            currentTheme={currentTheme}
-            onThemeChange={onThemeChange}
-          />
-        )}
+      {view === 'general' && (
+        <GeneralSettings
+          currentLanguage={currentLanguage}
+          onLanguageChange={onLanguageChange}
+          decimalSeparator={decimalSeparator}
+          onDecimalSeparatorChange={onDecimalSeparatorChange}
+          showHiddenIds={showHiddenIds}
+          onShowHiddenIdsChange={onShowHiddenIdsChange}
+          currentTheme={currentTheme}
+          onThemeChange={onThemeChange}
+        />
+      )}
 
-        {view === 'companies' && (
-          <CompaniesSettings
-            currentTheme={currentTheme}
-            currentLanguage={currentLanguage}
-            savedCompanies={savedCompanies}
-            onSaveCompanies={onSaveCompanies} 
-            onCreateCustomer={(companyId, name) => onCreateCustomer(companyId, name, 'company')}
-          />
-        )}
+      {view === 'companies' && (
+        <CompaniesSettings
+          currentTheme={currentTheme}
+          currentLanguage={currentLanguage}
+          savedCompanies={savedCompanies}
+          onSaveCompanies={onSaveCompanies}
+          onCreateCustomer={(companyId, name) => onCreateCustomer(companyId, name, 'company')}
+        />
+      )}
 
-        {view === 'people' && (
-          <PeopleSettings
-            currentTheme={currentTheme}
-            currentLanguage={currentLanguage}
-            savedPeople={savedPeople}
-            onSavePeople={onSavePeople}
-            onCreateCustomer={(personId, name) => onCreateCustomer(personId, name, 'person')}
-          />
-        )}
+      {view === 'people' && (
+        <PeopleSettings
+          currentTheme={currentTheme}
+          currentLanguage={currentLanguage}
+          savedPeople={savedPeople}
+          onSavePeople={onSavePeople}
+          onCreateCustomer={(personId, name) => onCreateCustomer(personId, name, 'person')}
+        />
+      )}
 
-        {view === 'datapoints' && (
-          <DatapointsSettings
-            currentTheme={currentTheme}
-            currentLanguage={currentLanguage}
-            standards={standards}
-            onStandardsChange={onStandardsChange}
-          />
-        )}
-      </div>
+      {view === 'datapoints' && (
+        <DatapointsSettings
+          currentTheme={currentTheme}
+          currentLanguage={currentLanguage}
+          standards={standards}
+          onStandardsChange={onStandardsChange}
+        />
+      )}
+    </div>
   );
 };
 

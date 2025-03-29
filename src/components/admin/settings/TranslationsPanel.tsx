@@ -14,10 +14,7 @@ interface TranslationsPanelProps {
   currentLanguage: Language;
 }
 
-const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
-  currentTheme,
-  currentLanguage
-}) => {
+const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, currentLanguage }) => {
   const [translations, setTranslations] = useState<Record<string, Record<Language, string>>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +27,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
     translations: Record<Language, string>;
   }>({
     key: '',
-    translations: {}
+    translations: {},
   });
 
   useEffect(() => {
@@ -53,9 +50,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
   const handleSave = async (key: string) => {
     try {
       setError(null);
-      const promises = Object.entries(editValues).map(([langId, value]) =>
-        updateTranslation(key, langId, value)
-      );
+      const promises = Object.entries(editValues).map(([langId, value]) => updateTranslation(key, langId, value));
       await Promise.all(promises);
       await loadData();
       setEditingKey(null);
@@ -75,14 +70,14 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
       }
 
       const promises = Object.entries(newValues.translations).map(([langId, value]) =>
-        updateTranslation(newValues.key.trim(), langId, value)
+        updateTranslation(newValues.key.trim(), langId, value),
       );
       await Promise.all(promises);
       await loadData();
       setIsAdding(false);
       setNewValues({
         key: '',
-        translations: {}
+        translations: {},
       });
     } catch (err) {
       console.error('Error adding translation:', err);
@@ -109,7 +104,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
       <div className="flex items-center justify-between mb-6">
         <Label className="w-full mb-6 flex items-center gap-x-4 relative">
           <Search className="text-primary absolute left-4" size={20} />
-          <Input 
+          <Input
             className="h-12 indent-10 bg-card"
             type="text"
             placeholder="Search translations..."
@@ -118,36 +113,27 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
           />
         </Label>
       </div>
-      <Button
-        onClick={() => setIsAdding(true)}
-        className="px-4 py-2 mb-10"
-      >
+      <Button onClick={() => setIsAdding(true)} className="px-4 py-2 mb-10">
         <Plus size={16} />
         Add Translation
       </Button>
 
-      {error && (
-        <div className="p-4 mb-4 rounded text-destructive-foreground border border-destructive bg-destructive">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-destructive-foreground border border-destructive bg-destructive">{error}</div>}
 
-        <section className="border border-input rounded-md bg-card">
-          <div className="w-full relative overflow-auto">
+      <section className="border border-input rounded-md bg-card">
+        <div className="w-full relative overflow-auto">
           <Table>
             <TableCaption>Translations</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Key</TableHead>
-                {LANGUAGES.map(lang => (
+                {LANGUAGES.map((lang) => (
                   <TableHead key={lang.id}>{lang.name}</TableHead>
                 ))}
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
-    <TableBody>
-
-
+            <TableBody>
               {isAdding && (
                 <TableRow>
                   <TableCell className="p-2">
@@ -158,34 +144,38 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                         setIsAdding(false);
                         setNewValues({
                           key: '',
-                          translations: {}
+                          translations: {},
                         });
                       }}
                     >
                       <Input
                         type="text"
                         value={newValues.key}
-                        onChange={(e) => setNewValues(prev => ({
-                          ...prev,
-                          key: e.target.value
-                        }))}
+                        onChange={(e) =>
+                          setNewValues((prev) => ({
+                            ...prev,
+                            key: e.target.value,
+                          }))
+                        }
                         className="w-full p-1"
                         placeholder="Enter translation key"
                       />
                     </FormHandler>
                   </TableCell>
-                  {LANGUAGES.map(lang => (
+                  {LANGUAGES.map((lang) => (
                     <TableCell key={lang.id} className="p-2">
                       <Input
                         type="text"
                         value={newValues.translations[lang.id] || ''}
-                        onChange={(e) => setNewValues(prev => ({
-                          ...prev,
-                          translations: {
-                            ...prev.translations,
-                            [lang.id]: e.target.value
-                          }
-                        }))}
+                        onChange={(e) =>
+                          setNewValues((prev) => ({
+                            ...prev,
+                            translations: {
+                              ...prev.translations,
+                              [lang.id]: e.target.value,
+                            },
+                          }))
+                        }
                         className="w-full p-1"
                         dir={lang.direction}
                         placeholder={`Enter ${lang.name} translation`}
@@ -194,10 +184,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                   ))}
                   <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
-                      <Button
-                        onClick={handleAddNew}
-                        variant="ghost"
-                      >
+                      <Button onClick={handleAddNew} variant="ghost">
                         <Save size={14} />
                       </Button>
                       <Button
@@ -206,7 +193,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           setIsAdding(false);
                           setNewValues({
                             key: '',
-                            translations: {}
+                            translations: {},
                           });
                         }}
                       >
@@ -221,23 +208,23 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                   <TableCell className="p-2">
                     <code className="font-mono text-sm">{key}</code>
                   </TableCell>
-                  {LANGUAGES.map(lang => (
+                  {LANGUAGES.map((lang) => (
                     <TableCell key={lang.id} className="p-2 text-muted-foreground">
                       {editingKey === key ? (
                         <Input
                           type="text"
                           value={editValues[lang.id] || values[lang.id] || ''}
-                          onChange={(e) => setEditValues(prev => ({
-                            ...prev,
-                            [lang.id]: e.target.value
-                          }))}
+                          onChange={(e) =>
+                            setEditValues((prev) => ({
+                              ...prev,
+                              [lang.id]: e.target.value,
+                            }))
+                          }
                           className="w-full p-1"
                           dir={lang.direction}
                         />
                       ) : (
-                        <div dir={lang.direction}>
-                          {values[lang.id] || '-'}
-                        </div>
+                        <div dir={lang.direction}>{values[lang.id] || '-'}</div>
                       )}
                     </TableCell>
                   ))}
@@ -267,10 +254,7 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                           <X size={14} />
                         </Button>
                       ) : (
-                        <Button
-                          onClick={() => handleDelete(key)}
-                          variant="ghost"
-                        >
+                        <Button onClick={() => handleDelete(key)} variant="ghost">
                           <X size={14} />
                         </Button>
                       )}
@@ -278,11 +262,10 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
-
+            </TableBody>
           </Table>
-          </div>
-        </section>
+        </div>
+      </section>
     </div>
   );
 };

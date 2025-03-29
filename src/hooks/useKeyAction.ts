@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 /**
  * Executes the provided callback when the specified key is pressed.
- * 
+ *
  * @param callback - Function to be called when the key is pressed
  * @param isSend - Extra condition before calling the callback
  * @param key - The key to listen for
@@ -11,8 +11,8 @@ import { useEffect, useRef } from "react";
 export const useKeyAction = <T extends (...args: any[]) => void>(
   callback: T,
   isSend: boolean,
-  key: string = "Enter",
-  debounceTime: number = 500
+  key: string = 'Enter',
+  debounceTime: number = 500,
 ) => {
   const lastExecuted = useRef<number>(0);
 
@@ -27,7 +27,7 @@ export const useKeyAction = <T extends (...args: any[]) => void>(
       }
     };
 
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [callback, isSend, key, debounceTime]);
 };

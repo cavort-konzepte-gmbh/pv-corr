@@ -41,10 +41,7 @@ export const fetchTranslations = async (language: Language) => {
 
 export const fetchAllTranslations = async () => {
   try {
-    const { data: translations, error } = await supabase
-      .from('translations')
-      .select('*')
-      .order('key', { ascending: true });
+    const { data: translations, error } = await supabase.from('translations').select('*').order('key', { ascending: true });
 
     if (error) throw error;
 
@@ -66,10 +63,7 @@ export const fetchAllTranslations = async () => {
 
 export const fetchLanguages = async () => {
   try {
-    const { data: languages, error } = await supabase
-      .from('languages')
-      .select('*')
-      .order('name', { ascending: true });
+    const { data: languages, error } = await supabase.from('languages').select('*').order('name', { ascending: true });
 
     if (error) throw error;
     return languages as LanguageEntry[];
@@ -81,15 +75,16 @@ export const fetchLanguages = async () => {
 
 export const updateTranslation = async (key: string, languageId: string, value: string) => {
   try {
-    const { error } = await supabase
-      .from('translations')
-      .upsert({
+    const { error } = await supabase.from('translations').upsert(
+      {
         key,
         language_id: languageId,
-        value
-      }, {
-        onConflict: 'key,language_id'
-      });
+        value,
+      },
+      {
+        onConflict: 'key,language_id',
+      },
+    );
 
     if (error) throw error;
   } catch (err) {
@@ -100,10 +95,7 @@ export const updateTranslation = async (key: string, languageId: string, value: 
 
 export const deleteTranslation = async (key: string) => {
   try {
-    const { error } = await supabase
-      .from('translations')
-      .delete()
-      .eq('key', key);
+    const { error } = await supabase.from('translations').delete().eq('key', key);
 
     if (error) throw error;
   } catch (err) {
@@ -114,10 +106,7 @@ export const deleteTranslation = async (key: string) => {
 
 export const updateLanguage = async (id: string, data: Partial<LanguageEntry>) => {
   try {
-    const { error } = await supabase
-      .from('languages')
-      .update(data)
-      .eq('id', id);
+    const { error } = await supabase.from('languages').update(data).eq('id', id);
 
     if (error) throw error;
   } catch (err) {

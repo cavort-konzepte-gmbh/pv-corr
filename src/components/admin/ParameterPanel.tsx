@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { Language, useTranslation } from "../../types/language";
-import { Theme } from "../../types/theme";
-import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from "../../services/parameters";
+import { useEffect, useState } from 'react';
+import { Language, useTranslation } from '../../types/language';
+import { Theme } from '../../types/theme';
+import { fetchParameters, Parameter, createParameter, deleteParameter, updateParameter } from '../../services/parameters';
 import { Edit2, Plus, Save, X, Code, Check } from 'lucide-react';
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from '../shared/FormHandler';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { supabase } from "@/lib/supabase";
-import { Label } from "../ui/label";
-import { Button } from "../ui/button";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { supabase } from '@/lib/supabase';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
 
 interface RatingLogicDialogProps {
   isOpen: boolean;
@@ -26,7 +26,7 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
   parameterId,
   initialCode,
   initialTestCases,
-  onSave
+  onSave,
 }) => {
   const [code, setCode] = useState(initialCode || '');
   const [testCases, setTestCases] = useState(initialTestCases || '');
@@ -51,12 +51,10 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="p-6 rounded-lg max-w-4xl w-full ma">
         <h3 className="text-lg mb-6 text-primary">Edit Rating Logic</h3>
-        
+
         <div className="space-y-4">
           <div>
-            <Label className="block text-sm mb-2 text-primary">
-              Rating Logic Code
-            </Label>
+            <Label className="block text-sm mb-2 text-primary">Rating Logic Code</Label>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -66,9 +64,7 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
           </div>
 
           <div>
-            <Label className="block text-sm mb-2 text-primary">
-              Test Cases (JSON Array)
-            </Label>
+            <Label className="block text-sm mb-2 text-primary">Test Cases (JSON Array)</Label>
             <textarea
               value={testCases}
               onChange={(e) => setTestCases(e.target.value)}
@@ -77,23 +73,13 @@ const RatingLogicDialog: React.FC<RatingLogicDialogProps> = ({
             />
           </div>
 
-          {error && (
-            <div className="p-4 rounded text-accent-primary border-a">
-              {error}
-            </div>
-          )}
+          {error && <div className="p-4 rounded text-accent-primary border-a">{error}</div>}
 
           <div className="flex justify-end gap-2">
-            <Button
-              onClick={onClose}
-              className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
-            >
+            <Button onClick={onClose} className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent">
               Cancel
             </Button>
-            <Button
-              onClick={handleSave}
-              className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-            >
+            <Button onClick={handleSave} className="px-4 py-2 rounded text-sm text-white bg-accent-primary">
               Save Changes
             </Button>
           </div>
@@ -138,14 +124,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   }, []);
 
   const handleChangeEditingValues = (name: string, value: string) => {
-    setEditingValues(previous => ({
+    setEditingValues((previous) => ({
       ...previous,
       [name]: value,
     }));
   };
 
   const handleChangeParameter = (name: string, value: string) => {
-    setNewParameter(previous => ({
+    setNewParameter((previous) => ({
       ...previous,
       [name]: value,
     }));
@@ -161,7 +147,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
       try {
         const updateData = {
           ...editingValues,
-          orderNumber: parseFloat(editingValues.orderNumber) || 0
+          orderNumber: parseFloat(editingValues.orderNumber) || 0,
         };
         await updateParameter(parameter.id, updateData);
         const updatedParameters = await fetchParameters();
@@ -183,7 +169,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
 
   const handleDeleteParameter = async (parameterId: string) => {
     // Get parameter name for confirmation
-    const parameter = parameters.find(p => p.id === parameterId);
+    const parameter = parameters.find((p) => p.id === parameterId);
     if (!parameter) return;
 
     // Only proceed if name matches
@@ -213,7 +199,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
 
       const createData = {
         ...newParameter,
-        orderNumber: parseFloat(newParameter.orderNumber) || 0
+        orderNumber: parseFloat(newParameter.orderNumber) || 0,
       };
 
       await createParameter(createData as any);
@@ -236,19 +222,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
   return (
     <div className="p-6">
       {loading ? (
-        <div className="text-center p-4 ">
-          {t("datapoint.loading")}
-        </div>
+        <div className="text-center p-4 ">{t('datapoint.loading')}</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold">
-              Parameters
-            </h3>
-            <Button
-              onClick={handleOpenParameter}
-              className="px-3 py-1 rounded text-sm flex items-center gap-2 "
-            >
+            <h3 className="text-lg font-bold">Parameters</h3>
+            <Button onClick={handleOpenParameter} className="px-3 py-1 rounded text-sm flex items-center gap-2 ">
               <Plus size={14} />
               Add Parameter
             </Button>
@@ -256,34 +235,29 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
               <Table className="text-card-foreground">
-          <TableCaption className="h-8">Parameters</TableCaption>
-            <TableHeader>
-              <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Parameter Name</TableHead>
-              <TableHead>Short Name</TableHead>
-              <TableHead>Unit</TableHead>
-              <TableHead>Range Type</TableHead>
-              <TableHead>Range Value</TableHead>
-              <TableHead>Rating Logic</TableHead>
-              <TableHead>Actions</TableHead>
-              </TableRow>
-
-            </TableHeader>
-            <TableBody>
-
+                <TableCaption className="h-8">Parameters</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>Parameter Name</TableHead>
+                    <TableHead>Short Name</TableHead>
+                    <TableHead>Unit</TableHead>
+                    <TableHead>Range Type</TableHead>
+                    <TableHead>Range Value</TableHead>
+                    <TableHead>Rating Logic</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {parameters.map((parameter) => (
                     <TableRow key={parameter.id}>
-
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="number"
                             name="orderNumber"
                             value={editingValues.orderNumber || '0'}
                             onChange={(e) => handleChangeEditingValues('orderNumber', e.target.value)}
-                
                             min="0"
                             step="0.01"
                           />
@@ -293,19 +267,15 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
-                          <FormHandler
-                            isEditing={true}
-                            onSave={() => handleUpdateSaveParameter(parameter)}
-                          >
-                          <FormInput
-                            type="text"
-                            name="name"
-                            value={editingValues.name || ''}
-                            onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                            className="w-full p-1 rounded text-sm text-primary"
-                          />
+                          <FormHandler isEditing={true} onSave={() => handleUpdateSaveParameter(parameter)}>
+                            <FormInput
+                              type="text"
+                              name="name"
+                              value={editingValues.name || ''}
+                              onChange={(e) => handleChangeEditingValues('name', e.target.value)}
+                              className="w-full p-1 rounded text-sm text-primary"
+                            />
                           </FormHandler>
                         ) : (
                           parameter.name
@@ -313,7 +283,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="text"
@@ -328,7 +297,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="unit"
@@ -356,7 +324,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="rangeType"
@@ -379,7 +346,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="text"
@@ -393,17 +359,14 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell  className="text-primary" >
+                      <TableCell className="text-primary">
                         <Button
                           onClick={() => setEditingRatingLogic(parameter.id)}
                           className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 "
-
                           variant="ghost"
                         >
-                          <Code size={14}  />
-                          {parameter.rating_logic_code && (
-                            <Check size={14} />
-                          )}
+                          <Code size={14} />
+                          {parameter.rating_logic_code && <Check size={14} />}
                         </Button>
                       </TableCell>
 
@@ -414,21 +377,15 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             className="p-1 rounded hover:bg-opacity-80 text-primary"
                             variant="ghost"
                           >
-                            {editingParameter === parameter.id ? (
-                              <Save size={14} />
-                            ) : (
-                              <Edit2 size={14} />
-                            )}
+                            {editingParameter === parameter.id ? <Save size={14} /> : <Edit2 size={14} />}
                           </Button>
                           {!editingParameter && (
-                            <Button 
+                            <Button
                               onClick={() => {
                                 setDeleteConfirm(parameter.id);
                                 setDeleteConfirmName('');
                               }}
-
-                              className="p-1 rounded hover:bg-opacity-80 " 
-
+                              className="p-1 rounded hover:bg-opacity-80 "
                               variant="ghost"
                             >
                               <X className="text-primary" size={14} />
@@ -440,9 +397,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                   ))}
                   {isNewParameter && (
                     <TableRow>
-
                       <TableCell className="p-2">
-
                         <FormInput
                           type="number"
                           name="orderNumber"
@@ -454,24 +409,20 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         />
                       </TableCell>
                       <TableCell className="p-2 border border-theme">
-                        <FormHandler
-                          isEditing={true}
-                          onSave={handleAddNewParameter}
-                        >
-                        {isNewParameter ? (
-                          <FormInput
-                            type="text"
-                            name="name"
-                            value={newParameter.name || ''}
-                            onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
-                            className="w-full p-1 rounded text-sm text-primary"
-                          />
-                        ) : null}
+                        <FormHandler isEditing={true} onSave={handleAddNewParameter}>
+                          {isNewParameter ? (
+                            <FormInput
+                              type="text"
+                              name="name"
+                              value={newParameter.name || ''}
+                              onChange={(e) => handleChangeParameter(e.target.name, e.target.value)}
+                              className="w-full p-1 rounded text-sm text-primary"
+                            />
+                          ) : null}
                         </FormHandler>
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {isNewParameter ? (
                           <FormInput
                             type="text"
@@ -484,7 +435,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {isNewParameter ? (
                           <FormSelect
                             name="unit"
@@ -510,7 +460,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {isNewParameter ? (
                           <FormSelect
                             value={newParameter.rangeType || ''}
@@ -531,7 +480,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         {isNewParameter ? (
                           <FormInput
                             type="text"
@@ -544,7 +492,6 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                       </TableCell>
 
                       <TableCell className="p-2">
-
                         <div className="flex items-center justify-center gap-2">
                           <Button onClick={handleAddNewParameter} variant="ghost">
                             <Save size={14} />
@@ -562,16 +509,16 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
           </section>
         </div>
       )}
-      
+
       {editingRatingLogic && (
         <RatingLogicDialog
           isOpen={true}
           onClose={() => setEditingRatingLogic(null)}
           currentTheme={currentTheme}
           parameterId={editingRatingLogic}
-          initialCode={parameters.find(p => p.id === editingRatingLogic)?.rating_logic_code || ''}
+          initialCode={parameters.find((p) => p.id === editingRatingLogic)?.rating_logic_code || ''}
           initialTestCases={(() => {
-            const param = parameters.find(p => p.id === editingRatingLogic);
+            const param = parameters.find((p) => p.id === editingRatingLogic);
             if (!param?.rating_logic_test_cases) return '';
             try {
               return JSON.stringify(param.rating_logic_test_cases, null, 2);
@@ -586,7 +533,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 .from('parameters')
                 .update({
                   rating_logic_code: code,
-                  rating_logic_test_cases: testCases ? JSON.parse(testCases) : null
+                  rating_logic_test_cases: testCases ? JSON.parse(testCases) : null,
                 })
                 .eq('id', editingRatingLogic);
 

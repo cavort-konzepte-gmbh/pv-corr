@@ -10,23 +10,27 @@ interface FormHandlerProps {
   debounceTime?: number;
 }
 
-export const FormHandler: React.FC<FormHandlerProps> = ({
-  children,
-  isEditing,
-  onSave,
-  onCancel,
-  debounceTime = 500
-}) => {
-  useKeyAction(() => {
-    onSave();
-  }, isEditing, "Enter", debounceTime);
+export const FormHandler: React.FC<FormHandlerProps> = ({ children, isEditing, onSave, onCancel, debounceTime = 500 }) => {
+  useKeyAction(
+    () => {
+      onSave();
+    },
+    isEditing,
+    'Enter',
+    debounceTime,
+  );
 
-  useKeyAction(() => {
-    if (onCancel) onCancel();
-  }, isEditing, "Escape", debounceTime);
+  useKeyAction(
+    () => {
+      if (onCancel) onCancel();
+    },
+    isEditing,
+    'Escape',
+    debounceTime,
+  );
 
   return (
-    <form 
+    <form
       onSubmit={(e) => {
         e.preventDefault();
         onSave();
@@ -79,22 +83,13 @@ export const DeleteConfirmDialog: React.FC<{
   onConfirmChange: (value: string) => void;
   onConfirm: () => void;
   onCancel: () => void;
-}> = ({
-  isOpen,
-  itemName,
-  confirmName,
-  onConfirmChange,
-  onConfirm,
-  onCancel
-}) => {
+}> = ({ isOpen, itemName, confirmName, onConfirmChange, onConfirm, onCancel }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="p-6 rounded-lg max-w-md w-full bg-surface">
-        <h3 className="text-lg mb-4 text-primary">
-          Delete {itemName}
-        </h3>
+        <h3 className="text-lg mb-4 text-primary">Delete {itemName}</h3>
         <p className="mb-4 text-secondary">
           This action cannot be undone. Please type the {itemName.toLowerCase()} name to confirm deletion.
         </p>
@@ -106,10 +101,7 @@ export const DeleteConfirmDialog: React.FC<{
             placeholder={`Type ${itemName.toLowerCase()} name to confirm`}
           />
           <div className="flex justify-end gap-2">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent"
-            >
+            <button onClick={onCancel} className="px-4 py-2 rounded text-sm text-secondary border-theme border-solid bg-transparent">
               Cancel
             </button>
             <button

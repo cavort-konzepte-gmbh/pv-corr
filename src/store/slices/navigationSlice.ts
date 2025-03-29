@@ -15,7 +15,7 @@ const initialState: NavigationState = {
   selectedFieldId: undefined,
   selectedZoneId: undefined,
   selectedCustomerId: null,
-  lastActive: Date.now()
+  lastActive: Date.now(),
 };
 
 const navigationSlice = createSlice({
@@ -44,8 +44,8 @@ const navigationSlice = createSlice({
     },
     updateLastActive: (state) => {
       state.lastActive = Date.now();
-    }
-  }
+    },
+  },
 });
 
 export const {
@@ -55,7 +55,7 @@ export const {
   setSelectedZoneId,
   setSelectedCustomerId,
   resetNavigation,
-  updateLastActive
+  updateLastActive,
 } = navigationSlice.actions;
 
 export default navigationSlice.reducer;

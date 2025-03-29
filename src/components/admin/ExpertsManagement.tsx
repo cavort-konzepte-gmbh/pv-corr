@@ -43,10 +43,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('experts')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from('experts').select('*').order('created_at', { ascending: true });
 
       if (error) throw error;
       setExperts(data || []);
@@ -59,14 +56,14 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   };
 
   const handleChangeEditingValues = (field: keyof Expert, value: string) => {
-    setEditingValues(prev => ({
+    setEditingValues((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   const handleChangeNewExpert = (field: keyof Expert, value: string) => {
-    setNewExpert(prev => ({
+    setNewExpert((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -85,10 +82,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
           return;
         }
 
-        const { error } = await supabase
-          .from('experts')
-          .update(editingValues)
-          .eq('id', expert.id);
+        const { error } = await supabase.from('experts').update(editingValues).eq('id', expert.id);
 
         if (error) throw error;
         await loadData();
@@ -114,12 +108,10 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
       const expertData = {
         ...newExpert,
-        hidden_id: generateHiddenId()
+        hidden_id: generateHiddenId(),
       };
 
-      const { error } = await supabase
-        .from('experts')
-        .insert(expertData);
+      const { error } = await supabase.from('experts').insert(expertData);
 
       if (error) throw error;
 
@@ -141,10 +133,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('experts')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('experts').delete().eq('id', id);
 
       if (error) throw error;
       await loadData();
@@ -154,43 +143,29 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
     }
   };
 
-  useKeyAction(() => {
-    if (editingExpert) {
-      handleUpdateSaveExpert(experts.find(e => e.id === editingExpert)!);
-    }
-  }, editingExpert !== null || isNewExpert, "Enter", 500);
+  useKeyAction(
+    () => {
+      if (editingExpert) {
+        handleUpdateSaveExpert(experts.find((e) => e.id === editingExpert)!);
+      }
+    },
+    editingExpert !== null || isNewExpert,
+    'Enter',
+    500,
+  );
 
   return (
     <div className="p-8">
       <div className="flex items-center gap-4 mb-8">
-        <Button
-          onClick={onBack}
-          className="p-2 rounded hover:bg-opacity-80"
-          variant="ghost"
-        >
+        <Button onClick={onBack} className="p-2 rounded hover:bg-opacity-80" variant="ghost">
           <ArrowLeft size={20} />
         </Button>
-        <h2 
-          className="text-2xl font-bold"
-   
-        >
-          Experts Management
-        </h2>
+        <h2 className="text-2xl font-bold">Experts Management</h2>
       </div>
 
-      {error && (
-        <div 
-          className="p-4 mb-4 rounded"
-     
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded">{error}</div>}
 
-      <Button
-        onClick={() => setIsNewExpert(true)}
-        className="w-full"        
-      >
+      <Button onClick={() => setIsNewExpert(true)} className="w-full">
         <Plus size={16} />
         Add New Expert
       </Button>
@@ -211,8 +186,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
               </TableRow>
             </TableHeader>
             <TableBody>
-
-              {experts.map(expert => (
+              {experts.map((expert) => (
                 <TableRow key={expert.id}>
                   <TableCell className="p-2">
                     {editingExpert === expert.id ? (
@@ -224,10 +198,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                           setEditingValues({});
                         }}
                       >
-                        <Input
-                          value={editingValues.name || ''}
-                          onChange={(e) => handleChangeEditingValues('name', e.target.value)}
-                        />
+                        <Input value={editingValues.name || ''} onChange={(e) => handleChangeEditingValues('name', e.target.value)} />
                       </FormHandler>
                     ) : (
                       expert.name
@@ -290,23 +261,11 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   </TableCell>
                   <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
-                      <Button
-                        onClick={() => handleUpdateSaveExpert(expert)}
-                        className="p-1 rounded hover:bg-opacity-80"
-                        variant="ghost"
-                      >
-                        {editingExpert === expert.id ? (
-                          <Save size={14} />
-                        ) : (
-                          <Edit2 size={14} />
-                        )}
+                      <Button onClick={() => handleUpdateSaveExpert(expert)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
+                        {editingExpert === expert.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {!editingExpert && (
-                        <Button
-                          onClick={() => handleDelete(expert.id)}
-                          className="p-1 rounded hover:bg-opacity-80"
-                          variant="ghost"
-                        >
+                        <Button onClick={() => handleDelete(expert.id)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
                           <X size={14} />
                         </Button>
                       )}
@@ -317,11 +276,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
               {isNewExpert && (
                 <TableRow>
                   <TableCell className="p-2">
-                    <FormHandler
-                      isEditing={true}
-                      onSave={handleAddNewExpert}
-                      onCancel={handleCancelNewExpert}
-                    >
+                    <FormHandler isEditing={true} onSave={handleAddNewExpert} onCancel={handleCancelNewExpert}>
                       <Input
                         type="text"
                         value={newExpert.name || ''}
@@ -382,7 +337,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
                   </TableCell>
                 </TableRow>
               )}
-        </TableBody>
+            </TableBody>
           </Table>
         </div>
       </section>

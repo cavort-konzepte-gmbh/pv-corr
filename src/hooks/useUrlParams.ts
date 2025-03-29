@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-export const useUrlParams = (params: Record<string, string | undefined | null>, setParams: (key: string, value: string | undefined | null) => void) => {
+export const useUrlParams = (
+  params: Record<string, string | undefined | null>,
+  setParams: (key: string, value: string | undefined | null) => void,
+) => {
   const isInitialMount = useRef(true);
 
   // Update URL when params change
@@ -11,7 +14,7 @@ export const useUrlParams = (params: Record<string, string | undefined | null>, 
     }
 
     const url = new URL(window.location.href);
-    
+
     // Update or remove each param
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
@@ -30,7 +33,7 @@ export const useUrlParams = (params: Record<string, string | undefined | null>, 
     const url = new URL(window.location.href);
     const params = Object.fromEntries(url.searchParams.entries());
 
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
       const value = params[key];
       if (value) {
         setParams(key, value);

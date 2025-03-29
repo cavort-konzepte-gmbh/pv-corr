@@ -13,12 +13,7 @@ interface AnalyseNormProps {
   onSelectNorm: (id: string) => void;
 }
 
-const AnalyseNorm: React.FC<AnalyseNormProps> = ({
-  currentTheme,
-  currentLanguage,
-  selectedNormId,
-  onSelectNorm
-}) => {
+const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage, selectedNormId, onSelectNorm }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [norms, setNorms] = useState<any[]>([]);
@@ -30,14 +25,16 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
         setLoading(true);
         const { data, error } = await supabase
           .from('norms')
-          .select(`
+          .select(
+            `
             *,
             parameters:norm_parameters (
               parameter_id,
               parameter_code,
               rating_ranges
             )
-          `)
+          `,
+          )
           .order('created_at', { ascending: true });
 
         if (error) throw error;
@@ -54,45 +51,30 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({
   }, []);
 
   if (loading) {
-    return (
-      <div className="text-center p-4 text-secondary">
-        {t("analysis.loading")}
-      </div>
-    );
+    return <div className="text-center p-4 text-secondary">{t('analysis.loading')}</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-        {error}
-      </div>
-    );
+    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>;
   }
 
   return (
     <div>
-      <h3 className="text-lg font-medium  mb-4">
-        {t("analysis.select_norm")}
-      </h3>
+      <h3 className="text-lg font-medium  mb-4">{t('analysis.select_norm')}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-       
-        {norms.map(norm => (
+        {norms.map((norm) => (
           <Button
             key={norm.id}
             onClick={() => onSelectNorm(norm.id)}
             className={`px-3 py-1 rounded text-sm transition-colors ${
-              selectedNormId === norm.id 
-                  ? ' text-primary-foreground hover:bg-theme' 
-                : 'bg-accent-primary text-primary '
+              selectedNormId === norm.id ? ' text-primary-foreground hover:bg-theme' : 'bg-accent-primary text-primary '
             }`}
           >
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm ">{norm.name}</div>
               </div>
-              {selectedNormId === norm.id && (
-                <Check size={12} className="text-accent-primary" />
-              )}
+              {selectedNormId === norm.id && <Check size={12} className="text-accent-primary" />}
             </div>
           </Button>
         ))}

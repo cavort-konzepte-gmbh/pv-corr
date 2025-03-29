@@ -19,13 +19,7 @@ interface PeoplePanelProps {
   onCreateCustomer?: (personId: string, name: string) => void;
 }
 
-const PeoplePanel: React.FC<PeoplePanelProps> = ({ 
-  currentTheme,
-  currentLanguage,
-  savedPeople,
-  onSavePeople,
-  onCreateCustomer 
-}) => {
+const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage, savedPeople, onSavePeople, onCreateCustomer }) => {
   const [showNewPersonForm, setShowNewPersonForm] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -40,7 +34,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
     try {
       const { data, error } = await supabase
         .from('people')
-        .select(`
+        .select(
+          `
           id,
           hidden_id,
           salutation,
@@ -49,7 +44,8 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
           last_name,
           email,
           phone
-        `)
+        `,
+        )
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -57,7 +53,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         throw error;
       }
 
-      const formattedPeople = data.map(person => ({
+      const formattedPeople = data.map((person) => ({
         id: person.id,
         hiddenId: person.hidden_id,
         salutation: person.salutation,
@@ -65,7 +61,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
         firstName: person.first_name,
         lastName: person.last_name,
         email: person.email,
-        phone: person.phone
+        phone: person.phone,
       }));
 
       onSavePeople(formattedPeople);
@@ -76,7 +72,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       setLoading(false);
     }
   };
-   
+
   const handleEditPerson = (person: Person) => {
     setEditingPerson(person);
     setFormValues({
@@ -85,13 +81,13 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       firstName: person.firstName,
       lastName: person.lastName,
       email: person.email,
-      phone: person.phone || ''
+      phone: person.phone || '',
     });
     setShowNewPersonForm(true);
   };
 
   const handleInputChange = (fieldId: string, value: string) => {
-    setFormValues(prev => {
+    setFormValues((prev) => {
       const newValues = { ...prev };
       newValues[fieldId] = value;
       return newValues;
@@ -100,7 +96,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
   const updateSelectedProject = async () => {
     setError(null);
-    
+
     if (!formValues.salutation || !formValues.firstName || !formValues.lastName || !formValues.email) {
       setError('Please fill in all required fields');
       return;
@@ -108,23 +104,18 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
 
     try {
       const personData = {
-        ...toCase(formValues, "snakeCase")
+        ...toCase(formValues, 'snakeCase'),
       };
 
       if (editingPerson) {
-        const { error } = await supabase
-          .from('people')
-          .update(personData)
-          .eq('id', editingPerson.id);
+        const { error } = await supabase.from('people').update(personData).eq('id', editingPerson.id);
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('people')
-          .insert({
-            ...personData,
-            hidden_id: generateHiddenId()
-          });
+        const { error } = await supabase.from('people').insert({
+          ...personData,
+          hidden_id: generateHiddenId(),
+        });
 
         if (error) throw error;
       }
@@ -137,19 +128,16 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
       console.error('Error saving person:', err);
       setError(err instanceof Error ? err.message : 'Failed to save person');
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSelectedProject()
+    updateSelectedProject();
   };
 
   const handleDelete = async (personId: string) => {
     try {
-      const { error } = await supabase
-        .from('people')
-        .delete()
-        .eq('id', personId);
+      const { error } = await supabase.from('people').delete().eq('id', personId);
 
       if (error) throw error;
       await fetchPeople();
@@ -164,39 +152,28 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
   }, showNewPersonForm);
 
   if (loading) {
-    return (
-      <div className="text-center p-4 text-secondary">
-        {translation("people.loading")}
-      </div>
-    );
-  };
+    return <div className="text-center p-4 text-secondary">{translation('people.loading')}</div>;
+  }
 
   return (
     <div className="p-6">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary bg-surface">{error}</div>}
 
-      <Button
-        onClick={() => setShowNewPersonForm(true)}
-        className="w-full px-4 py-3 duration-200 mb-6"        
-      >
+      <Button onClick={() => setShowNewPersonForm(true)} className="w-full px-4 py-3 duration-200 mb-6">
         <Plus size={16} />
-        {translation("people.new")}
+        {translation('people.new')}
       </Button>
 
       {showNewPersonForm ? (
         <div>
           <h3 className="text-lg mb-6 flex items-center gap-2 text-primary">
             <User className="text-accent-primary" size={16} />
-            {editingPerson ? translation("people.edit") : translation("people.new")}
+            {editingPerson ? translation('people.edit') : translation('people.new')}
           </h3>
-          
+
           <form onSubmit={handleSubmit} className="text-card-foreground space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              {PERSON_FIELDS.map(field => (
+              {PERSON_FIELDS.map((field) => (
                 <div key={field.id}>
                   <Label className="block text-sm mb-1">
                     {translation(field.label as any)}
@@ -207,10 +184,10 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       value={formValues[field.id] || ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                       required={field.required}
-                      className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"                      
+                      className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">Select {field.label}</option>
-                      {field.options?.map(option => (
+                      {field.options?.map((option) => (
                         <option key={option} value={option}>
                           {option}
                         </option>
@@ -222,7 +199,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                       value={formValues[field.id] || ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                       required={field.required}
-                      className="w-full p-2 rounded text-sm"                      
+                      className="w-full p-2 rounded text-sm"
                     />
                   )}
                 </div>
@@ -238,30 +215,26 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                   setEditingPerson(null);
                 }}
               >
-                {translation("actions.cancel")}
+                {translation('actions.cancel')}
               </Button>
-              <Button
-                type="submit"
-              >
-                {editingPerson ? translation("settings.autosave") : translation("people.add")}
-              </Button>
+              <Button type="submit">{editingPerson ? translation('settings.autosave') : translation('people.add')}</Button>
             </div>
           </form>
         </div>
       ) : (
         <div className="space-y-4">
-          {savedPeople.map(person => (
+          {savedPeople.map((person) => (
             <div
               key={person.id}
               className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-accent hover:cursor-pointer"
-              onClick={() => handleEditPerson(person)}              
-            > 
+              onClick={() => handleEditPerson(person)}
+            >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <User className="text-primary" size={16} />
                   <span className="font-medium">
-                    {person.salutation} 
-                    {person.title ? ` ${person.title}` : ''} 
+                    {person.salutation}
+                    {person.title ? ` ${person.title}` : ''}
                     {` ${person.firstName} ${person.lastName}`}
                   </span>
                 </div>
@@ -270,12 +243,9 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onCreateCustomer(
-                          person.id,
-                          `${person.firstName} ${person.lastName}`
-                        );
+                        onCreateCustomer(person.id, `${person.firstName} ${person.lastName}`);
                       }}
-                      className="px-2 py-1 text-xs hover:bg-opacity-80"                      
+                      className="px-2 py-1 text-xs hover:bg-opacity-80"
                     >
                       Make Customer
                     </Button>
@@ -284,7 +254,9 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({
                 </div>
               </div>
               <div className="text-sm flex flex-col gap-1 text-muted-foreground">
-                <div>{person.email} • {person.phone || 'No phone'}</div>
+                <div>
+                  {person.email} • {person.phone || 'No phone'}
+                </div>
               </div>
             </div>
           ))}

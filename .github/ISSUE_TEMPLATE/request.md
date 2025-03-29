@@ -8,13 +8,10 @@ assignees: ''
 
 ## Name
 
-
-
 ## Description
 
-
-
 ## Priority level
+
 [ ] Very High
 [ ] High
 [ ] Normal

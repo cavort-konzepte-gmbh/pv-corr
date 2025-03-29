@@ -2,20 +2,20 @@ name: Repository Backup
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-  workflow_dispatch:      # Allows manual trigger
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
   backup:
     runs-on: ubuntu-latest
     permissions:
-      contents: write    # This gives permission to push to the repository
-    
+      contents: write # This gives permission to push to the repository
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history
+          fetch-depth: 0 # Fetch all history
 
       - name: Configure Git
         run: |
@@ -26,19 +26,19 @@ jobs:
         run: |
           # Ensure .backup directory exists
           mkdir -p .backup
-          
+
           # Create timestamp for backup name
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
           BACKUP_FILE=".backup/backup_${TIMESTAMP}.bundle"
-          
+
           # Create git bundle backup
           git bundle create "${BACKUP_FILE}" --all
-          
+
           # Clean up old backups (keep last 7)
           cd .backup
           ls -t *.bundle 2>/dev/null | tail -n +8 | xargs -r rm
           cd ..
-          
+
           # Stage, commit and push
           git add .backup/
           git commit -m "Automated backup ${TIMESTAMP}"

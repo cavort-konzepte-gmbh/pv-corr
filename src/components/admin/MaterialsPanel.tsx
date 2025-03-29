@@ -22,10 +22,7 @@ interface Material {
   molar_mass: number | null;
 }
 
-export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ 
-  currentTheme,
-  currentLanguage
-}) => {
+export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, currentLanguage }) => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +39,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
   const loadData = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('materials')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.from('materials').select('*').order('created_at', { ascending: true });
 
       if (error) throw error;
       setMaterials(data || []);
@@ -58,14 +52,14 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
   };
 
   const handleChangeEditingValues = (name: string, value: string) => {
-    setEditingValues(previous => ({
+    setEditingValues((previous) => ({
       ...previous,
       [name]: value,
     }));
   };
 
   const handleChangeMaterial = (name: string, value: string) => {
-    setNewMaterial(previous => ({
+    setNewMaterial((previous) => ({
       ...previous,
       [name]: value,
     }));
@@ -86,11 +80,11 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
 
         const { error } = await supabase
           .from('materials')
-          .update({ 
+          .update({
             name: editingValues.name,
             e_potential,
             valency,
-            molar_mass
+            molar_mass,
           })
           .eq('id', material.id);
 
@@ -111,10 +105,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
 
   const handleDeleteMaterial = async (materialId: string) => {
     try {
-      const { error } = await supabase
-        .from('materials')
-        .delete()
-        .eq('id', materialId);
+      const { error } = await supabase.from('materials').delete().eq('id', materialId);
 
       if (error) throw error;
       await loadData();
@@ -136,15 +127,13 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
       const valency = newMaterial.valency ? parseFloat(newMaterial.valency) : null;
       const molar_mass = newMaterial.molar_mass ? parseFloat(newMaterial.molar_mass) : null;
 
-      const { error } = await supabase
-        .from('materials')
-        .insert({
-          name: newMaterial.name,
-          e_potential,
-          valency,
-          molar_mass,
-          hidden_id: generateHiddenId()
-        });
+      const { error } = await supabase.from('materials').insert({
+        name: newMaterial.name,
+        e_potential,
+        valency,
+        molar_mass,
+        hidden_id: generateHiddenId(),
+      });
 
       if (error) throw error;
       await loadData();
@@ -165,26 +154,15 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
 
   return (
     <div className="p-6">
-      {error && (
-        <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-          {error}
-        </div>
-      )}
+      {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {loading ? (
-        <div className="text-center p-4 text-primary">
-          Loading materials...
-        </div>
+        <div className="text-center p-4 text-primary">Loading materials...</div>
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold">
-              Materials
-            </h3>
-            <Button
-              onClick={handleOpenMaterial}
-              className="px-3 py-1"
-            >
+            <h3 className="text-lg font-bold">Materials</h3>
+            <Button onClick={handleOpenMaterial} className="px-3 py-1">
               <Plus size={14} />
               Add Material
             </Button>
@@ -204,9 +182,6 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-
-            
-          
                   {materials.map((material) => (
                     <TableRow key={material.id}>
                       <TableCell className="p-2">
@@ -271,11 +246,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                             className="p-1 rounded hover:bg-opacity-80"
                             variant="ghost"
                           >
-                            {editingMaterial === material.id ? (
-                              <Save size={14} />
-                            ) : (
-                              <Edit2 size={14} />
-                            )}
+                            {editingMaterial === material.id ? <Save size={14} /> : <Edit2 size={14} />}
                           </Button>
                           <Button onClick={() => handleDeleteMaterial(material.id)} variant="ghost">
                             <X size={14} />
@@ -331,11 +302,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({
                       </TableCell>
                       <TableCell className="p-2">
                         <div className="flex items-center justify-center gap-2">
-                          <Button
-                            onClick={handleAddNewMaterial}
-                            className="p-1 rounded hover:bg-opacity-80 text-primary"
-                            variant="ghost"
-                          >
+                          <Button onClick={handleAddNewMaterial} className="p-1 rounded hover:bg-opacity-80 text-primary" variant="ghost">
                             <Save size={14} />
                           </Button>
                           <Button

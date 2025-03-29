@@ -13,8 +13,8 @@ const initialState = {
   name: '',
   latitude: '',
   longitude: '',
-  has_fence: ''
-}
+  has_fence: '',
+};
 
 interface FieldFormProps {
   currentTheme: Theme;
@@ -23,12 +23,7 @@ interface FieldFormProps {
   currentLanguage: Language;
 }
 
-const FieldForm: React.FC<FieldFormProps> = ({
-  currentTheme,
-  selectedProjectId,
-  onProjectsChange,
-  currentLanguage,
-}) => {
+const FieldForm: React.FC<FieldFormProps> = ({ currentTheme, selectedProjectId, onProjectsChange, currentLanguage }) => {
   const [showForm, setShowForm] = useState(false);
   const [newField, setNewField] = useState(initialState);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +31,9 @@ const FieldForm: React.FC<FieldFormProps> = ({
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
-    setNewField(previous => ({
+    setNewField((previous) => ({
       ...previous,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -49,7 +44,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if(!newField || !selectedProjectId) return;
+    if (!newField || !selectedProjectId) return;
     try {
       await createField(selectedProjectId, newField);
       // Fetch fresh projects data to ensure everything is in sync
@@ -66,12 +61,12 @@ const FieldForm: React.FC<FieldFormProps> = ({
 
   return (
     <>
-      <button 
+      <button
         className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
         onClick={() => setShowForm(true)}
       >
         <Plus className="size-4" />
-        {translation("field.add")}
+        {translation('field.add')}
       </button>
 
       {showForm && (
@@ -79,11 +74,11 @@ const FieldForm: React.FC<FieldFormProps> = ({
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
             <h3 className="flex gap-2 text-lg mb-4 text-primary">
               <Folder className="text-accent-primary" />
-              {translation("field.add_new")}
+              {translation('field.add_new')}
             </h3>
             <form onSubmit={handleSubmit}>
               <Label className="block text-sm mb-1 text-secondary" htmlFor="new-field">
-                {translation("field.name")}
+                {translation('field.name')}
                 <input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -94,7 +89,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 />
               </Label>
               <Label className="block text-sm mb-1 text-secondary">
-                {translation("project.latitude")}
+                {translation('project.latitude')}
                 <Input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -104,7 +99,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 />
               </Label>
               <Label className="block text-sm mb-1 text-secondary">
-                {translation("project.longitude")}
+                {translation('project.longitude')}
                 <Input
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                   type="text"
@@ -114,7 +109,7 @@ const FieldForm: React.FC<FieldFormProps> = ({
                 />
               </Label>
               <div className="block text-sm mb-1 text-secondary">
-                <Label>{translation("field.has_fence")}</Label>
+                <Label>{translation('field.has_fence')}</Label>
                 <select
                   name="has_fence"
                   value={newField.has_fence}
@@ -122,8 +117,8 @@ const FieldForm: React.FC<FieldFormProps> = ({
                   className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
                 >
                   <option value="">Select fence option</option>
-                  <option value="no">{translation("field.has_fence.no")}</option>
-                  <option value="yes">{translation("field.has_fence.yes")}</option>
+                  <option value="no">{translation('field.has_fence.no')}</option>
+                  <option value="yes">{translation('field.has_fence.yes')}</option>
                 </select>
               </div>
               <div className="w-full mt-6 flex items-center justify-end gap-x-2">
@@ -132,13 +127,10 @@ const FieldForm: React.FC<FieldFormProps> = ({
                   type="button"
                   onClick={handleReset}
                 >
-                  {translation("actions.cancel")}
+                  {translation('actions.cancel')}
                 </Button>
-                <Button
-                  className="px-4 py-2 rounded text-sm text-white bg-accent-primary"
-                  type="submit"
-                >
-                  {translation("actions.save")}
+                <Button className="px-4 py-2 rounded text-sm text-white bg-accent-primary" type="submit">
+                  {translation('actions.save')}
                 </Button>
               </div>
             </form>

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef } from 'react';
 
 /**
  * This hook debounces the provided function and returns the debounced function
@@ -8,10 +8,7 @@ import { useRef } from "react";
  * @param delay - The delay in milliseconds
  * @returns the debounced function
  */
-export const useDebounce = <T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number = 500
-) => {
+export const useDebounce = <T extends (...args: any[]) => any>(callback: T, delay: number = 500) => {
   const timeout = useRef<NodeJS.Timeout | null>(null);
 
   return (...args: Parameters<T>) => {

@@ -13,12 +13,7 @@ interface ParameterFilterProps {
   onParametersChange: (parameters: Parameter[]) => void;
 }
 
-const ParameterFilter: React.FC<ParameterFilterProps> = ({
-  currentTheme,
-  currentLanguage,
-  parameters,
-  onParametersChange
-}) => {
+const ParameterFilter: React.FC<ParameterFilterProps> = ({ currentTheme, currentLanguage, parameters, onParametersChange }) => {
   const [selectedNorm, setSelectedNorm] = useState<string | null>(null);
   const [norms, setNorms] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,12 +28,14 @@ const ParameterFilter: React.FC<ParameterFilterProps> = ({
       setLoading(true);
       const { data, error } = await supabase
         .from('norms')
-        .select(`
+        .select(
+          `
           *,
           parameters:norm_parameters (
             parameter_id
           )
-        `)
+        `,
+        )
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -52,16 +49,16 @@ const ParameterFilter: React.FC<ParameterFilterProps> = ({
 
   const handleNormChange = (normId: string) => {
     setSelectedNorm(normId === selectedNorm ? null : normId);
-    
+
     if (normId === selectedNorm) {
       // Show all parameters when deselecting
       onParametersChange(parameters);
     } else {
       // Filter parameters based on selected norm
-      const norm = norms.find(n => n.id === normId);
+      const norm = norms.find((n) => n.id === normId);
       if (norm) {
         const normParameterIds = norm.parameters.map((p: any) => p.parameter_id);
-        const filteredParameters = parameters.filter(p => normParameterIds.includes(p.id));
+        const filteredParameters = parameters.filter((p) => normParameterIds.includes(p.id));
         onParametersChange(filteredParameters);
       }
     }
@@ -71,17 +68,15 @@ const ParameterFilter: React.FC<ParameterFilterProps> = ({
     <div className="mb-4 flex items-center gap-4">
       <div className="flex items-center gap-2 ">
         <Filter size={16} />
-        <span>{t("datapoint.filter_by_norm")}</span>
+        <span>{t('datapoint.filter_by_norm')}</span>
       </div>
       <div className="flex gap-2">
-        {norms.map(norm => (
+        {norms.map((norm) => (
           <Button
             key={norm.id}
             onClick={() => handleNormChange(norm.id)}
             className={`px-3 py-1 rounded text-sm transition-colors ${
-              selectedNorm === norm.id 
-                ? 'bg-accent-primary text-primary' 
-                : 'text-primary-foreground hover:bg-theme'
+              selectedNorm === norm.id ? 'bg-accent-primary text-primary' : 'text-primary-foreground hover:bg-theme'
             }`}
           >
             {norm.name}

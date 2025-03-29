@@ -11,12 +11,7 @@ interface ProjectsSettingsProps {
   places: SavedPlace[];
 }
 
-const ProjectsSettings: React.FC<ProjectsSettingsProps> = ({
-  currentTheme,
-  projects,
-  onProjectsChange,
-  places
-}) => {
+const ProjectsSettings: React.FC<ProjectsSettingsProps> = ({ currentTheme, projects, onProjectsChange, places }) => {
   return (
     <ProjectsPanel
       currentTheme={currentTheme}
