@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { Theme } from "../../types/theme";
 import LoginForm from "./LoginForm";
-import LandingPage from "./LandingPage";
 import AdminDashboard from "../admin/AdminDashboard";
 import { Language, setTranslations } from "../../types/language";
 import { fetchTranslations } from "../../services/translations";
@@ -125,9 +124,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   }
 
   if (!user) {
-    if (showLanding) {
-      return <LandingPage currentTheme={currentTheme} onContinue={() => setShowLanding(false)} />;
-    }
     return <LoginForm currentTheme={currentTheme} onSuccess={(type) => setLoginType(type)} />;
   }
 
