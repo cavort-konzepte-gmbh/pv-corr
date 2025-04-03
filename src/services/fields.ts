@@ -1,6 +1,9 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../lib/supabase";
 import { Field, Gate } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { RootState } from "@/store/index";
+import { selectAllProjects, selectProjectById } from "@/store/slices/projectsSlice";
 
 export const createField = async (projectId: string, field: Omit<Field, "id" | "hiddenId" | "gates" | "zones">) => {
   if (!projectId) {
@@ -208,3 +211,8 @@ export const deleteGate = async (gateId: string) => {
 
   return updatedField;
 };
+
+export const getAllFieldsByProjectId = createAsyncThunk<Field[]>("fields/get", async (_, { getState }) => {
+  const { projects, navigation: { selectedProjectId } } = getState() as RootState;
+  return selectAllProjects(projects).find(project => project.id === selectedProjectId)?.fields || [];
+});

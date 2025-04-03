@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project } from "../../types/projects";
@@ -6,6 +6,10 @@ import { Person } from "../../types/people";
 import { Company } from "../../types/companies";
 import ProjectSummary from "./elements/fields/ProjectSummary";
 import FieldList from "./elements/fields/FieldList";
+import { useAppDispatch, useAppSelector } from "@/store/slices/hooks";
+import { selectProjectById } from "@/store/slices/projectsSlice";
+import { getAllFieldsByProjectId } from "@/services/fields";
+import { selectAllFields } from "@/store/slices/fieldsSlice";
 
 interface FieldsProps {
   currentTheme: Theme;
@@ -23,7 +27,6 @@ interface FieldsProps {
 const Fields: React.FC<FieldsProps> = ({
   currentTheme,
   projects,
-  selectedProjectId,
   onSelectField,
   people,
   companies,
@@ -31,8 +34,18 @@ const Fields: React.FC<FieldsProps> = ({
   currentLanguage,
   selectedCustomerId,
 }) => {
+  const dispatch = useAppDispatch();
   const translation = useTranslation(currentLanguage);
+  const { selectedProjectId } = useAppSelector((state) => state.navigation);
   const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+  const projectIdle = useAppSelector(state => state.projects.status)
+  const fields = useAppSelector((state) => selectAllFields(state));
+
+  useEffect(() => {
+    if(projectIdle === "succeeded") {
+      dispatch(getAllFieldsByProjectId())
+    }
+  }, [projectIdle])
 
   if (!selectedProject) {
     return <div className="p-6 text-center text-secondary">{translation("field.select_project")}</div>;
@@ -54,7 +67,7 @@ const Fields: React.FC<FieldsProps> = ({
 
       <FieldList
         currentTheme={currentTheme}
-        fields={selectedProject.fields || []}
+        fields={fields}
         onSelectField={(fieldId) => onSelectField(selectedProject.id, fieldId)}
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}

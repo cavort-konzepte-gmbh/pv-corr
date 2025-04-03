@@ -1,15 +1,11 @@
 import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
-import { Field, Project } from "@/types/projects";
+import { Project } from "@/types/projects";
 import { addProject, getAllProjects, removeProject, setProject } from "@/services/projects";
 interface ProjectState {
   status: "idle" | "loading" | "succeeded" | "failed";
 }
 
 const projectsAdapter = createEntityAdapter<Project>({
-  sortComparer: (x, y) => x - y,
-});
-
-const fieldsAdapter = createEntityAdapter<Field>({
   sortComparer: (x, y) => x - y,
 });
 
@@ -66,5 +62,8 @@ export const projectsSlice = createSlice({
   },
 });
 
-export const { selectAll: selectAllFields, selectById: selectFieldById, selectIds: selectFieldIds } = fieldsAdapter.getSelectors();
-export const { selectAll: selectAllProjects, selectById: selectProjectById, selectIds: selectProjectIds } = projectsAdapter.getSelectors();
+export const {
+  selectAll: selectAllProjects,
+  selectById: selectProjectById,
+  selectIds: selectProjectIds,
+} = projectsAdapter.getSelectors();

@@ -307,7 +307,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
   }
 };
 
-export const getAllProjects = createAsyncThunk<Project[]>("projects", async () => {
+export const getAllProjects = createAsyncThunk<Project[]>("projects/get", async () => {
   return await fetchProjects();
 });
 
