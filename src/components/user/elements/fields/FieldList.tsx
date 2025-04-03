@@ -19,7 +19,6 @@ interface FieldListProps {
   onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
   selectedProjectId: string;
-  selectedCustomerId: string | null;
 }
 
 const FieldList: React.FC<FieldListProps> = ({
@@ -29,7 +28,6 @@ const FieldList: React.FC<FieldListProps> = ({
   onProjectsChange,
   currentLanguage,
   selectedProjectId,
-  selectedCustomerId,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});

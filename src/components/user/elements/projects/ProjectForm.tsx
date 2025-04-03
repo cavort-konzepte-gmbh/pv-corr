@@ -3,31 +3,22 @@ import { Theme } from "../../../../types/theme";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
 import { Plus } from "lucide-react";
-import { createProject } from "../../../../services/projects";
-import { fetchProjects } from "../../../../services/projects";
+import { addProject } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
-import { Project } from "../../../../types/projects";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/store/slices/hooks";
 
 interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
   savedPeople: Person[];
   savedCompanies: Company[];
-  onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
   selectedCustomerId: string | null;
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({
-  currentTheme,
-  savedPeople,
-  savedCompanies,
-  currentLanguage,
-  selectedCustomerId,
-  onProjectsChange,
-}) => {
+const ProjectForm: React.FC<ProjectFormProps> = ({ currentTheme, savedPeople, savedCompanies, currentLanguage, selectedCustomerId }) => {
   const [showForm, setShowForm] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [clientRef, setClientRef] = useState("");
@@ -42,6 +33,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const [createDefaultZone, setCreateDefaultZone] = useState(true);
   const [defaultZoneName, setDefaultZoneName] = useState("Zone 1");
   const translation = useTranslation(currentLanguage);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,28 +44,26 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
     try {
       setError(null);
-      const newProject = await createProject(
-        {
-          name: projectName.trim(),
-          clientRef: clientRef.trim() || undefined,
-          customerId: selectedCustomerId,
-          latitude: latitude.trim() || undefined,
-          longitude: longitude.trim() || undefined,
-          imageUrl: imageUrl.trim() || undefined,
-          managerId: selectedManagerId,
-          typeProject,
-        },
-        {
-          createDefaultField,
-          defaultFieldName: defaultFieldName.trim(),
-          createDefaultZone,
-          defaultZoneName: defaultZoneName.trim(),
-        },
+      dispatch(
+        addProject({
+          project: {
+            name: projectName.trim(),
+            clientRef: clientRef.trim() || undefined,
+            customerId: selectedCustomerId,
+            latitude: latitude.trim() || undefined,
+            longitude: longitude.trim() || undefined,
+            imageUrl: imageUrl.trim() || undefined,
+            managerId: selectedManagerId,
+            typeProject,
+          },
+          options: {
+            createDefaultField,
+            defaultFieldName: defaultFieldName.trim(),
+            createDefaultZone,
+            defaultZoneName: defaultZoneName.trim(),
+          },
+        }),
       );
-
-      // Update projects list with new project
-      const updatedProjects = await fetchProjects(selectedCustomerId as string);
-      onProjectsChange(updatedProjects);
 
       setShowForm(false);
       setProjectName("");
@@ -93,13 +83,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
   return (
     <>
-      <Button onClick={() => setShowForm(true)}>
+      <Button className="mb-6" onClick={() => setShowForm(true)}>
         <Plus size={16} />
         {translation("project.add")}
       </Button>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-card">
             <h3 className="text-lg mb-6 text-primary">{translation("project.new")}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">

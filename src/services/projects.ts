@@ -1,3 +1,4 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../lib/supabase";
 import { Project } from "../types/projects";
 import { toCase } from "../utils/cases";
@@ -147,23 +148,24 @@ export const updateProject = async (project: Project) => {
     .select(
       `
       *,
-      fields!inner (
-        id,
-        hidden_id,
-        name,
-        latitude,
-        longitude,
-        has_fence,
-        gates:gates (*),
-        zones!inner (
+        fields (
           id,
           hidden_id,
           name,
           latitude,
           longitude,
-          datapoints:datapoints (*)
+          has_fence,
+          gates (*),
+          zones (
+            id,
+            hidden_id,
+            name,
+            latitude,
+            longitude,
+            datapoints (*)
+          )
         )
-      )`,
+      `,
     )
     .eq("id", project.id)
     .single();
@@ -304,3 +306,28 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     throw new Error("Failed to load projects");
   }
 };
+
+export const getAllProjects = createAsyncThunk<Project[]>("projects", async () => {
+  return await fetchProjects();
+});
+
+export const setProject = createAsyncThunk<Project, Project>("projects/update", async (project, { dispatch }) => {
+  const updated = await updateProject(project);
+  dispatch(getAllProjects());
+  return updated;
+});
+
+export const removeProject = createAsyncThunk<boolean, string>("projects/delete", async (projectId, { dispatch }) => {
+  const deleted = await deleteProject(projectId);
+  dispatch(getAllProjects());
+  return deleted;
+});
+
+export const addProject = createAsyncThunk<Project, { project: Omit<Project, "id" | "fields">; options?: CreateProjectOptions }>(
+  "projects/add",
+  async (args, { dispatch }) => {
+    const created = await createProject(args.project, args.options);
+    dispatch(getAllProjects());
+    return created;
+  },
+);

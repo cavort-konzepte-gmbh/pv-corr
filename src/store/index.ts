@@ -2,6 +2,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import navigationReducer from "./slices/navigationSlice";
+import { projectsSlice } from "./slices/projectsSlice";
 
 const persistConfig = {
   key: "root",
@@ -16,6 +17,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   navigation: navigationReducer,
+  projects: projectsSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

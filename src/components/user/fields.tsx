@@ -50,8 +50,6 @@ const Fields: React.FC<FieldsProps> = ({
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         savedPeople={people}
-        onProjectsChange={onProjectsChange}
-        selectedCustomerId={selectedCustomerId}
       />
 
       <FieldList
@@ -61,7 +59,6 @@ const Fields: React.FC<FieldsProps> = ({
         onProjectsChange={onProjectsChange}
         currentLanguage={currentLanguage}
         selectedProjectId={selectedProject.id}
-        selectedCustomerId={selectedCustomerId}
       />
     </div>
   );
