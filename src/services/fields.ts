@@ -3,7 +3,8 @@ import { supabase } from "../lib/supabase";
 import { Field, Gate } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
 import { RootState } from "@/store/index";
-import { selectAllProjects, selectProjectById } from "@/store/slices/projectsSlice";
+import { selectAllProjects } from "@/store/slices/projectsSlice";
+import { getAllProjects } from "./projects";
 
 export const createField = async (projectId: string, field: Omit<Field, "id" | "hiddenId" | "gates" | "zones">) => {
   if (!projectId) {
@@ -213,6 +214,33 @@ export const deleteGate = async (gateId: string) => {
 };
 
 export const getAllFieldsByProjectId = createAsyncThunk<Field[]>("fields/get", async (_, { getState }) => {
-  const { projects, navigation: { selectedProjectId } } = getState() as RootState;
-  return selectAllProjects(projects).find(project => project.id === selectedProjectId)?.fields || [];
+  const {
+    projects,
+    navigation: { selectedProjectId },
+  } = getState() as RootState;
+  return selectAllProjects(projects).find((project) => project.id === selectedProjectId)?.fields || [];
 });
+
+export const addField = createAsyncThunk<Field, { projectId: string; field: Omit<Field, "id" | "hiddenId" | "gates" | "zones"> }>(
+  "fields/add",
+  async ({ projectId, field }, { dispatch }) => {
+    const newField = await createField(projectId, field);
+    dispatch(getAllProjects());
+    return newField;
+  },
+);
+
+export const removeField = createAsyncThunk<boolean, string>("fields/remove", async (fieldId, { dispatch }) => {
+  await deleteField(fieldId);
+  dispatch(getAllProjects());
+  return true;
+});
+
+export const setField = createAsyncThunk<Field, { fieldId: string; field: Partial<Field> }>(
+  "fields/set",
+  async ({ fieldId, field }, { dispatch }) => {
+    const updatedField = await updateField(fieldId, field);
+    dispatch(getAllProjects());
+    return updatedField;
+  },
+);

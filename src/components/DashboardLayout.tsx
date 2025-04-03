@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Theme, THEMES } from "../types/theme";
 import { Language, LANGUAGES, useTranslation } from "../types/language";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -27,8 +27,6 @@ import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, Layo
 import { FileText } from "lucide-react";
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
-import { updateUserSettings } from "@/services/userSettings";
-import { store } from "@/store";
 import { useAppDispatch, useAppSelector } from "@/store/slices/hooks";
 import { selectAllProjects } from "@/store/slices/projectsSlice";
 
@@ -283,10 +281,8 @@ const DashboardLayout = () => {
       case "fields":
         return (
           <Fields
-            currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             projects={projects}
-            onProjectsChange={setProjects}
             selectedProjectId={selectedProjectId}
             selectedField={selectedFieldId}
             onSelectField={(projectId, fieldId) => {
@@ -303,10 +299,8 @@ const DashboardLayout = () => {
       case "zones":
         return (
           <Zones
-            currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             projects={projects}
-            onProjectsChange={setProjects}
             selectedProjectId={selectedProjectId}
             selectedFieldId={selectedFieldId}
             onSelectZone={(zoneId) => {

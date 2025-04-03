@@ -62,8 +62,4 @@ export const projectsSlice = createSlice({
   },
 });
 
-export const {
-  selectAll: selectAllProjects,
-  selectById: selectProjectById,
-  selectIds: selectProjectIds,
-} = projectsAdapter.getSelectors();
+export const { selectAll: selectAllProjects, selectById: selectProjectById, selectIds: selectProjectIds } = projectsAdapter.getSelectors();

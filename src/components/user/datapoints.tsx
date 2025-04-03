@@ -93,8 +93,6 @@ const Datapoints: React.FC<DatapointsProps> = ({
         isExpanded={showFieldSummary}
         onToggle={() => setShowFieldSummary(!showFieldSummary)}
         field={field}
-        onProjectsChange={onProjectsChange}
-        currentTheme={currentTheme}
         currentLanguage={currentLanguage}
       />
 

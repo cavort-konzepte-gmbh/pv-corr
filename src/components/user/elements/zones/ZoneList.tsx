@@ -1,28 +1,32 @@
 import React, { useState } from "react";
-import { Theme } from "../../../../types/theme";
-import { Project, Zone } from "../../../../types/projects";
+import { Zone } from "../../../../types/projects";
 import { ChevronRight, Edit2, Save, X, Building2, Wrench, Plus } from "lucide-react";
-import { updateZone, deleteZone } from "../../../../services/zones";
-import { fetchProjects } from "../../../../services/projects";
+import { removeZone, addZone, setZone } from "../../../../services/zones";
 import { useEffect } from "react";
 import { supabase } from "../../../../lib/supabase";
 import { Language, useTranslation } from "../../../../types/language";
 import { FormHandler } from "../../../shared/FormHandler";
-import { createZone } from "../../../../services/zones";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppDispatch } from "@/store/slices/hooks";
 
 interface ZoneListProps {
-  currentTheme: Theme;
   zones: Zone[];
   onSelectZone: (zoneId: string) => void;
-  onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
   selectedFieldId: string;
 }
 
-const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, onProjectsChange, currentLanguage, selectedFieldId }) => {
+const newValesInitialState = {
+  name: "",
+  latitude: "",
+  longitude: "",
+  substructureId: "",
+  foundationId: "",
+};
+
+const ZoneList: React.FC<ZoneListProps> = ({ zones, onSelectZone, currentLanguage, selectedFieldId }) => {
   const [editingZoneId, setEditingZoneId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingZone, setUpdatingZone] = useState(false);
@@ -30,17 +34,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
   const [selectedSubstructure, setSelectedSubstructure] = useState<any>(null);
   const [selectedFoundation, setSelectedFoundation] = useState<any>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newValues, setNewValues] = useState({
-    name: "",
-    latitude: "",
-    longitude: "",
-    substructureId: "",
-    foundationId: "",
-  });
+  const [newValues, setNewValues] = useState(newValesInitialState);
   const [substructures, setSubstructures] = useState<any[]>([]);
   const [foundations, setFoundations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const translation = useTranslation(currentLanguage);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const loadData = async () => {
@@ -77,13 +76,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
         foundationId: values.foundationId === "" ? null : values.foundationId,
       };
 
-      await updateZone(zoneId, updateData);
-
-      // Wait a moment before refreshing to ensure DB update is complete
+      dispatch(setZone({ zoneId, zone: updateData as any }));
       await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
 
       // Reset editing state
       setEditingZoneId(null);
@@ -99,11 +93,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
 
   const handleDeleteZone = async (zoneId: string) => {
     try {
-      await deleteZone(zoneId);
-      const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
+      dispatch(removeZone(zoneId));
     } catch (err) {
       console.error("Error deleting zone:", err);
     }
@@ -116,27 +106,21 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
     }
 
     try {
-      await createZone(selectedFieldId, {
-        name: newValues.name.trim(),
-        latitude: newValues.latitude || undefined,
-        longitude: newValues.longitude || undefined,
-        substructureId: newValues.substructureId || undefined,
-        foundationId: newValues.foundationId || undefined,
-      });
-
-      const updatedProjects = await fetchProjects();
-      if (updatedProjects) {
-        onProjectsChange(updatedProjects);
-      }
+      dispatch(
+        addZone({
+          fieldId: selectedFieldId,
+          zone: {
+            name: newValues.name.trim(),
+            latitude: newValues.latitude || undefined,
+            longitude: newValues.longitude || undefined,
+            substructureId: newValues.substructureId || undefined,
+            foundationId: newValues.foundationId || undefined,
+          },
+        }),
+      );
 
       setIsAdding(false);
-      setNewValues({
-        name: "",
-        latitude: "",
-        longitude: "",
-        substructureId: "",
-        foundationId: "",
-      });
+      setNewValues(newValesInitialState);
     } catch (err) {
       console.error("Error creating zone:", err);
       setError("Failed to create zone");

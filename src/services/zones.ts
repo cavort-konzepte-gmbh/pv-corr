@@ -1,6 +1,10 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../lib/supabase";
 import { Zone } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { RootState } from "@/store/slices/hooks";
+import { getAllFieldsByProjectId } from "./fields";
+import { getAllProjects } from "./projects";
 
 export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hiddenId" | "datapoints">) => {
   if (!fieldId) {
@@ -96,3 +100,32 @@ export const deleteZone = async (zoneId: string) => {
     throw error;
   }
 };
+
+export const getAllZonesByFieldId = createAsyncThunk<Zone[], string>("zones/get", async (fieldId, { dispatch }) => {
+  const fields = await dispatch(getAllFieldsByProjectId()).unwrap();
+  return fields.find((f) => f.id === fieldId)?.zones || [];
+});
+
+export const setZone = createAsyncThunk<Zone, { zoneId: string; zone: Partial<Zone> }>(
+  "zones/set",
+  async ({ zoneId, zone }, { dispatch }) => {
+    const updatedZone = await updateZone(zoneId, zone);
+    dispatch(getAllProjects());
+    return updatedZone;
+  },
+);
+
+export const removeZone = createAsyncThunk<boolean, string>("zones/remove", async (zoneId, { dispatch }) => {
+  await deleteZone(zoneId);
+  dispatch(getAllProjects());
+  return true;
+});
+
+export const addZone = createAsyncThunk<Zone, { fieldId: string; zone: Omit<Zone, "id" | "hiddenId" | "datapoints"> }>(
+  "zones/add",
+  async ({ fieldId, zone }, { dispatch }) => {
+    const createdZone = await createZone(fieldId, zone);
+    dispatch(getAllProjects());
+    return createdZone;
+  },
+);

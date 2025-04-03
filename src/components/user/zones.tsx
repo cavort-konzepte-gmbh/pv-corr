@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project } from "../../types/projects";
@@ -7,14 +7,14 @@ import { Company } from "../../types/companies";
 import { useState } from "react";
 import FieldSummary from "./elements/zones/FieldSummary";
 import ZoneList from "./elements/zones/ZoneList";
-import ZoneForm from "./elements/zones/ZoneForm";
 import ProjectSummary from "./elements/fields/ProjectSummary";
+import { useAppDispatch, useAppSelector } from "@/store/slices/hooks";
+import { getAllZonesByFieldId } from "@/services/zones";
+import { selectAllZones } from "@/store/slices/zonesSlice";
 
 interface ZonesProps {
-  currentTheme: Theme;
   currentLanguage: Language;
   projects: Project[];
-  onProjectsChange: (projects: Project[]) => void;
   selectedProjectId?: string;
   selectedFieldId?: string;
   onSelectZone: (zoneId: string) => void;
@@ -23,21 +23,26 @@ interface ZonesProps {
 }
 
 const Zones: React.FC<ZonesProps> = ({
-  currentTheme,
   projects,
   selectedProjectId,
   selectedFieldId,
   onSelectZone,
   people,
   companies,
-  onProjectsChange,
   currentLanguage,
 }) => {
+  const dispatch = useAppDispatch();
   const transition = useTranslation(currentLanguage);
+  const zones = useAppSelector((state) => selectAllZones(state));
+
+  useEffect(() => {
+    if (!selectedFieldId) return;
+    dispatch(getAllZonesByFieldId(selectedFieldId));
+  }, []);
 
   const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
 
-  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f: any) => f.id === selectedFieldId) : null;
 
   if (!selectedProject || !selectedField) {
     return <div className="p-6 text-center">{transition("zones.please_select_field")}</div>;
@@ -54,30 +59,15 @@ const Zones: React.FC<ZonesProps> = ({
         project={selectedProject}
         manager={manager}
         company={company}
-        currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         savedPeople={people}
         isExpanded={showProjectSummary}
         onToggle={() => setShowProjectSummary(!showProjectSummary)}
-        onProjectsChange={onProjectsChange}
-        selectedCustomerId={selectedProject.companyId}
       />
 
-      <FieldSummary
-        field={selectedField}
-        currentTheme={currentTheme}
-        currentLanguage={currentLanguage}
-        onProjectsChange={onProjectsChange}
-      />
+      <FieldSummary field={selectedField} currentLanguage={currentLanguage} />
 
-      <ZoneList
-        currentTheme={currentTheme}
-        zones={selectedField.zones}
-        selectedFieldId={selectedField.id}
-        onSelectZone={onSelectZone}
-        onProjectsChange={onProjectsChange}
-        currentLanguage={currentLanguage}
-      />
+      <ZoneList zones={zones} selectedFieldId={selectedField.id} onSelectZone={onSelectZone} currentLanguage={currentLanguage} />
     </div>
   );
 };

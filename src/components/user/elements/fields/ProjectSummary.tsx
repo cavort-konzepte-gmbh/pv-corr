@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Theme } from "../../../../types/theme";
 import { Project } from "../../../../types/projects";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
@@ -16,7 +15,6 @@ interface ProjectSummaryProps {
   project: Project;
   manager?: Person;
   company?: Company;
-  currentTheme: Theme;
   currentLanguage: Language;
   savedPeople: Person[];
   isExpanded?: boolean;
@@ -27,7 +25,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   project,
   manager,
   company,
-  currentTheme,
   currentLanguage,
   savedPeople,
   isExpanded = true,
@@ -228,13 +225,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
       </section>
 
       {showMediaDialog && (
-        <MediaDialog
-          isOpen={true}
-          onClose={() => setShowMediaDialog(null)}
-          entityId={showMediaDialog}
-          currentTheme={currentTheme}
-          entityType="project"
-        />
+        <MediaDialog isOpen={true} onClose={() => setShowMediaDialog(null)} entityId={showMediaDialog} entityType="project" />
       )}
     </div>
   );

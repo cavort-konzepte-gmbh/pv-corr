@@ -1,34 +1,23 @@
 import React, { useState } from "react";
-import { Theme } from "../../../../types/theme";
-import { Field, Project } from "../../../../types/projects";
-import { ChevronRight, Edit2, X, MoreVertical, Save, Plus } from "lucide-react";
+import { Field } from "../../../../types/projects";
+import { ChevronRight, Edit2, X, Save, Plus } from "lucide-react";
 import { googleMaps } from "../../../../utils/google-maps";
-import { deleteField, updateField } from "../../../../services/fields";
-import { fetchProjects } from "../../../../services/projects";
+import { addField, removeField, setField } from "../../../../services/fields";
 import { Language, useTranslation } from "../../../../types/language";
 import { FormHandler } from "../../../shared/FormHandler";
-import { createField } from "../../../../services/fields";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/store/slices/hooks";
 
 interface FieldListProps {
-  currentTheme: Theme;
   fields?: Field[];
   onSelectField: (fieldId: string) => void;
-  onProjectsChange: (projects: Project[]) => void;
   currentLanguage: Language;
   selectedProjectId: string;
 }
 
-const FieldList: React.FC<FieldListProps> = ({
-  currentTheme,
-  fields: initialFields,
-  onSelectField,
-  onProjectsChange,
-  currentLanguage,
-  selectedProjectId,
-}) => {
+const FieldList: React.FC<FieldListProps> = ({ fields: initialFields, onSelectField, currentLanguage, selectedProjectId }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [updatingField, setUpdatingField] = useState(false);
@@ -42,6 +31,7 @@ const FieldList: React.FC<FieldListProps> = ({
   });
   const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
+  const dispatch = useAppDispatch();
 
   const handleSave = async (field: Field) => {
     if (updatingField && !field.id) return;
@@ -59,17 +49,17 @@ const FieldList: React.FC<FieldListProps> = ({
 
       setLocalFields((prevFields) => prevFields.map((f) => (f.id === field.id ? updatedField : f)));
 
-      // Send update to server
-      await updateField(field.id, {
-        name: editingValues.name || field.name,
-        latitude: editingValues.latitude || field.latitude,
-        longitude: editingValues.longitude || field.longitude,
-        has_fence: hasFence,
-      });
-
-      // Refresh projects to ensure sync - wait for the update to complete
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
+      dispatch(
+        setField({
+          fieldId: field.id,
+          field: {
+            name: editingValues.name || field.name,
+            latitude: editingValues.latitude || field.latitude,
+            longitude: editingValues.longitude || field.longitude,
+            has_fence: hasFence,
+          },
+        }),
+      );
 
       setEditingId(null);
       setEditingValues({});
@@ -96,16 +86,17 @@ const FieldList: React.FC<FieldListProps> = ({
 
     try {
       setError(null);
-      await createField(selectedProjectId, {
-        name: newValues.name.trim(),
-        latitude: newValues.latitude || undefined,
-        longitude: newValues.longitude || undefined,
-        has_fence: newValues.has_fence as "yes" | "no",
-      });
-
-      // Fetch fresh project data
-      const updatedProjects = await fetchProjects(null);
-      onProjectsChange(updatedProjects);
+      dispatch(
+        addField({
+          projectId: selectedProjectId,
+          field: {
+            name: newValues.name.trim(),
+            latitude: newValues.latitude || undefined,
+            longitude: newValues.longitude || undefined,
+            has_fence: newValues.has_fence as "yes" | "no",
+          },
+        }),
+      );
 
       setIsAdding(false);
       setNewValues({
@@ -128,9 +119,7 @@ const FieldList: React.FC<FieldListProps> = ({
 
   const handleRemoveField = async (event: React.MouseEvent, field: Field) => {
     event.stopPropagation();
-    await deleteField(field.id);
-    const updatedProjects = await fetchProjects();
-    onProjectsChange(updatedProjects);
+    dispatch(removeField(field.id));
   };
 
   return (
