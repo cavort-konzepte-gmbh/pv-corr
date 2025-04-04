@@ -17,6 +17,12 @@ export interface LanguageEntry {
 
 export const fetchTranslations = async (language: Language) => {
   try {
+    // Check if we have cached translations for this language
+    const cachedTranslations = localStorage.getItem(`translations_${language}`);
+    if (cachedTranslations) {
+      return JSON.parse(cachedTranslations);
+    }
+
     const { data: translations, error } = await supabase
       .from("translations")
       .select("*")
@@ -30,6 +36,9 @@ export const fetchTranslations = async (language: Language) => {
     translations.forEach((translation) => {
       translationMap[translation.key] = translation.value;
     });
+
+    // Cache translations in localStorage for faster loading next time
+    localStorage.setItem(`translations_${language}`, JSON.stringify(translationMap));
 
     return translationMap;
   } catch (err) {

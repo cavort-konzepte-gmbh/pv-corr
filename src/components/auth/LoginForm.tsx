@@ -23,6 +23,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
     setError(null);
 
     try {
+      // Clear any existing sessions first
+      await supabase.auth.signOut();
+      
       const {
         data: { user },
         error,
@@ -33,6 +36,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
 
       if (error) {
         throw error;
+      }
+
+      if (!user) {
+        throw new Error("No user returned from authentication");
       }
 
       // Check if this is an admin login attempt

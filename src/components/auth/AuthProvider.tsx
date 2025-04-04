@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { Theme } from "../../types/theme";
-import LoginForm from "./LoginForm";
-import AdminDashboard from "../admin/AdminDashboard";
 import { Language, setTranslations } from "../../types/language";
 import { fetchTranslations } from "../../services/translations";
+import LoginForm from "./LoginForm";
+import AdminDashboard from "../admin/AdminDashboard";
 import { Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
@@ -36,16 +36,17 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentTheme, currentLanguage }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showLanding, setShowLanding] = useState(true);
   const [loginType, setLoginType] = useState<"user" | "admin" | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewMode, setViewMode] = useState<"user" | "admin">("user");
 
+  // Load translations when component mounts or language changes
   useEffect(() => {
-    // Load translations when language changes
     const loadTranslations = async () => {
+      setLoading(true);
       const translations = await fetchTranslations(currentLanguage);
       setTranslations(translations);
+      setLoading(false);
     };
     loadTranslations();
   }, [currentLanguage]);
@@ -65,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
         setUser(null);
         setIsAdmin(false);
         setViewMode("user");
-        setShowLanding(true);
+        setLoginType(null);
       } else if (session?.user) {
         handleSession(session);
       }
@@ -103,9 +104,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
 
   const signOut = async () => {
     try {
+      // Clear any cached auth state before signing out
+      localStorage.removeItem("sb-auth-token");
+      sessionStorage.removeItem("sb-auth-token");
+      
       await supabase.auth.signOut();
       setLoginType(null);
-      setShowLanding(true);
+      setUser(null);
+      setIsAdmin(false);
+      setViewMode("user");
+      
+      // Force page reload to clear any cached state
+      window.location.href = "/";
     } catch (error) {
       console.error("Error signing out:", error);
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Theme, THEMES } from "../types/theme";
-import { Language, LANGUAGES, useTranslation } from "../types/language";
+import { Language, LANGUAGES, useTranslation, setTranslations } from "../types/language";
 import { BrowserRouter as Router } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { generateHiddenId } from "../utils/generateHiddenId";
@@ -10,6 +10,7 @@ import { Customer } from "../types/customers";
 import { Standard, STANDARDS } from "../types/standards";
 import { fetchProjects } from "../services/projects";
 import { fetchCustomers } from "../services/customers";
+import { fetchTranslations } from "../services/translations";
 import { useAuth } from "./auth/AuthProvider";
 import { ArrowLeft } from "lucide-react";
 import { SavedPlace } from "./shared/types";
@@ -55,9 +56,24 @@ const DashboardLayout = () => {
   const [loading, setLoading] = useState(true);
   const [settingsView, setSettingsView] = useState<"general" | "theme" | "companies" | "people" | "datapoints">("general");
   const [selectedZone, setSelectedZone] = useState<Zone | undefined>();
+  const [translationsLoaded, setTranslationsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [standards, setStandards] = useState<Standard[]>(STANDARDS);
   const t = useTranslation(currentLanguage);
+
+  // Preload translations when component mounts
+  useEffect(() => {
+    const preloadTranslations = async () => {
+      try {
+        const translations = await fetchTranslations(currentLanguage);
+        setTranslations(translations);
+        setTranslationsLoaded(true);
+      } catch (err) {
+        console.error("Error preloading translations:", err);
+      }
+    };
+    preloadTranslations();
+  }, [currentLanguage]);
 
   const handleCreateCustomer = async (id: string, name: string, type: "person" | "company") => {
     try {
@@ -108,6 +124,17 @@ const DashboardLayout = () => {
   const handleLanguageChange = (language: Language) => {
     if (!language || !LANGUAGES.find((l) => l.id === language)) return;
     setCurrentLanguage(language);
+    
+    // Immediately load translations when language changes
+    const loadTranslations = async () => {
+      try {
+        const translations = await fetchTranslations(language);
+        setTranslations(translations);
+      } catch (err) {
+        console.error("Error loading translations:", err);
+      }
+    };
+    loadTranslations();
   };
 
   const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth();

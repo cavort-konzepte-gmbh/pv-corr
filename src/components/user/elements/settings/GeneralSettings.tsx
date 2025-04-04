@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Language, LANGUAGES } from "../../../../types/language";
-import { useTranslation } from "../../../../types/language";
+import { Language, LANGUAGES, useTranslation, setTranslations } from "../../../../types/language";
+import { fetchTranslations } from "../../../../services/translations";
 import { updateUserSettings } from "../../../../services/userSettings";
 import { Button } from "@/components/ui/button";
 
@@ -28,11 +28,38 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   const t = useTranslation(currentLanguage);
   const [updating, setUpdating] = useState(false);
 
-  const handleSettingChange = async (key: string, value: any) => {
+  const handleLanguageChange = async (language: Language) => {
+    if (updating) return;
+    setUpdating(true);
+    
+    try {
+      // First load the translations for the new language
+      const translations = await fetchTranslations(language);
+      setTranslations(translations);
+      
+      // Then update the user settings
+      await updateUserSettings({ language });
+      
+      // Update the UI
+      onLanguageChange(language);
+    } catch (err) {
+      console.error("Error changing language:", err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleSettingChange = async (key: string, value: any, isLanguage = false) => {
     if (updating) return;
     setUpdating(true);
 
     try {
+      // Special handling for language changes
+      if (key === "language" && isLanguage) {
+        await handleLanguageChange(value as Language);
+        return;
+      }
+      
       // Update settings through service
       const success = await updateUserSettings({
         [key === "language"
@@ -70,7 +97,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         </div>
         <select
           value={currentLanguage}
-          onChange={(e) => handleSettingChange("language", e.target.value)}
+          onChange={(e) => handleSettingChange("language", e.target.value, true)}
           disabled={updating}
           className="px-3 py-1 rounded font-medium text-sm text-primary border border-input shadow-sm bg-accent"
         >

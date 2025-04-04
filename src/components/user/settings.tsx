@@ -2,6 +2,8 @@ import React from "react";
 import { Theme, THEMES } from "../../types/theme";
 import { Language } from "../../types/language";
 import { Company } from "../../types/companies";
+import { setTranslations } from "../../types/language";
+import { fetchTranslations } from "../../services/translations";
 import { Standard } from "../../types/standards";
 import GeneralSettings from "./elements/settings/GeneralSettings";
 import CompaniesSettings from "./elements/settings/CompaniesSettings";
@@ -30,6 +32,16 @@ interface SettingsProps {
   onCreateCustomer: (...args: any) => void;
 }
 
+// Helper function to load translations when language changes
+const loadLanguageTranslations = async (language: Language) => {
+  try {
+    const translations = await fetchTranslations(language);
+    setTranslations(translations);
+  } catch (err) {
+    console.error("Error loading translations:", err);
+  }
+};
+
 const Settings: React.FC<SettingsProps> = ({
   view,
   onViewChange,
@@ -50,6 +62,11 @@ const Settings: React.FC<SettingsProps> = ({
   onSavePeople,
   onCreateCustomer,
 }) => {
+  // Ensure translations are loaded when the settings component mounts
+  React.useEffect(() => {
+    loadLanguageTranslations(currentLanguage);
+  }, [currentLanguage]);
+
   return (
     <div className="flex-1 p-6 overflow-auto">
       {view === "general" && (
