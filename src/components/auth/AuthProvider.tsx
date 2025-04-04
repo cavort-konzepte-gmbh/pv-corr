@@ -40,12 +40,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   const [loginType, setLoginType] = useState<"user" | "admin" | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [viewMode, setViewMode] = useState<"user" | "admin">("user");
+  const [translations, setTranslationsState] = useState<any>(null);
 
   useEffect(() => {
-    // Load translations when language changes
+   
+
     const loadTranslations = async () => {
       const translations = await fetchTranslations(currentLanguage);
       setTranslations(translations);
+      setTranslationsState(translations); 
     };
     loadTranslations();
   }, [currentLanguage]);
