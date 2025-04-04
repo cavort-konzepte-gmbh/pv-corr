@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Theme } from "../../../../types/theme";
 import { Edit2, Save, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Language, useTranslation } from "../../../../types/language";
-import { updateField } from "../../../../services/fields";
-import { fetchProjects } from "../../../../services/projects";
+import { setField } from "../../../../services/fields";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAppDispatch } from "@/store/slices/hooks";
 
 interface FieldSummaryProps {
   field: {
@@ -17,21 +16,13 @@ interface FieldSummaryProps {
     has_fence?: string;
     zones?: any[];
   };
-  currentTheme: Theme;
   currentLanguage: Language;
-  onProjectsChange: (projects: any[]) => void;
   isExpanded?: boolean;
   onToggle?: () => void;
 }
 
-const FieldSummary: React.FC<FieldSummaryProps> = ({
-  field,
-  currentTheme,
-  currentLanguage,
-  onProjectsChange,
-  isExpanded = true,
-  onToggle,
-}) => {
+const FieldSummary: React.FC<FieldSummaryProps> = ({ field, currentLanguage, isExpanded = true, onToggle }) => {
+  const dispatch = useAppDispatch();
   const translation = useTranslation(currentLanguage);
   const [isEditing, setIsEditing] = useState(false);
   const [editValues, setEditValues] = useState({
@@ -45,9 +36,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
     if (!field.id) return;
 
     try {
-      await updateField(field.id, editValues);
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
+      dispatch(setField({ fieldId: field.id, field: editValues }));
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating field:", err);

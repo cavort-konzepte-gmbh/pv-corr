@@ -1,40 +1,34 @@
 import React, { useState } from "react";
-import { Theme } from "../../../../types/theme";
 import { Project } from "../../../../types/projects";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
 import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { Language, useTranslation } from "../../../../types/language";
-import { updateProject, fetchProjects } from "../../../../services/projects";
+import { setProject } from "../../../../services/projects";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppDispatch } from "@/store/slices/hooks";
 
 interface ProjectSummaryProps {
   project: Project;
   manager?: Person;
   company?: Company;
-  currentTheme: Theme;
   currentLanguage: Language;
   savedPeople: Person[];
-  onProjectsChange: (projects: Project[]) => void;
   isExpanded?: boolean;
   onToggle?: () => void;
-  selectedCustomerId: string | null;
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   project,
   manager,
   company,
-  currentTheme,
   currentLanguage,
   savedPeople,
-  onProjectsChange,
   isExpanded = true,
   onToggle,
-  selectedCustomerId,
 }) => {
   const translation = useTranslation(currentLanguage);
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
@@ -45,19 +39,19 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
     latitude: project.latitude || "",
     longitude: project.longitude || "",
   });
+  const dispatch = useAppDispatch();
 
   const handleSave = async () => {
     try {
-      const updatedProject = await updateProject({
-        ...project,
-        managerId: editValues.managerId,
-        typeProject: editValues.typeProject,
-        latitude: editValues.latitude,
-        longitude: editValues.longitude,
-      });
-
-      const updatedProjects = await fetchProjects();
-      onProjectsChange(updatedProjects);
+      dispatch(
+        setProject({
+          ...project,
+          managerId: editValues.managerId,
+          typeProject: editValues.typeProject,
+          latitude: editValues.latitude,
+          longitude: editValues.longitude,
+        }),
+      );
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating project:", err);
@@ -231,13 +225,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
       </section>
 
       {showMediaDialog && (
-        <MediaDialog
-          isOpen={true}
-          onClose={() => setShowMediaDialog(null)}
-          entityId={showMediaDialog}
-          currentTheme={currentTheme}
-          entityType="project"
-        />
+        <MediaDialog isOpen={true} onClose={() => setShowMediaDialog(null)} entityId={showMediaDialog} entityType="project" />
       )}
     </div>
   );

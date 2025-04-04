@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Theme, THEMES } from "../types/theme";
 import { Language, LANGUAGES, useTranslation } from "../types/language";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -8,7 +8,7 @@ import { Project, Zone } from "../types/projects";
 import { Company } from "../types/companies";
 import { Customer } from "../types/customers";
 import { Standard, STANDARDS } from "../types/standards";
-import { fetchProjects } from "../services/projects";
+import { fetchProjects, getAllProjects } from "../services/projects";
 import { fetchCustomers } from "../services/customers";
 import { useAuth } from "./auth/AuthProvider";
 import { ArrowLeft } from "lucide-react";
@@ -27,7 +27,8 @@ import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, Layo
 import { FileText } from "lucide-react";
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
-import { updateUserSettings } from "@/services/userSettings";
+import { useAppDispatch, useAppSelector } from "@/store/slices/hooks";
+import { selectAllProjects } from "@/store/slices/projectsSlice";
 
 const DashboardLayout = () => {
   const {
@@ -43,8 +44,7 @@ const DashboardLayout = () => {
     setSelectedCustomerId,
     resetNavigation,
   } = useAppNavigation();
-
-  const [projects, setProjects] = useState<Project[]>([]);
+  const dispatch = useAppDispatch();
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [savedPeople, setSavedPeople] = useState<Person[]>([]);
@@ -58,6 +58,12 @@ const DashboardLayout = () => {
   const [error, setError] = useState<string | null>(null);
   const [standards, setStandards] = useState<Standard[]>(STANDARDS);
   const t = useTranslation(currentLanguage);
+  const projects = useAppSelector((state) => selectAllProjects(state.projects));
+
+  /**
+   * @deprecated used to avoid errors due to the old version without redux
+   */
+  const setProjects = (_: Project[]) => {};
 
   const handleCreateCustomer = async (id: string, name: string, type: "person" | "company") => {
     try {
@@ -127,6 +133,7 @@ const DashboardLayout = () => {
         // Load uncategorized projects
         const uncategorizedProjects = await fetchProjects();
         setProjects(uncategorizedProjects);
+        dispatch(getAllProjects());
       } catch (error) {
         console.error("Error loading initial data:", error);
         setError("Failed to load data. Please try again.");
@@ -257,10 +264,8 @@ const DashboardLayout = () => {
         return (
           <Projects
             currentTheme={currentTheme}
-            savedPlaces={savedPlaces}
             savedPeople={savedPeople}
             savedCompanies={savedCompanies}
-            projects={projects}
             customers={customers}
             selectedCustomerId={selectedCustomerId}
             onMoveProject={handleMoveProject}
@@ -271,16 +276,13 @@ const DashboardLayout = () => {
               setSelectedZoneId(undefined);
             }}
             currentLanguage={currentLanguage}
-            onProjectsChange={setProjects}
           />
         );
       case "fields":
         return (
           <Fields
-            currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             projects={projects}
-            onProjectsChange={setProjects}
             selectedProjectId={selectedProjectId}
             selectedField={selectedFieldId}
             onSelectField={(projectId, fieldId) => {
@@ -297,10 +299,8 @@ const DashboardLayout = () => {
       case "zones":
         return (
           <Zones
-            currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             projects={projects}
-            onProjectsChange={setProjects}
             selectedProjectId={selectedProjectId}
             selectedFieldId={selectedFieldId}
             onSelectZone={(zoneId) => {

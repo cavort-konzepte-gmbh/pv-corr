@@ -8,7 +8,7 @@ interface MediaDialogProps {
   isOpen: boolean;
   onClose: () => void;
   entityId: string;
-  currentTheme: Theme;
+  currentTheme?: Theme;
   entityType: string;
 }
 
