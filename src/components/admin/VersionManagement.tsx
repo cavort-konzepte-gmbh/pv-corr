@@ -19,7 +19,10 @@ interface Version {
   is_beta: boolean;
   link?: string;
   is_current: boolean;
-  created_at: string;
+  created_at: string; // Ensure this matches the service's Version type
+  major?: number; // Add optional properties if they exist in the service
+  minor?: number;
+  patch?: number;
   created_by?: string;
 }
 
@@ -57,22 +60,31 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     e.preventDefault();
     try {
       const versionString = `${formValues.major}.${formValues.minor}.${formValues.patch}`;
-      
-      const insertData = {
+
+      const insertData: {
+        version: string;
+        major: number;
+        minor: number;
+        patch: number;
+        is_beta: boolean;
+        is_current: boolean;
+        created_by: string | undefined;
+        link?: string; // Add optional link property
+      } = {
         version: versionString,
         major: formValues.major,
         minor: formValues.minor,
         patch: formValues.patch,
         is_beta: formValues.is_beta,
         is_current: true,
-        created_by: (await supabase.auth.getUser()).data.user?.id
+        created_by: (await supabase.auth.getUser()).data.user?.id,
       };
 
       // Only add link if it's not empty
       if (formValues.link.trim()) {
-        insertData['link'] = formValues.link;
+        insertData.link = formValues.link;
       }
-      
+
       const { data, error } = await supabase
         .from("versions")
         .insert(insertData)
@@ -80,7 +92,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         .single();
 
       if (error) throw error;
-      
+
       await loadVersions();
       setShowNewForm(false);
       setFormValues({

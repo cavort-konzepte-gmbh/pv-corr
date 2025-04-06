@@ -4,6 +4,7 @@ import { Theme } from "../../types/theme";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
+import { Github, Grid2x2, Mail } from "lucide-react";
 
 interface LoginFormProps {
   currentTheme: Theme;
@@ -25,7 +26,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
     try {
       // Clear any existing sessions first
       await supabase.auth.signOut();
-      
+
       const {
         data: { user },
         error,
@@ -57,6 +58,26 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
       }
       setError(errorMessage);
       console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithProvider = async (provider: "github" | "google" | "azure") => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (err) {
+      setError(`Failed to sign in with ${provider}`);
+      console.error(`${provider} login error:`, err);
     } finally {
       setLoading(false);
     }
@@ -111,10 +132,39 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
             />
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full p-2 rounded font-medium ">
+          <Button type="submit" disabled={loading} className="w-full p-2 rounded font-medium border border-primary">
             {loading ? "Signing in..." : "Continue"}
           </Button>
         </form>
+
+        <div className="flex gap-2 mt-4">
+          <Button
+            onClick={() => signInWithProvider("google")}
+            disabled={loading}
+            className="flex-1 p-1 rounded font-medium bg-accent-primary text-primary flex items-center justify-center gap-2 text-sm border border-primary"
+          >
+            <Mail size={14} />
+            {loading ? "Google..." : "Google"}
+          </Button>
+
+          <Button
+            onClick={() => signInWithProvider("azure")}
+            disabled={loading}
+            className="flex-1 p-1 rounded font-medium bg-accent-primary text-primary flex items-center justify-center gap-2 text-sm border border-primary"
+          >
+            <Grid2x2 size={14} />
+            {loading ? "Microsoft..." : "Microsoft"}
+          </Button>
+        </div>
+
+        <Button
+          onClick={() => signInWithProvider("github")}
+          disabled={loading}
+          className="w-full p-1 rounded font-medium bg-accent-primary text-primary mt-2 flex items-center justify-center gap-2 text-sm border border-primary"
+        >
+          <Github size={14} />
+          {loading ? "GitHub..." : "GitHub"}
+        </Button>
       </div>
     </div>
   );
