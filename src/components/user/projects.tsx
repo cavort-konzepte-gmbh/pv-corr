@@ -4,6 +4,7 @@ import { Project } from "../../types/projects";
 import { Customer } from "../../types/customers";
 import { Person } from "../../types/people";
 import { Company } from "../../types/companies";
+import { useEffect } from "react";
 import ProjectList from "./elements/projects/ProjectList";
 import ProjectForm from "./elements/projects/ProjectForm";
 import { Language } from "../../types/language";
@@ -33,19 +34,32 @@ const Projects: React.FC<ProjectsProps> = ({
   currentLanguage,
   onProjectsChange,
 }) => {
+  // Add error handling for empty projects array
+  useEffect(() => {
+    if (!projects || projects.length === 0) {
+      console.log("No projects available or projects array is empty");
+    }
+  }, [projects]);
+
   return (
     <div className="p-6">
-      <ProjectList
-        currentTheme={currentTheme}
-        projects={projects}
-        savedPeople={savedPeople}
-        customers={customers}
-        selectedCustomerId={selectedCustomerId}
-        onMoveProject={onMoveProject}
-        onSelectProject={onSelectProject}
-        currentLanguage={currentLanguage}
-        onProjectsChange={onProjectsChange}
-      />
+      {projects && projects.length > 0 ? (
+        <ProjectList
+          currentTheme={currentTheme}
+          projects={projects}
+          savedPeople={savedPeople}
+          customers={customers}
+          selectedCustomerId={selectedCustomerId}
+          onMoveProject={onMoveProject}
+          onSelectProject={onSelectProject}
+          currentLanguage={currentLanguage}
+          onProjectsChange={onProjectsChange}
+        />
+      ) : (
+        <div className="p-4 text-center text-muted-foreground">
+          No projects available. Create your first project below.
+        </div>
+      )}
       <ProjectForm
         currentTheme={currentTheme}
         savedPeople={savedPeople}

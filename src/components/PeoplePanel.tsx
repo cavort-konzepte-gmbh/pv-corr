@@ -250,7 +250,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                       Make Customer
                     </Button>
                   )}
-                  <ChevronRight className="text-primary" size={16} />
+                  <ChevronRight className="text-foreground" size={16} />
                 </div>
               </div>
               <div className="text-sm flex flex-col gap-1 text-muted-foreground">

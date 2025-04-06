@@ -12,7 +12,7 @@ export const LANGUAGES: { id: Language; name: string; direction: "ltr" | "rtl" }
   { id: "ar", name: "العربية", direction: "rtl" },
 ];
 
-// Initialize with default empty translations
+// Initialize with default fallback translations for critical UI elements
 let translations: TranslationMap = {
   // Add some basic fallback translations for critical UI elements
   "nav.customers": "Customers",
@@ -26,16 +26,31 @@ let translations: TranslationMap = {
   "nav.administration": "Administration",
   "nav.signout": "Sign Out",
   "nav.back": "Back",
+  "general.view_on_map": "View on map",
+  "general.location_not_set": "Location not set",
+  "field.has_fence.yes": "Yes",
+  "field.has_fence.no": "No",
+  "zones.location": "Location",
+  "project.latitude": "Latitude",
+  "project.longitude": "Longitude",
+  "actions.save": "Save",
+  "actions.cancel": "Cancel",
+  "datapoints": "Datapoints",
+  "fields": "Fields",
+  "zones": "Zones",
 };
 
 export const setTranslations = (newTranslations: TranslationMap) => {
-  // Merge with existing translations rather than replacing
-  translations = { ...translations, ...newTranslations };
+  if (newTranslations && Object.keys(newTranslations).length > 0) {
+    // Merge with existing translations rather than replacing
+    translations = { ...translations, ...newTranslations };
+  }
 };
 
 export const useTranslation = (currentLanguage: Language) => {
   return (key: string): string => {
     // Return the translation if it exists, otherwise return the key
+    if (!key) return '';
     return translations[key] !== undefined ? translations[key] as string : key;
   };
 };

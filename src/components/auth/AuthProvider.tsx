@@ -43,10 +43,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   // Load translations when component mounts or language changes
   useEffect(() => {
     const loadTranslations = async () => {
-      setLoading(true);
-      const translations = await fetchTranslations(currentLanguage);
-      setTranslations(translations);
-      setLoading(false);
+      try {
+        setLoading(true);
+        const translations = await fetchTranslations(currentLanguage);
+        setTranslations(translations);
+      } catch (err) {
+        console.error("Error loading translations in AuthProvider:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     loadTranslations();
   }, [currentLanguage]);
@@ -127,8 +132,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-theme">
-        <div className="text-sm text-secondary">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-sm text-muted-foreground">Loading...</div>
       </div>
     );
   }

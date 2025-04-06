@@ -135,14 +135,14 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           {zone.latitude}, {zone.longitude}
                         </span>
                         <Button
-                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")}
-                          className="text-sm hover:underline text-accent-primary"
+                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")} 
+                          className="text-sm hover:underline"
                         >
                           {translation("general.view_on_map")}
                         </Button>
                       </div>
                     ) : (
-                      <span>{translation("general.location_not_set")}</span>
+                      <span className="text-muted-foreground">{translation("general.location_not_set")}</span>
                     )}
                   </TableCell>
                 </TableRow>

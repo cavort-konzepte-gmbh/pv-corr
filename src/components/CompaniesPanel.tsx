@@ -268,7 +268,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                           Make Customer
                         </Button>
                       )}
-                      <ChevronRight className="text-primary" size={16} />
+                      <ChevronRight className="text-foreground" size={16} />
                     </div>
                   </div>
                   <div className="text-sm space-y-2 text-muted-foreground">

@@ -35,16 +35,52 @@ const Zones: React.FC<ZonesProps> = ({
 }) => {
   const transition = useTranslation(currentLanguage);
 
-  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+  // Safely find the selected project with error handling
+  const selectedProject = (() => {
+    try {
+      if (!selectedProjectId || !projects || !Array.isArray(projects)) return null;
+      return projects.find((p) => p && p.id === selectedProjectId) || null;
+    } catch (err) {
+      console.error("Error finding selected project:", err);
+      return null;
+    }
+  })();
 
-  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+  // Safely find the selected field with error handling
+  const selectedField = (() => {
+    try {
+      if (!selectedProject || !selectedFieldId || !selectedProject.fields || !Array.isArray(selectedProject.fields)) return null;
+      return selectedProject.fields.find((f) => f && f.id === selectedFieldId) || null;
+    } catch (err) {
+      console.error("Error finding selected field:", err);
+      return null;
+    }
+  })();
 
   if (!selectedProject || !selectedField) {
     return <div className="p-6 text-center">{transition("zones.please_select_field")}</div>;
   }
 
-  const manager = people.find((person) => person.id === selectedProject.managerId);
-  const company = companies.find((company) => company.id === selectedProject.companyId);
+  // Safely find manager and company with error handling
+  const manager = (() => {
+    try {
+      if (!people || !Array.isArray(people) || !selectedProject.managerId) return null;
+      return people.find((person) => person && person.id === selectedProject.managerId) || null;
+    } catch (err) {
+      console.error("Error finding manager:", err);
+      return null;
+    }
+  })();
+  
+  const company = (() => {
+    try {
+      if (!companies || !Array.isArray(companies) || !selectedProject.companyId) return null;
+      return companies.find((company) => company && company.id === selectedProject.companyId) || null;
+    } catch (err) {
+      console.error("Error finding company:", err);
+      return null;
+    }
+  })();
 
   const [showProjectSummary, setShowProjectSummary] = useState(false);
 
@@ -72,7 +108,7 @@ const Zones: React.FC<ZonesProps> = ({
 
       <ZoneList
         currentTheme={currentTheme}
-        zones={selectedField.zones}
+        zones={selectedField.zones && Array.isArray(selectedField.zones) ? selectedField.zones : []}
         selectedFieldId={selectedField.id}
         onSelectZone={onSelectZone}
         onProjectsChange={onProjectsChange}

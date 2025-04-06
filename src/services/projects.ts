@@ -240,8 +240,14 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
       return [];
     }
 
+    // Ensure data is properly structured before processing
+    if (!Array.isArray(data)) {
+      console.error("Expected array of projects but got:", typeof data);
+      return [];
+    }
+
     // Filter projects based on customerId after fetching
-    const projects = data.map((project) => ({
+    const projects = data.filter(project => project).map((project) => ({
       id: project.id,
       hiddenId: project.hidden_id,
       name: project.name,
@@ -253,21 +259,21 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
       managerId: project.manager_id,
       typeProject: project.type_project,
       customerId: project.customer_id,
-      fields: (project.fields || []).map((field) => ({
+      fields: (Array.isArray(project.fields) ? project.fields : []).filter(field => field).map((field) => ({
         id: field.id,
         hiddenId: field.hidden_id,
         name: field.name,
         latitude: field.latitude,
         longitude: field.longitude,
         has_fence: field.has_fence,
-        gates: (field.gates || []).map((gate) => ({
+        gates: (Array.isArray(field.gates) ? field.gates : []).filter(gate => gate).map((gate) => ({
           id: gate.id,
           hiddenId: gate.hidden_id,
           name: gate.name,
           latitude: gate.latitude,
           longitude: gate.longitude,
         })),
-        zones: (field.zones || []).map((zone) => ({
+        zones: (Array.isArray(field.zones) ? field.zones : []).filter(zone => zone).map((zone) => ({
           id: zone.id,
           hiddenId: zone.hidden_id,
           name: zone.name,
@@ -275,7 +281,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           longitude: zone.longitude,
           substructureId: zone.substructure_id,
           foundationId: zone.foundation_id,
-          datapoints: (zone.datapoints || []).map((dp) => ({
+          datapoints: (Array.isArray(zone.datapoints) ? zone.datapoints : []).filter(dp => dp).map((dp) => ({
             id: dp.id,
             hiddenId: dp.hidden_id,
             sequentialId: dp.sequential_id,
@@ -301,6 +307,8 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     });
   } catch (err) {
     console.error("Error fetching projects:", err);
-    throw new Error("Failed to load projects");
+    // Return empty array instead of throwing to prevent white screen
+    console.warn("Returning empty projects array due to error");
+    return [];
   }
 };

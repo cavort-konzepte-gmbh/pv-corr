@@ -10,6 +10,7 @@ import { updateProject, deleteProject, fetchProjects } from "../../../../service
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface ProjectListProps {
   currentTheme: Theme;
@@ -40,6 +41,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
   const translation = useTranslation(currentLanguage);
   const [error, setError] = useState<string | null>(null);
 
+  // Safely handle project selection
   const handleSaveProject = async (project: Project) => {
     try {
       await updateProject({
@@ -72,17 +74,25 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   const handleSelectProject = (projectId: string) => {
     if (editingProject === projectId) return;
-    onSelectProject(projectId);
+    try {
+      onSelectProject(projectId);
+    } catch (err) {
+      console.error("Error selecting project:", err);
+      setError("Failed to select project");
+    }
   };
 
   return (
     <div className="space-y-4">
       {error && <div className="p-4 mb-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
-      {projects.map((project) => (
+      {Array.isArray(projects) && projects.map((project) => project && (
         <div key={project.id} className="relative">
-          <section className="border border-input rounded-md bg-card">
+          <section 
+            className="border border-input rounded-md bg-card cursor-pointer hover:bg-muted/50" 
+            onClick={() => handleSelectProject(project.id)}
+          >
             <div className="w-full relative overflow-auto">
-              <Table onClick={() => handleSelectProject(project.id)}>
+              <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-accent">
@@ -94,16 +104,16 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             <div className="flex items-center gap-2">
                               <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">{project.typeProject}</span>
                               <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                {project.fields.length} {translation("fields")}
+                                {project.fields?.length || 0} {translation("fields")}
                               </span>
                               <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
+                                {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0} {translation("zones")}
                               </span>
                               <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                {project.fields.reduce(
-                                  (acc, field) => acc + field.zones.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0),
+                                {project.fields?.reduce(
+                                  (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
                                   0,
-                                )}{" "}
+                                ) || 0}{" "}
                                 {translation("datapoints")}
                               </span>
                             </div>
@@ -157,7 +167,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                               <Edit2 size={14} />
                             </Button>
                           )}
-                          <ChevronRight size={16} />
+                          <ChevronRight className="text-foreground" size={16} />
                         </div>
                       </div>
                     </TableHead>

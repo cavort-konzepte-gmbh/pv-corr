@@ -64,16 +64,35 @@ const DashboardLayout = () => {
   // Preload translations when component mounts
   useEffect(() => {
     const preloadTranslations = async () => {
+      setLoading(true);
       try {
         const translations = await fetchTranslations(currentLanguage);
         setTranslations(translations);
         setTranslationsLoaded(true);
       } catch (err) {
         console.error("Error preloading translations:", err);
+      } finally {
+        setLoading(false);
       }
     };
     preloadTranslations();
   }, [currentLanguage]);
+
+  // Ensure translations are loaded when language changes
+  useEffect(() => {
+    if (currentLanguage && !translationsLoaded) {
+      const loadTranslations = async () => {
+        try {
+          const translations = await fetchTranslations(currentLanguage);
+          setTranslations(translations);
+          setTranslationsLoaded(true);
+        } catch (err) {
+          console.error("Error loading translations on language change:", err);
+        }
+      };
+      loadTranslations();
+    }
+  }, [currentLanguage, translationsLoaded]);
 
   const handleCreateCustomer = async (id: string, name: string, type: "person" | "company") => {
     try {
@@ -123,15 +142,22 @@ const DashboardLayout = () => {
 
   const handleLanguageChange = (language: Language) => {
     if (!language || !LANGUAGES.find((l) => l.id === language)) return;
+    
+    // Reset translations loaded flag to trigger reload
+    setTranslationsLoaded(false);
     setCurrentLanguage(language);
     
     // Immediately load translations when language changes
     const loadTranslations = async () => {
+      setLoading(true);
       try {
         const translations = await fetchTranslations(language);
         setTranslations(translations);
+        setTranslationsLoaded(true);
       } catch (err) {
         console.error("Error loading translations:", err);
+      } finally {
+        setLoading(false);
       }
     };
     loadTranslations();
@@ -205,16 +231,61 @@ const DashboardLayout = () => {
   };
 
   const renderContent = () => {
-    const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+    // Safely find the selected project with error handling
+    const selectedProject = (() => {
+      try {
+        if (!selectedProjectId || !projects || !Array.isArray(projects)) return null;
+        return projects.find((p) => p && p.id === selectedProjectId) || null;
+      } catch (err) {
+        console.error("Error finding selected project:", err);
+        return null;
+      }
+    })();
 
-    const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+    // Safely find the selected field with error handling
+    const selectedField = (() => {
+      try {
+        if (!selectedProject || !selectedFieldId || !selectedProject.fields || !Array.isArray(selectedProject.fields)) return null;
+        return selectedProject.fields.find((f) => f && f.id === selectedFieldId) || null;
+      } catch (err) {
+        console.error("Error finding selected field:", err);
+        return null;
+      }
+    })();
 
-    const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
+    // Safely find the selected zone with error handling
+    const selectedZone = (() => {
+      try {
+        if (!selectedField || !selectedZoneId || !selectedField.zones || !Array.isArray(selectedField.zones)) return null;
+        return selectedField.zones.find((z) => z && z.id === selectedZoneId) || null;
+      } catch (err) {
+        console.error("Error finding selected zone:", err);
+        return null;
+      }
+    })();
 
     // Get manager and company info for project
-    const manager = selectedProject?.managerId ? savedPeople.find((p) => p.id === selectedProject.managerId) : null;
+    // Safely find manager with error handling
+    const manager = (() => {
+      try {
+        if (!selectedProject?.managerId || !savedPeople || !Array.isArray(savedPeople)) return null;
+        return savedPeople.find((p) => p && p.id === selectedProject.managerId) || null;
+      } catch (err) {
+        console.error("Error finding manager:", err);
+        return null;
+      }
+    })();
 
-    const company = selectedProject?.companyId ? savedCompanies.find((c) => c.id === selectedProject.companyId) : null;
+    // Safely find company with error handling
+    const company = (() => {
+      try {
+        if (!selectedProject?.companyId || !savedCompanies || !Array.isArray(savedCompanies)) return null;
+        return savedCompanies.find((c) => c && c.id === selectedProject.companyId) || null;
+      } catch (err) {
+        console.error("Error finding company:", err);
+        return null;
+      }
+    })();
 
     // Prepare project data with manager and company info
     const projectData = selectedProject
@@ -565,6 +636,11 @@ const DashboardLayout = () => {
           )}
           {renderContent()}
         </div>
+        {loading && (
+          <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="text-sm text-muted-foreground">Loading application data...</div>
+          </div>
+        )}
       </div>
     </Router>
   );

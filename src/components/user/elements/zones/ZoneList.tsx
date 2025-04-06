@@ -9,9 +9,10 @@ import { supabase } from "../../../../lib/supabase";
 import { Language, useTranslation } from "../../../../types/language";
 import { FormHandler } from "../../../shared/FormHandler";
 import { createZone } from "../../../../services/zones";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface ZoneListProps {
   currentTheme: Theme;
@@ -152,6 +153,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
+            <TableCaption>{translation("zones")}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>{translation("zones.short_name")}</TableHead>
@@ -259,7 +261,10 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                 </TableRow>
               )}
               {zones.map((zone) => (
-                <TableRow key={zone.id}>
+                <TableRow 
+                  key={zone.id} 
+                  className={cn("hover:bg-muted/50", { "cursor-pointer": editingZoneId !== zone.id })}
+                >
                   <TableCell className="p-2">
                     {editingZoneId === zone.id ? (
                       <Input
@@ -269,9 +274,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
                         className="w-full p-1"
                         required
+                        onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      zone.name
+                      <div onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
+                        {zone.name}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
@@ -283,6 +291,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                           placeholder="Latitude"
                           className="w-full p-1"
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <Input
                           type="text"
@@ -290,14 +299,28 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
                           placeholder="Longitude"
                           className="w-full p-1"
+                          onClick={(e) => e.stopPropagation()}
                         />
                       </div>
                     ) : zone.latitude && zone.longitude ? (
-                      <Button onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")}>
-                        View on map
-                      </Button>
+                      <div className="flex items-center justify-between" onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
+                        <span>
+                          {zone.latitude}, {zone.longitude}
+                        </span>
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank");
+                          }}
+                          className="text-sm hover:underline"
+                        >
+                          {translation("general.view_on_map")}
+                        </Button>
+                      </div>
                     ) : (
-                      <span>{translation("general.location_not_set")}</span>
+                      <div onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)} className="text-muted-foreground">
+                        {translation("general.location_not_set")}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
@@ -306,6 +329,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         value={editingValues.substructureId || zone.substructureId || ""}
                         onChange={(e) => setEditingValues({ ...editingValues, substructureId: e.target.value })}
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <option value="">Select Substructure</option>
                         {substructures.map((sub) => (
@@ -315,7 +339,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         ))}
                       </select>
                     ) : (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2" onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
                         <Wrench size={14} className="text-primary" />
                         {zone.substructureId ? (
                           (() => {
@@ -340,6 +364,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         value={editingValues.foundationId || zone.foundationId || ""}
                         onChange={(e) => setEditingValues({ ...editingValues, foundationId: e.target.value })}
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <option value="">Select Foundation</option>
                         {foundations.map((foundation) => (
@@ -349,7 +374,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         ))}
                       </select>
                     ) : (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2" onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
                         <Building2 size={14} className="text-primary" />
                         {zone.foundationId ? (
                           (() => {
@@ -365,7 +390,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                   <TableCell className="p-2">
                     <div className="flex items-center justify-center gap-2">
                       <Button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           editingZoneId === zone.id
                             ? handleUpdateZone(zone.id, editingValues)
                             : (() => {
@@ -377,8 +403,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                                   substructureId: zone.substructureId || "",
                                   foundationId: zone.foundationId || "",
                                 });
-                              })()
-                        }
+                              })();
+                        }}
                         className="size-8"
                         variant="ghost"
                         disabled={updatingZone}
@@ -387,11 +413,15 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       </Button>
                       {editingZoneId === zone.id && (
                         <>
-                          <Button onClick={() => handleDeleteZone(zone.id)} variant="ghost">
+                          <Button onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteZone(zone.id);
+                          }} variant="ghost">
                             {translation("actions.delete")}
                           </Button>
                           <Button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setEditingZoneId(null);
                               setEditingValues({});
                             }}
@@ -402,8 +432,17 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           </Button>
                         </>
                       )}
-                      <Button onClick={() => onSelectZone(zone.id)} className="size-8">
-                        <ChevronRight size={14} />
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (editingZoneId !== zone.id) {
+                            onSelectZone(zone.id);
+                          }
+                        }}
+                        className="size-8"
+                        variant="ghost"
+                      >
+                        <ChevronRight className="text-foreground" size={14} />
                       </Button>
                     </div>
                   </TableCell>

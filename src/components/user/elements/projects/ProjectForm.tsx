@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Theme } from "../../../../types/theme";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
-import { Plus } from "lucide-react";
+import { Plus, Users, Building2, MapPin, FileText, FolderPlus, Check } from "lucide-react";
 import { createProject } from "../../../../services/projects";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
@@ -10,6 +10,10 @@ import { Project } from "../../../../types/projects";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProjectFormProps extends React.PropsWithChildren {
   currentTheme: Theme;
@@ -29,23 +33,32 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   onProjectsChange,
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [projectName, setProjectName] = useState("");
-  const [clientRef, setClientRef] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
-  const [typeProject, setTypeProject] = useState<"roof" | "field">("field");
+  const [formData, setFormData] = useState({
+    projectName: "",
+    clientRef: "",
+    latitude: "",
+    longitude: "",
+    imageUrl: "",
+    selectedManagerId: "none", // Changed from empty string to "none"
+    typeProject: "field" as "roof" | "field",
+    createDefaultField: true,
+    defaultFieldName: "Field 1",
+    createDefaultZone: true,
+    defaultZoneName: "Zone 1"
+  });
   const [error, setError] = useState<string | null>(null);
-  const [createDefaultField, setCreateDefaultField] = useState(true);
-  const [defaultFieldName, setDefaultFieldName] = useState("Field 1");
-  const [createDefaultZone, setCreateDefaultZone] = useState(true);
-  const [defaultZoneName, setDefaultZoneName] = useState("Zone 1");
   const translation = useTranslation(currentLanguage);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectName.trim()) {
+    if (!formData.projectName.trim()) {
       setError("Project name is required");
       return;
     }
@@ -54,20 +67,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       setError(null);
       const newProject = await createProject(
         {
-          name: projectName.trim(),
-          clientRef: clientRef.trim() || undefined,
+          name: formData.projectName.trim(),
+          clientRef: formData.clientRef.trim() || undefined,
           customerId: selectedCustomerId,
-          latitude: latitude.trim() || undefined,
-          longitude: longitude.trim() || undefined,
-          imageUrl: imageUrl.trim() || undefined,
-          managerId: selectedManagerId,
-          typeProject,
+          latitude: formData.latitude.trim() || undefined,
+          longitude: formData.longitude.trim() || undefined,
+          imageUrl: formData.imageUrl.trim() || undefined,
+          managerId: formData.selectedManagerId === "none" ? undefined : formData.selectedManagerId,
+          typeProject: formData.typeProject,
         },
         {
-          createDefaultField,
-          defaultFieldName: defaultFieldName.trim(),
-          createDefaultZone,
-          defaultZoneName: defaultZoneName.trim(),
+          createDefaultField: formData.createDefaultField,
+          defaultFieldName: formData.defaultFieldName.trim(),
+          createDefaultZone: formData.createDefaultZone,
+          defaultZoneName: formData.defaultZoneName.trim(),
         },
       );
 
@@ -76,172 +89,257 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       onProjectsChange(updatedProjects);
 
       setShowForm(false);
-      setProjectName("");
-      setClientRef("");
-      setLatitude("");
-      setLongitude("");
-      setImageUrl("");
-      setSelectedManagerId(null);
-      setTypeProject("field");
+      setFormData({
+        projectName: "",
+        clientRef: "",
+        latitude: "",
+        longitude: "",
+        imageUrl: "",
+        selectedManagerId: "none", // Reset to "none" instead of empty string
+        typeProject: "field",
+        createDefaultField: true,
+        defaultFieldName: "Field 1",
+        createDefaultZone: true,
+        defaultZoneName: "Zone 1"
+      });
       setError(null);
     } catch (err) {
       console.error("Error creating project:", err);
-      // Keep form open if there's an error
       setError(err instanceof Error ? err.message : "Failed to create project");
     }
   };
 
   return (
     <>
-      <Button onClick={() => setShowForm(true)}>
-        <Plus size={16} />
+      <Button onClick={() => setShowForm(true)} className="w-full mt-4 flex items-center gap-2">
+        <FolderPlus size={16} />
         {translation("project.add")}
       </Button>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="p-6 rounded-lg max-w-md w-full bg-card">
-            <h3 className="text-lg mb-6 text-primary">{translation("project.new")}</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label className="block text-sm mb-1">
-                  {translation("project.name")}
-                  <span className="text-red-500 ml-1">*</span>
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FolderPlus className="h-5 w-5 text-primary" />
+              {translation("project.new")}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="projectName" className="text-sm font-medium">
+                  {translation("project.name")} <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  type="text"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  required
+                  id="projectName"
+                  value={formData.projectName}
+                  onChange={(e) => handleInputChange("projectName", e.target.value)}
                   placeholder="Enter project name"
+                  required
                 />
               </div>
-
-              <div>
-                <Label className="block text-sm mb-1">{translation("project.manager")}</Label>
-                <select
-                  value={selectedManagerId || ""}
-                  onChange={(e) => setSelectedManagerId(e.target.value || null)}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-                >
-                  <option value="">{translation("project.manager.not_assigned")}</option>
-                  {savedPeople.map((person) => (
-                    <option key={person.id} value={person.id}>
-                      {person.title ? `${person.title} ` : ""}
-                      {person.firstName} {person.lastName}
-                    </option>
-                  ))}
-                </select>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="projectManager" className="text-sm font-medium">
+                    {translation("project.manager")}
+                  </Label>
+                  <Select 
+                    value={formData.selectedManagerId} 
+                    onValueChange={(value) => handleInputChange("selectedManagerId", value)}
+                  >
+                    <SelectTrigger id="projectManager" className="w-full">
+                      <SelectValue placeholder={translation("project.manager.not_assigned")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">
+                        {translation("project.manager.not_assigned")}
+                      </SelectItem>
+                      {savedPeople.map((person) => (
+                        <SelectItem key={person.id} value={person.id}>
+                          {person.title ? `${person.title} ` : ""}
+                          {person.firstName} {person.lastName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="projectType" className="text-sm font-medium">
+                    {translation("project.type")}
+                  </Label>
+                  <Select 
+                    value={formData.typeProject} 
+                    onValueChange={(value) => handleInputChange("typeProject", value as "roof" | "field")}
+                  >
+                    <SelectTrigger id="projectType" className="w-full">
+                      <SelectValue placeholder="Select project type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="field">{translation("project.type.field")}</SelectItem>
+                      <SelectItem value="roof">{translation("project.type.roof")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-
-              <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation("project.type")}</Label>
-                <select
-                  value={typeProject}
-                  onChange={(e) => setTypeProject(e.target.value as "roof" | "field")}
-                  className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
-                >
-                  <option value="field">{translation("project.type.field")}</option>
-                  <option value="roof">{translation("project.type.roof")}</option>
-                </select>
-              </div>
-
-              <div>
-                <div className="space-y-4 mt-4 p-4 rounded bg-theme">
-                  <h4 className="font-medium text-primary">Default Structure</h4>
-
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="checkbox"
-                      id="createDefaultField"
-                      checked={createDefaultField}
-                      onChange={(e) => setCreateDefaultField(e.target.checked)}
-                      className="rounded border-theme"
+              
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Default Structure</CardTitle>
+                  <CardDescription>Configure initial project structure</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="createDefaultField" 
+                      checked={formData.createDefaultField}
+                      onCheckedChange={(checked) => handleInputChange("createDefaultField", !!checked)}
                     />
-                    <Label htmlFor="createDefaultField" className="text-sm text-primary">
+                    <Label htmlFor="createDefaultField" className="text-sm font-medium">
                       Create default field
                     </Label>
                   </div>
-
-                  {createDefaultField && (
-                    <div>
-                      <Input
-                        type="text"
-                        value={defaultFieldName}
-                        onChange={(e) => setDefaultFieldName(e.target.value)}
-                        placeholder="Field name"
-                      />
-
-                      <div className="mt-2 flex items-center gap-2">
+                  
+                  {formData.createDefaultField && (
+                    <div className="pl-6 space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="defaultFieldName" className="text-sm font-medium">Field name</Label>
                         <Input
-                          type="checkbox"
-                          id="createDefaultZone"
-                          checked={createDefaultZone}
-                          onChange={(e) => setCreateDefaultZone(e.target.checked)}
-                          className="rounded border-theme"
+                          id="defaultFieldName"
+                          value={formData.defaultFieldName}
+                          onChange={(e) => handleInputChange("defaultFieldName", e.target.value)}
+                          placeholder="Field name"
                         />
-                        <Label htmlFor="createDefaultZone" className="text-sm text-primary">
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="createDefaultZone" 
+                          checked={formData.createDefaultZone}
+                          onCheckedChange={(checked) => handleInputChange("createDefaultZone", !!checked)}
+                        />
+                        <Label htmlFor="createDefaultZone" className="text-sm font-medium">
                           Create default zone
                         </Label>
                       </div>
-
-                      {createDefaultZone && (
-                        <Input
-                          type="text"
-                          value={defaultZoneName}
-                          onChange={(e) => setDefaultZoneName(e.target.value)}
-                          placeholder="Zone name"
-                        />
+                      
+                      {formData.createDefaultZone && (
+                        <div className="pl-6 space-y-2">
+                          <Label htmlFor="defaultZoneName" className="text-sm font-medium">Zone name</Label>
+                          <Input
+                            id="defaultZoneName"
+                            value={formData.defaultZoneName}
+                            onChange={(e) => handleInputChange("defaultZoneName", e.target.value)}
+                            placeholder="Zone name"
+                          />
+                        </div>
                       )}
                     </div>
                   )}
+                </CardContent>
+              </Card>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="clientRef" className="text-sm font-medium">
+                    {translation("project.client_ref")}
+                  </Label>
+                  <div className="flex items-center">
+                    <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="clientRef"
+                      value={formData.clientRef}
+                      onChange={(e) => handleInputChange("clientRef", e.target.value)}
+                      placeholder="Enter client reference"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl" className="text-sm font-medium">
+                    {translation("project.image_url")}
+                  </Label>
+                  <Input
+                    id="imageUrl"
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={(e) => handleInputChange("imageUrl", e.target.value)}
+                    placeholder="Enter image URL"
+                  />
                 </div>
               </div>
-
-              <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation("project.client_ref")}</Label>
-                <Input type="text" value={clientRef} onChange={(e) => setClientRef(e.target.value)} placeholder="Enter client reference" />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="latitude" className="text-sm font-medium">
+                    {translation("project.latitude")}
+                  </Label>
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="latitude"
+                      value={formData.latitude}
+                      onChange={(e) => handleInputChange("latitude", e.target.value)}
+                      placeholder="Enter latitude"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="longitude" className="text-sm font-medium">
+                    {translation("project.longitude")}
+                  </Label>
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="longitude"
+                      value={formData.longitude}
+                      onChange={(e) => handleInputChange("longitude", e.target.value)}
+                      placeholder="Enter longitude"
+                    />
+                  </div>
+                </div>
               </div>
-
-              <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation("project.latitude")}</Label>
-                <Input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Enter latitude" />
+            </div>
+            
+            {error && (
+              <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                {error}
               </div>
-
-              <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation("project.longitude")}</Label>
-                <Input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Enter longitude" />
-              </div>
-
-              <div>
-                <Label className="block text-sm mb-1 text-secondary">{translation("project.image_url")}</Label>
-                <Input
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="Enter image URL (e.g. https://images.unsplash.com/...)"
-                />
-              </div>
-
-              {error && <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-card">{error}</div>}
-
-              <div className="flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => {
-                    setShowForm(false);
-                    setProjectName("");
-                  }}
-                >
-                  {translation("actions.cancel")}
-                </Button>
-                <Button type="submit">{translation("project.create")}</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            )}
+            
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowForm(false);
+                  setFormData({
+                    projectName: "",
+                    clientRef: "",
+                    latitude: "",
+                    longitude: "",
+                    imageUrl: "",
+                    selectedManagerId: "none", // Reset to "none" instead of empty string
+                    typeProject: "field",
+                    createDefaultField: true,
+                    defaultFieldName: "Field 1",
+                    createDefaultZone: true,
+                    defaultZoneName: "Zone 1"
+                  });
+                }}
+              >
+                {translation("actions.cancel")}
+              </Button>
+              <Button type="submit">
+                {translation("project.create")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

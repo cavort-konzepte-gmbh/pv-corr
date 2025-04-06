@@ -214,14 +214,15 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       <span>
                         {project.latitude}, {project.longitude}
                       </span>
-                      <Button
+                      <Button 
                         onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank")}
+                        className="text-sm hover:underline"
                       >
                         {translation("general.view_on_map")}
                       </Button>
                     </div>
                   ) : (
-                    <span className="text-primary">{translation("general.location_not_set")}</span>
+                    <span className="text-muted-foreground">{translation("general.location_not_set")}</span>
                   )}
                 </TableCell>
               </TableRow>

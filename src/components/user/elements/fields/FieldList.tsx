@@ -11,6 +11,7 @@ import { createField } from "../../../../services/fields";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface FieldListProps {
   currentTheme: Theme;
@@ -145,7 +146,7 @@ const FieldList: React.FC<FieldListProps> = ({
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
-            <TableCaption>List fields</TableCaption>
+            <TableCaption>{translation("fields")}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead> {translation("field.name")}</TableHead>
@@ -232,7 +233,7 @@ const FieldList: React.FC<FieldListProps> = ({
                 </TableRow>
               )}
               {(initialFields || []).map((field) => (
-                <TableRow key={field.id}>
+                <TableRow key={field.id} className={cn("hover:bg-muted/50", { "cursor-pointer": editingId !== field.id })}>
                   <TableCell className="p-2">
                     {editingId === field.id ? (
                       <Input
@@ -240,9 +241,12 @@ const FieldList: React.FC<FieldListProps> = ({
                         value={editingValues.name || field.name}
                         onChange={(e) => setEditingValues({ ...editingValues, name: e.target.value })}
                         className="w-full p-1"
+                        onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      field.name
+                      <div onClick={() => editingId !== field.id && onSelectField(field.id)}>
+                        {field.name}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
@@ -257,19 +261,20 @@ const FieldList: React.FC<FieldListProps> = ({
                         }
                         className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                         disabled={updatingField}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <option value="">Not set</option>
                         <option value="no">{translation("field.has_fence.no")}</option>
                         <option value="yes">{translation("field.has_fence.yes")}</option>
                       </select>
                     ) : (
-                      <span>
+                      <div onClick={() => editingId !== field.id && onSelectField(field.id)}>
                         {field.has_fence === null
                           ? "Not set"
                           : translation(
                               field.has_fence === "yes" || field.has_fence === true ? "field.has_fence.yes" : "field.has_fence.no",
                             )}
-                      </span>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
@@ -280,20 +285,29 @@ const FieldList: React.FC<FieldListProps> = ({
                           value={editingValues.latitude || field.latitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
                           placeholder={translation("project.latitude")}
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <Input
                           type="text"
                           value={editingValues.longitude || field.longitude || ""}
                           onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
                           placeholder={translation("project.longitude")}
+                          onClick={(e) => e.stopPropagation()}
                         />
                       </div>
                     ) : field.latitude && field.longitude ? (
-                      <Button onClick={(event) => handleOpenGoogleMaps(event, field.latitude, field.longitude)}>
+                      <Button 
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleOpenGoogleMaps(event, field.latitude, field.longitude);
+                        }}
+                      >
                         {translation("general.view_on_map")}
                       </Button>
                     ) : (
-                      <span>{translation("general.location_not_set")}</span>
+                      <div onClick={() => editingId !== field.id && onSelectField(field.id)} className="text-muted-foreground">
+                        {translation("general.location_not_set")}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell className="p-2">
@@ -324,8 +338,15 @@ const FieldList: React.FC<FieldListProps> = ({
                           <X size={14} />
                         </Button>
                       )}
-                      <Button onClick={() => onSelectField(field.id)} className="size-8" variant="ghost">
-                        <ChevronRight size={14} />
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectField(field.id);
+                        }} 
+                        className="size-8" 
+                        variant="ghost"
+                      >
+                        <ChevronRight className="text-foreground" size={14} />
                       </Button>
                     </div>
                   </TableCell>
