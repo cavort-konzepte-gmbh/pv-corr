@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
-import { FileText, ChevronDown, ChevronRight } from "lucide-react";
-import { Datapoint, Project, Zone } from "../../types/projects";
+import { FileText, ChevronDown, ChevronRight, FileCheck } from "lucide-react";
+import { Datapoint } from "../../types/projects";
 import { supabase } from "../../lib/supabase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
 
@@ -29,11 +29,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
   const [normParameters, setNormParameters] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const [navigating, setNavigating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     // Create set of parameter IDs from norm
@@ -90,6 +93,60 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       }
       return next;
     });
+  };
+
+  const handleCreateReport = async () => {
+    try {
+      setIsSaving(true);
+      
+      // Calculate total rating
+      const totalRating = selectedDatapoints.reduce((sum, dp) => {
+        return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
+      }, 0);
+
+      // Determine classification based on total rating
+      const classification = 
+        totalRating >= 0 ? "Ia" :
+        totalRating >= -4 ? "Ib" :
+        totalRating >= -10 ? "II" : "III";
+
+      // Create report data
+      const reportData = {
+        projectId: project.id,
+        zoneId: zone.id,
+        standardId: selectedNorm.id,
+        content: {
+          projectName: project.name,
+          zoneName: zone.name,
+          normName: selectedNorm.name,
+          timestamp: new Date().toISOString(),
+        },
+        parameters: selectedDatapoints.map(dp => ({
+          id: dp.id,
+          values: dp.values,
+          ratings: dp.ratings,
+        })),
+        ratings: selectedDatapoints.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
+        totalRating,
+        classification,
+        recommendations: totalRating >= 0 
+          ? "No special measures required. Standard corrosion protection is sufficient."
+          : totalRating >= -10
+            ? "Moderate corrosion protection measures recommended."
+            : "Enhanced corrosion protection measures required.",
+      };
+
+      // Create the report
+      const { report } = await createReport(reportData);
+
+      // Navigate to the output view to see the report
+      navigate(`/?view=output&reportId=${report.id}`);
+    } catch (err) {
+      console.error("Error creating report:", err);
+      setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -260,19 +317,73 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       <div className="flex justify-end mt-6">
         <Button
           onClick={() => {
-            if (navigating) return;
-            setNavigating(true);
-            // Navigate to output with preview params
-            navigate(`/output?preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`, {
-              replace: true, // Use replace to avoid adding to history stack
-            });
+            try {
+              if (navigating) return;
+              setNavigating(true);
+              // Navigate to output with preview params - use correct URL format
+              navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+            } catch (err) {
+              console.error("Error navigating to preview:", err);
+              setNavigating(false);
+            }
           }}
-          disabled={navigating}
+          disabled={navigating || selectedDatapoints.length === 0}
           className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
         >
           <FileText size={16} />
           {t("analysis.generate_report")} ({selectedDatapoints.length} {t("datapoints")})
         </Button>
+      </div>
+      
+      {/* Create Report Button */}
+      <div className="flex justify-between items-center mt-8 border-t pt-6 border-input bg-card p-4 rounded-lg">
+        <div className="flex-1">
+          <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Create a report from your analysis to save and share your findings.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              try {
+                if (navigating) return;
+                setNavigating(true);
+                // Navigate to output with preview params - use correct URL format
+                navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+              } catch (err) {
+                console.error("Error navigating to preview:", err);
+                setNavigating(false);
+              }
+            }}
+            title="Preview a report from the selected datapoints"
+            disabled={navigating || selectedDatapoints.length === 0}
+            variant="outline"
+            className="px-6 py-3 rounded text-sm flex items-center gap-2"
+          >
+            <FileText size={16} />
+            {t("analysis.preview_report")}
+          </Button>
+          <Button
+            onClick={() => {
+              if (navigating) return;
+              try {
+                setNavigating(true);
+                
+                // Navigate to output view with correct URL format
+                navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+              } catch (err) {
+                console.error("Error creating report:", err);
+                setNavigating(false);
+              }
+            }}
+            disabled={navigating || selectedDatapoints.length === 0}
+            className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+          >
+            <FileCheck size={16} />
+            {t("analysis.create_report")}
+          </Button>
+        </div>
       </div>
     </div>
   );

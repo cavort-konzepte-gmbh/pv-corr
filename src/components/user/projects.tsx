@@ -56,18 +56,10 @@ const Projects: React.FC<ProjectsProps> = ({
           onProjectsChange={onProjectsChange}
         />
       ) : (
-        <div className="p-4 text-center text-muted-foreground">
+        <div className="p-4 mb-4 text-center text-muted-foreground">
           No projects available. Create your first project below.
         </div>
       )}
-      <ProjectForm
-        currentTheme={currentTheme}
-        savedPeople={savedPeople}
-        savedCompanies={savedCompanies}
-        currentLanguage={currentLanguage}
-        selectedCustomerId={selectedCustomerId}
-        onProjectsChange={onProjectsChange}
-      />
     </div>
   );
 };

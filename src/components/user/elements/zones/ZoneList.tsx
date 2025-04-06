@@ -146,14 +146,9 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
 
   return (
     <div>
-      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
-        <Plus size={16} />
-        {translation("zones.add")}
-      </Button>
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
-            <TableCaption>{translation("zones")}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>{translation("zones.short_name")}</TableHead>
@@ -305,14 +300,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                     ) : zone.latitude && zone.longitude ? (
                       <div className="flex items-center justify-between" onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
                         <span>
-                          {zone.latitude}, {zone.longitude}
+                          {zone.latitude?.toString()}, {zone.longitude?.toString()}
                         </span>
                         <Button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank");
+                            window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank");
                           }}
-                          className="text-sm hover:underline"
+                         className="text-xs h-8 px-2 ml-2"
                         >
                           {translation("general.view_on_map")}
                         </Button>
@@ -452,6 +447,11 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
           </Table>
         </div>
       </section>
+      
+      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
+        <Plus size={16} />
+        {translation("zones.add")}
+      </Button>
     </div>
   );
 };

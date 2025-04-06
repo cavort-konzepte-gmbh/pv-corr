@@ -130,14 +130,9 @@ const DatapointList: React.FC<DatapointListProps> = ({
 
   return (
     <div>
-      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
-        <Plus size={16} />
-        {translation("datapoint.add_new")}
-      </Button>
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
-            <TableCaption>Datapoints</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>{translation("datapoint.short_name")}</TableHead>
@@ -275,6 +270,12 @@ const DatapointList: React.FC<DatapointListProps> = ({
           </Table>
         </div>
       </section>
+      
+      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
+        <Plus size={16} />
+        {translation("datapoint.add_new")}
+      </Button>
+      
       {error && <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {showMediaDialog && (

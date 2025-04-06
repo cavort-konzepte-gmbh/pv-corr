@@ -8,6 +8,7 @@ import {
   setSelectedFieldId,
   setSelectedZoneId,
   setSelectedCustomerId,
+  setSelectedReportId,
   resetNavigation,
   updateLastActive,
 } from "../store/slices/navigationSlice";
@@ -37,6 +38,9 @@ export const useAppNavigation = () => {
         case "zoneId":
           dispatch(setSelectedZoneId(value || undefined));
           break;
+        case "reportId":
+          dispatch(setSelectedReportId(value || undefined));
+          break;
       }
     },
     [dispatch, navigation.view],
@@ -50,6 +54,7 @@ export const useAppNavigation = () => {
       projectId: navigation.selectedProjectId,
       fieldId: navigation.selectedFieldId,
       zoneId: navigation.selectedZoneId,
+      reportId: navigation.selectedReportId,
     },
     handleParamChange,
   );
@@ -74,12 +79,14 @@ export const useAppNavigation = () => {
     selectedFieldId: navigation.selectedFieldId,
     selectedZoneId: navigation.selectedZoneId,
     selectedCustomerId: navigation.selectedCustomerId,
+    selectedReportId: navigation.selectedReportId,
     lastActive: navigation.lastActive,
     setView: (view: typeof navigation.view) => dispatch(setView(view)),
     setSelectedProjectId: (id: string | undefined) => dispatch(setSelectedProjectId(id)),
     setSelectedFieldId: (id: string | undefined) => dispatch(setSelectedFieldId(id)),
     setSelectedZoneId: (id: string | undefined) => dispatch(setSelectedZoneId(id)),
     setSelectedCustomerId: (id: string | null) => dispatch(setSelectedCustomerId(id)),
+    setSelectedReportId: (id: string | undefined) => dispatch(setSelectedReportId(id)),
     resetNavigation: () => dispatch(resetNavigation()),
   };
 };

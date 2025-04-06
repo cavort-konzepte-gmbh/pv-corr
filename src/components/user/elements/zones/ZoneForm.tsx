@@ -60,11 +60,6 @@ const ZoneForm: React.FC<ZoneFormProps> = ({ currentTheme, selectedFieldId, onPr
 
   return (
     <>
-      <Button className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 " onClick={() => setShowForm(true)}>
-        <Plus className="size-4 text-primary" />
-        {translation("zones.add")}
-      </Button>
-
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="p-6 rounded-lg max-w-md w-full bg-surface">
@@ -111,6 +106,11 @@ const ZoneForm: React.FC<ZoneFormProps> = ({ currentTheme, selectedFieldId, onPr
           </div>
         </div>
       )}
+      
+      <Button className="w-full py-3 px-4 mt-4 flex items-center justify-center gap-x-2" onClick={() => setShowForm(true)}>
+        <Plus className="size-4 text-primary" />
+        {translation("zones.add")}
+      </Button>
     </>
   );
 };

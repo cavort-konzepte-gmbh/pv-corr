@@ -132,11 +132,11 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                     ) : zone.latitude && zone.longitude ? (
                       <div className="flex items-center justify-between">
                         <span>
-                          {zone.latitude}, {zone.longitude}
+                          {zone.latitude?.toString()}, {zone.longitude?.toString()}
                         </span>
                         <Button
-                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude},${zone.longitude}`, "_blank")} 
-                          className="text-sm hover:underline"
+                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank")}
+                          className="text-xs h-8 px-2 ml-2"
                         >
                           {translation("general.view_on_map")}
                         </Button>

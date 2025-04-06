@@ -131,7 +131,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                         {field.latitude}, {field.longitude}
                       </span>
                       <Button onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, "_blank")}>
-                        {translation("general.view_on_map")}
+                       <span className="text-xs">{translation("general.view_on_map")}</span>
                       </Button>
                     </div>
                   ) : (

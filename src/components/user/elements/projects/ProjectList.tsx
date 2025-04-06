@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import ProjectForm from "./ProjectForm";
 
 interface ProjectListProps {
   currentTheme: Theme;
@@ -225,14 +226,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
                       ) : project.latitude && project.longitude ? (
                         <div className="flex items-center justify-between">
                           <span>
-                            {project.latitude}, {project.longitude}
+                            {project.latitude?.toString()}, {project.longitude?.toString()}
                           </span>
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank");
+                              window.open(`https://www.google.com/maps?q=${project.latitude?.toString()},${project.longitude?.toString()}`, "_blank");
                             }}
-                            className="text-sm hover:underline"
+                           className="text-xs h-8 px-2 ml-2"
                           >
                             {translation("general.view_on_map")}
                           </Button>
@@ -279,6 +280,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
           )}
         </div>
       ))}
+      
+      <ProjectForm
+        currentTheme={currentTheme}
+        savedPeople={savedPeople}
+        currentLanguage={currentLanguage}
+        selectedCustomerId={selectedCustomerId}
+        onProjectsChange={onProjectsChange}
+      />
     </div>
   );
 };

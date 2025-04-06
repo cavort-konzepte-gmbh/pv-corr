@@ -9,6 +9,7 @@ import { Company } from "../types/companies";
 import { Customer } from "../types/customers";
 import { Standard, STANDARDS } from "../types/standards";
 import { fetchProjects } from "../services/projects";
+import { fetchReports } from "../services/reports";
 import { fetchCustomers } from "../services/customers";
 import { fetchTranslations } from "../services/translations";
 import { useAuth } from "./auth/AuthProvider";
@@ -23,9 +24,10 @@ import Fields from "./user/fields";
 import Zones from "./user/zones";
 import Datapoints from "./user/datapoints";
 import Settings from "./user/settings";
+import Output from "./user/output";
+import Reports from "./user/reports";
 import AnalysisPanel from "./analysis/AnalysisPanel";
-import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2 } from "lucide-react";
-import { FileText } from "lucide-react";
+import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2, FileText, ClipboardList } from "lucide-react";
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { updateUserSettings } from "@/services/userSettings";
@@ -37,17 +39,20 @@ const DashboardLayout = () => {
     selectedFieldId,
     selectedZoneId,
     selectedCustomerId,
+    selectedReportId,
     setView,
     setSelectedProjectId,
     setSelectedFieldId,
     setSelectedZoneId,
     setSelectedCustomerId,
+    setSelectedReportId,
     resetNavigation,
   } = useAppNavigation();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
   const [savedPeople, setSavedPeople] = useState<Person[]>([]);
   const [showHiddenIds, setShowHiddenIds] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>("en");
@@ -170,12 +175,18 @@ const DashboardLayout = () => {
       setError(null);
       try {
         setLoading(true);
-        // Load initial data
-        const [people, companies, fetchedCustomers] = await Promise.all([fetchPeople(), fetchCompanies(), fetchCustomers()]);
+        // Load initial data with reports
+        const [people, companies, fetchedCustomers, fetchedReports] = await Promise.all([
+          fetchPeople(), 
+          fetchCompanies(), 
+          fetchCustomers(),
+          fetchReports()
+        ]);
 
         setSavedPeople(people);
         setCompanies(companies);
         setCustomers(fetchedCustomers);
+        setReports(fetchedReports || []);
 
         // Load uncategorized projects
         const uncategorizedProjects = await fetchProjects();
@@ -447,7 +458,28 @@ const DashboardLayout = () => {
           />
         );
       case "output":
-        return <div className="p-6 text-center text-secondary">{t("output.panel_coming_soon")}</div>;
+        return (
+          <Output
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
+            projects={projects}
+            reports={reports}
+          />
+        );
+      case "reports":
+        return (
+          <Reports
+            currentTheme={currentTheme}
+            currentLanguage={currentLanguage}
+            projects={projects}
+            reports={reports}
+            selectedReportId={selectedReportId}
+            onSelectReport={(reportId) => {
+              setSelectedReportId(reportId);
+              setView("output");
+            }}
+          />
+        );
       case "settings":
         return (
           <Settings
@@ -601,8 +633,12 @@ const DashboardLayout = () => {
                   <span>{t("nav.analyse")}</span>
                 </ButtonSection>
                 <ButtonSection view={view} match="output" onClick={() => setView("output")}>
-                  <Database size={18} />
+                  <FileText size={18} />
                   <span>{t("nav.output")}</span>
+                </ButtonSection>
+                <ButtonSection view={view} match="reports" onClick={() => setView("reports")}>
+                  <ClipboardList size={18} />
+                  <span>{t("reports.title")}</span>
                 </ButtonSection>
               </>
             )}

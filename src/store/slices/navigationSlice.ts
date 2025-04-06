@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface NavigationState {
-  view: "customers" | "projects" | "fields" | "zones" | "datapoints" | "analyse" | "evaluation" | "output" | "settings";
-  selectedProjectId: string | undefined;
-  selectedFieldId: string | undefined;
-  selectedZoneId: string | undefined;
+  view: "customers" | "projects" | "fields" | "zones" | "datapoints" | "analyse" | "output" | "reports" | "settings";
+  selectedProjectId?: string;
+  selectedFieldId?: string;
+  selectedZoneId?: string;
   selectedCustomerId: string | null;
+  selectedReportId?: string;
   lastActive: number;
 }
 
@@ -15,6 +16,7 @@ const initialState: NavigationState = {
   selectedFieldId: undefined,
   selectedZoneId: undefined,
   selectedCustomerId: null,
+  selectedReportId: undefined,
   lastActive: Date.now(),
 };
 
@@ -37,10 +39,16 @@ const navigationSlice = createSlice({
     setSelectedCustomerId: (state, action: PayloadAction<string | null>) => {
       state.selectedCustomerId = action.payload;
     },
+    setSelectedReportId: (state, action: PayloadAction<string | undefined>) => {
+      state.selectedReportId = action.payload;
+    },
     resetNavigation: (state) => {
       state.selectedProjectId = undefined;
       state.selectedFieldId = undefined;
       state.selectedZoneId = undefined;
+      state.selectedCustomerId = null;
+      state.selectedReportId = undefined;
+      state.view = "customers";
     },
     updateLastActive: (state) => {
       state.lastActive = Date.now();
@@ -54,6 +62,7 @@ export const {
   setSelectedFieldId,
   setSelectedZoneId,
   setSelectedCustomerId,
+  setSelectedReportId,
   resetNavigation,
   updateLastActive,
 } = navigationSlice.actions;

@@ -138,15 +138,9 @@ const FieldList: React.FC<FieldListProps> = ({
 
   return (
     <div>
-      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mb-4">
-        <Plus size={16} />
-        {translation("field.add")}
-      </Button>
-
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
-            <TableCaption>{translation("fields")}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead> {translation("field.name")}</TableHead>
@@ -299,8 +293,9 @@ const FieldList: React.FC<FieldListProps> = ({
                       <Button 
                         onClick={(event) => {
                           event.stopPropagation();
-                          handleOpenGoogleMaps(event, field.latitude, field.longitude);
+                          handleOpenGoogleMaps(event, parseFloat(field.latitude.toString()), parseFloat(field.longitude.toString()));
                         }}
+                       className="h-8 text-xs px-2"
                       >
                         {translation("general.view_on_map")}
                       </Button>
@@ -356,6 +351,11 @@ const FieldList: React.FC<FieldListProps> = ({
           </Table>
         </div>
       </section>
+      
+      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
+        <Plus size={16} />
+        {translation("field.add")}
+      </Button>
 
       {error && (
         <div className="mt-2 p-2 rounded text-sm text-destructive-foreground border border-destructive bg-destructive">{error}</div>

@@ -57,14 +57,6 @@ const DatapointForm: React.FC<DatapointFormProps> = ({ currentTheme, currentLang
 
   return (
     <>
-      <button
-        onClick={() => setIsAdding(true)}
-        className="w-full py-3 px-4 mt-8 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
-      >
-        <Plus size={16} />
-        {t("datapoint.add_new")}
-      </button>
-
       {isAdding && (
         <div className="mt-4">
           <FormHandler
@@ -144,10 +136,18 @@ const DatapointForm: React.FC<DatapointFormProps> = ({ currentTheme, currentLang
           </FormHandler>
 
           {error && (
-            <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
+            <div className="p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
           )}
         </div>
       )}
+      
+      <button
+        onClick={() => setIsAdding(true)}
+        className="w-full py-3 px-4 mt-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"
+      >
+        <Plus size={16} />
+        {t("datapoint.add_new")}
+      </button>
     </>
   );
 };
