@@ -4,7 +4,6 @@ import { Language, useTranslation } from "../../types/language";
 import { Project, Zone } from "../../types/projects";
 import { FileText, Save, Download, FileCheck } from "lucide-react";
 import AnalysisReport from "./AnalysisReport";
-import { supabase } from "../../lib/supabase";
 import { useAuth } from "../auth/AuthProvider";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import AnalyseData from "./AnalyseData";
@@ -13,6 +12,7 @@ import AnalyseResult from "./AnalyseResult";
 import { createReport } from "../../services/reports";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { supabase } from "../../lib/supabase";
 
 interface AnalysisPanelProps {
   currentTheme: Theme;
@@ -39,7 +39,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [selectedNorm, setSelectedNorm] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [parameters, setParameters] = useState<any[]>([]); // Added missing parameters state
+  const [parameters, setParameters] = useState<any[]>([]);
   const [navigating, setNavigating] = useState(false);
   const t = useTranslation(currentLanguage);
   const { user } = useAuth();
@@ -140,6 +140,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
     try {
       setIsSaving(true);
+      setNavigating(true);
       setSaveError(null);
 
       // Get selected datapoints
@@ -149,6 +150,9 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       const totalRating = selectedDps.reduce((sum, dp) => {
         return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
       }, 0);
+      
+      // Get the datapoint IDs to include in the URL
+      const datapointIds = selectedDatapoints.join(',');
 
       // Determine classification based on total rating
       const classification = 
@@ -185,11 +189,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       // Create the report
       const { report } = await createReport(reportData);
 
-      // Navigate to the output view to see the report - use correct URL format
-      navigate(`?view=output&reportId=${report.id}`);
+      // Navigate to output view with the report ID and datapoint IDs
+      window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
     } catch (err) {
       console.error("Error creating report:", err);
       setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
+      setNavigating(false);
     } finally {
       setIsSaving(false);
     }
@@ -305,15 +310,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
               <Button
                 onClick={() => {
                   if (navigating) return;
+                   
                   setNavigating(true);
                   
-                  // Navigate to output with preview params
-                  navigate(
-                    `/view=output&preview=true&projectId=${selectedProject?.id}&zoneId=${selectedZone?.id}&normId=${selectedNorm?.id}`,
-                    {
-                      replace: false // Add to history stack so user can navigate back
-                    }
-                  );
+                  // Get the datapoint IDs to include in the URL
+                  const datapointIds = selectedDatapoints.join(',');
+                  
+                  // Use window.location for a full page navigation
+                  window.location.href = `/?view=output&preview=true&projectId=${selectedProject?.id}&zoneId=${selectedZone?.id}&normId=${selectedNorm?.id}&datapointIds=${datapointIds}`;
                 }}
                 title="Preview a report from the selected datapoints"
                 disabled={navigating || isSaving || selectedDatapoints.length === 0 || !selectedNormId}

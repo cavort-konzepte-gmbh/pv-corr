@@ -273,7 +273,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       />
                     ) : (
                       <div onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
-                        {zone.name}
+                        <div className="flex items-center gap-2">
+                          <span>{zone.name}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
+                            {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </TableCell>

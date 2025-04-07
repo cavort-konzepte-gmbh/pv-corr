@@ -469,12 +469,13 @@ const DashboardLayout = () => {
       case "reports":
         return (
           <Reports
+            key="reports-view"
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             projects={projects}
             reports={reports}
             selectedReportId={selectedReportId}
-            onSelectReport={(reportId) => {
+            onSelectReport={(reportId: string) => {
               setSelectedReportId(reportId);
               setView("output");
             }}

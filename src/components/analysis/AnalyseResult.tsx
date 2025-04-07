@@ -4,9 +4,10 @@ import { Language, useTranslation } from "../../types/language";
 import { FileText, ChevronDown, ChevronRight, FileCheck } from "lucide-react";
 import { Datapoint } from "../../types/projects";
 import { supabase } from "../../lib/supabase";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
+import { createReport } from "../../services/reports";
 
 interface AnalyseResultProps {
   currentTheme: Theme;
@@ -29,7 +30,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
   const [normParameters, setNormParameters] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
@@ -136,14 +136,19 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             : "Enhanced corrosion protection measures required.",
       };
 
+      // Get the datapoint IDs to include in the URL
+      const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
+
       // Create the report
       const { report } = await createReport(reportData);
 
-      // Navigate to the output view to see the report
-      navigate(`/?view=output&reportId=${report.id}`);
+      // Navigate to the output view with the report ID
+      setNavigating(true);
+      window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
     } catch (err) {
       console.error("Error creating report:", err);
       setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
+      setNavigating(false);
     } finally {
       setIsSaving(false);
     }
@@ -299,40 +304,12 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                           <TableCell className="p-2 ">{rating}</TableCell>
                         </TableRow>
                       ))}
-                    <TableRow>
-                      <TableCell className="p-2 font-bold ">SUM</TableCell>
-                      <TableCell className="p-2 "></TableCell>
-                      <TableCell className="p-2 font-bold ">
-                        {Object.values(parameterRatings).reduce((sum, { rating }) => sum + rating, 0)}
-                      </TableCell>
-                    </TableRow>
                   </TableBody>
                 </Table>
               )}
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="flex justify-end mt-6">
-        <Button
-          onClick={() => {
-            try {
-              if (navigating) return;
-              setNavigating(true);
-              // Navigate to output with preview params - use correct URL format
-              navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
-            } catch (err) {
-              console.error("Error navigating to preview:", err);
-              setNavigating(false);
-            }
-          }}
-          disabled={navigating || selectedDatapoints.length === 0}
-          className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
-        >
-          <FileText size={16} />
-          {t("analysis.generate_report")} ({selectedDatapoints.length} {t("datapoints")})
-        </Button>
       </div>
       
       {/* Create Report Button */}
@@ -347,10 +324,15 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           <Button
             onClick={() => {
               try {
+                // Prevent multiple clicks
                 if (navigating) return;
                 setNavigating(true);
-                // Navigate to output with preview params - use correct URL format
-                navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
+                
+                // Get the datapoint IDs to include in the URL
+                const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
+                
+                // Navigate to output view with preview parameters and datapoint IDs
+                window.location.href = `/?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}&datapointIds=${datapointIds}`;
               } catch (err) {
                 console.error("Error navigating to preview:", err);
                 setNavigating(false);
@@ -365,23 +347,12 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             {t("analysis.preview_report")}
           </Button>
           <Button
-            onClick={() => {
-              if (navigating) return;
-              try {
-                setNavigating(true);
-                
-                // Navigate to output view with correct URL format
-                navigate(`?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}`);
-              } catch (err) {
-                console.error("Error creating report:", err);
-                setNavigating(false);
-              }
-            }}
+            onClick={handleCreateReport}
             disabled={navigating || selectedDatapoints.length === 0}
             className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
           >
             <FileCheck size={16} />
-            {t("analysis.create_report")}
+            {isSaving ? t("analysis.creating_report") : t("analysis.create_report")}
           </Button>
         </div>
       </div>

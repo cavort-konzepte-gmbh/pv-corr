@@ -1,8 +1,9 @@
 import React from "react";
 import { Theme } from "../../types/theme";
-import { ArrowLeft, Palette, Globe, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Palette, Globe, ChevronLeft, Tag } from "lucide-react";
 import ThemeManagement from "./ThemeManagement";
 import TranslationsPanel from "./settings/TranslationsPanel";
+import VersionManagement from "./VersionManagement";
 import { Button } from "../ui/button";
 
 interface AdminSettingsProps {
@@ -11,7 +12,7 @@ interface AdminSettingsProps {
 }
 
 const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) => {
-  const [activeView, setActiveView] = React.useState<"overview" | "themes" | "translations">("overview");
+  const [activeView, setActiveView] = React.useState<"overview" | "themes" | "translations" | "versions">("overview");
 
   return (
     <div className="p-8">
@@ -37,7 +38,9 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
       {activeView === "themes" ? (
         <ThemeManagement currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
       ) : activeView === "translations" ? (
-        <TranslationsPanel currentTheme={currentTheme} currentLanguage="en" />
+        <TranslationsPanel currentTheme={currentTheme} currentLanguage="en" onBack={() => setActiveView("overview")} />
+      ) : activeView === "versions" ? (
+        <VersionManagement currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Theme Management */}
@@ -65,6 +68,18 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ currentTheme, onBack }) =
               <Globe className="text-accent-primary" size={24} />
               <h3 className="text-lg font-medium mt-2">Translations Management</h3>
               <p className="text-sm text-muted-foreground">Manage system translations</p>
+            </div>
+          </div>
+
+          {/* Version Management */}
+          <div
+            onClick={() => setActiveView("versions")}
+            className="p-6 rounded-lg border transition-all hover:translate-x-1 text-card-foreground border-accent hover:cursor-pointer bg-card"
+          >
+            <div className="flex flex-col gap-2">
+              <Tag className="text-accent-primary" size={24} />
+              <h3 className="text-lg font-medium mt-2">Version Management</h3>
+              <p className="text-sm text-muted-foreground">Manage application versions</p>
             </div>
           </div>
         </div>

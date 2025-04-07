@@ -6,7 +6,7 @@ import { FileText, Download, Share, ChevronLeft, Calendar, User, Building2, MapP
 import { supabase } from "../../lib/supabase";
 import { getCurrentVersion } from "../../services/versions";
 import { Button } from "../ui/button"; 
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -16,14 +16,15 @@ interface OutputViewProps {
   project?: Project;
   zone?: Zone;
   normId?: string;
+  reportId?: string;
   onBack: () => void;
 }
 
-const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, project, zone, normId, onBack }) => {
+const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, project, zone, normId, reportId, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<any>(null);
-  const [datapoints, setDatapoints] = useState<any[]>([]);
+  const [selectedDatapoints, setSelectedDatapoints] = useState<any[]>([]);
   const [norm, setNorm] = useState<any>(null); 
   const [currentVersion, setCurrentVersion] = useState<string>("1.0.0");
   const [analyst, setAnalyst] = useState<{
@@ -47,12 +48,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   useEffect(() => {
     const loadReportData = async () => {
       try {
-        setLoading(true);
-        debugLog("Loading report data with props:", { project, zone, normId });
-        
+        setLoading(true);        
         // Get parameters from URL
         const params = new URLSearchParams(location.search);
-        const reportId = params.get("reportId");
+        const reportIdFromUrl = params.get("reportId") || reportId;
         const versionNumber = params.get("version") || undefined;
         const preview = params.get("preview") === "true";
         const projectId = params.get("projectId") || project?.id; 
@@ -60,14 +59,12 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         const normIdFromUrl = params.get("normId"); 
         const normIdToUse = normId || normIdFromUrl;
 
-        debugLog("URL parameters:", { reportId, versionNumber, preview, projectId, zoneId, normIdToUse });
-        
-        if (reportId) {
+        if (reportIdFromUrl) {
           // Load specific report
           const { data: report, error: reportError } = await supabase
             .from("analysis_outputs")
             .select("*, versions:analysis_versions(*)")
-            .eq("id", reportId)
+            .eq("id", reportIdFromUrl)
             .single();
             
           if (reportError) throw reportError;
@@ -97,10 +94,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           setReportData({
             id: report.id,
             hidden_id: report.hidden_id,
-            project_id: report.project_id,
-            zone_id: report.zone_id,
-            norm_id: report.norm_id,
-            analyst_id: report.analyst_id,
+            project_id: report.project_id || projectId,
+            zone_id: report.zone_id || zoneId,
+            norm_id: report.norm_id || normIdToUse,
+            analyst_id: report.analyst_id || (await supabase.auth.getUser()).data.user?.id,
             created_at: report.created_at,
             currentVersion: version,
           });
@@ -110,10 +107,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           // Load project and zone data if needed
           if (!project || !zone) {
             const projectResponse = await supabase
-              .from("projects").select("*").eq("id", report.project_id).single();
+              .from("projects").select("*").eq("id", report.project_id || projectId).single();
               
             const zoneResponse = await supabase
-              .from("zones").select("*").eq("id", report.zone_id).single();
+              .from("zones").select("*").eq("id", report.zone_id || zoneId).single();
               
             if (!projectResponse.error && !zoneResponse.error) {
               // We would set project and zone here if they weren't passed as props
@@ -164,57 +161,94 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           // If we don't have the zone's datapoints, fetch them
           if (zoneToUse && (!zoneToUse.datapoints || zoneToUse.datapoints.length === 0)) {
             debugLog("Fetching datapoints for zone:", zoneToUse?.id);
-            const { data: datapointsData, error: datapointsError } = await supabase
+            // Get datapoint IDs from URL if available
+            const datapointIds = params.get("datapointIds")?.split(",") || [];
+            
+            let query = supabase
               .from("datapoints")
-              .select("id, hidden_id, name, type, values, ratings, timestamp")
-              .eq("zone_id", zoneToUse?.id);
+              .select("id, hidden_id, name, type, values, ratings, timestamp");
+              
+            // If specific datapoints are requested, filter by IDs
+            if (datapointIds.length > 0) {
+              query = query.in("id", datapointIds);
+            } else {
+              // Otherwise get all datapoints for the zone
+              query = query.eq("zone_id", zoneToUse?.id);
+            }
+            
+            const { data: datapointsData, error: datapointsError } = await query;
               
             if (datapointsError) {
               debugLog("Error fetching datapoints:", datapointsError);
               throw datapointsError;
             }
             
-            datapointsToUse = datapointsData || [];
+            // If we have specific datapoint IDs, make sure they're in the right order
+            if (datapointIds.length > 0 && datapointsData) {
+              // Sort datapoints according to the order in datapointIds
+              datapointsToUse = datapointIds
+                .map(id => datapointsData.find(dp => dp.id === id))
+                .filter(dp => dp !== undefined);
+            } else {
+              datapointsToUse = datapointsData || [];
+            }
+            
             debugLog("Fetched datapoints:", datapointsToUse);
-            setDatapoints(datapointsToUse);
+            setSelectedDatapoints(datapointsToUse);
           } else {
-            datapointsToUse = zoneToUse?.datapoints || [];
+            // Get datapoint IDs from URL if available
+            const datapointIds = params.get("datapointIds")?.split(",") || [];
+            
+            if (datapointIds.length > 0) {
+              // Filter and sort datapoints according to the datapointIds
+              datapointsToUse = datapointIds
+                .map(id => zoneToUse?.datapoints?.find(dp => dp.id === id))
+                .filter(dp => dp !== undefined);
+            } else {
+              datapointsToUse = zoneToUse?.datapoints || [];
+            }
+            
             debugLog("Using existing datapoints from zone:", datapointsToUse);
-            setDatapoints(datapointsToUse);
+            setSelectedDatapoints(datapointsToUse);
           }
           
           // Create a preview report
           debugLog("Creating preview report with datapoints:", datapointsToUse);
            
-          // Calculate total rating from datapoints
-          const totalRating = datapointsToUse.reduce((sum, dp) => {
-            const dpRatings = dp.ratings || {};
-            return sum + Object.values(dpRatings).reduce((a: number, b: number) => a + b, 0);
-          }, 0);
+          try {
+            // Calculate total rating from datapoints
+            const totalRating = datapointsToUse.reduce((sum, dp) => {
+              const dpRatings = dp.ratings || {};
+              return sum + Object.values(dpRatings).reduce((a: number, b: number) => a + b, 0);
+            }, 0);
            
-          debugLog("Calculated total rating:", totalRating);
+            debugLog("Calculated total rating:", totalRating);
            
-          setReportData({
-            id: "preview",
-            hidden_id: "preview",
-            project_id: projectToUse?.id || projectId,
-            zone_id: zoneToUse?.id || zoneId,
-            norm_id: normIdToUse,
-            analyst_id: (await supabase.auth.getUser()).data.user?.id,
-            created_at: new Date().toISOString(),
-            currentVersion: {
-              id: "preview-version",
-              version_number: 1,
-              parameters: datapointsToUse.map(dp => ({
-                id: dp.id,
-                values: dp.values,
-                ratings: dp.ratings
-              })),
-              total_rating: totalRating,
-              classification: "Preview",
-              created_at: new Date().toISOString()
-            }
-          });
+            setReportData({
+              id: "preview",
+              hidden_id: "preview",
+              project_id: projectToUse?.id || projectId,
+              zone_id: zoneToUse?.id || zoneId,
+              norm_id: normIdToUse,
+              analyst_id: (await supabase.auth.getUser()).data.user?.id,
+              created_at: new Date().toISOString(),
+              currentVersion: {
+                id: "preview-version",
+                version_number: 1,
+                parameters: datapointsToUse.map(dp => ({
+                  id: dp.id,
+                  values: dp.values,
+                  ratings: dp.ratings
+                })),
+                total_rating: totalRating,
+                classification: "Preview",
+                created_at: new Date().toISOString()
+              }
+            });
+          } catch (err) {
+            console.error("Error creating preview:", err);
+            setError("Failed to create preview: " + (err instanceof Error ? err.message : String(err)));
+          }
         } else {
           throw new Error("Insufficient data to display report");
         }
@@ -251,7 +285,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         const loadParameterDetails = async () => {
            try {
              // Get all parameter IDs from the datapoints
-             const pointsToUse = datapoints.length > 0 ? datapoints : (zone?.datapoints || []);
+             const pointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : (zone?.datapoints || []);
              if (!pointsToUse || pointsToUse.length === 0) return;
              
              const firstDatapoint = pointsToUse[0];
@@ -512,8 +546,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
       <div className="mb-8 p-6 rounded-lg border border-input bg-card print:border-black print:border print:p-4 print:page-break-after-avoid">
         <h2 className="text-lg font-medium text-foreground mb-4 print:text-black">{t("analysis.parameters_results")}</h2>
         {(() => {
-          // Get the datapoints to use
-          const datapointsToUse = datapoints.length > 0 ? datapoints : (zone?.datapoints || []);
+          // Use the selected datapoints
+          const datapointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : (zone?.datapoints || []);
           
           if (!datapointsToUse || datapointsToUse.length === 0) {
             return (
@@ -523,10 +557,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               </div>
             );
           }
-          
-          // Get the first datapoint
-          const firstDatapoint = datapointsToUse[0];
-          if (!firstDatapoint?.values || Object.keys(firstDatapoint.values).length === 0) {
+
+          // Check if any datapoint has values
+          const hasValues = datapointsToUse.some(dp => dp?.values && Object.keys(dp.values).length > 0);
+          if (!hasValues) {
             return (
               <div className="p-4 text-center border border-input rounded-md">
                 <Info className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
@@ -536,55 +570,81 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           }
           
           return (
-          <div className="overflow-x-auto print:border-black print:border print:border-collapse">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="print:text-black">{t("analysis.parameter")}</TableHead>
-                  <TableHead className="print:text-black">{t("analysis.value")}</TableHead>
-                  <TableHead className="print:text-black">{t("analysis.unit")}</TableHead>
-                  <TableHead className="print:text-black">{t("analysis.rating")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Object.entries(firstDatapoint.values).map(([key, value]) => {
-                  const rating = firstDatapoint.ratings?.[key] || 0;
-                  const paramDetail = parameterDetails[key] || { name: key, unit: "" };
+            <div className="space-y-6">
+              {datapointsToUse.map((datapoint, index) => (
+                <div key={datapoint.id} className="mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-base font-medium text-foreground print:text-black">
+                      {datapoint.name || `Datapoint ${index + 1}`}
+                    </h3>
+                    <div className="text-xs text-muted-foreground print:text-gray-600">
+                      {new Date(datapoint.timestamp).toLocaleString()}
+                    </div>
+                  </div>
                   
-                  return (
-                    <TableRow key={key} className="hover:bg-muted/50">
-                      <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
-                        {paramDetail.name || key}
-                      </TableCell>
-                      <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{value}</TableCell>
-                      <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
-                        {paramDetail.unit || "-"}
-                      </TableCell>
-                      <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-2 h-2 rounded-full"
-                            style={{
-                              backgroundColor: rating >= 0 ? "#22c55e" : "#ef4444",
-                            }}
-                          />
-                          {rating}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                <TableRow className="bg-muted/20">
-                  <TableCell colSpan={3} className="p-2 border border-input print:border-gray-300 font-bold print:text-black text-right">
-                    {t("analysis.total_rating")}
-                  </TableCell>
-                  <TableCell className="p-2 border border-input print:border-gray-300 font-bold print:text-black">
-                    {totalRating}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
+                  <div className="overflow-x-auto print:border-black print:border print:border-collapse">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="print:text-black">{t("analysis.parameter")}</TableHead>
+                          <TableHead className="print:text-black">{t("analysis.value")}</TableHead>
+                          <TableHead className="print:text-black">{t("analysis.unit")}</TableHead>
+                          <TableHead className="print:text-black">{t("analysis.rating")}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {Object.entries(datapoint.values || {}).map(([key, value]) => {
+                          const rating = datapoint.ratings?.[key] || 0;
+                          const paramDetail = parameterDetails[key] || { name: key, unit: "" };
+                          
+                          return (
+                            <TableRow key={key} className="hover:bg-muted/50">
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
+                                {paramDetail.name || key}
+                              </TableCell>
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{value}</TableCell>
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
+                                {paramDetail.unit || "-"}
+                              </TableCell>
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-2 h-2 rounded-full"
+                                    style={{
+                                      backgroundColor: rating >= 0 ? "#22c55e" : "#ef4444",
+                                    }}
+                                  />
+                                  {rating}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                        <TableRow className="bg-muted/20">
+                          <TableCell colSpan={3} className="p-2 border border-input print:border-gray-300 font-bold print:text-black text-right">
+                            {t("analysis.datapoint_total")}
+                          </TableCell>
+                          <TableCell className="p-2 border border-input print:border-gray-300 font-bold print:text-black">
+                            {Object.values(datapoint.ratings || {}).reduce((sum: number, rating: number) => sum + rating, 0)}
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="mt-6 p-4 border border-input rounded-lg bg-muted/10">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-base font-medium text-foreground print:text-black">
+                    {t("analysis.combined_results")}
+                  </h3>
+                  <div className="text-sm font-medium text-foreground print:text-black">
+                    {t("analysis.total_rating")}: {totalRating}
+                  </div>
+                </div>
+              </div>
+            </div>
           );
         })()}</div>
 
@@ -644,18 +704,18 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
       <div className="text-sm text-muted-foreground border-t border-input pt-4 print:text-gray-600 print:border-t print:border-gray-300">
         <div className="flex justify-between items-center">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 print:block">
               <User size={14} />
               <span>{analyst?.name}</span>
               {analyst?.title && <span>• {analyst.title}</span>}
               {analyst?.email && <span>• {analyst.email}</span>}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 print:block">
               <Calendar size={14} />
               <span>{new Date(reportData.currentVersion.created_at).toLocaleDateString()}</span>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right print:hidden">
             <div>
               {t("analysis.software_version")}: {currentVersion}
             </div>
@@ -711,8 +771,21 @@ body {
   color: #000 !important;
 }
 
+.print\\:hidden {
+  display: none !important;
+}
+
+.print\\:block {
+  display: block !important;
+}
+
 .print\\:text-gray-600 {
   color: #4b5563 !important;
+}
+
+
+.print\\:text-transparent {
+  color: transparent !important;
 }
 
 .print\\:page-break-before-avoid {
@@ -747,18 +820,21 @@ th {
 /* Hide browser UI elements when printing */
 @media print {
   nav, header, footer, button, .print\\:hidden {
+    display: none !important; 
+  }
+
+  .hidden.print\\:block {
+    display: block !important;
+  }
+
+  /* Hide user and version info in the footer */
+  .text-right {
     display: none !important;
   }
   
   /* Ensure page breaks don't happen inside elements */
   table, tr, td, th {
     page-break-inside: avoid;
-  }
-  
-  /* Force background colors and images to print */
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 }
       `}</style>

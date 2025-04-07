@@ -239,7 +239,17 @@ const FieldList: React.FC<FieldListProps> = ({
                       />
                     ) : (
                       <div onClick={() => editingId !== field.id && onSelectField(field.id)}>
-                        {field.name}
+                        <div className="flex items-center gap-2">
+                          <span>{field.name}</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
+                              {field.zones?.length || 0} {translation("zones").toLowerCase()}
+                            </span>
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
+                              {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints").toLowerCase()}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </TableCell>

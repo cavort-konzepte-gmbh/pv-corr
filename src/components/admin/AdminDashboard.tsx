@@ -1,12 +1,10 @@
 import React from "react";
 import { Theme } from "../../types/theme";
-import { Users, Database, Settings, LogOut, BellRing, Tag } from "lucide-react";
+import { Users, Database, Settings, LogOut, BellRing } from "lucide-react";
 import DatabaseManagement from "./DatabaseManagement";
 import UserManagement from "./UserManagement";
 import AdminSettings from "./AdminSettings";
 import NotificationsPanel from "./notifications/NotificationsPanel";
-import TranslationsPanel from "./settings/TranslationsPanel";
-import VersionManagement from "./VersionManagement";
 import { Language } from "../../types/language";
 import { supabase } from "../../lib/supabase";
 import { Button } from "../ui/button";
@@ -17,7 +15,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
-  const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings" | "translations" | "versions">(
+  const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings">(
     "overview",
   );
 
@@ -41,10 +39,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         <AdminSettings currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
       ) : activeView === "notifications" ? (
         <NotificationsPanel currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
-      ) : activeView === "translations" ? (
-        <TranslationsPanel currentTheme={currentTheme} currentLanguage={currentLanguage} />
-      ) : activeView === "versions" ? (
-        <VersionManagement currentTheme={currentTheme} onBack={() => setActiveView("overview")} />
       ) : (
         <div className="p-8">
           <div className="flex items-center justify-between mb-8">
@@ -100,22 +94,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
                 <div>
                   <h3 className="font-medium">Notifications</h3>
                   <p className="text-sm text-muted-foreground">Manage notifications</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Version Management */}
-            <div
-              onClick={() => setActiveView("versions")}
-              className="p-6 rounded-lg text-card-foreground border border-accent bg-card hover:cursor-pointer"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                  <Tag className="text-accent-primary" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-medium">Version Management</h3>
-                  <p className="text-sm text-muted-foreground">Manage application versions</p>
                 </div>
               </div>
             </div>

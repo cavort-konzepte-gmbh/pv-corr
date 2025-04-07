@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Theme } from "../../../types/theme";
 import { Language, LANGUAGES } from "../../../types/language";
-import { Plus, Save, X, Edit2, Search } from "lucide-react";
+import { Plus, Save, X, Edit2, Search, ArrowLeft } from "lucide-react";
 import { fetchAllTranslations, fetchLanguages, updateTranslation, deleteTranslation } from "../../../services/translations";
 import { FormHandler } from "../../shared/FormHandler";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,9 +12,10 @@ import { Label } from "@radix-ui/react-label";
 interface TranslationsPanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
+  onBack?: () => void;
 }
 
-const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, currentLanguage }) => {
+const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, currentLanguage, onBack }) => {
   const [translations, setTranslations] = useState<Record<string, Record<Language, string>>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,8 +102,17 @@ const TranslationsPanel: React.FC<TranslationsPanelProps> = ({ currentTheme, cur
 
   return (
     <div className="p-6">
+      <div className="flex items-center gap-4 mb-6">
+        {onBack && (
+          <Button onClick={onBack} variant="ghost" className="p-2 rounded hover:bg-opacity-80">
+            <ArrowLeft size={20} />
+          </Button>
+        )}
+        <h2 className="text-2xl font-bold">Translations Management</h2>
+      </div>
+
       <div className="flex items-center justify-between mb-6">
-        <Label className="w-full mb-6 flex items-center gap-x-4 relative">
+        <Label className="w-full flex items-center gap-x-4 relative">
           <Search className="text-primary absolute left-4" size={20} />
           <Input
             className="h-12 indent-10 bg-card"
