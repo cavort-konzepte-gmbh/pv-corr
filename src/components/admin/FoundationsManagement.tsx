@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { supabase } from "../../lib/supabase";
-import { ArrowLeft, Plus, Edit2, X, Save } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, X, Save, ArrowUpDown } from "lucide-react";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Input } from "../ui/input";
@@ -12,16 +12,22 @@ interface FoundationsManagementProps {
   onBack: () => void;
 }
 
+type SortField = "name" | "created_at";
+type SortDirection = "asc" | "desc";
+
 interface Foundation {
   id: string;
   hidden_id: string;
   name: string;
+  created_at?: string;
 }
 
 const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTheme, onBack }) => {
   const [foundations, setFoundations] = useState<Foundation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [editingFoundation, setEditingFoundation] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewFoundation, setIsNewFoundation] = useState(false);
@@ -30,6 +36,39 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
   useEffect(() => {
     loadData();
   }, []);
+
+  // Sort foundations based on current sort field and direction
+  const sortedFoundations = React.useMemo(() => {
+    if (!foundations) return [];
+    
+    return [...foundations].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "created_at":
+          const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+          comparison = aDate - bDate;
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [foundations, sortField, sortDirection]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -161,15 +200,44 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
               <Table>
-                <TableCaption>Foundations</TableCaption>
+                <TableCaption className="h-8">Foundations</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("name")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Name
+                        {sortField === "name" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("created_at")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Created
+                        {sortField === "created_at" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {foundations.map((foundation) => (
+                  {sortedFoundations.map((foundation) => (
                     <TableRow key={foundation.id}>
                       <TableCell className="p-2">
                         {editingFoundation === foundation.id ? (
@@ -182,6 +250,9 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                         ) : (
                           foundation.name
                         )}
+                      </TableCell>
+                      <TableCell className="p-2 text-muted-foreground text-sm">
+                        {foundation.created_at ? new Date(foundation.created_at).toLocaleDateString() : "-"}
                       </TableCell>
                       <TableCell className="p-2">
                         <div className="flex items-center justify-start gap-2">
@@ -210,6 +281,9 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                           className="w-full p-1"
                           placeholder="Enter foundation name"
                         />
+                      </TableCell>
+                      <TableCell className="p-2 text-muted-foreground text-sm">
+                        -
                       </TableCell>
                       <TableCell className="p-2">
                         <div className="flex items-center justify-start gap-2">

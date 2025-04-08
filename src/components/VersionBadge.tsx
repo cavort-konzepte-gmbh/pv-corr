@@ -12,8 +12,7 @@ const VersionBadge: React.FC<VersionBadgeProps> = ({ className }) => {
   const { user } = useAuth();
   const [version, setVersion] = React.useState<string>("0.0.0");
   const [error, setError] = React.useState<string | null>(null);
-  const [isBeta, setIsBeta] = React.useState<boolean>(false);
-  const [versionLink, setVersionLink] = React.useState<string | null>(null);
+  const [versionType, setVersionType] = React.useState<string>("stable");
 
   React.useEffect(() => {
     const loadVersion = async () => {
@@ -22,8 +21,7 @@ const VersionBadge: React.FC<VersionBadgeProps> = ({ className }) => {
         const versionData = await getCurrentVersion();
         if (versionData) {
           setVersion(versionData.version);
-          setIsBeta(versionData.is_beta || false);
-          setVersionLink("https://github.com/cavort-konzepte-gmbh/pv-corr/blob/main/CHANGELOG.md");
+          setVersionType(versionData.type || "stable");
         }
       } catch (err) {
         console.error("Error loading version:", err);
@@ -75,7 +73,7 @@ const VersionBadge: React.FC<VersionBadgeProps> = ({ className }) => {
             <ExternalLink size={10} />
           </a>
           <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-            {isBeta ? "Beta" : "Stable"}
+            {versionType === "beta" ? "Beta" : "Stable"}
           </span>
         </div>
       </div>

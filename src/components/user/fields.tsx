@@ -6,6 +6,7 @@ import { Person } from "../../types/people";
 import { Company } from "../../types/companies";
 import ProjectSummary from "./elements/fields/ProjectSummary";
 import FieldList from "./elements/fields/FieldList";
+import { useEffect } from "react";
 
 interface FieldsProps {
   currentTheme: Theme;
@@ -32,6 +33,24 @@ const Fields: React.FC<FieldsProps> = ({
   selectedCustomerId,
 }) => {
   const translation = useTranslation(currentLanguage);
+  
+  // Refresh projects data when component mounts or when selectedProjectId changes
+  useEffect(() => {
+    if (selectedProjectId) {
+      const refreshProjects = async () => {
+        try {
+          const updatedProjects = await fetchProjects();
+          if (updatedProjects) {
+            onProjectsChange(updatedProjects);
+          }
+        } catch (err) {
+          console.error("Error refreshing projects:", err);
+        }
+      };
+      
+      refreshProjects();
+    }
+  }, [selectedProjectId]);
   
   // Safely find the selected project with error handling
   const selectedProject = (() => {

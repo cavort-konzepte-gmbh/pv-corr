@@ -296,7 +296,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     }));
 
     // Filter projects based on customerId
-    return projects.filter((project) => {
+    const filteredProjects = projects.filter((project) => {
       if (customerId === null) {
         return !project.customerId;
       }
@@ -305,6 +305,9 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
       }
       return true;
     });
+    
+    // Sort projects by name
+    return filteredProjects.sort((a, b) => a.name.localeCompare(b.name));
   } catch (err) {
     console.error("Error fetching projects:", err);
     // Return empty array instead of throwing to prevent white screen

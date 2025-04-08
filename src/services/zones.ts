@@ -21,8 +21,10 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
       field_id: fieldId,
       hidden_id: generateHiddenId(),
       name: zone.name,
-      latitude: zone.latitude,
-      longitude: zone.longitude,
+      latitude: zone.latitude || null,
+      longitude: zone.longitude || null,
+      substructure_id: zone.substructureId || null,
+      foundation_id: zone.foundationId || null
     })
     .select()
     .single();
@@ -33,6 +35,8 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
   }
 
   // Fetch complete zone data after creation
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
   const { data: completeZone, error: fetchError } = await supabase
     .from("zones")
     .select(

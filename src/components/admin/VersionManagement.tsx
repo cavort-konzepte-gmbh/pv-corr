@@ -20,18 +20,12 @@ interface VersionManagementProps {
 interface Version {
   id: string;
   version: string;
-  is_beta: boolean;
-  link?: string;
+  type: string;
   is_current: boolean;
   created_at: string;
   major?: number;
   minor?: number;
   patch?: number;
-  created_by?: string;
-  changelog?: Array<{
-    type: string;
-    description: string;
-  }>;
 }
 
 const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onBack }) => {
@@ -47,12 +41,8 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     major: 0,
     minor: 0,
     patch: 0,
-    is_beta: false,
-    changelog: [],
     type: "stable"
   });
-  const [changelogItems, setChangelogItems] = useState<{type: string, description: string}[]>([]);
-  const [editChangelogItems, setEditChangelogItems] = useState<{type: string, description: string}[]>([]);
 
   useEffect(() => {
     loadVersions();
@@ -79,15 +69,13 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
       setError(`Version ${versionString} already exists. Please use a different version number.`);
       return false;
     }
-    
-    if (changelogItems.length > 0) {
-      const invalidItems = changelogItems.filter(item => !item.type || !item.description.trim());
-      if (invalidItems.length > 0) {
-        setError("All changelog items must have a type and description");
-        return false;
-      }
+
+    // Validate type is one of the allowed values
+    if (!['beta', 'stable'].includes(formValues.type)) {
+      setError('Version type must be either "beta" or "stable"');
+      return false;
     }
-    
+        
     return true;
   };
 
@@ -104,8 +92,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         major: formValues.major,
         minor: formValues.minor,
         patch: formValues.patch,
-        is_beta: formValues.type === "beta",
-        changelog: changelogItems
+        type: formValues.type
       };
      
       await createVersion(versionData);
@@ -115,36 +102,16 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         major: 0,
         minor: 0,
         patch: 0,
-        changelog: [],
-        is_beta: false,
         type: "stable"
       });
-      setChangelogItems([]);
     } catch (err) {
       console.error("Error creating version:", err);
       setError(typeof err === 'string' ? err : err instanceof Error ? err.message : "Failed to create version");
     }
   };
 
-  const handleAddChangelogItem = () => {
-    setChangelogItems([...changelogItems, { type: "feature", description: "" }]);
-  };
-
-  const handleUpdateChangelogItem = (index: number, field: string, value: string) => {
-    const updatedItems = [...changelogItems];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    setChangelogItems(updatedItems);
-  };
-
-  const handleRemoveChangelogItem = (index: number) => {
-    const updatedItems = [...changelogItems];
-    updatedItems.splice(index, 1);
-    setChangelogItems(updatedItems);
-  };
-
   const handleEditVersion = (version: Version) => {
     setEditingVersion(version);
-    setEditChangelogItems(version.changelog || []);
   };
 
   const handleUpdateVersion = async () => {
@@ -152,20 +119,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     
     try {
       setError(null);
-      
-      // Validate changelog entries
-      if (editChangelogItems.length > 0) {
-        const invalidItems = editChangelogItems.filter(item => !item.type || !item.description.trim());
-        if (invalidItems.length > 0) {
-          setError("All changelog items must have a type and description");
-          return;
-        }
-      }
-      
+            
       const updateData = {
-        is_beta: editingVersion.is_beta || false,
+        type: editingVersion.type || 'stable',
         is_current: editingVersion.is_current || false,
-        changelog: editChangelogItems
       };
       
       const { error: updateError } = await supabase
@@ -180,7 +137,6 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
       // Reload versions to refresh the UI
       await loadVersions();
       setEditingVersion(null);
-      setEditChangelogItems([]);
     } catch (err) {
       console.error("Error updating version:", err);
       setError(typeof err === 'string' ? err : err instanceof Error ? err.message : "Failed to update version");
@@ -202,35 +158,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     }
   };
 
-  const handleAddEditChangelogItem = () => {
-    setEditChangelogItems([...editChangelogItems, { type: "feature", description: "" }]);
-  };
-
-  const handleUpdateEditChangelogItem = (index: number, field: string, value: string) => {
-    const updatedItems = [...editChangelogItems];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    setEditChangelogItems(updatedItems);
-  };
-
-  const handleRemoveEditChangelogItem = (index: number) => {
-    const updatedItems = [...editChangelogItems];
-    updatedItems.splice(index, 1);
-    setEditChangelogItems(updatedItems);
-  };
-
   const handleSetCurrent = async (versionId: string) => {
     try {
       await supabase
-        .from('versions')
-        .update({ is_current: false })
-        .not("id", "eq", versionId);
-      
-      const { error } = await supabase
-        .from('versions')
-        .update({ is_current: true })
-        .eq("id", versionId);
-      
-      if (error) throw error;
+        .rpc('set_version_as_current', { version_id: versionId });
       
       await loadVersions();
     } catch (err) {
@@ -268,7 +199,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label className="block text-sm mb-1">
-                    {t("version.major")}
+                    Major
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
@@ -281,7 +212,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                 </div>
                 <div>
                   <Label className="block text-sm mb-1">
-                    {t("version.minor")}
+                    Minor
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
@@ -294,7 +225,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                 </div>
                 <div>
                   <Label className="block text-sm mb-1">
-                    {t("version.patch")}
+                    Patch
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
@@ -307,8 +238,8 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="block text-sm">{t("version.type")}</Label>
+              <div className="space-y-2 mt-4">
+                <Label className="block text-sm">Version Type</Label>
                 <Select 
                   value={formValues.type} 
                   onValueChange={(value) => setFormValues({ 
@@ -320,53 +251,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                     <SelectValue placeholder="Select version type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="alpha">{t("version.type.alpha")}</SelectItem>
                     <SelectItem value="beta">{t("version.type.beta")}</SelectItem>
                     <SelectItem value="stable">{t("version.type.stable")}</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="mt-6">
-                <Label className="block text-sm mb-2">
-                  {t("version.changelog")}
-                </Label>
-                {changelogItems.length > 0 ? (
-                  <div className="space-y-3 mb-3">
-                    {changelogItems.map((item, index) => (
-                      <div key={index} className="flex gap-2 items-start">
-                        <div className="flex gap-2 items-start">
-                          <select
-                            value={item.type}
-                            onChange={(e) => handleUpdateChangelogItem(index, 'type', e.target.value)}
-                            className="w-1/3 p-2 rounded text-sm border border-input shadow-sm bg-accent"
-                          >
-                            <option value="feature">{t("version.changelog.type.feature")}</option>
-                            <option value="fix">{t("version.changelog.type.fix")}</option>
-                            <option value="improvement">{t("version.changelog.type.improvement")}</option>
-                            <option value="breaking">{t("version.changelog.type.breaking")}</option>
-                          </select>
-                        </div>
-                        <Input
-                          type="text" 
-                          value={item.description}
-                          onChange={(e) => handleUpdateChangelogItem(index, 'description', e.target.value)}
-                          placeholder="Description"
-                          className="w-full"
-                        />
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleRemoveChangelogItem(index)}
-                          className="text-destructive"
-                        >
-                          <X size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-                <Button type="button" variant="outline" size="sm" onClick={handleAddChangelogItem}>{t("version.changelog.add")}</Button>
               </div>
 
               <div className="flex justify-between items-center mt-4">
@@ -375,13 +263,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                   disabled={loading}
                   onClick={() => {
                     setShowNewForm(false);
-                    setChangelogItems([]);
                     setFormValues({
                       major: 0,
                       minor: 0,
                       patch: 0,
-                      is_beta: false,
-                      changelog: [],
                       type: "stable"
                     });
                   }}
@@ -406,14 +291,12 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         <div className="w-full relative overflow-auto">
           <Table>
             <TableCaption>{t("version.list")}</TableCaption>
-            <TableHeader className="bg-muted/50">
+            <TableHeader>
               <TableRow>
                 <TableHead>{t("version.number")}</TableHead>
                 <TableHead>{t("version.type")}</TableHead>
                 <TableHead>{t("version.created")}</TableHead>
-                <TableHead>{t("version.link")}</TableHead>
                 <TableHead>{t("version.current")}</TableHead>
-                <TableHead>{t("version.changelog")}</TableHead>
                 <TableHead>{t("version.actions")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -423,24 +306,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                   <TableCell className="font-mono">{version.version}</TableCell>
                   <TableCell className="whitespace-nowrap">
                     <span className="text-xs px-2 py-1 rounded-full bg-primary/10">
-                      {version.is_beta ? "Beta" : "Stable"}
+                      {version.type === "beta" ? "Beta" : "Stable"}
                     </span>
                   </TableCell>
                   <TableCell>{new Date(version.created_at).toLocaleString()}</TableCell>
-                  <TableCell>
-                    {version.link ? (
-                      <a
-                        href="https://github.com/cavort-konzepte-gmbh/pv-corr/blob/main/CHANGELOG.md" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-accent-primary hover:underline"
-                      >
-                        CHANGELOG.md
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
                   <TableCell>
                     {version.is_current ? (
                       <Check className="text-green-500" size={16} />
@@ -452,19 +321,6 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                       >
                         {t("version.set_current")}
                       </Button>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {version.changelog && version.changelog.length > 0 ? (
-                      <div className="space-y-1">
-                        {version.changelog.map((item, index) => (
-                          <div key={index} className="text-xs">
-                            <span className="font-semibold">{item.type}:</span> {item.description}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">{t("version.no_changelog")}</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -523,100 +379,58 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
             </h3>
             
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Label className="flex items-center space-x-2">
-                  <Input 
-                    type="checkbox" 
-                    checked={editingVersion.is_beta}
-                    onChange={(e) => setEditingVersion({
-                      ...editingVersion,
-                      is_beta: e.target.checked
-                    })}
-                    className="h-4 w-4"
-                  />
-                  <span>Beta Version</span>
-                </Label>
-                
-                <Label className="flex items-center space-x-2">
-                  <Input 
-                    type="checkbox" 
-                    checked={editingVersion.is_current}
-                    onChange={(e) => setEditingVersion({
-                      ...editingVersion,
-                      is_current: e.target.checked
-                    })}
-                    className="h-4 w-4"
-                  />
-                  <span>Current Version</span>
-                </Label>
+                <div className="flex items-center space-x-2">
+                  <Label className="flex items-center space-x-2">
+                    <Select 
+                      value={editingVersion.type} 
+                      onValueChange={(value) => setEditingVersion({
+                        ...editingVersion,
+                        type: value
+                      })}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="beta">Beta</SelectItem>
+                        <SelectItem value="stable">Stable</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Label>
+                  
+                  <Label className="flex items-center space-x-2">
+                    <Input 
+                      type="checkbox" 
+                      checked={editingVersion.is_current}
+                      onChange={(e) => setEditingVersion({
+                        ...editingVersion,
+                        is_current: e.target.checked
+                      })}
+                      className="h-4 w-4"
+                    />
+                    <span>Current Version</span>
+                  </Label>
+                </div>
+                                
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setEditingVersion(null);
+                    }}
+                    variant="destructive"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={handleUpdateVersion}
+                    disabled={loading}
+                  >
+                    Save Changes
+                  </Button>
+                </div>
               </div>
-              
-              <div className="mt-6">
-                <Label className="block text-sm mb-2">
-                  {t("version.changelog")}
-                </Label>
-                {editChangelogItems.length > 0 ? (
-                  <div className="space-y-3 mb-3">
-                    {editChangelogItems.map((item, index) => (
-                      <div key={index} className="flex gap-2 items-start">
-                        <div className="flex gap-2 items-start">
-                          <select
-                            value={item.type}
-                            onChange={(e) => handleUpdateEditChangelogItem(index, 'type', e.target.value)}
-                            className="w-1/3 p-2 rounded text-sm border border-input shadow-sm bg-accent"
-                          >
-                            <option value="feature">{t("version.changelog.type.feature")}</option>
-                            <option value="fix">{t("version.changelog.type.fix")}</option>
-                            <option value="improvement">{t("version.changelog.type.improvement")}</option>
-                            <option value="breaking">{t("version.changelog.type.breaking")}</option>
-                          </select>
-                        </div>
-                        <Input
-                          type="text" 
-                          value={item.description}
-                          onChange={(e) => handleUpdateEditChangelogItem(index, 'description', e.target.value)}
-                          placeholder="Description"
-                          className="w-full"
-                        />
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleRemoveEditChangelogItem(index)}
-                          className="text-destructive"
-                        >
-                          <X size={16} />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground text-sm mb-2">No changelog entries</div>
-                )}
-                <Button type="button" variant="outline" size="sm" onClick={handleAddEditChangelogItem}>
-                  {t("version.changelog.add")}
-                </Button>
-              </div>
-              
-              <div className="flex justify-between items-center mt-4">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setEditingVersion(null);
-                    setEditChangelogItems([]);
-                  }}
-                  variant="destructive"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="button"
-                  onClick={handleUpdateVersion}
-                  disabled={loading}
-                >
-                  Save Changes
-                </Button>
-              </div>
-            </div>
           </div>
         </div>
       )}

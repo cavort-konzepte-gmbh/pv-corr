@@ -4,6 +4,7 @@ import { Language, useTranslation } from "../../../../types/language";
 import { Parameter } from "../../../../types/parameters";
 import { Datapoint } from "../../../../types/projects";
 import { Edit2, Save, X, Upload, Clock, Plus } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { fetchProjects } from "../../../../services/projects";
 import { updateDatapoint } from "../../../../services/datapoints";
@@ -24,6 +25,9 @@ interface DatapointListProps {
   onProjectsChange: (projects: any[]) => void;
 }
 
+type SortField = "name" | "timestamp" | "parameter";
+type SortDirection = "asc" | "desc";
+
 const DatapointList: React.FC<DatapointListProps> = ({
   currentTheme,
   currentLanguage,
@@ -36,6 +40,9 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingName, setEditingName] = useState<string>("");
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({});
+  const [sortField, setSortField] = useState<SortField>("timestamp");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortParameter, setSortParameter] = useState<string>("");
   const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
   const [isAdding, setIsAdding] = useState(false);
@@ -54,6 +61,63 @@ const DatapointList: React.FC<DatapointListProps> = ({
     );
     setParameterMap(map);
   }, [parameters]);
+
+  // Sort datapoints based on current sort field and direction
+  const sortedDatapoints = React.useMemo(() => {
+    if (!datapoints) return [];
+    
+    return [...datapoints].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = (a.name || "").localeCompare(b.name || "");
+          break;
+        case "timestamp":
+          comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+          break;
+        case "parameter":
+          if (sortParameter) {
+            const aValue = a.values[sortParameter] || "";
+            const bValue = b.values[sortParameter] || "";
+            
+            // Try to compare as numbers if possible
+            const aNum = parseFloat(aValue);
+            const bNum = parseFloat(bValue);
+            
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+              comparison = aNum - bNum;
+            } else {
+              comparison = aValue.localeCompare(bValue);
+            }
+          }
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [datapoints, sortField, sortDirection, sortParameter]);
+
+  const handleSortChange = (field: SortField, paramId?: string) => {
+    if (field === "parameter" && paramId) {
+      if (sortField === "parameter" && sortParameter === paramId) {
+        // Toggle direction if clicking the same parameter
+        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      } else {
+        // Set new parameter and default to ascending
+        setSortField("parameter");
+        setSortParameter(paramId);
+        setSortDirection("asc");
+      }
+    } else if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const handleAddDatapoint = async () => {
     if (!newName.trim()) {
@@ -135,11 +199,54 @@ const DatapointList: React.FC<DatapointListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{translation("datapoint.short_name")}</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("name")}
+                >
+                  <div className="flex items-center gap-1">
+                    {translation("datapoint.short_name")}
+                    {sortField === "name" ? (
+                      <span className="text-xs ml-1">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    ) : (
+                      <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                    )}
+                  </div>
+                </TableHead>
                 {parameters.map((param) => (
-                  <TableHead key={param.id}>{param.shortName || param.name}</TableHead>
+                  <TableHead 
+                    key={param.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleSortChange("parameter", param.id)}
+                  >
+                    <div className="flex items-center gap-1">
+                      {param.shortName || param.name}
+                      {sortField === "parameter" && sortParameter === param.id ? (
+                        <span className="text-xs ml-1">
+                          {sortDirection === "asc" ? "▲" : "▼"}
+                        </span>
+                      ) : (
+                        <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                      )}
+                    </div>
+                  </TableHead>
                 ))}
-                <TableHead>{translation("actions")}</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("timestamp")}
+                >
+                  <div className="flex items-center gap-1">
+                    {translation("actions")}
+                    {sortField === "timestamp" ? (
+                      <span className="text-xs ml-1">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    ) : (
+                      <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                    )}
+                  </div>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,7 +308,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                   </TableCell>
                 </TableRow>
               )}
-              {datapoints.map((datapoint) => (
+              {sortedDatapoints.map((datapoint) => (
                 <TableRow key={datapoint.id}>
                   <TableCell className="p-2">
                     {editingDatapoint === datapoint.id ? (

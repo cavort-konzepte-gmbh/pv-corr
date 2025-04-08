@@ -6,6 +6,7 @@ import { Plus, Users, Building2, MapPin, FileText, FolderPlus, Check } from "luc
 import { createProject } from "../../../../services/projects";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
+import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
 import { Project } from "../../../../types/projects";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -63,15 +64,32 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       return;
     }
 
+    // Validate coordinates if provided
+    if ((formData.latitude && !isValidCoordinate(formData.latitude)) || 
+        (formData.longitude && !isValidCoordinate(formData.longitude))) {
+      setError("Coordinates must be in decimal format (e.g., 57.123456)");
+      return;
+    }
+
     try {
       setError(null);
+      
+      // Format coordinates if valid
+      let latitude = formData.latitude;
+      let longitude = formData.longitude;
+      
+      if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
+        latitude = formatCoordinate(latitude);
+        longitude = formatCoordinate(longitude);
+      }
+      
       const newProject = await createProject(
         {
           name: formData.projectName.trim(),
           clientRef: formData.clientRef.trim() || undefined,
           customerId: selectedCustomerId,
-          latitude: formData.latitude.trim() || undefined,
-          longitude: formData.longitude.trim() || undefined,
+          latitude: latitude || undefined,
+          longitude: longitude || undefined,
           imageUrl: formData.imageUrl.trim() || undefined,
           managerId: formData.selectedManagerId === "none" ? undefined : formData.selectedManagerId,
           typeProject: formData.typeProject,
@@ -87,6 +105,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       // Update projects list with new project
       const updatedProjects = await fetchProjects(selectedCustomerId as string);
       onProjectsChange(updatedProjects);
+
+      // If the new project has an ID, navigate to it
+      if (newProject && newProject.id) {
+        // Wait a moment to ensure the database has completed all operations
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Refresh projects again to ensure we have the latest data including fields and zones
+        const refreshedProjects = await fetchProjects(selectedCustomerId as string);
+        onProjectsChange(refreshedProjects);
+      }
 
       setShowForm(false);
       setFormData({
@@ -279,10 +307,17 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   <div className="flex items-center">
                     <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                     <Input
+                      type="text"
                       id="latitude"
                       value={formData.latitude}
-                      onChange={(e) => handleInputChange("latitude", e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleInputChange("latitude", value);
+                      }}
                       placeholder="Enter latitude"
+                      title="Enter decimal coordinates (e.g., 57.123456)"
+                      className={!isValidCoordinate(formData.latitude) && formData.latitude ? "border-destructive" : ""}
+                      placeholder="e.g., 57.123456"
                     />
                   </div>
                 </div>
@@ -294,13 +329,28 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   <div className="flex items-center">
                     <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                     <Input
+                      type="text"
                       id="longitude"
                       value={formData.longitude}
-                      onChange={(e) => handleInputChange("longitude", e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleInputChange("longitude", value);
+                      }}
                       placeholder="Enter longitude"
+                      title="Enter decimal coordinates (e.g., 10.123456)"
+                      className={!isValidCoordinate(formData.longitude) && formData.longitude ? "border-destructive" : ""}
+                      placeholder="e.g., 10.123456"
                     />
                   </div>
                 </div>
+                
+                {(formData.latitude && !isValidCoordinate(formData.latitude)) || 
+                 (formData.longitude && !isValidCoordinate(formData.longitude)) ? (
+                  <div className="col-span-2 text-destructive flex items-center gap-1 text-xs mt-1">
+                    <AlertCircle size={12} />
+                    <span>Coordinates must be in decimal format (e.g., 57.123456, 10.123456)</span>
+                  </div>
+                ) : null}
               </div>
             </div>
             

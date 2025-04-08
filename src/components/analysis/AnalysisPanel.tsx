@@ -221,7 +221,26 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   }, []);
 
   const toggleDatapoint = (datapointId: string) => {
-    setSelectedDatapoints((prev) => (prev.includes(datapointId) ? prev.filter((id) => id !== datapointId) : [...prev, datapointId]));
+    // Handle special cases for select all/deselect all
+    if (datapointId === "__select_all__") {
+      // Select all datapoints
+      const allDatapointIds = selectedZone?.datapoints.map(dp => dp.id) || [];
+      setSelectedDatapoints(allDatapointIds);
+      return;
+    }
+    
+    if (datapointId === "__deselect_all__") {
+      // Deselect all datapoints
+      setSelectedDatapoints([]);
+      return;
+    }
+    
+    // Normal toggle behavior for individual datapoints
+    setSelectedDatapoints((prev) => 
+      prev.includes(datapointId) 
+        ? prev.filter((id) => id !== datapointId) 
+        : [...prev, datapointId]
+    );
   };
 
   if (showReport && selectedProject && selectedZone && selectedNorm) {

@@ -6,6 +6,8 @@ import { Company } from "../../../../types/companies";
 import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { Language, useTranslation } from "../../../../types/language";
+import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
+import { AlertCircle } from "lucide-react";
 import { updateProject, fetchProjects } from "../../../../services/projects";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -48,12 +50,29 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
 
   const handleSave = async () => {
     try {
+      // Validate coordinates if provided
+      if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
+          (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
+        // Show error but don't prevent saving - the UI will show validation errors
+        console.error("Invalid coordinates format");
+        return;
+      }
+
+      // Format coordinates if valid
+      let latitude = editValues.latitude;
+      let longitude = editValues.longitude;
+      
+      if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
+        latitude = formatCoordinate(latitude);
+        longitude = formatCoordinate(longitude);
+      }
+
       const updatedProject = await updateProject({
         ...project,
         managerId: editValues.managerId,
         typeProject: editValues.typeProject,
-        latitude: editValues.latitude,
-        longitude: editValues.longitude,
+        latitude: latitude,
+        longitude: longitude,
       });
 
       const updatedProjects = await fetchProjects();
@@ -197,17 +216,34 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       <Input
                         type="text"
                         value={editValues.latitude}
-                        onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
-                        className="w-1/2 p-1"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEditValues({ ...editValues, latitude: value });
+                        }}
+                        className={`w-1/2 p-1 ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.latitude")}
+                        title="Enter decimal coordinates (e.g., 57.123456)"
+                        placeholder="e.g., 57.123456"
                       />
                       <Input
                         type="text"
                         value={editValues.longitude}
-                        onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
-                        className="w-1/2 p-1"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setEditValues({ ...editValues, longitude: value });
+                        }}
+                        className={`w-1/2 p-1 ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.longitude")}
+                        title="Enter decimal coordinates (e.g., 10.123456)"
+                        placeholder="e.g., 10.123456"
                       />
+                      {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
+                       (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
+                        <div className="text-destructive flex items-center gap-1 text-xs mt-1">
+                          <AlertCircle size={12} />
+                          <span>Use decimal format (e.g., 57.123456)</span>
+                        </div>
+                      ) : null}
                     </div>
                   ) : project.latitude && project.longitude ? (
                     <div className="flex items-center justify-between">

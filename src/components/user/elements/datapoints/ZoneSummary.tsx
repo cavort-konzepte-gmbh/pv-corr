@@ -8,6 +8,8 @@ import { fetchProjects } from "../../../../services/projects";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
+import { AlertCircle } from "lucide-react";
 
 interface ZoneSummaryProps {
   zone: Zone;
@@ -28,6 +30,23 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
 
   const handleSave = async () => {
     try {
+      // Validate coordinates if provided
+      if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
+          (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
+        // Show error but don't prevent saving - the UI will show validation errors
+        console.error("Invalid coordinates format");
+        return;
+      }
+
+      // Format coordinates if valid
+      let latitude = editValues.latitude;
+      let longitude = editValues.longitude;
+      
+      if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
+        latitude = formatCoordinate(latitude);
+        longitude = formatCoordinate(longitude);
+      }
+
       await updateZone(zone.id, editValues);
       const updatedProjects = await fetchProjects();
       onProjectsChange(updatedProjects);
@@ -117,26 +136,42 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                         <Input
                           type="text"
                           value={editValues.latitude}
-                          onChange={(e) => setEditValues({ ...editValues, latitude: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEditValues({ ...editValues, latitude: value });
+                          }}
                           className="w-1/2 p-1 rounded text-sm text-primary "
                           placeholder={translation("project.latitude")}
+                          title="Enter decimal coordinates (e.g., 57.123456)"
+                          placeholder="e.g., 57.123456"
+                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                         />
                         <Input
                           type="text"
                           value={editValues.longitude}
-                          onChange={(e) => setEditValues({ ...editValues, longitude: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEditValues({ ...editValues, longitude: value });
+                          }}
                           className="w-1/2 p-1 rounded text-sm text-primary "
                           placeholder={translation("project.longitude")}
+                          title="Enter decimal coordinates (e.g., 10.123456)"
+                          placeholder="e.g., 10.123456"
+                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         />
+                        {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
+                         (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
+                          <div className="text-destructive flex items-center gap-1 text-xs mt-1">
+                            <AlertCircle size={12} />
+                            <span>Use decimal format (e.g., 57.123456)</span>
+                          </div>
+                        ) : null}
                       </div>
                     ) : zone.latitude && zone.longitude ? (
                       <div className="flex items-center justify-between">
-                        <span>
-                          {zone.latitude?.toString()}, {zone.longitude?.toString()}
-                        </span>
                         <Button
                           onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank")}
-                          className="text-xs h-8 px-2 ml-2"
+                          className="text-xs h-8 px-2"
                         >
                           {translation("general.view_on_map")}
                         </Button>

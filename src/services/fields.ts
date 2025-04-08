@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { Field, Gate } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { createZone } from "./zones";
 
 export const createField = async (projectId: string, field: Omit<Field, "id" | "hiddenId" | "gates" | "zones">) => {
   if (!projectId) {
@@ -26,7 +27,21 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
     throw error;
   }
 
-  // Fetch complete field data after creation
+  // Automatically create a default zone for the new field
+  try {
+    await createZone(newField.id, {
+      name: "Zone 1",
+      latitude: field.latitude || undefined,
+      longitude: field.longitude || undefined,
+    });
+  } catch (zoneError) {
+    console.error("Error creating default zone:", zoneError);
+    // Don't throw here, we still want to return the field even if zone creation fails
+  }
+
+  // Fetch complete field data after creation with a small delay to ensure zone is created
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
   const { data: completeField, error: fetchError } = await supabase
     .from("fields")
     .select(
@@ -45,6 +60,30 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
   if (fetchError) {
     console.error("Error fetching complete field:", fetchError);
     throw fetchError;
+  }
+
+  // If the field doesn't have zones yet (race condition), fetch again after a delay
+  if (!completeField.zones || completeField.zones.length === 0) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const { data: retryField, error: retryError } = await supabase
+      .from("fields")
+      .select(
+        `
+        *,
+        gates (*),
+        zones (
+          *,
+          datapoints (*)
+        )
+      `,
+      )
+      .eq("id", newField.id)
+      .single();
+      
+    if (!retryError) {
+      return retryField;
+    }
   }
 
   return completeField;

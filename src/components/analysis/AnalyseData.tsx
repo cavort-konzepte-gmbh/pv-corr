@@ -2,7 +2,7 @@ import React from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Datapoint } from "../../types/projects";
-import { Check, ArrowUpDown } from "lucide-react";
+import { Check, ArrowUpDown, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
 
@@ -48,7 +48,35 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium ">{t("analysis.select_datapoints")}</h3>
+        <div className="flex items-center gap-4">
+          <h3 className="text-lg font-medium">{t("analysis.select_datapoints")}</h3>
+          <Button 
+            onClick={() => {
+              if (selectedDatapoints.length === datapoints.length) {
+                // If all are selected, deselect all
+                onToggleDatapoint("__deselect_all__");
+              } else {
+                // Otherwise select all
+                onToggleDatapoint("__select_all__");
+              }
+            }}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {selectedDatapoints.length === datapoints.length ? (
+              <>
+                <CheckSquare className="h-4 w-4" />
+                <span>Deselect All</span>
+              </>
+            ) : (
+              <>
+                <Square className="h-4 w-4" />
+                <span>Select All</span>
+              </>
+            )}
+          </Button>
+        </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => handleSort("name")}

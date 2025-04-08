@@ -12,6 +12,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
 
 interface FieldListProps {
   currentTheme: Theme;
@@ -22,6 +23,9 @@ interface FieldListProps {
   selectedProjectId: string;
   selectedCustomerId: string | null;
 }
+
+type SortField = "name" | "has_fence" | "location";
+type SortDirection = "asc" | "desc";
 
 const FieldList: React.FC<FieldListProps> = ({
   currentTheme,
@@ -41,10 +45,52 @@ const FieldList: React.FC<FieldListProps> = ({
     name: "",
     latitude: "",
     longitude: "",
-    has_fence: "",
+    has_fence: "no",
   });
   const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  // Sort fields based on current sort field and direction
+  const sortedFields = React.useMemo(() => {
+    if (!initialFields) return [];
+    
+    return [...initialFields].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "has_fence":
+          // Convert has_fence to comparable values
+          const aFence = a.has_fence === "yes" || a.has_fence === true ? 1 : 0;
+          const bFence = b.has_fence === "yes" || b.has_fence === true ? 1 : 0;
+          comparison = aFence - bFence;
+          break;
+        case "location":
+          // Sort by whether location is set
+          const aHasLocation = a.latitude && a.longitude ? 1 : 0;
+          const bHasLocation = b.latitude && b.longitude ? 1 : 0;
+          comparison = aHasLocation - bHasLocation;
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [initialFields, sortField, sortDirection]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const handleSave = async (field: Field) => {
     if (updatingField && !field.id) return;
@@ -96,16 +142,37 @@ const FieldList: React.FC<FieldListProps> = ({
       setError("Invalid fence value");
       return;
     }
+    
+    // Validate coordinates if provided
+    if ((newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
+        (newValues.longitude && !isValidCoordinate(newValues.longitude))) {
+      setError("Coordinates must be in decimal format (e.g., 57.123456)");
+      return;
+    }
 
     try {
       setError(null);
-      await createField(selectedProjectId, {
+      setUpdatingField(true);
+      
+      // Format coordinates if valid
+      let latitude = newValues.latitude;
+      let longitude = newValues.longitude;
+      
+      if (latitude && longitude) {
+        latitude = formatCoordinate(latitude);
+        longitude = formatCoordinate(longitude);
+      }
+      
+      const newField = await createField(selectedProjectId, {
         name: newValues.name.trim(),
-        latitude: newValues.latitude || undefined,
-        longitude: newValues.longitude || undefined,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
         has_fence: newValues.has_fence as "yes" | "no",
       });
 
+      // Wait a moment to ensure the database has completed the field and zone creation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // Fetch fresh project data
       const updatedProjects = await fetchProjects(null);
       onProjectsChange(updatedProjects);
@@ -118,9 +185,16 @@ const FieldList: React.FC<FieldListProps> = ({
         has_fence: "no",
       });
       setError(null);
+      
+      // If the new field has an ID, select it to show its zones
+      if (newField && newField.id) {
+        onSelectField(newField.id);
+      }
     } catch (err) {
       console.error("Error creating field:", err);
       setError(err instanceof Error ? err.message : "Failed to create field");
+    } finally {
+      setUpdatingField(false);
     }
   };
 
@@ -143,9 +217,45 @@ const FieldList: React.FC<FieldListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead> {translation("field.name")}</TableHead>
-                <TableHead> {translation("field.has_fence")}</TableHead>
-                <TableHead> {translation("zones.location")}</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("name")}
+                >
+                  <div className="flex items-center gap-1">
+                    {translation("field.name")}
+                    {sortField === "name" && (
+                      <span className="text-xs ml-1">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("has_fence")}
+                >
+                  <div className="flex items-center gap-1">
+                    {translation("field.has_fence")}
+                    {sortField === "has_fence" && (
+                      <span className="text-xs ml-1">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => handleSortChange("location")}
+                >
+                  <div className="flex items-center gap-1">
+                    {translation("zones.location")}
+                    {sortField === "location" && (
+                      <span className="text-xs ml-1">
+                        {sortDirection === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </div>
+                </TableHead>
                 <TableHead> {translation("actions")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -191,14 +301,26 @@ const FieldList: React.FC<FieldListProps> = ({
                       <Input
                         type="text"
                         value={newValues.latitude}
-                        onChange={(e) => setNewValues({ ...newValues, latitude: e.target.value })}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setNewValues({ ...newValues, latitude: value });
+                        }}
                         placeholder={translation("project.latitude")}
+                        className={!isValidCoordinate(newValues.latitude) && newValues.latitude ? "border-destructive" : ""}
+                        placeholder="e.g., 57.123456"
+                        title="Enter decimal coordinates (e.g., 57.123456)"
                       />
                       <Input
                         type="text"
                         value={newValues.longitude}
-                        onChange={(e) => setNewValues({ ...newValues, longitude: e.target.value })}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setNewValues({ ...newValues, longitude: value });
+                        }}
                         placeholder={translation("project.longitude")}
+                        className={!isValidCoordinate(newValues.longitude) && newValues.longitude ? "border-destructive" : ""}
+                        placeholder="e.g., 10.123456"
+                        title="Enter decimal coordinates (e.g., 10.123456)"
                       />
                     </div>
                   </TableCell>
@@ -226,7 +348,7 @@ const FieldList: React.FC<FieldListProps> = ({
                   </TableCell>
                 </TableRow>
               )}
-              {(initialFields || []).map((field) => (
+              {sortedFields.map((field) => (
                 <TableRow key={field.id} className={cn("hover:bg-muted/50", { "cursor-pointer": editingId !== field.id })}>
                   <TableCell className="p-2">
                     {editingId === field.id ? (
@@ -287,16 +409,28 @@ const FieldList: React.FC<FieldListProps> = ({
                         <Input
                           type="text"
                           value={editingValues.latitude || field.latitude || ""}
-                          onChange={(e) => setEditingValues({ ...editingValues, latitude: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEditingValues({ ...editingValues, latitude: value });
+                          }}
                           placeholder={translation("project.latitude")}
                           onClick={(e) => e.stopPropagation()}
+                          className={!isValidCoordinate(editingValues.latitude) && editingValues.latitude ? "border-destructive" : ""}
+                          placeholder="e.g., 57.123456"
+                          title="Enter decimal coordinates (e.g., 57.123456)"
                         />
                         <Input
                           type="text"
                           value={editingValues.longitude || field.longitude || ""}
-                          onChange={(e) => setEditingValues({ ...editingValues, longitude: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setEditingValues({ ...editingValues, longitude: value });
+                          }}
                           placeholder={translation("project.longitude")}
                           onClick={(e) => e.stopPropagation()}
+                          className={!isValidCoordinate(editingValues.longitude) && editingValues.longitude ? "border-destructive" : ""}
+                          placeholder="e.g., 10.123456"
+                          title="Enter decimal coordinates (e.g., 10.123456)"
                         />
                       </div>
                     ) : field.latitude && field.longitude ? (

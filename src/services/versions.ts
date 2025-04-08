@@ -3,21 +3,12 @@ import { supabase } from '../lib/supabase';
 export interface Version {
   id: string;
   version: string;
-  is_beta: boolean;
+  type: string;
   major: number;
   minor: number;
   patch: number;
-  release_date?: string;
-  github_release_url?: string;
-  link?: string;
   is_current?: boolean;
   created_at: string;
-  updated_at?: string;
-  created_by?: string;
-  changelog?: Array<{
-    type: "feature" | "fix" | "improvement" | "breaking";
-    description: string;
-  }>;
 }
 
 export const getCurrentVersion = async (): Promise<Version | null> => {
@@ -46,17 +37,24 @@ export const getCurrentVersion = async (): Promise<Version | null> => {
     if (latestError) throw latestError;
 
     if (latestVersion) {
-      // Set this as the current version
-      try {
-        const { error: updateError } = await supabase
-          .from("versions")
-          .update({ is_current: true })
-          .eq("id", latestVersion.id);
+      // First set all versions to not current
+      const { error: resetError } = await supabase
+        .from("versions")
+        .update({ is_current: false })
+        .neq("id", "00000000-0000-0000-0000-000000000000"); // Dummy WHERE clause to match all rows
 
-        if (updateError) console.warn("Could not set current version:", updateError);
-      } catch (err) {
-        console.warn("Error updating current version:", err);
+      if (resetError) {
+        console.warn("Could not reset current versions:", resetError);
+        return latestVersion;
       }
+
+      // Then set the latest version as current
+      const { error: updateError } = await supabase
+        .from("versions")
+        .update({ is_current: true })
+        .eq("id", latestVersion.id);
+
+      if (updateError) console.warn("Could not set current version:", updateError);
 
       return latestVersion;
     }
@@ -88,11 +86,7 @@ export const createVersion = async (versionData: {
   major: number;
   minor: number;
   patch: number;
-  is_beta: boolean;
-  changelog?: Array<{
-    type: string;
-    description: string;
-  }>;
+  type: string;
 }) => {
   try {
     // Check if version already exists
@@ -121,9 +115,12 @@ export const createVersion = async (versionData: {
     const { data, error } = await supabase
       .from('versions')
       .insert({
-        ...versionData,
-        is_current: isFirstVersion, // Make it current if it's the first version
-        link: "https://github.com/cavort-konzepte-gmbh/pv-corr/blob/main/CHANGELOG.md"
+        version: versionData.version,
+        major: versionData.major,
+        minor: versionData.minor,
+        patch: versionData.patch,
+        type: versionData.type,
+        is_current: isFirstVersion
       })
       .select()
       .single();
@@ -139,7 +136,7 @@ export const createVersion = async (versionData: {
 export const updateVersion = async (id: string, updateData: Partial<Version>) => {
   // First check if the version exists
   const { data: existingVersion, error: checkError } = await supabase
-    .from("versions")
+    .from('versions')
     .select("*")
     .eq("id", id)
     .maybeSingle();
@@ -151,11 +148,26 @@ export const updateVersion = async (id: string, updateData: Partial<Version>) =>
   if (!existingVersion) {
     throw new Error(`Version with ID ${id} not found`);
   }
+
+  // If setting as current version, first set all versions to not current
+  if (updateData.is_current) {
+    const { error: resetError } = await supabase
+      .from('versions')
+      .update({ is_current: false })
+      .neq("id", "00000000-0000-0000-0000-000000000000"); // Dummy WHERE clause to match all rows
+
+    if (resetError) {
+      throw new Error(`Failed to reset current versions: ${resetError.message}`);
+    }
+  }
   
   // Then update the version
   const { error } = await supabase
     .from('versions')
-    .update(updateData)
+    .update({
+      type: updateData.type,
+      is_current: updateData.is_current,
+    })
     .eq('id', id);
 
   if (error) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { supabase } from "../../lib/supabase";
-import { ArrowLeft, Plus, Edit2, X, Save } from "lucide-react";
+import { ArrowLeft, Plus, Edit2, X, Save, ArrowUpDown } from "lucide-react";
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from "../shared/FormHandler";
 import { useKeyAction } from "../../hooks/useKeyAction";
 import { generateHiddenId } from "../../utils/generateHiddenId";
@@ -26,11 +26,16 @@ interface NeighboringStructuresManagementProps {
   onBack: () => void;
 }
 
+type SortField = "name" | "depth" | "height" | "construction_year";
+type SortDirection = "asc" | "desc";
+
 const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementProps> = ({ currentTheme, onBack }) => {
   const [structures, setStructures] = useState<NeighboringStructure[]>([]);
   const [materials, setMaterials] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [editingStructure, setEditingStructure] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Partial<NeighboringStructure>>({});
   const [isNewStructure, setIsNewStructure] = useState(false);
@@ -45,6 +50,49 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
   useEffect(() => {
     loadMaterials();
   }, []);
+
+  // Sort structures based on current sort field and direction
+  const sortedStructures = React.useMemo(() => {
+    if (!structures) return [];
+    
+    return [...structures].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "depth":
+          const aDepth = a.depth !== undefined ? Number(a.depth) : -Infinity;
+          const bDepth = b.depth !== undefined ? Number(b.depth) : -Infinity;
+          comparison = aDepth - bDepth;
+          break;
+        case "height":
+          const aHeight = a.height !== undefined ? Number(a.height) : -Infinity;
+          const bHeight = b.height !== undefined ? Number(b.height) : -Infinity;
+          comparison = aHeight - bHeight;
+          break;
+        case "construction_year":
+          const aYear = a.construction_year !== undefined ? Number(a.construction_year) : -Infinity;
+          const bYear = b.construction_year !== undefined ? Number(b.construction_year) : -Infinity;
+          comparison = aYear - bYear;
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [structures, sortField, sortDirection]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const loadMaterials = async () => {
     try {
@@ -227,7 +275,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-lg">Neighboring Structures</h3>
-            <Button onClick={handleOpenNewStructure} className="px-3 py-1">
+            <Button onClick={handleOpenNewStructure} className="px-3 py-1 rounded text-sm">
               <Plus size={14} />
               Add Structure
             </Button>
@@ -236,19 +284,166 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
               <Table>
-                <TableCaption>Neighboring Structures</TableCaption>
+                <TableCaption className="h-8">Neighboring Structures</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Depth (m)</TableHead>
-                    <TableHead>Height (m)</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("name")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Name
+                        {sortField === "name" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("depth")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Depth (m)
+                        {sortField === "depth" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("height")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Height (m)
+                        {sortField === "height" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Coating</TableHead>
-                    <TableHead>Construction Year</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("construction_year")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Construction Year
+                        {sortField === "construction_year" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {structures.map((structure) => (
+                  {isNewStructure && (
+                    <TableRow>
+                      <TableCell className="p-2">
+                        <FormHandler isEditing={true} onSave={handleAddNewStructure} onCancel={handleCancelNewStructure}>
+                          <Input
+                            type="text"
+                            value={newStructure.name || ""}
+                            onChange={(e) => handleChangeNewStructure("name", e.target.value)}
+                            className="w-full p-1"
+                            placeholder="Enter structure name"
+                          />
+                        </FormHandler>
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <Input
+                          type="number"
+                          value={newStructure.depth || ""}
+                          onChange={(e) => handleChangeNewStructure("depth", e.target.value)}
+                          className="w-full p-1"
+                          min="0"
+                          step="0.1"
+                          placeholder="Enter depth"
+                        />
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <Input
+                          type="number"
+                          value={newStructure.height || ""}
+                          onChange={(e) => handleChangeNewStructure("height", e.target.value)}
+                          className="w-full p-1"
+                          min="0"
+                          step="0.1"
+                          placeholder="Enter height"
+                        />
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex gap-2">
+                          <FormSelect
+                            value={newStructure.coating_material_id || ""}
+                            onChange={(e) => handleChangeNewStructure("coating_material_id", e.target.value)}
+                            className="w-[60%] p-2"
+                          >
+                            <option value="">Select coating material</option>
+                            {materials.map((material) => (
+                              <option key={material.id} value={material.id}>
+                                {material.name}
+                              </option>
+                            ))}
+                          </FormSelect>
+                          <Input
+                            type="number"
+                            value={newStructure.coating_thickness || ""}
+                            onChange={(e) => handleChangeNewStructure("coating_thickness", e.target.value)}
+                            className="w-[25%] p-2"
+                            min="0"
+                            step="0.1"
+                            placeholder="Thickness"
+                          />
+                          <FormSelect
+                            value={newStructure.coating_thickness_unit || "mm"}
+                            onChange={(e) => handleChangeNewStructure("coating_thickness_unit", e.target.value)}
+                            className="w-[15%] p-2"
+                          >
+                            <option value="mm">mm</option>
+                            <option value="μm">μm</option>
+                          </FormSelect>
+                        </div>
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <Input
+                          type="number"
+                          value={newStructure.construction_year || ""}
+                          onChange={(e) => handleChangeNewStructure("construction_year", e.target.value)}
+                          className="w-full p-1"
+                          min="1800"
+                          max={new Date().getFullYear()}
+                          placeholder="Enter year"
+                        />
+                      </TableCell>
+                      <TableCell className="p-2">
+                        <div className="flex items-center justify-center gap-2">
+                          <Button onClick={handleAddNewStructure} variant="ghost">
+                            <Save className="text-primary" size={14} />
+                          </Button>
+                          <Button onClick={handleCancelNewStructure} variant="ghost">
+                            <X className="text-primary" size={14} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {sortedStructures.map((structure) => (
                     <TableRow key={structure.id}>
                       <TableCell className="p-2">
                         {editingStructure === structure.id ? (
@@ -392,97 +587,6 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                       </TableCell>
                     </TableRow>
                   ))}
-                  {isNewStructure && (
-                    <TableRow>
-                      <TableCell className="p-2">
-                        <FormHandler isEditing={true} onSave={handleAddNewStructure} onCancel={handleCancelNewStructure}>
-                          <Input
-                            type="text"
-                            value={newStructure.name || ""}
-                            onChange={(e) => handleChangeNewStructure("name", e.target.value)}
-                            className="w-full p-1"
-                            placeholder="Enter structure name"
-                          />
-                        </FormHandler>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Input
-                          type="number"
-                          value={newStructure.depth || ""}
-                          onChange={(e) => handleChangeNewStructure("depth", e.target.value)}
-                          className="w-full p-1"
-                          min="0"
-                          step="0.1"
-                          placeholder="Enter depth"
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Input
-                          type="number"
-                          value={newStructure.height || ""}
-                          onChange={(e) => handleChangeNewStructure("height", e.target.value)}
-                          className="w-full p-1"
-                          min="0"
-                          step="0.1"
-                          placeholder="Enter height"
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <div className="flex gap-2">
-                          <FormSelect
-                            value={newStructure.coating_material_id || ""}
-                            onChange={(e) => handleChangeNewStructure("coating_material_id", e.target.value)}
-                            className="w-[60%] p-2"
-                          >
-                            <option value="">Select coating material</option>
-                            {materials.map((material) => (
-                              <option key={material.id} value={material.id}>
-                                {material.name}
-                              </option>
-                            ))}
-                          </FormSelect>
-                          <Input
-                            type="number"
-                            value={newStructure.coating_thickness || ""}
-                            onChange={(e) => handleChangeNewStructure("coating_thickness", e.target.value)}
-                            className="w-[25%] p-2"
-                            min="0"
-                            step="0.1"
-                            placeholder="Thickness"
-                          />
-                          <FormSelect
-                            value={newStructure.coating_thickness_unit || "mm"}
-                            onChange={(e) => handleChangeNewStructure("coating_thickness_unit", e.target.value)}
-                            className="w-[15%] p-2"
-                          >
-                            <option value="mm">mm</option>
-                            <option value="μm">μm</option>
-                          </FormSelect>
-                        </div>
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Input
-                          type="number"
-                          value={newStructure.construction_year || ""}
-                          onChange={(e) => handleChangeNewStructure("construction_year", e.target.value)}
-                          className="w-full p-1"
-                          min="1800"
-                          max={new Date().getFullYear()}
-                          placeholder="Enter year"
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <div className="flex items-center justify-center gap-2">
-                          <Button onClick={handleAddNewStructure} variant="ghost">
-                            <Save className="text-primary" size={14} />
-                          </Button>
-                          <Button onClick={handleCancelNewStructure} variant="ghost">
-                            <X className="text-primary" size={14} />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
             </div>

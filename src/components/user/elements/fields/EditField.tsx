@@ -3,6 +3,8 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { updateField } from "../../../../services/fields";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
+import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
+import { AlertCircle } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +37,21 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const { id, ...data } = fields;
+    
+    // Validate coordinates if provided
+    if ((data.latitude && !isValidCoordinate(data.latitude)) || 
+        (data.longitude && !isValidCoordinate(data.longitude))) {
+      // Show error but don't prevent saving - the UI will show validation errors
+      console.error("Invalid coordinates format");
+      return;
+    }
+
+    // Format coordinates if valid
+    if (data.latitude && data.longitude && isValidCoordinate(data.latitude) && isValidCoordinate(data.longitude)) {
+      data.latitude = formatCoordinate(data.latitude);
+      data.longitude = formatCoordinate(data.longitude);
+    }
+    
     try {
       await updateField(id, data);
       const updatedProjects = await fetchProjects();
@@ -69,23 +86,38 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
           <Label className="block text-sm mb-1 text-secondary">
             {translation("project.latitude")}
             <input
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+              className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${
+                !isValidCoordinate(fields.latitude) && fields.latitude ? "border-destructive" : ""
+              }`}
               type="text"
               name="latitude"
               value={fields.latitude}
               onChange={handleChange}
+              placeholder="e.g., 57.123456"
+              title="Enter decimal coordinates (e.g., 57.123456)"
             />
           </Label>
           <Label className="block text-sm mb-1 text-secondary">
             {translation("project.longitude")}
             <input
-              className="w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface"
+              className={`w-full p-2 rounded text-sm text-primary border-theme border-solid bg-surface ${
+                !isValidCoordinate(fields.longitude) && fields.longitude ? "border-destructive" : ""
+              }`}
               type="text"
               name="longitude"
               value={fields.longitude}
               onChange={handleChange}
+              placeholder="e.g., 10.123456"
+              title="Enter decimal coordinates (e.g., 10.123456)"
             />
           </Label>
+          {(fields.latitude && !isValidCoordinate(fields.latitude)) || 
+           (fields.longitude && !isValidCoordinate(fields.longitude)) ? (
+            <div className="text-destructive flex items-center gap-1 text-xs mt-1">
+              <AlertCircle size={12} />
+              <span>Use decimal format (e.g., 57.123456)</span>
+            </div>
+          ) : null}
           {!isEditingCoordinates && (
             <div className="block text-sm mb-1 text-secondary">
               <Label>{translation("field.has_fence")}</Label>

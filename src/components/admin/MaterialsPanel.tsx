@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { supabase } from "../../lib/supabase";
-import { Plus, Edit2, Save, X } from "lucide-react";
+import { Plus, Edit2, Save, X, ArrowUpDown } from "lucide-react";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
@@ -12,6 +12,9 @@ interface MaterialsPanelProps {
   currentTheme: Theme;
   currentLanguage: Language;
 }
+
+type SortField = "name" | "e_potential" | "valency" | "molar_mass";
+type SortDirection = "asc" | "desc";
 
 interface Material {
   id: string;
@@ -27,6 +30,8 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingMaterial, setEditingMaterial] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewMaterial, setIsNewMaterial] = useState<boolean>(false);
   const [newMaterial, setNewMaterial] = useState<Record<string, string>>({});
@@ -35,6 +40,49 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
   useEffect(() => {
     loadData();
   }, []);
+
+  // Sort materials based on current sort field and direction
+  const sortedMaterials = React.useMemo(() => {
+    if (!materials) return [];
+    
+    return [...materials].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortField) {
+        case "name":
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case "e_potential":
+          const aEPot = a.e_potential !== null ? Number(a.e_potential) : -Infinity;
+          const bEPot = b.e_potential !== null ? Number(b.e_potential) : -Infinity;
+          comparison = aEPot - bEPot;
+          break;
+        case "valency":
+          const aValency = a.valency !== null ? Number(a.valency) : -Infinity;
+          const bValency = b.valency !== null ? Number(b.valency) : -Infinity;
+          comparison = aValency - bValency;
+          break;
+        case "molar_mass":
+          const aMass = a.molar_mass !== null ? Number(a.molar_mass) : -Infinity;
+          const bMass = b.molar_mass !== null ? Number(b.molar_mass) : -Infinity;
+          comparison = aMass - bMass;
+          break;
+      }
+      
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [materials, sortField, sortDirection]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -171,18 +219,74 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
           <section className="border border-input rounded-md bg-card">
             <div className="w-full relative overflow-auto">
               <Table>
-                <TableCaption>Materials</TableCaption>
+                <TableCaption className="h-8">Materials</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>E-Potential</TableHead>
-                    <TableHead>Valency</TableHead>
-                    <TableHead>Molar Mass</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("name")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Name
+                        {sortField === "name" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("e_potential")}
+                    >
+                      <div className="flex items-center gap-1">
+                        E-Potential
+                        {sortField === "e_potential" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("valency")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Valency
+                        {sortField === "valency" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSortChange("molar_mass")}
+                    >
+                      <div className="flex items-center gap-1">
+                        Molar Mass
+                        {sortField === "molar_mass" ? (
+                          <span className="text-xs ml-1">
+                            {sortDirection === "asc" ? "▲" : "▼"}
+                          </span>
+                        ) : (
+                          <ArrowUpDown size={14} className="ml-1 opacity-50" />
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {materials.map((material) => (
+                  {sortedMaterials.map((material) => (
                     <TableRow key={material.id}>
                       <TableCell className="p-2">
                         {editingMaterial === material.id ? (
