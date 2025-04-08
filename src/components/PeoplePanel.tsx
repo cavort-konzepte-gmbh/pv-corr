@@ -176,7 +176,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
               {PERSON_FIELDS.map((field) => (
                 <div key={field.id}>
                   <Label className="block text-sm mb-1">
-                    {translation(field.label as any)}
+                    {translation(field.label)}
                     {field.required && <span className="text-red-500 ml-1">*</span>}
                   </Label>
                   {field.type === "select" ? (
@@ -247,7 +247,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                       }}
                       className="px-2 py-1 text-xs hover:bg-opacity-80"
                     >
-                      Make Customer
+                         {translation("make_customer")}
                     </Button>
                   )}
                   <ChevronRight className="text-foreground" size={16} />
