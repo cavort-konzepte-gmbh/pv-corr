@@ -153,8 +153,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
               <TableRow>
                 <TableHead>{translation("zones.short_name")}</TableHead>
                 <TableHead>{translation("zones.location")}</TableHead>
-                <TableHead>Substructure</TableHead>
-                <TableHead>Foundation</TableHead>
+                <TableHead>{translation("zones.substructure")}</TableHead>
+                <TableHead>{translation("zones.foundation")}</TableHead>
                 <TableHead>{translation("zones.actions")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -209,7 +209,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       onChange={(e) => setNewValues({ ...newValues, substructureId: e.target.value })}
                       className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
-                      <option value="">Select Substructure</option>
+                      <option value="">{translation("zones.select_substructure")}</option>
                       {substructures.map((sub) => (
                         <option key={sub.id} value={sub.id}>
                           {sub.manufacturer} - {sub.system} ({sub.version})
@@ -223,7 +223,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       onChange={(e) => setNewValues({ ...newValues, foundationId: e.target.value })}
                       className="w-full p-2 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
-                      <option value="">Select Foundation</option>
+                      <option value=""> {translation("zones.select_foundation")}</option>
                       {foundations.map((foundation) => (
                         <option key={foundation.id} value={foundation.id}>
                           {foundation.name}
@@ -331,7 +331,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <option value="">Select Substructure</option>
+                        <option value="">{translation("zones.select_substructure")}</option>
                         {substructures.map((sub) => (
                           <option key={sub.id} value={sub.id}>
                             {sub.manufacturer} - {sub.system} ({sub.version})
@@ -366,7 +366,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         className="w-full p-2 rounded text-sm  border border-input shadow-sm bg-accent"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <option value="">Select Foundation</option>
+                        <option value="">{translation("zones.select_foundation")}</option>
                         {foundations.map((foundation) => (
                           <option key={foundation.id} value={foundation.id}>
                             {foundation.name}

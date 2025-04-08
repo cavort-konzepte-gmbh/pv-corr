@@ -56,7 +56,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
               sortField === "name" ? "text-accent-primary bg-theme" : "text-secondary"
             }`}
           >
-            Name
+            {t("name")}
             <ArrowUpDown size={12} />
           </Button>
           <Button
@@ -65,7 +65,8 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
               sortField === "timestamp" ? "text-accent-primary bg-theme" : "text-secondary"
             }`}
           >
-            Date
+            {t("date")}
+          
             <ArrowUpDown size={12} />
           </Button>
         </div>

@@ -298,7 +298,8 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Create a report from your analysis to save and share your findings.
+                {t("analysis.report_description")}
+            
               </p>
               {saveError && (
                 <div className="p-3 mb-4 text-sm rounded bg-destructive/10 text-destructive">

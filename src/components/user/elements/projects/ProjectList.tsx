@@ -103,7 +103,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                           <div className="flex items-center gap-4">
                             <span>{project.name}</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">{project.typeProject}</span>
+                              <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">{translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}</span>
                               <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                                 {project.fields?.length || 0} {translation("fields")}
                               </span>
@@ -148,7 +148,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                                 }}
                                 className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white bg-accent-primary"
                               >
-                                Move
+                                {translation("move.to")}
                               </Button>
                             </>
                           ) : (
@@ -258,7 +258,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                   }}
                   className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
                 >
-                  Move to No Customer
+                  {translation("move.to")}  No Customer
                 </Button>
               )}
               {customers
@@ -273,7 +273,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     }}
                     className="w-full p-2 text-left rounded hover:bg-opacity-10 text-sm"
                   >
-                    Move to {customer.name}
+                    {translation("move.to")} {customer.name}
+                  
                   </Button>
                 ))}
             </div>

@@ -142,8 +142,8 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
       </div>
       <div className="p-3 flex items-center justify-between rounded">
         <div>
-          <span className="text-3xl font-semibold leading-none">Theme</span>
-          <span className="block text-muted-foreground">Select the theme</span>
+          <span className="text-3xl font-semibold leading-none">{t("settings.theme")}</span>
+          <span className="block text-muted-foreground">{t("settings.select_thme")}</span>
         </div>
         <select
           onChange={handleChangeTheme}
@@ -157,10 +157,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           <option value="green.dark">Green Dark</option>
         </select>
       </div>
-      <div className="p-3 text-primary-foreground bg-primary">
-        <span>Theme</span>
-        <span className="text-xs">Select the theme</span>
-      </div>
+      
     </div>
   );
 };

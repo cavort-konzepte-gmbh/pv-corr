@@ -287,9 +287,9 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                   <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Parameter</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead>Rating</TableHead>
+                      <TableHead> {t("analysis.parameter")}</TableHead>
+                      <TableHead>{t("analysis.value")}</TableHead>
+                      <TableHead>{t("analysis.rating")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -317,7 +317,8 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         <div className="flex-1">
           <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Create a report from your analysis to save and share your findings.
+          {t("analysis.report_description")}
+       
           </p>
         </div>
         <div className="flex gap-3">

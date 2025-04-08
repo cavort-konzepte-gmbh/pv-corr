@@ -239,7 +239,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                     {translation("actions.cancel")}
                   </Button>
                   <Button type="submit" className="px-4 py-2 rounded">
-                    {editingCompany ? translation("general.save_changes") : "Create Company"}
+                    {editingCompany ? translation("general.save_changes") : translation("general.create_company")}
                   </Button>
                 </div>
               </form>
@@ -265,7 +265,8 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                           }}
                           className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white"
                         >
-                          Make Customer
+                          {translation("make_customer")}
+                      
                         </Button>
                       )}
                       <ChevronRight className="text-foreground" size={16} />
