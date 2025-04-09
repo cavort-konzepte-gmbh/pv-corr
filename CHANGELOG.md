@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-04-10
+### Added
+- New utility file ratingCalculator.ts for consistent rating calculations
+- Function to determine classification based on B0 value
+- New units to parameters
+- Enhanced visual display of ratings with better indicators
+- Translation keys for stress levels and risk categories
+### Fixed
+- Consistent rating calculation by summing all ratings from datapoints
+- Removed hardcoded parameter UUIDs
+- Report data handling in OutputView.tsx component
+- Classification display with improved visual presentation
+- Data transfer in AnalysisPanel with proper datapoint ID passing
+- Project page refresh error
+- Norms-related calculations and displays
+- Loading-related bugs
+
 ## [1.0.5] - 2025-04-08
 ### Added
 - Coordinate validation and formatting utilities
