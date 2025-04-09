@@ -6,6 +6,7 @@ import { Edit2, Plus, Save, X, Code, Check } from "lucide-react";
 import { FormHandler, FormInput, FormSelect, DeleteConfirmDialog } from "../shared/FormHandler";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { supabase } from "@/lib/supabase";
+import { showToast } from "@/lib/toast";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 
@@ -197,19 +198,38 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
         return;
       }
 
+      if (!newParameter.name) {
+        setError("Parameter name is required");
+        return;
+      }
+
       const createData = {
         ...newParameter,
         orderNumber: parseFloat(newParameter.orderNumber) || 0,
+        ratingRanges: [], // Changed from string '[]' to actual empty array
       };
 
-      await createParameter(createData as any);
-      const updatedParameters = await fetchParameters();
-      setParameters(updatedParameters);
-      resetValues();
-      setNewParameter({});
-      setIsNewParameter(false);
+      try {
+        setError(null);
+        console.log("Attempting to create parameter:", createData);
+        
+        await createParameter(createData as any);
+        
+        // Success is handled by the service with toast
+        const updatedParameters = await fetchParameters();
+        setParameters(updatedParameters);
+        resetValues();
+        setNewParameter({});
+        setIsNewParameter(false);
+        setError(null);
+      } catch (err) {
+        console.error("Error creating parameter:", err);
+        setError(err instanceof Error ? err.message : "Failed to create parameter");
+        // Error is handled by the service with toast
+      }
     } catch (error) {
       console.error(error);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     }
   };
 
@@ -251,7 +271,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                 <TableBody>
                   {parameters.map((parameter) => (
                     <TableRow key={parameter.id}>
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="number"
@@ -266,7 +286,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormHandler isEditing={true} onSave={() => handleUpdateSaveParameter(parameter)}>
                             <FormInput
@@ -282,7 +302,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="text"
@@ -296,7 +316,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="unit"
@@ -317,13 +337,18 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <option value="mV">mV</option>
                             <option value="A">A</option>
                             <option value="mA">mA</option>
+                            <option value="year">year</option>
+                            <option value="µm/year">µm/year</option>
+                            <option value="µm">µm</option>
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
                           </FormSelect>
                         ) : (
                           parameter.unit || "-"
                         )}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormSelect
                             name="rangeType"
@@ -345,7 +370,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {editingParameter === parameter.id ? (
                           <FormInput
                             type="text"
@@ -359,7 +384,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         )}
                       </TableCell>
 
-                      <TableCell className="text-primary">
+                      <TableCell className="text-primary align-middle">
                         <Button
                           onClick={() => setEditingRatingLogic(parameter.id)}
                           className="p-1 rounded hover:bg-opacity-80 flex items-center gap-2 "
@@ -370,7 +395,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </Button>
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         <div className="flex items-center justify-center gap-2">
                           <Button
                             onClick={() => handleUpdateSaveParameter(parameter)}
@@ -397,7 +422,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                   ))}
                   {isNewParameter && (
                     <TableRow>
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         <FormInput
                           type="number"
                           name="orderNumber"
@@ -408,7 +433,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                           step="0.01"
                         />
                       </TableCell>
-                      <TableCell className="p-2 border border-theme">
+                      <TableCell className="p-2 border border-theme align-middle">
                         <FormHandler isEditing={true} onSave={handleAddNewParameter}>
                           {isNewParameter ? (
                             <FormInput
@@ -422,7 +447,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         </FormHandler>
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {isNewParameter ? (
                           <FormInput
                             type="text"
@@ -434,7 +459,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         ) : null}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {isNewParameter ? (
                           <FormSelect
                             name="unit"
@@ -455,11 +480,16 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                             <option value="mV">mV</option>
                             <option value="A">A</option>
                             <option value="mA">mA</option>
+                            <option value="year">year</option>
+                            <option value="µm/year">µm/year</option>
+                            <option value="µm">µm</option>
+                            <option value="cm">cm</option>
+                            <option value="m">m</option>
                           </FormSelect>
                         ) : null}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {isNewParameter ? (
                           <FormSelect
                             value={newParameter.rangeType || ""}
@@ -479,7 +509,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         ) : null}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         {isNewParameter ? (
                           <FormInput
                             type="text"
@@ -491,7 +521,7 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
                         ) : null}
                       </TableCell>
 
-                      <TableCell className="p-2">
+                      <TableCell className="p-2 align-middle">
                         <div className="flex items-center justify-center gap-2">
                           <Button onClick={handleAddNewParameter} variant="ghost">
                             <Save size={14} />
@@ -507,6 +537,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
               </Table>
             </div>
           </section>
+          
+          {error && (
+            <div className="mt-4 p-3 text-sm bg-destructive/10 text-destructive rounded-md">
+              {error}
+            </div>
+          )}
         </div>
       )}
 
@@ -540,10 +576,12 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
               if (error) throw error;
               const updatedParameters = await fetchParameters();
               setParameters(updatedParameters);
+              showToast("Rating logic updated successfully", "success");
               setEditingRatingLogic(null);
             } catch (err) {
               console.error("Error updating rating logic:", err);
               setError("Failed to update rating logic");
+              showToast("Failed to update rating logic", "error");
             }
           }}
         />

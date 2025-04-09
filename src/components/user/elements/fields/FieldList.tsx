@@ -6,6 +6,7 @@ import { googleMaps } from "../../../../utils/google-maps";
 import { deleteField, updateField } from "../../../../services/fields";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
+import { showToast } from "../../../../lib/toast";
 import { FormHandler } from "../../../shared/FormHandler";
 import { createField } from "../../../../services/fields";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -133,20 +134,20 @@ const FieldList: React.FC<FieldListProps> = ({
 
   const handleAddField = async () => {
     if (!newValues.name?.trim()) {
-      setError("Field name is required");
+      showToast("Field name is required", "error");
       return;
     }
 
     // Validate has_fence value
     if (!["yes", "no"].includes(newValues.has_fence)) {
-      setError("Invalid fence value");
+      showToast("Invalid fence value", "error");
       return;
     }
     
     // Validate coordinates if provided
     if ((newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
         (newValues.longitude && !isValidCoordinate(newValues.longitude))) {
-      setError("Coordinates must be in decimal format (e.g., 57.123456)");
+      showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
       return;
     }
 

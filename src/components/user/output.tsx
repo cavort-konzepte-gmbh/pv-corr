@@ -6,6 +6,7 @@ import { FileText, Download, Eye, History, Info, Loader2, Share, ChevronLeft, Ca
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "../../lib/supabase";
+import { showToast } from "../../lib/toast";
 import OutputView from "../output/OutputView";
 import { Button } from "../ui/button";
 import { fetchReports } from "../../services/reports";

@@ -6,6 +6,7 @@ import { Plus, Users, Building2, MapPin, FileText, FolderPlus, Check } from "luc
 import { createProject } from "../../../../services/projects";
 import { fetchProjects } from "../../../../services/projects";
 import { Language, useTranslation } from "../../../../types/language";
+import { showToast } from "../../../../lib/toast";
 import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
 import { Project } from "../../../../types/projects";
 import { Label } from "@/components/ui/label";
@@ -60,14 +61,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.projectName.trim()) {
-      setError("Project name is required");
+      showToast("Project name is required", "error");
       return;
     }
 
     // Validate coordinates if provided
     if ((formData.latitude && !isValidCoordinate(formData.latitude)) || 
         (formData.longitude && !isValidCoordinate(formData.longitude))) {
-      setError("Coordinates must be in decimal format (e.g., 57.123456)");
+      showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
       return;
     }
 

@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import { Project } from "../types/projects";
 import { toCase } from "../utils/cases";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { showToast } from "../lib/toast";
 
 interface CreateProjectOptions {
   createDefaultField?: boolean;
@@ -69,9 +70,11 @@ export const createProject = async (
 
     if (projectError) {
       console.error("Project creation error:", projectError);
+      showToast(`Failed to create project: ${projectError.message}`, "error");
       throw new Error(projectError.message);
     }
     if (!projectData) {
+      showToast("No project data returned after creation", "error");
       throw new Error("No project data returned after creation");
     }
 
@@ -92,6 +95,7 @@ export const createProject = async (
 
       if (fieldError) {
         console.error("Field creation error:", fieldError);
+        showToast(`Failed to create default field: ${fieldError.message}`, "warning");
         throw new Error(fieldError.message);
       }
 
@@ -107,14 +111,17 @@ export const createProject = async (
 
         if (zoneError) {
           console.error("Zone creation error:", zoneError);
+          showToast(`Failed to create default zone: ${zoneError.message}`, "warning");
           throw new Error(zoneError.message);
         }
       }
     }
 
+    showToast("Project created successfully", "success");
     return toCase<Project>(projectData, "camelCase");
   } catch (err) {
     console.error("Error creating project:", err);
+    showToast(`Failed to create project: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     throw err instanceof Error ? err : new Error("Failed to create project");
   }
 };
@@ -138,6 +145,7 @@ export const updateProject = async (project: Project) => {
 
   if (updateError) {
     console.error("Error updating project:", updateError);
+    showToast(`Failed to update project: ${updateError.message}`, "error");
     throw updateError;
   }
 
@@ -170,9 +178,11 @@ export const updateProject = async (project: Project) => {
 
   if (fetchError) {
     console.error("Error fetching updated project:", fetchError);
+    showToast(`Failed to fetch updated project: ${fetchError.message}`, "error");
     throw fetchError;
   }
 
+  showToast("Project updated successfully", "success");
   return toCase<Project>(completeProject, "camelCase");
 };
 
@@ -180,9 +190,15 @@ export const moveProject = async (projectId: string, customerId: string | null) 
   try {
     const { error } = await supabase.from("projects").update({ customer_id: customerId }).eq("id", projectId);
 
-    if (error) throw error;
+    if (error) {
+      showToast(`Failed to move project: ${error.message}`, "error");
+      throw error;
+    }
+    
+    showToast("Project moved successfully", "success");
   } catch (err) {
     console.error("Error moving project:", err);
+    showToast(`Failed to move project: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     throw err;
   }
 };
@@ -192,10 +208,12 @@ export const deleteProject = async (projectId: string) => {
     const { data: project, error: fetchError } = await supabase.from("projects").select("id").eq("id", projectId).single();
 
     if (fetchError) {
+      showToast("Project not found", "error");
       throw new Error("Project not found");
     }
 
     if (!project) {
+      showToast("Project does not exist", "error");
       throw new Error("Project does not exist");
     }
 
@@ -203,13 +221,16 @@ export const deleteProject = async (projectId: string) => {
 
     if (deleteProjectError) {
       console.error("Error deleting project:", deleteProjectError);
+      showToast(`Failed to delete project: ${deleteProjectError.message}`, "error");
       throw new Error(deleteProjectError.message);
     }
 
+    showToast("Project deleted successfully", "success");
     return true;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to delete project";
     console.error("Error deleting project:", message);
+    showToast(`Failed to delete project: ${message}`, "error");
     throw new Error(message);
   }
 };

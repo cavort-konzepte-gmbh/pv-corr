@@ -578,7 +578,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                       {datapoint.name || `Datapoint ${index + 1}`}
                     </h3>
                     <div className="text-xs text-muted-foreground print:text-gray-600">
-                      {new Date(datapoint.timestamp).toLocaleString()}
+                      {typeof totalRating === 'number' ? totalRating.toFixed(2) : '0.00'}
                     </div>
                   </div>
                   
@@ -607,15 +607,19 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                                 {paramDetail.unit || "-"}
                               </TableCell>
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-2 h-2 rounded-full"
-                                    style={{
-                                      backgroundColor: rating >= 0 ? "#22c55e" : "#ef4444",
-                                    }}
-                                  />
-                                  {rating}
-                                </div>
+                                {rating !== undefined ? (
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="w-2 h-2 rounded-full"
+                                      style={{
+                                        backgroundColor: rating >= 0 ? "#22c55e" : "#ef4444",
+                                      }}
+                                    />
+                                    {rating}
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground">-</span>
+                                )}
                               </TableCell>
                             </TableRow>
                           );
@@ -625,7 +629,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                             {t("analysis.datapoint_total")}
                           </TableCell>
                           <TableCell className="p-2 border border-input print:border-gray-300 font-bold print:text-black">
-                            {Object.values(datapoint.ratings || {}).reduce((sum: number, rating: number) => sum + rating, 0)}
+                            {Object.values(datapoint.ratings || {}).length > 0 
+                              ? Object.values(datapoint.ratings || {}).reduce((sum: number, rating: number) => sum + rating, 0).toFixed(2)
+                              : '0.00'
+                            }
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -634,7 +641,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                 </div>
               ))}
               
-              <div className="mt-6 p-4 border border-input rounded-lg bg-muted/10">
+              <div className="mt-6 p-4 border border-input rounded-lg bg-muted/10 print:border-black">
                 <div className="flex justify-between items-center">
                   <h3 className="text-base font-medium text-foreground print:text-black">
                     {t("analysis.combined_results")}
@@ -684,6 +691,23 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               </div>
             </div>
           </div>
+
+          {/* Norm-specific results */}
+          {reportData?.currentVersion?.content?.normResults && (
+            <div className="mt-6 border-t pt-4 border-input">
+              <h3 className="text-base font-medium mb-3">{t("analysis.norm_specific_results")}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(reportData.currentVersion.content.normResults).map(([key, value]) => (
+                  <div key={key} className="p-3 border border-input rounded-md">
+                    <div className="text-sm font-medium text-muted-foreground">{key}</div>
+                    <div className="text-lg mt-1 text-foreground print:text-black">
+                      {String(value)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="text-sm font-medium text-muted-foreground mb-2 print:text-gray-600">{t("analysis.recommendations")}</div>

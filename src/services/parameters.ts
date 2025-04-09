@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import { Parameter } from "../types/parameters";
 import { toCase } from "../utils/cases";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { showToast } from "../lib/toast";
 
 interface ParameterResponse {
   id: string;
@@ -59,15 +60,35 @@ export const createParameter = async (parameter: Omit<Parameter, "id" | "hiddenI
     unit: parameter.unit || null,
     range_type: parameter.rangeType,
     range_value: parameter.rangeValue || "",
+    order_number: parameter.orderNumber || 0,
+    rating_ranges: parameter.ratingRanges || '[]'
   };
 
-  const { data, error } = await supabase.from("parameters").insert(parameterData).select().single();
+  try {
+    console.log("Creating parameter with data:", JSON.stringify(parameterData));
+    
+    const { data, error } = await supabase
+      .from("parameters")
+      .insert(parameterData)
+      .select()
+      .single();
 
-  if (error) {
-    throw error;
+    if (error) {
+      console.error("Error creating parameter:", error);
+      showToast(`Failed to create parameter: ${error.message}`, "error");
+      throw error;
+    }
+
+    console.log("Parameter created successfully:", data);
+    showToast("Parameter created successfully", "success");
+    return data;
+  } catch (err) {
+    console.error("Error in createParameter:", err);
+    showToast(`Failed to create parameter: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    throw err instanceof Error 
+      ? err 
+      : new Error("Failed to create parameter. Please check your input values.");
   }
-
-  return data;
 };
 
 export const updateParameter = async (id: string, parameter: Partial<Parameter>) => {
@@ -86,25 +107,51 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
   if (parameter.rangeType !== undefined) updateData.range_type = parameter.rangeType;
   if (parameter.rangeValue !== undefined) updateData.range_value = parameter.rangeValue;
   if (parameter.orderNumber !== undefined) updateData.order_number = parameter.orderNumber;
+  if (parameter.ratingRanges !== undefined) updateData.rating_ranges = parameter.ratingRanges || '[]';
+  if (parameter.rating_logic_code !== undefined) updateData.rating_logic_code = parameter.rating_logic_code;
+  if (parameter.rating_logic_test_cases !== undefined) updateData.rating_logic_test_cases = parameter.rating_logic_test_cases;
 
-  const { data, error } = await supabase.from("parameters").update(updateData).eq("id", id.toString()).select().single();
-
-  if (error) {
-    throw error;
+  try {
+    console.log("Updating parameter with data:", JSON.stringify(updateData));
+    
+    const { data, error } = await supabase.from("parameters").update(updateData).eq("id", id.toString()).select().single();
+  
+    if (error) {
+      console.error("Error updating parameter:", error);
+      showToast(`Failed to update parameter: ${error.message}`, "error");
+      throw error;
+    }
+  
+    console.log("Parameter updated successfully:", data);
+    showToast("Parameter updated successfully", "success");
+    return {
+      ...toCase(data, "camelCase"),
+      rating_logic_code: data.rating_logic_code,
+      rating_logic_test_cases: data.rating_logic_test_cases,
+    };
+  } catch (err) {
+    console.error("Error in updateParameter:", err);
+    showToast(`Failed to update parameter: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    throw err instanceof Error 
+      ? err 
+      : new Error("Failed to update parameter. Please check your input values.");
   }
-
-  return {
-    ...toCase(data, "camelCase"),
-    rating_logic_code: data.rating_logic_code,
-    rating_logic_test_cases: data.rating_logic_test_cases,
-  };
 };
 
 export const deleteParameter = async (id: string) => {
-  const { error } = await supabase.from("parameters").delete().eq("id", id);
+  try {
+    const { error } = await supabase.from("parameters").delete().eq("id", id);
 
-  if (error) {
-    console.error("Error deleting parameter:", error);
-    throw error;
+    if (error) {
+      console.error("Error deleting parameter:", error);
+      showToast(`Failed to delete parameter: ${error.message}`, "error");
+      throw error;
+    }
+    
+    showToast("Parameter deleted successfully", "success");
+  } catch (err) {
+    console.error("Error deleting parameter:", err);
+    showToast(`Failed to delete parameter: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    throw err;
   }
 };

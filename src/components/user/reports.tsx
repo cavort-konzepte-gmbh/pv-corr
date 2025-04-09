@@ -5,6 +5,7 @@ import { Language, useTranslation } from "../../types/language";
 import { Project } from "../../types/projects";
 import { FileText, Download, Eye, History, Info, Loader2, Search, Filter, SortDesc, SortAsc, Calendar, Tag, User, Trash2, AlertCircle } from "lucide-react";
 import { fetchReports, deleteReport } from "../../services/reports";
+import { showToast } from "../../lib/toast";
 import { Button } from "../ui/button"; 
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
@@ -258,10 +259,14 @@ const Reports: React.FC<ReportsProps> = ({
       
       // Show success message
       setError("Report deleted successfully");
+      showToast("Report deleted successfully", "success");
+      showToast("Report deleted successfully", "success");
       setTimeout(() => setError(null), 3000);
     } catch (err) {
       console.error("Error deleting report:", err);
       setError("Failed to delete report: " + (err instanceof Error ? err.message : String(err)));
+      showToast(`Failed to delete report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+      showToast(`Failed to delete report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);

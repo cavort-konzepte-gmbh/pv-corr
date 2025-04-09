@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { supabase } from "../../lib/supabase";
-import { Plus, Edit2, Save, X, Info, Code } from "lucide-react";
+import { Plus, Edit2, Save, X, Info, Code, ChevronRight, ChevronDown } from "lucide-react";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import { Parameter } from "../../types/parameters";
+import { showToast } from "../../lib/toast";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -78,7 +79,7 @@ const OutputConfigDialog: React.FC<OutputConfigDialogProps> = ({ isOpen, onClose
                 <Textarea
                   value={output.formula}
                   onChange={(e) => handleUpdateOutput(output.id, "formula", e.target.value)}
-                  placeholder="Enter JavaScript formula (e.g. values.Z1 + values.Z2)"
+                  placeholder="Enter JavaScript formula (e.g. return values.Z1 + values.Z2)"
                 />
                 <Textarea
                   value={output.description}
@@ -144,6 +145,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
   const [editingNorm, setEditingNorm] = useState<string | null>(null);
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
   const [isNewNorm, setIsNewNorm] = useState(false);
+  const [expandedNorms, setExpandedNorms] = useState<Set<string>>(new Set());
   const [newNorm, setNewNorm] = useState<Record<string, string>>({});
   const [selectedRole, setSelectedRole] = useState<"super_admin" | "admin" | "user">("user");
   const [showNewNormForm, setShowNewNormForm] = useState(false);
@@ -245,7 +247,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
   const handleAddNewNorm = async () => {
     try {
       if (!newNorm.name?.trim()) {
-        setError("Norm name is required");
+        showToast("Norm name is required", "error");
         return;
       }
 
@@ -257,13 +259,14 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
       });
 
       if (error) throw error;
+      showToast("Norm created successfully", "success");
       await loadData();
       resetValues();
       setNewNorm({});
       setIsNewNorm(false);
     } catch (err) {
       console.error("Error creating norm:", err);
-      setError("Failed to create norm");
+      showToast(`Failed to create norm: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     }
   };
 
@@ -282,6 +285,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
         const { error } = await supabase.from("norm_parameters").delete().eq("norm_id", normId).eq("parameter_id", parameterId);
 
         if (error) throw error;
+        showToast(`Parameter removed from norm`, "success");
       } else {
         // Add association
         const { error } = await supabase.from("norm_parameters").insert({
@@ -292,13 +296,27 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
         });
 
         if (error) throw error;
+        showToast(`Parameter added to norm`, "success");
       }
 
       await loadData();
     } catch (err) {
       console.error("Error toggling parameter:", err);
-      setError("Failed to update parameter association");
+      showToast(`Failed to update parameter association: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     }
+  };
+
+  const toggleNormExpansion = (normId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedNorms(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(normId)) {
+        newSet.delete(normId);
+      } else {
+        newSet.add(normId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -360,8 +378,11 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
           ) : (
             <div className="space-y-4">
               {norms.map((norm) => (
-                <div key={norm.id} className="p-4 rounded-lg border transition-all text-card-foreground border-accent bg-card">
-                  <div className="flex items-center justify-between mb-4">
+                <div key={norm.id} className="rounded-lg border transition-all text-primary border-accent bg-card">
+                  <div 
+                    className="p-4 flex items-center justify-between cursor-pointer"
+                    onClick={(e) => toggleNormExpansion(norm.id, e)}
+                  >
                     <div>
                       {editingNorm === norm.id ? (
                         <div className="space-y-2">
@@ -388,15 +409,13 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                         </div>
                       ) : (
                         <div>
-                          <h3 className="font-medium text-lg">
-                            {norm.name}
-                            {norm.version && <span className="ml-2 text-sm text-muted-foreground">v{norm.version}</span>}
-                          </h3>
-                          {norm.description && <p className="text-sm mt-1 text-muted-foreground">{norm.description}</p>}
+                          <span className="font-medium">{norm.name}</span>
+                          {norm.version && <span className="text-sm text-secondary ml-2">v{norm.version}</span>}
                         </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground">
+                      {expandedNorms.has(norm.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                       <Button onClick={() => handleUpdateSaveNorm(norm)} className="p-1 rounded hover:bg-opacity-80" variant="ghost">
                         {editingNorm === norm.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
@@ -413,90 +432,96 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                       </Button>
                     </div>
                   </div>
-
-                  {editingNorm === norm.id ? (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("standards.select_parameter")}</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {parameters.map((param) => {
-                          const isSelected = normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id);
-                          return (
-                            <div key={param.id} className="flex items-center gap-2 p-2 rounded border">
-                              <Input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
-                                className="size-5 rounded"
-                              />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-1">
-                                  <span className="text-sm">{param.shortName || param.name}</span>
-                                  {param.unit && <span className="text-xs text-muted-foreground">({param.unit})</span>}
-                                  <div className="relative group">
-                                    <Info size={12} className="text-muted-foreground cursor-help" />
-                                    <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">
-                                      <p className="text-xs">{param.name}</p>
+                  
+                  {(expandedNorms.has(norm.id) || editingNorm === norm.id) && (
+                    <div className="px-4 pb-4">
+                      {norm.description && <p className="text-sm mb-4 text-secondary">{norm.description}</p>}
+                      
+                      {editingNorm === norm.id ? (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("standards.select_parameter")}</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                            {parameters.map((param) => {
+                              const isSelected = normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id);
+                              return (
+                                <div key={param.id} className="flex items-center gap-2 p-2 rounded border">
+                                  <Input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => handleToggleParameter(norm.id, param.id, param.shortName || param.name)}
+                                    className="size-5 rounded"
+                                  />
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-sm">{param.shortName || param.name}</span>
+                                      {param.unit && <span className="text-xs text-muted-foreground">({param.unit})</span>}
+                                      <div className="relative group">
+                                        <Info size={12} className="text-muted-foreground cursor-help" />
+                                        <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">
+                                          <p className="text-xs">{param.name}</p>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium mb-2 text-muted-foreground">Selected Parameters</h4>
-                      <section className="border border-input rounded-md bg-card">
-                        <div className="w-full relative overflow-auto">
-                          <Table>
-                            <thead>
-                              <tr>
-                                <th className="text-left p-2 text-sm font-normal text-muted-foreground">Name</th>
-                                <th className="text-left p-2 text-sm font-normal text-muted-foreground">Parameter Code</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {parameters
-                                .filter((param) => normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id))
-                                .sort((a, b) => {
-                                  const aOrder =
-                                    typeof a.orderNumber === "number" ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
-                                  const bOrder =
-                                    typeof b.orderNumber === "number" ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
-                                  return aOrder - bOrder;
-                                })
-                                .map((param) => (
-                                  <tr key={param.id} className="border-t border-accent">
-                                    <td className="p-2 text-sm">{param.shortName || param.name}</td>
-                                    <td className="p-2 text-sm text-muted-foreground">
-                                      <div className="flex items-center gap-2">
-                                        <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
-                                        <Button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigator.clipboard.writeText(param.id);
-                                            // Show temporary success indicator
-                                            const button = e.currentTarget;
-                                            button.innerHTML = "✓";
-                                            setTimeout(() => {
-                                              button.innerHTML = "Copy";
-                                            }, 1000);
-                                          }}
-                                          className="text-xs px-2 py-1 rounded hover:bg-theme text-muted-foreground"
-                                          variant="ghost"
-                                        >
-                                          Copy
-                                        </Button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                ))}
-                            </tbody>
-                          </Table>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </section>
+                      ) : (
+                        <div>
+                          <h4 className="text-sm font-medium mb-2 text-muted-foreground">Selected Parameters</h4>
+                          <section className="border border-input rounded-md bg-card">
+                            <div className="w-full relative overflow-auto">
+                              <Table>
+                                <thead>
+                                  <tr>
+                                    <th className="text-left p-2 text-sm font-normal text-muted-foreground">Name</th>
+                                    <th className="text-left p-2 text-sm font-normal text-muted-foreground">Parameter Code</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {parameters
+                                    .filter((param) => normParameters.some((np) => np.norm_id === norm.id && np.parameter_id === param.id))
+                                    .sort((a, b) => {
+                                      const aOrder =
+                                        typeof a.orderNumber === "number" ? a.orderNumber : parseFloat(a.orderNumber as string) || 0;
+                                      const bOrder =
+                                        typeof b.orderNumber === "number" ? b.orderNumber : parseFloat(b.orderNumber as string) || 0;
+                                      return aOrder - bOrder;
+                                    })
+                                    .map((param) => (
+                                      <tr key={param.id} className="border-t border-accent">
+                                        <td className="p-2 text-sm">{param.shortName || param.name}</td>
+                                        <td className="p-2 text-sm text-muted-foreground">
+                                          <div className="flex items-center gap-2">
+                                            <code className="font-mono bg-theme px-2 py-1 rounded text-xs">{param.id}</code>
+                                            <Button
+                                              onClick={async (e) => {
+                                                e.stopPropagation();
+                                                await navigator.clipboard.writeText(param.id);
+                                                // Show temporary success indicator
+                                                const button = e.currentTarget;
+                                                button.innerHTML = "✓";
+                                                setTimeout(() => {
+                                                  button.innerHTML = "Copy";
+                                                }, 1000);
+                                              }}
+                                              className="text-xs px-2 py-1 rounded hover:bg-theme text-muted-foreground"
+                                              variant="ghost"
+                                            >
+                                              Copy
+                                            </Button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                </tbody>
+                              </Table>
+                            </div>
+                          </section>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

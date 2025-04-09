@@ -11,6 +11,7 @@ import { updateDatapoint } from "../../../../services/datapoints";
 import { FormHandler } from "../../../shared/FormHandler";
 import { createDatapoint } from "../../../../services/datapoints";
 import { deleteDatapoint } from "../../../../services/datapoints";
+import { showToast } from "../../../../lib/toast";
 import { ParameterInput } from "../../../DatapointForm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,19 +122,32 @@ const DatapointList: React.FC<DatapointListProps> = ({
 
   const handleAddDatapoint = async () => {
     if (!newName.trim()) {
-      setError("Datapoint name is required");
+      showToast("Datapoint name is required", "error");
       return;
     }
     if (Object.keys(newValues).length === 0) {
-      setError("Please enter at least one value");
+      showToast("Please enter at least one value", "error");
       return;
     }
+
+    // Process values to ensure proper number formatting
+    const processedValues: Record<string, any> = {};
+    Object.entries(newValues).forEach(([key, value]) => {
+      // Convert numeric strings to numbers
+      if (typeof value === 'string' && value !== 'impurities' && value.trim() !== '' && !isNaN(parseFloat(value))) {
+        processedValues[key] = parseFloat(value);
+      } else {
+        processedValues[key] = value;
+      }
+    });
+    
+    console.log("Processed values for new datapoint:", processedValues);
 
     try {
       await createDatapoint(zoneId, {
         type: "measurement",
         name: newName.trim(),
-        values: newValues,
+        values: processedValues,
         ratings: {},
       });
 
@@ -157,11 +171,25 @@ const DatapointList: React.FC<DatapointListProps> = ({
         return;
       }
 
+      // Debug the values being saved
+      console.log("Saving datapoint values:", editingValues);
+      
       const updateData = {
         values: editingValues,
         name: editingName.trim(),
       };
 
+      // Convert any numeric strings to actual numbers
+      Object.keys(updateData.values).forEach(key => {
+        const value = updateData.values[key];
+        // Skip conversion for special values like 'impurities'
+        if (typeof value === 'string' && value !== 'impurities' && !isNaN(parseFloat(value))) {
+          updateData.values[key] = parseFloat(value);
+        }
+      });
+      
+      console.log("Processed datapoint values:", updateData.values);
+      
       setEditingDatapoint(null);
       setEditingName("");
       setEditingValues({});
@@ -171,7 +199,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
         onProjectsChange(projects);
       } catch (err) {
         console.error("Error updating datapoint:", err);
-        setError("Failed to update datapoint");
+        // Toast is handled in the service
       }
     } else {
       // Start editing
@@ -247,6 +275,15 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     )}
                   </div>
                 </TableHead>
+              </TableRow>
+              <TableRow>
+                <TableHead></TableHead>
+                {parameters.map((param) => (
+                  <TableHead key={`unit-${param.id}`} className="text-xs text-muted-foreground font-normal">
+                    {param.unit || "-"}
+                  </TableHead>
+                ))}
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

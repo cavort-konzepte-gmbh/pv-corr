@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../../lib/supabase";
+import { showToast } from "../../lib/toast";
 import { Theme } from "../../types/theme";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -52,11 +53,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
       // Pass the login type to onSuccess
       onSuccess(loginType);
     } catch (err) {
-      let errorMessage = "Invalid email or password";
+      let errorMessage = "Invalid email or password. Please try again.";
       if (err instanceof Error && err.message === "Invalid admin credentials") {
-        errorMessage = "Invalid admin credentials";
+        errorMessage = "Invalid admin credentials. You don't have admin access.";
       }
       setError(errorMessage);
+      showToast(errorMessage, "error");
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -77,6 +79,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ currentTheme, onSuccess }) => {
       }
     } catch (err) {
       setError(`Failed to sign in with ${provider}`);
+      showToast(`Failed to sign in with ${provider}`, "error");
       console.error(`${provider} login error:`, err);
     } finally {
       setLoading(false);

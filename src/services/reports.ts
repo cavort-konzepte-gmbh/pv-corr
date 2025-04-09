@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { showToast } from "../lib/toast";
 
 interface CreateReportData {
   projectId: string;
@@ -31,7 +32,10 @@ export const createReport = async (data: CreateReportData) => {
       .select()
       .single();
 
-    if (reportError) throw reportError;
+    if (reportError) {
+      showToast(`Failed to create report: ${reportError.message}`, "error");
+      throw reportError;
+    }
 
     // Then create the first version
     const { data: version, error: versionError } = await supabase
@@ -39,7 +43,13 @@ export const createReport = async (data: CreateReportData) => {
       .insert({
         output_id: report.id,
         version_number: 1,
-        content: data.content,
+        content: {
+          projectName: data.content.projectName,
+          zoneName: data.content.zoneName,
+          normName: data.content.normName,
+          timestamp: data.content.timestamp,
+          normResults: data.normResults || {},
+        },
         parameters: data.parameters,
         ratings: data.ratings,
         total_rating: data.totalRating,
@@ -50,14 +60,23 @@ export const createReport = async (data: CreateReportData) => {
       .select()
       .single();
 
-    if (versionError) throw versionError;
+    if (versionError) {
+      showToast(`Failed to create report version: ${versionError.message}`, "error");
+      throw versionError;
+    }
 
+    // Log the created report and version for debugging
+    console.log("Created report:", report);
+    console.log("Created version:", version);
+    console.log("Norm results:", data.normResults);
+    showToast("Report created successfully", "success");
     return {
       report,
       version,
     };
   } catch (err) {
     console.error("Error creating report:", err);
+    showToast(`Failed to create report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     throw new Error(`Failed to create report: ${err instanceof Error ? err.message : 'Unknown error'}`);
   }
 };

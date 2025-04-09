@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Language, LANGUAGES, useTranslation, setTranslations } from "../../../../types/language";
 import { fetchTranslations } from "../../../../services/translations";
 import { updateUserSettings } from "../../../../services/userSettings";
+import { showToast } from "../../../../lib/toast";
 import { Button } from "@/components/ui/button";
 
 interface GeneralSettingsProps {
@@ -40,10 +41,13 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
       // Then update the user settings
       await updateUserSettings({ language });
       
+      showToast(`Language changed to ${LANGUAGES.find(l => l.id === language)?.name}`, "success");
+      
       // Update the UI
       onLanguageChange(language);
     } catch (err) {
       console.error("Error changing language:", err);
+      showToast(`Failed to change language: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     } finally {
       setUpdating(false);
     }

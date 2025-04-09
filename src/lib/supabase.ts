@@ -4,8 +4,17 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
-  throw new Error("Missing Supabase environment variables");
+// More descriptive error messages for each missing variable
+if (!supabaseUrl) {
+  throw new Error("VITE_SUPABASE_URL is not defined in environment variables");
+}
+
+if (!supabaseAnonKey) {
+  throw new Error("VITE_SUPABASE_ANON_KEY is not defined in environment variables");
+}
+
+if (!supabaseServiceKey) {
+  throw new Error("VITE_SUPABASE_SERVICE_ROLE_KEY is not defined in environment variables");
 }
 
 // Create regular client with anon key for normal operations

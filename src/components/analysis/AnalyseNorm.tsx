@@ -2,8 +2,9 @@ import React from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../lib/supabase";
+import { showToast } from "../../lib/toast";
 import { Button } from "../ui/button";
 
 interface AnalyseNormProps {
@@ -17,12 +18,14 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [norms, setNorms] = useState<any[]>([]);
+  const [loadingNorm, setLoadingNorm] = useState(false);
   const t = useTranslation(currentLanguage);
 
   useEffect(() => {
     const loadNorms = async () => {
       try {
         setLoading(true);
+        setError(null);
         const { data, error } = await supabase
           .from("norms")
           .select(
@@ -37,11 +40,16 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
           )
           .order("created_at", { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error loading norms:", error);
+          throw error;
+        }
+        
         setNorms(data || []);
       } catch (err) {
         console.error("Error loading norms:", err);
         setError("Failed to load norms");
+        showToast("Failed to load norms", "error");
       } finally {
         setLoading(false);
       }
@@ -49,6 +57,47 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
 
     loadNorms();
   }, []);
+
+  const handleSelectNorm = useCallback(async (normId: string) => {
+    try {
+      setLoadingNorm(true);
+      
+      // If clicking the already selected norm, deselect it
+      if (selectedNormId === normId) {
+        onSelectNorm("");
+        return;
+      }
+      
+      // Fetch the complete norm data to ensure we have all parameters
+      const { data, error } = await supabase
+        .from("norms")
+        .select(
+          `
+          *,
+          parameters:norm_parameters (
+            parameter_id,
+            parameter_code,
+            rating_ranges
+          )
+        `,
+        )
+        .eq("id", normId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching norm details:", error);
+        throw error;
+      }
+      
+      // Now that we have the data, update the selection
+      onSelectNorm(normId);
+    } catch (err) {
+      console.error("Error selecting norm:", err);
+      showToast(`Error selecting norm: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    } finally {
+      setLoadingNorm(false);
+    }
+  }, [selectedNormId, onSelectNorm]);
 
   if (loading) {
     return <div className="text-center p-4 text-secondary">{t("analysis.loading")}</div>;
@@ -64,10 +113,11 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {norms.map((norm) => (
           <Button
-            key={norm.id}
-            onClick={() => onSelectNorm(norm.id)}
-            className={`px-3 py-1 rounded text-sm transition-colors ${
-              selectedNormId === norm.id ? " text-primary-foreground hover:bg-theme" : "bg-accent-primary text-primary "
+            key={norm.id} 
+            onClick={() => handleSelectNorm(norm.id)}
+            disabled={loadingNorm}
+            className={`px-3 py-1 rounded text-sm transition-colors ${loadingNorm ? "opacity-50 cursor-not-allowed" : ""} ${
+              selectedNormId === norm.id ? "bg-accent-primary text-primary" : "text-primary-foreground hover:bg-theme"
             }`}
           >
             <div className="flex items-center justify-between">

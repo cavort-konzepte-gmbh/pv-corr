@@ -79,6 +79,9 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     const min = parseFloat(minStr.replace(/[,()]/g, "").trim());
     const max = maxStr ? parseFloat(maxStr.replace(/[,()]/g, "").trim()) : undefined;
 
+    // Debug the range values
+    console.log(`Range for ${parameter.parameterCode}: min=${min}, max=${max}`);
+    
     // Only set min/max if they are valid numbers
     return (
       <Input
@@ -90,9 +93,17 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
           // Round to 2 decimal places
           val = Math.round(val * 100) / 100;
 
+          // Debug the validation
+          console.log(`Validating ${val} against min=${min}, max=${max}`);
+          
           // Validate against min/max if they exist
-          const isValid = !isNaN(val) && !isNaN(min) && val >= min && (max === undefined || val <= max);
+          const isValid = !isNaN(val) && (
+            (isNaN(min) || val >= min) && 
+            (max === undefined || isNaN(max) || val <= max)
+          );
 
+          console.log(`Validation result: ${isValid}`);
+          
           if (isValid) {
             onChange(e.target.value);
           }

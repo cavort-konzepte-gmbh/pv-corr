@@ -2,6 +2,7 @@ import { supabase } from "../lib/supabase";
 import { Field, Gate } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
 import { createZone } from "./zones";
+import { showToast } from "../lib/toast";
 
 export const createField = async (projectId: string, field: Omit<Field, "id" | "hiddenId" | "gates" | "zones">) => {
   if (!projectId) {
@@ -24,9 +25,12 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
 
   if (error) {
     console.error("Error creating field:", error);
+    showToast(`Failed to create field: ${error.message}`, "error");
     throw error;
   }
 
+  showToast("Field created successfully", "success");
+  
   // Automatically create a default zone for the new field
   try {
     await createZone(newField.id, {
@@ -122,11 +126,20 @@ export const updateField = async (fieldId: string, field: Partial<Field>) => {
 };
 
 export const deleteField = async (fieldId: string) => {
-  const { error } = await supabase.from("fields").delete().eq("id", fieldId);
+  try {
+    const { error } = await supabase.from("fields").delete().eq("id", fieldId);
 
-  if (error) {
-    console.error("Error deleting field:", error);
-    throw error;
+    if (error) {
+      console.error("Error deleting field:", error);
+      showToast(`Failed to delete field: ${error.message}`, "error");
+      throw error;
+    }
+    
+    showToast("Field deleted successfully", "success");
+  } catch (err) {
+    console.error("Error deleting field:", err);
+    showToast(`Failed to delete field: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    throw err;
   }
 };
 

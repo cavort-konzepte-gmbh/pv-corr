@@ -1,4 +1,5 @@
 import { supabase } from "../lib/supabase";
+import { showToast } from "../lib/toast";
 
 export interface UserMetadata {
   firstName?: string;
@@ -49,20 +50,28 @@ export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promi
     });
 
     if (error) {
-      console.error("Error updating user metadata:", error);
+      console.error("Error updating user metadata:", error.message);
+      showToast(`Failed to update user settings: ${error.message}`, "error");
       return false;
+    }
+
+    if (!data.user) {
+      showToast("No user returned after update", "error");
+      throw new Error("No user returned after update");
     }
 
     // Dispatch event with updated settings
     window.dispatchEvent(
       new CustomEvent("userSettingsLoaded", {
-        detail: snakeCaseMetadata,
+        detail: data.user.user_metadata,
       }),
     );
-
+    
+    showToast("User settings updated successfully", "success");
     return true;
-  } catch (err) {
-    console.error("Error in updateUserMetadata:", err);
+  } catch (error) {
+    console.error("Error in updateUserMetadata:", error);
+    showToast(`Failed to update user settings: ${error instanceof Error ? error.message : "Unknown error"}`, "error");
     return false;
   }
 };

@@ -7,6 +7,7 @@ import { Company } from "../../types/companies";
 import ProjectSummary from "./elements/fields/ProjectSummary";
 import FieldList from "./elements/fields/FieldList";
 import { useEffect } from "react";
+import { fetchProjects } from "../../services/projects";
 
 interface FieldsProps {
   currentTheme: Theme;

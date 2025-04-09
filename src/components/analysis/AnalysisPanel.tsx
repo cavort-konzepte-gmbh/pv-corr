@@ -8,10 +8,12 @@ import { useAuth } from "../auth/AuthProvider";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import AnalyseData from "./AnalyseData";
 import AnalyseNorm from "./AnalyseNorm";
+import { showToast, promiseToast } from "../../lib/toast";
 import AnalyseResult from "./AnalyseResult";
 import { createReport } from "../../services/reports";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { calculateZincLossRate, formatZincLossRate } from "../../services/calculations";
 import { supabase } from "../../lib/supabase";
 
 interface AnalysisPanelProps {
@@ -36,7 +38,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [selectedNormId, setSelectedNormId] = useState<string | null>(null);
   const [selectedDatapoints, setSelectedDatapoints] = useState<string[]>([]);
   const [showReport, setShowReport] = useState(false);
-  const [selectedNorm, setSelectedNorm] = useState<any>(null);
+  const [selectedNorm, setSelectedNorm] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [parameters, setParameters] = useState<any[]>([]);
@@ -45,14 +47,18 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  // Handle norm selection
   useEffect(() => {
     const loadNorm = async () => {
-      if (!selectedNormId) {
+      if (!selectedNormId || selectedNormId === "") {
         setSelectedNorm(null);
         return;
       }
 
       try {
+        // Show loading toast
+        const toastId = showToast("Loading norm data...", "loading");
+        
         const { data, error } = await supabase
           .from("norms")
           .select(
@@ -68,15 +74,45 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           .eq("id", selectedNormId)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error loading norm:", error);
+          showToast(`Failed to load norm: ${error.message}`, "error", { id: toastId });
+          throw error;
+        }
+        
+        // Ensure output_config is an array
+        if (data && (!data.output_config || !Array.isArray(data.output_config))) {
+          data.output_config = [];
+        }
+        
         setSelectedNorm(data);
+        showToast("Norm loaded successfully", "success", { id: toastId });
       } catch (err) {
         console.error("Error loading norm:", err);
+        setSelectedNorm(null);
+        setSelectedNormId(null);
+        showToast(`Failed to load norm: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
       }
     };
 
     loadNorm();
   }, [selectedNormId]);
+
+  // Load analysis parameters
+  useEffect(() => {
+    const loadAnalysisData = async () => {
+      try {
+        const { data, error } = await supabase.from("analysis_parameters").select("*").order("created_at", { ascending: true });
+
+        if (error) throw error;
+        setParameters(data || []);
+      } catch (err) {
+        console.error("Error loading analysis data:", err);
+      }
+    };
+
+    loadAnalysisData();
+  }, []);
 
   const handleSaveAnalysis = async () => {
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
@@ -135,12 +171,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const handleCreateReport = async () => {
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
       setSaveError("Please select datapoints and a norm before creating a report");
+      showToast("Please select datapoints and a norm before creating a report", "error");
       return;
     }
 
     try {
       setIsSaving(true);
       setNavigating(true);
+      const toastId = showToast("Creating report...", "loading");
       setSaveError(null);
 
       // Get selected datapoints
@@ -151,14 +189,132 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
       }, 0);
       
+      // Apply any custom calculations from norm output_config
+      let calculatedRating = totalRating;
+      if (selectedNorm?.output_config && Array.isArray(selectedNorm.output_config)) {
+        
+        // Check if we need to calculate zinc loss rate
+        const zincLossOutput = selectedNorm.output_config.find(o => o.id === 'zincLossRate');
+        if (zincLossOutput) {
+          try {
+            // Find parameter IDs for zinc loss calculation
+            const resistivityParam = parameters.find(p => p.shortName?.toLowerCase() === 'resistivity');
+            const chloridesParam = parameters.find(p => p.shortName?.toLowerCase() === 'chlorides');
+            const soilTypeParam = parameters.find(p => p.shortName?.toLowerCase() === 'soil type');
+            const phParam = parameters.find(p => p.shortName?.toLowerCase() === 'ph');
+            const coatingThicknessParam = parameters.find(p => p.shortName?.toLowerCase() === 'coating thickness');
+            
+            if (resistivityParam && chloridesParam && soilTypeParam && phParam) {
+              // Get values from first datapoint
+              const firstDatapoint = selectedDps[0];
+              if (firstDatapoint) {
+                const parameterIds = {
+                  RESISTIVITY: resistivityParam.id,
+                  CHLORIDES: chloridesParam.id,
+                  SOIL_TYPE: soilTypeParam.id,
+                  PH: phParam.id,
+                  COATING_THICKNESS: coatingThicknessParam?.id
+                };
+                
+                // Calculate zinc loss rate
+                const results = calculateZincLossRate(firstDatapoint.values, parameterIds);
+                const [zincLossRate, steelLossRate, zincLifetime, requiredReserve] = results;
+                
+                console.log("Zinc loss calculation results:", {
+                  zincLossRate,
+                  steelLossRate,
+                  zincLifetime,
+                  requiredReserve
+                });
+                
+                // Store the results in the correct format
+                reportData.normResults = {
+                  "Zinc Loss Rate": formatZincLossRate(zincLossRate),
+                  "Steel Loss Rate": `${steelLossRate} μm/year`,
+                  "Zinc Lifetime": `${zincLifetime} years`,
+                  "Required Reserve": `${requiredReserve} mm`
+                };
+              }
+            }
+          } catch (err) {
+            console.error("Error in zinc loss calculation:", err);
+          }
+        }
+        
+        // Find the main output formula (usually b0)
+        const mainOutput = selectedNorm.output_config.find(o => o.id === 'b0');
+        if (mainOutput?.formula) {
+          try {
+            // Create context for each datapoint
+            const results = selectedDps.map(dp => {
+              // Create a context with parameter values and ratings
+              const context: Record<string, any> = {
+                values: {},
+                ratings: {},
+              };
+              
+              // Add all parameter values to the context
+              Object.entries(dp.values).forEach(([paramId, value]) => {
+                const param = parameters.find(p => p.id === paramId);
+                if (param?.shortName) {
+                  // Convert string numbers to actual numbers
+                  let numValue = value;
+                  if (typeof value === 'string' && !isNaN(parseFloat(value))) {
+                    numValue = parseFloat(value);
+                  }
+                  context.values[param.shortName] = numValue;
+                }
+              });
+              
+              // Add all parameter ratings to the context
+              Object.entries(dp.ratings || {}).forEach(([paramId, rating]) => {
+                const param = parameters.find(p => p.id === paramId);
+                if (param?.shortName) {
+                  context.ratings[param.shortName] = rating;
+                }
+              });
+              
+              try {
+                // Create a function from the formula and execute it with the context
+                let formula = output.formula.trim();
+                if (!formula.startsWith('return ') && !formula.includes('return ')) {
+                  formula = `return ${formula}`;
+                }
+                
+                const calculateOutput = new Function('values', 'ratings', formula);
+                return calculateOutput(context.values, context.ratings);
+              } catch (err) {
+                console.error(`Error calculating output for datapoint:`, err);
+                return 0;
+              }
+            });
+            
+            // Add the result to the report data
+            if (results.length > 0) {
+              // Format the result based on its type
+              const result = results[0];
+              if (Array.isArray(result)) {
+                reportData.normResults[output.name || output.id] = `${result[0]} ± ${result[1]}`;
+              } else if (typeof result === 'number') {
+                reportData.normResults[output.name || output.id] = result.toFixed(2);
+              } else {
+                reportData.normResults[output.name || output.id] = String(result);
+              }
+            }
+          } catch (err) {
+            console.error(`Error calculating output ${output.id}:`, err);
+          }
+        }
+      }
+      
       // Get the datapoint IDs to include in the URL
       const datapointIds = selectedDatapoints.join(',');
 
       // Determine classification based on total rating
       const classification = 
-        totalRating >= 0 ? "Ia" :
-        totalRating >= -4 ? "Ib" :
-        totalRating >= -10 ? "II" : "III";
+        calculatedRating >= 0 ? "Ia" :
+        calculatedRating >= -4 ? "Ib" :
+        calculatedRating >= -10 ? "II" : "III";
 
       // Create report data
       const reportData = {
@@ -171,17 +327,18 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           normName: selectedNorm.name,
           timestamp: new Date().toISOString(),
         },
+        normResults: {}, // Will be populated with calculation results
         parameters: selectedDps.map(dp => ({
           id: dp.id,
           values: dp.values,
           ratings: dp.ratings,
         })),
         ratings: selectedDps.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
-        totalRating,
+        totalRating: calculatedRating,
         classification,
-        recommendations: totalRating >= 0 
+        recommendations: calculatedRating >= 0 
           ? "No special measures required. Standard corrosion protection is sufficient."
-          : totalRating >= -10
+          : calculatedRating >= -10
             ? "Moderate corrosion protection measures recommended."
             : "Enhanced corrosion protection measures required.",
       };
@@ -189,36 +346,19 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       // Create the report
       const { report } = await createReport(reportData);
 
+      showToast("Report created successfully", "success", { id: toastId });
+      
       // Navigate to output view with the report ID and datapoint IDs
       window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
     } catch (err) {
       console.error("Error creating report:", err);
       setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
+      showToast(`Failed to create report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
       setNavigating(false);
     } finally {
       setIsSaving(false);
     }
   };
-
-  // Get selected project and zone from navigation state
-  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
-  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
-  const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
-
-  useEffect(() => {
-    const loadAnalysisData = async () => {
-      try {
-        const { data, error } = await supabase.from("analysis_parameters").select("*").order("created_at", { ascending: true });
-
-        if (error) throw error;
-        setParameters(data || []);
-      } catch (err) {
-        console.error("Error loading analysis data:", err);
-      }
-    };
-
-    loadAnalysisData();
-  }, []);
 
   const toggleDatapoint = (datapointId: string) => {
     // Handle special cases for select all/deselect all
@@ -242,6 +382,11 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         : [...prev, datapointId]
     );
   };
+
+  // Get selected project and zone from navigation state
+  const selectedProject = selectedProjectId ? projects.find((p) => p.id === selectedProjectId) : null;
+  const selectedField = selectedProject && selectedFieldId ? selectedProject.fields.find((f) => f.id === selectedFieldId) : null;
+  const selectedZone = selectedField && selectedZoneId ? selectedField.zones.find((z) => z.id === selectedZoneId) : null;
 
   if (showReport && selectedProject && selectedZone && selectedNorm) {
     return (
@@ -301,7 +446,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         {/* Analysis Result */}
         {selectedDatapoints.length > 0 && selectedNormId && (
           <AnalyseResult
-            key={`result-${selectedDatapoints.join("-")}-${selectedNormId}`}
+            key={`result-${selectedDatapoints.join("-")}-${selectedNormId}-${selectedNorm?.id || 'loading'}`}
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
             selectedDatapoints={selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
@@ -318,7 +463,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
               <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 {t("analysis.report_description")}
-            
               </p>
               {saveError && (
                 <div className="p-3 mb-4 text-sm rounded bg-destructive/10 text-destructive">

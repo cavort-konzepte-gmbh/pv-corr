@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { Zone } from "../types/projects";
 import { generateHiddenId } from "../utils/generateHiddenId";
+import { showToast } from "../lib/toast";
 
 export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hiddenId" | "datapoints">) => {
   if (!fieldId) {
@@ -12,6 +13,7 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
 
   if (fieldError) {
     console.error("Error finding field:", fieldError);
+    showToast(`Failed to create zone: ${fieldError.message}`, "error");
     throw fieldError;
   }
 
@@ -31,9 +33,12 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
 
   if (error) {
     console.error("Error creating zone:", error);
+    showToast(`Failed to create zone: ${error.message}`, "error");
     throw error;
   }
 
+  showToast("Zone created successfully", "success");
+  
   // Fetch complete zone data after creation
   await new Promise(resolve => setTimeout(resolve, 300));
   
@@ -50,6 +55,7 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
 
   if (fetchError) {
     console.error("Error fetching complete zone:", fetchError);
+    showToast(`Failed to fetch zone details: ${fetchError.message}`, "error");
     throw fetchError;
   }
 
@@ -84,19 +90,34 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       )
       .single();
 
-    if (error) throw error;
+    if (error) {
+      showToast(`Failed to update zone: ${error.message}`, "error");
+      throw error;
+    }
+    
+    showToast("Zone updated successfully", "success");
     return data;
   } catch (err) {
     console.error("Error updating zone:", err);
+    showToast(`Failed to update zone: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
     throw err;
   }
 };
 
 export const deleteZone = async (zoneId: string) => {
-  const { error } = await supabase.from("zones").delete().eq("id", zoneId);
+  try {
+    const { error } = await supabase.from("zones").delete().eq("id", zoneId);
 
-  if (error) {
-    console.error("Error deleting zone:", error);
-    throw error;
+    if (error) {
+      console.error("Error deleting zone:", error);
+      showToast(`Failed to delete zone: ${error.message}`, "error");
+      throw error;
+    }
+    
+    showToast("Zone deleted successfully", "success");
+  } catch (err) {
+    console.error("Error deleting zone:", err);
+    showToast(`Failed to delete zone: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    throw err;
   }
 };

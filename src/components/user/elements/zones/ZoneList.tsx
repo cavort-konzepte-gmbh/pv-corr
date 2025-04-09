@@ -5,6 +5,7 @@ import { ChevronRight, Edit2, Save, X, Building2, Wrench, Plus } from "lucide-re
 import { updateZone, deleteZone } from "../../../../services/zones";
 import { fetchProjects } from "../../../../services/projects";
 import { useEffect } from "react";
+import { showToast } from "../../../../lib/toast";
 import { supabase } from "../../../../lib/supabase";
 import { Language, useTranslation } from "../../../../types/language";
 import { FormHandler } from "../../../shared/FormHandler";
@@ -183,14 +184,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
 
   const handleAddZone = async () => {
     if (!newValues.name?.trim()) {
-      setError("Zone name is required");
+      showToast("Zone name is required", "error");
       return;
     }
     
     // Validate coordinates if provided
     if ((newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
         (newValues.longitude && !isValidCoordinate(newValues.longitude))) {
-      setError("Coordinates must be in decimal format (e.g., 57.123456)");
+      showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
       return;
     }
 
