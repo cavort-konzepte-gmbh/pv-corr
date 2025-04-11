@@ -30,7 +30,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [normParameters, setNormParameters] = useState<Set<string>>(new Set());
+  const [normParameters, setNormParameters] = useState<Map<string, string>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
   const [navigating, setNavigating] = useState(false);
@@ -52,8 +52,11 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       }
       
       // Create set of parameter IDs from norm
-      const paramIds = new Set(selectedNorm.parameters.map((p: any) => p.parameter_id));
-      setNormParameters(paramIds);
+      const paramMap = new Map();
+      selectedNorm.parameters.forEach((p: any) => {
+        paramMap.set(p.parameter_id, p.parameter_code);
+      });
+      setNormParameters(paramMap);
       
       // Initialize with a short delay to ensure all data is loaded
       setTimeout(() => {
@@ -142,18 +145,22 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
     // Calculate ratings for each parameter
     const parameterRatings: Record<string, { value: string; rating: number; unit?: string }> = {};
     
-    // Debug the datapoint values
-    console.log("Processing datapoint values:", datapoint.values);
+    if (!datapoint.values) {
+      console.warn("Datapoint has no values:", datapoint);
+      return { datapoint, parameterRatings: {}, outputs: {}, classification: { class: "N/A", stress: "No data" } };
+    }
     
     // Process each parameter in the datapoint values
     Object.entries(datapoint.values || {})
       .filter(([paramId]) => normParameters.has(paramId))
       .forEach(([paramId, value]) => {
         const parameter = parameterMap[paramId];
-        if (!parameter) return;
+        if (!parameter) {
+          console.warn(`Parameter ${paramId} not found in parameter map`);
+          return;
+        }
 
-        // Debug the parameter processing
-        console.log(`Processing parameter ${parameter.short_name || parameter.name} with value ${value}`);
+        const paramCode = normParameters.get(paramId) || parameter.shortName || parameter.name;
         
         // Execute rating logic code if available
         let rating = 0;
@@ -161,20 +168,16 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           try {
             // Create a function from the rating logic code
             const calculateRating = new Function("value", parameter.rating_logic_code);
-            console.log(`Executing rating logic for ${parameter.short_name || parameter.name}`);
             rating = calculateRating(value);
-            console.log(`Rating result: ${rating}`);
           } catch (err) {
-            console.error(`Error calculating rating for parameter ${parameter.short_name}:`, err);
+            console.error(`Error calculating rating for parameter ${parameter.shortName || parameter.name}:`, err);
           }
         } else {
           // If no rating logic code, use the datapoint's rating if available
           rating = (datapoint.ratings && datapoint.ratings[paramId]) || 0;
-          console.log(`Using existing rating: ${rating}`);
         }
 
-        const paramName = parameter.short_name || parameter.name;
-        parameterRatings[paramName] = {
+        parameterRatings[paramCode] = {
           value,
           rating,
           unit: parameter.unit,
@@ -186,18 +189,19 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
     // Get all ratings for parameters Z1-Z15
     const zRatings: Record<number, number> = {};
-    
-    // Debug the ratings
-    console.log("Datapoint ratings:", datapoint.ratings);
-    
+        
     // Process each parameter rating
     if (datapoint.ratings) {
       Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
+        // Get parameter info from map
         const param = parameterMap[paramId];
-        if (!param?.shortName) return;
+        if (!param) return;
+        
+        const paramCode = normParameters.get(paramId) || param.shortName || param.name;
+        if (!paramCode) return;
 
         // Match Z1-Z15 pattern
-        const match = param.shortName.match(/^Z(\d+)$/i);
+        const match = paramCode.match(/^Z(\d+)$/i);
         if (!match) return;
 
         const num = parseInt(match[1]);
@@ -207,9 +211,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       });
     }
 
-    // Debug Z ratings
-    console.log("Z ratings:", zRatings);
-    
     // Process each output formula from the norm configuration
     if (selectedNorm?.output_config && Array.isArray(selectedNorm.output_config)) {
       console.log("Processing output config:", selectedNorm.output_config);
@@ -340,7 +341,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium  mb-4">{t("analysis.results")}</h3>
+      <h3 className="text-lg font-medium mb-4">{t("analysis.results")}</h3>
 
       <div className="space-y-4">
         {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
@@ -348,7 +349,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
               <div className="font-medium ">{datapoint.name}</div>
               <div className="flex items-center gap-4">
-                <div className="text-sm ">{new Date(datapoint.timestamp).toLocaleString()}</div>
+                <div className="text-sm ">{datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}</div>
                 {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </div>
             </div>
@@ -381,7 +382,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                   <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>
                   <TableHeader>
                     <TableRow>
-                      <TableHead> {t("analysis.parameter")}</TableHead>
+                      <TableHead>{t("analysis.parameter")}</TableHead>
                       <TableHead>{t("analysis.value")}</TableHead>
                       <TableHead>{t("analysis.rating")}</TableHead>
                     </TableRow>
@@ -395,7 +396,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                           <TableCell className="p-2">
                             {value} {unit && <span className="text-secondary">({unit})</span>}
                           </TableCell>
-                          <TableCell className="p-2 ">{rating}</TableCell>
+                          <TableCell className="p-2">{rating}</TableCell>
                         </TableRow>
                       ))}
                   </TableBody>

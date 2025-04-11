@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { calculateZincLossRate, formatZincLossRate } from "../../services/calculations";
 import { supabase } from "../../lib/supabase";
+import { fetchDatapointsByZoneId } from "../../services/datapoints";
 
 interface AnalysisPanelProps {
   currentTheme: Theme;
@@ -44,9 +45,29 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [isCreateDisabled] = useState(true); // Set to true to disable the Create Report button
   const [parameters, setParameters] = useState<any[]>([]);
   const [navigating, setNavigating] = useState(false);
+  const [zoneDatapoints, setZoneDatapoints] = useState<Datapoint[]>([]);
   const t = useTranslation(currentLanguage);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch datapoints directly when zone changes
+  useEffect(() => {
+    const loadDatapoints = async () => {
+      if (selectedZoneId) {
+        try {
+          console.log("Fetching datapoints for analysis from zone:", selectedZoneId);
+          const datapoints = await fetchDatapointsByZoneId(selectedZoneId);
+          console.log("Fetched datapoints for analysis:", datapoints.length);
+          setZoneDatapoints(datapoints);
+        } catch (err) {
+          console.error("Error loading datapoints for analysis:", err);
+          showToast("Failed to load datapoints for analysis", "error");
+        }
+      }
+    };
+    
+    loadDatapoints();
+  }, [selectedZoneId]);
 
   // Handle norm selection
   useEffect(() => {
@@ -419,6 +440,11 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
     return <div className="p-6 text-center text-secondary">{t("datapoint.please_select_zone")}</div>;
   }
 
+  // Use directly fetched datapoints if available, otherwise use the ones from the zone
+  const availableDatapoints = zoneDatapoints.length > 0 
+    ? zoneDatapoints 
+    : (selectedZone?.datapoints || []);
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold text-primary mb-6">
@@ -435,7 +461,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         <AnalyseData
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
-          datapoints={selectedZone.datapoints}
+          datapoints={availableDatapoints}
           selectedDatapoints={selectedDatapoints}
           onToggleDatapoint={toggleDatapoint}
         />
@@ -454,7 +480,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             key={`result-${selectedDatapoints.join("-")}-${selectedNormId}-${selectedNorm?.id || 'loading'}`}
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
-            selectedDatapoints={selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
+            selectedDatapoints={availableDatapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
             selectedNorm={selectedNorm}
             project={selectedProject}
             zone={selectedZone}

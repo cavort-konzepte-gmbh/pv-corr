@@ -9,6 +9,7 @@ import DatapointList from "./elements/datapoints/DatapointList";
 import { fetchParameters } from "../../services/parameters";
 import ProjectSummary from "./elements/fields/ProjectSummary";
 import FieldSummary from "./elements/zones/FieldSummary";
+import { fetchDatapointsByZoneId } from "../../services/datapoints";
 import { Person } from "../../types/people";
 
 interface DatapointsProps {
@@ -44,6 +45,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   const [showFieldSummary, setShowFieldSummary] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [zoneDatapoints, setZoneDatapoints] = useState<Datapoint[]>([]);
   const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
@@ -61,6 +63,27 @@ const Datapoints: React.FC<DatapointsProps> = ({
     };
     loadParameters();
   }, []);
+
+  // Fetch datapoints directly when zone changes
+  useEffect(() => {
+    const loadDatapoints = async () => {
+      if (selectedZone?.id) {
+        try {
+          setLoading(true);
+          const datapoints = await fetchDatapointsByZoneId(selectedZone.id);
+          console.log("Fetched datapoints:", datapoints);
+          setZoneDatapoints(datapoints);
+        } catch (err) {
+          console.error("Error loading datapoints:", err);
+          setError("Failed to load datapoints");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadDatapoints();
+  }, [selectedZone?.id]);
 
   if (!project || !field || !selectedZone) {
     return <div className="p-6 text-center text-secondary">{translation("datapoint.please_select_zone")}</div>;
@@ -117,8 +140,8 @@ const Datapoints: React.FC<DatapointsProps> = ({
       <DatapointList
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
-        zoneId={selectedZone.id}
-        datapoints={selectedZone.datapoints || []}
+        zoneId={selectedZone.id || ""}
+        datapoints={zoneDatapoints.length > 0 ? zoneDatapoints : (selectedZone.datapoints || [])}
         parameters={filteredParameters}
         onProjectsChange={onProjectsChange}
       />

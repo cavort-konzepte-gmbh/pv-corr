@@ -12,6 +12,7 @@ import { FormHandler } from "../../../shared/FormHandler";
 import { createDatapoint } from "../../../../services/datapoints";
 import { deleteDatapoint } from "../../../../services/datapoints";
 import { showToast } from "../../../../lib/toast";
+import { fetchDatapointsByZoneId } from "../../../../services/datapoints";
 import { ParameterInput } from "../../../DatapointForm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Create a map of parameter id to parameter object for easier lookup
@@ -63,6 +65,28 @@ const DatapointList: React.FC<DatapointListProps> = ({
     );
     setParameterMap(map);
   }, [parameters]);
+
+  // Fetch datapoints directly when component mounts or zoneId changes
+  useEffect(() => {
+    const loadDatapoints = async () => {
+      if (zoneId) {
+        try {
+          setIsLoading(true);
+          const fetchedDatapoints = await fetchDatapointsByZoneId(zoneId);
+          console.log("Directly fetched datapoints:", fetchedDatapoints.length);
+          
+          // If we have datapoints from direct fetch but not from props, refresh the projects
+          if (fetchedDatapoints.length > 0 && datapoints.length === 0) {
+            const projects = await fetchProjects();
+            onProjectsChange(projects);
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadDatapoints();
+  }, [zoneId]);
 
   // Sort datapoints based on current sort field and direction
   const sortedDatapoints = React.useMemo(() => {
@@ -80,8 +104,8 @@ const DatapointList: React.FC<DatapointListProps> = ({
           break;
         case "parameter":
           if (sortParameter) {
-            const aValue = a.values[sortParameter] || "";
-            const bValue = b.values[sortParameter] || "";
+            const aValue = a.values?.[sortParameter] || "";
+            const bValue = b.values?.[sortParameter] || "";
             
             // Try to compare as numbers if possible
             const aNum = parseFloat(aValue);
@@ -217,7 +241,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
       setEditingDatapoint(datapoint.id);
       setEditingName(datapoint.name);
       // Create a copy of the values to prevent direct modification
-      setEditingValues({ ...datapoint.values });
+      setEditingValues({ ...(datapoint.values || {}) });
     }
   };
 
@@ -404,7 +428,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                             rangeType: param.rangeType,
                             rangeValue: param.rangeValue,
                           }}
-                          value={editingValues[param.id] || datapoint.values[param.id] || ""}
+                          value={editingValues[param.id] || datapoint.values?.[param.id] || ""}
                           onChange={(value) =>
                             setEditingValues((prev) => ({
                               ...prev,
@@ -415,7 +439,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           disabled={isProcessing}
                         />
                       ) : (
-                        <span>{datapoint.values[param.id] !== undefined ? datapoint.values[param.id] : "-"}</span>
+                        <span>{datapoint.values?.[param.id] !== undefined ? datapoint.values[param.id] : "-"}</span>
                       )}
                     </TableCell>
                   ))}
@@ -458,6 +482,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
           </Table>
         </div>
       </section>
+      
+      {isLoading && datapoints.length === 0 && (
+        <div className="mt-4 p-4 text-center text-muted-foreground">
+          Loading datapoints...
+        </div>
+      )}
+      
+      {!isLoading && datapoints.length === 0 && (
+        <div className="mt-4 p-4 text-center text-muted-foreground">
+          No datapoints found. Add your first datapoint using the button below.
+        </div>
+      )}
       
       <Button 
         onClick={() => setIsAdding(true)} 

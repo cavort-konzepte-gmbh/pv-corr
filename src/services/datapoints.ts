@@ -170,7 +170,12 @@ export const createDatapoint = async (
 export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {
   try {
     console.log("Fetching datapoints for zone:", zoneId);
-
+    
+    if (!zoneId) {
+      console.error("No zone ID provided for fetching datapoints");
+      return [];
+    }
+    
     // Remove any 'uuid.' prefix if present
     const cleanZoneId = zoneId.startsWith('uuid.') ? zoneId.substring(5) : zoneId;
     
@@ -192,28 +197,29 @@ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint
     if (!zoneExists) {
       throw new Error(`Zone with ID ${cleanZoneId} not found`);
     }
-
-    const { data: result, error } = await supabase.rpc('handle_datapoint_operation', {
-      dp_id: null,
-      dp_name: null,
-      dp_values: { zone_id: cleanZoneId },
-      operation: 'get_by_zone'
-    });
+    
+    // Directly query the datapoints table instead of using RPC
+    const { data, error } = await supabase
+      .from("datapoints")
+      .select("*")
+      .eq("zone_id", cleanZoneId)
+      .order("timestamp", { ascending: false });
 
     if (error) {
-      console.error("Error in RPC call:", error);
+      console.error("Error fetching datapoints:", error);
       throw error;
     }
     
-    if (result && result.success === false) {
-      console.error("RPC returned error:", result.error);
-      throw new Error(result.error);
+    if (!data) {
+      console.warn("No datapoints found for zone:", cleanZoneId);
+      return [];
     }
-
-    console.log("Datapoints fetched successfully:", result?.data?.length || 0);
-    return result.data || [];
+    
+    console.log("Datapoints fetched successfully:", data.length);
+    return data;
   } catch (err) {
     console.error("Error fetching datapoints:", err);
-    throw err;
+    // Return empty array instead of throwing to prevent UI errors
+    return [];
   }
 };
