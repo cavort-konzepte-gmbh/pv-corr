@@ -227,7 +227,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         if (!parameter) return;
 
         // Debug the parameter processing
-        console.log(`Processing parameter ${parameter.shortName || parameter.name} with value ${value}`);
+        console.log(`Processing parameter ${parameter.short_name || parameter.name} with value ${value}`);
         
         // Execute rating logic code if available
         let rating = 0;
@@ -235,7 +235,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           try {
             // Create a function from the rating logic code
             const calculateRating = new Function("value", parameter.rating_logic_code);
-            console.log(`Executing rating logic for ${parameter.shortName || parameter.name}`);
+            console.log(`Executing rating logic for ${parameter.short_name || parameter.name}`);
             rating = calculateRating(value);
             console.log(`Rating result: ${rating}`);
           } catch (err) {
@@ -247,7 +247,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           console.log(`Using existing rating: ${rating}`);
         }
 
-        const paramName = parameter.shortName || parameter.name;
+        const paramName = parameter.short_name || parameter.name;
         parameterRatings[paramName] = {
           value,
           rating,
@@ -299,14 +299,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             // Add all parameter values to the context
             Object.entries(datapoint.values || {}).forEach(([paramId, value]) => {
               const param = parameterMap[paramId];
-              if (param?.shortName) {
+              if (param?.short_name || param?.name) {
                 // Convert string numbers to actual numbers
                 let numValue = value;
                 if (typeof value === 'string' && !isNaN(parseFloat(value))) {
                   numValue = parseFloat(value);
                 }
-                console.log(`Setting context value ${param.shortName} = ${numValue}`);
-                context.values[param.shortName] = numValue;
+                console.log(`Setting context value ${param.short_name || param.name} = ${numValue}`);
+                context.values[param.id] = numValue;
               }
             });
             
@@ -314,9 +314,9 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             if (datapoint.ratings) {
               Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
               const param = parameterMap[paramId];
-              if (param?.shortName) {
-                console.log(`Setting context rating ${param.shortName} = ${rating}`);
-                context.ratings[param.shortName] = rating;
+              if (param?.short_name) {
+                console.log(`Setting context rating ${param.short_name} = ${rating}`);
+                context.ratings[param.short_name] = rating;
               }
               });
             }
@@ -335,11 +335,10 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                 formula = `return ${formula}`;
               }
               
-              console.log(`Executing formula for ${output.id}: ${formula}`);
               try {
                 const calculateOutput = new Function('values', 'ratings', formula);
                 const result = calculateOutput(context.values, context.ratings);
-                
+
                 // Handle array results (like zinc loss rate)
                 if (Array.isArray(result)) {
                   // Store the first value for display purposes
