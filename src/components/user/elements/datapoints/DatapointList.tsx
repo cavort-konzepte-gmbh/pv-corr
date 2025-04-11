@@ -152,6 +152,8 @@ const DatapointList: React.FC<DatapointListProps> = ({
     
     try {
       console.log("Adding new datapoint for zone:", zoneId);
+      console.log("Zone ID type:", typeof zoneId);
+      console.log("Zone ID value:", zoneId);
       
       if (!newName.trim()) {
         showToast("Datapoint name is required", "error");
@@ -222,9 +224,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
           name: editingName.trim(),
         };
         
+        // Update the datapoint
         await updateDatapoint(datapoint.id, updateData);
+        
+        // Refresh the datapoints list directly
+        const refreshedDatapoints = await fetchDatapointsByZoneId(zoneId);
+        
+        // Also refresh projects to ensure UI consistency
         const projects = await fetchProjects();
         onProjectsChange(projects);
+        
+        // Show success message
+        showToast("Datapoint updated successfully", "success");
         
         setEditingDatapoint(null);
         setEditingName("");
@@ -241,7 +252,8 @@ const DatapointList: React.FC<DatapointListProps> = ({
       setEditingDatapoint(datapoint.id);
       setEditingName(datapoint.name);
       // Create a copy of the values to prevent direct modification
-      setEditingValues({ ...(datapoint.values || {}) });
+      // Ensure we're working with a copy and handle potential undefined values
+      setEditingValues(datapoint.values ? { ...datapoint.values } : {});
     }
   };
 

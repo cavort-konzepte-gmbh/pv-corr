@@ -3,10 +3,17 @@ import { generateHiddenId } from "../utils/generateHiddenId";
 import { Datapoint } from "../types/projects";
 import { showToast } from "../lib/toast";
 
+// Helper function to convert string to UUID format
+const toUUID = (id: string) => {
+  // Remove any 'uuid.' prefix if present
+  const cleanId = id.startsWith('uuid.') ? id.substring(5) : id;
+  return cleanId;
+};
+
 export const deleteDatapoint = async (datapointId: string) => {
   try {
-    const { data, error } = await supabase.rpc('handle_datapoint_operation', {
-      dp_id: datapointId,
+    const { data, error } = await supabase.rpc('handle_datapoint_operation_v2', {
+      dp_id: toUUID(datapointId),
       dp_name: null,
       dp_values: null,
       operation: 'delete'
@@ -48,18 +55,21 @@ export const updateDatapoint = async (
       const value = processedValues[key];
       // Skip conversion for special values like 'impurities'
       if (typeof value === 'string' && value !== 'impurities' && value.trim() !== '' && !isNaN(parseFloat(value))) {
-        processedValues[key] = parseFloat(value);
+        // Keep as string to ensure consistent handling
+        processedValues[key] = value;
       }
     });
     
     console.log("Processed values:", processedValues);
     
-    const { data: result, error } = await supabase.rpc('handle_datapoint_operation', {
-      dp_id: datapointId,
-      dp_name: data.name.trim(),
-      dp_values: processedValues,
-      operation: 'update'
-    });
+    const { data: result, error } = await supabase
+      .from('datapoints')
+      .update({
+        name: data.name.trim(),
+        values: processedValues
+      })
+      .eq('id', toUUID(datapointId))
+      .select('*');
 
     if (error) {
       showToast(`Failed to update datapoint: ${error.message}`, "error");
@@ -68,7 +78,21 @@ export const updateDatapoint = async (
 
     console.log("Datapoint updated successfully");
     showToast("Datapoint updated successfully", "success");
-    return result.data;
+    
+    const { data: zoneData, error: zoneError } = await supabase
+      .from('datapoints')
+      .select('zone_id')
+      .eq('id', toUUID(datapointId))
+      .single();
+      
+    if (zoneError) {
+      console.error("Error fetching zone_id:", zoneError);
+    } else if (zoneData?.zone_id) {
+      // Refresh datapoints after update
+      await fetchDatapointsByZoneId(zoneData.zone_id);
+    }
+    
+    return result;
   } catch (err) {
     console.error("Error updating datapoint:", err);
     showToast(`Failed to update datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
@@ -87,6 +111,8 @@ export const createDatapoint = async (
 ) => {
   try {
     console.log("Creating datapoint for zone:", zoneId);
+    console.log("Zone ID type:", typeof zoneId);
+    console.log("Zone ID value:", zoneId);
     
     // Validate zoneId
     if (!zoneId || typeof zoneId !== 'string' || zoneId.trim() === '') {
@@ -96,8 +122,9 @@ export const createDatapoint = async (
       throw new Error(error);
     }
 
-    // Remove any 'uuid.' prefix if present
-    const cleanZoneId = zoneId.startsWith('uuid.') ? zoneId.substring(5) : zoneId;
+    // Convert zoneId to UUID format
+    const zoneUUID = toUUID(zoneId);
+    console.log("Converted Zone UUID:", zoneUUID);
 
     // Process values to ensure proper number formatting
     const processedValues = { ...data.values };
@@ -119,12 +146,12 @@ export const createDatapoint = async (
       values: processedValues,
       ratings: data.ratings,
       timestamp: new Date().toISOString(),
-      zone_id: cleanZoneId
+      zone_id: zoneUUID // Use the converted UUID
     };
 
     console.log("Full datapoint data being sent:", JSON.stringify(datapointData, null, 2));
 
-    const { data: result, error } = await supabase.rpc('handle_datapoint_operation', {
+    const { data: result, error } = await supabase.rpc('handle_datapoint_operation_v2', {
       dp_id: null,
       dp_name: data.name.trim(),
       dp_values: datapointData,
@@ -176,33 +203,30 @@ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint
       return [];
     }
     
-    // Remove any 'uuid.' prefix if present
-    const cleanZoneId = zoneId.startsWith('uuid.') ? zoneId.substring(5) : zoneId;
-    
     // First check if the zone exists
     const { data: zoneExists, error: zoneError } = await supabase
       .from("zones")
       .select("id")
-      .eq("id", cleanZoneId)
+      .eq("id", toUUID(zoneId))
       .single();
       
     if (zoneError) {
       console.error("Error checking zone existence:", zoneError);
       if (zoneError.code === 'PGRST116') {
-        throw new Error(`Zone with ID ${cleanZoneId} not found`);
+        throw new Error(`Zone with ID ${zoneId} not found`);
       }
       throw zoneError;
     }
     
     if (!zoneExists) {
-      throw new Error(`Zone with ID ${cleanZoneId} not found`);
+      throw new Error(`Zone with ID ${zoneId} not found`);
     }
-    
-    // Directly query the datapoints table instead of using RPC
+
+    // Query datapoints
     const { data, error } = await supabase
       .from("datapoints")
       .select("*")
-      .eq("zone_id", cleanZoneId)
+      .eq("zone_id", toUUID(zoneId))
       .order("timestamp", { ascending: false });
 
     if (error) {
@@ -211,7 +235,7 @@ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint
     }
     
     if (!data) {
-      console.warn("No datapoints found for zone:", cleanZoneId);
+      console.warn("No datapoints found for zone:", zoneId);
       return [];
     }
     
