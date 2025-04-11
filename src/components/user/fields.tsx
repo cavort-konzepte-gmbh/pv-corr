@@ -53,6 +53,24 @@ const Fields: React.FC<FieldsProps> = ({
     }
   }, [selectedProjectId]);
   
+  // Refresh projects data when component mounts or when selectedProjectId changes
+  useEffect(() => {
+    if (selectedProjectId) {
+      const refreshProjects = async () => {
+        try {
+          const updatedProjects = await fetchProjects();
+          if (updatedProjects) {
+            onProjectsChange(updatedProjects);
+          }
+        } catch (err) {
+          console.error("Error refreshing projects:", err);
+        }
+      };
+      
+      refreshProjects();
+    }
+  }, [selectedProjectId]);
+  
   // Safely find the selected project with error handling
   const selectedProject = (() => {
     try {

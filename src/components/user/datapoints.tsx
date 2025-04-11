@@ -4,11 +4,11 @@ import { Language, useTranslation } from "../../types/language";
 import { Project, Zone } from "../../types/projects";
 import { Parameter } from "../../types/parameters";
 import ZoneSummary from "./elements/datapoints/ZoneSummary";
+import FieldSummary from "./elements/zones/FieldSummary";
+import ProjectSummary from "./elements/fields/ProjectSummary";
 import ParameterFilter from "./elements/datapoints/ParameterFilter";
 import DatapointList from "./elements/datapoints/DatapointList";
 import { fetchParameters } from "../../services/parameters";
-import ProjectSummary from "./elements/fields/ProjectSummary";
-import FieldSummary from "./elements/zones/FieldSummary";
 import { fetchDatapointsByZoneId } from "../../services/datapoints";
 import { Person } from "../../types/people";
 
@@ -25,6 +25,7 @@ interface DatapointsProps {
   onBack: () => void;
   onProjectsChange: (projects: Project[]) => void;
   savedPeople?: Person[];
+  companies?: Company[];
   selectedCustomerId: string | null;
 }
 
@@ -37,6 +38,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
   onBack,
   onProjectsChange,
   savedPeople = [],
+  companies = [],
   selectedCustomerId,
 }) => {
   const [parameters, setParameters] = useState<Parameter[]>([]);
@@ -101,6 +103,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
     <div className="p-6">
       <ProjectSummary
         isExpanded={showProjectSummary}
+        isExpanded={showProjectSummary}
         onToggle={() => setShowProjectSummary(!showProjectSummary)}
         project={project}
         manager={savedPeople?.find((p) => p.id === project.managerId)}
@@ -109,6 +112,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         onProjectsChange={onProjectsChange}
+        onToggle={() => setShowProjectSummary(!showProjectSummary)}
         selectedCustomerId={selectedCustomerId}
       />
 

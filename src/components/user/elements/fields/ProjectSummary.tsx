@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Theme } from "../../../../types/theme";
 import { Project } from "../../../../types/projects";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from "lucide-react";
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload, FolderOpen } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { Language, useTranslation } from "../../../../types/language";
 import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
@@ -48,6 +48,19 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
     longitude: project.longitude || "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
+
+  // Sort people alphabetically
+  useEffect(() => {
+    if (savedPeople && savedPeople.length > 0) {
+      const sorted = [...savedPeople].sort((a, b) => 
+        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+      );
+      setSortedPeople(sorted);
+    } else {
+      setSortedPeople([]);
+    }
+  }, [savedPeople]);
 
   const handleSave = async () => {
     try {
@@ -113,28 +126,31 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                 <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Building2 size={16} />
-                      <div className="flex items-center gap-4">
-                        <span>{project.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.typeProject === "field" ? translation("project.type.field") : translation("project.type.roof")}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.fields.length} {translation("fields")}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border ">
-                            {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20">
-                            {project.fields.reduce(
-                              (acc, field) => acc + field.zones.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0),
-                              0,
-                            )}{" "}
-                            {translation("datapoints")}
-                          </span>
-                        </div>
-                      </div>
+                      <span className="project-overview-title">PROJECT OVERVIEW</span>
+                      <span className="text-lg">{project.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {project.fields?.length || 0}
+                        </span>
+                        <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
+                        </span>
+                        <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {project.fields?.reduce(
+                            (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
+                            0,
+                          ) || 0}
+                        </span>
+                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -216,7 +232,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">{translation("project.manager.not_assigned")}</option>
-                      {savedPeople.map((person) => (
+                      {sortedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
                         </option>

@@ -4,7 +4,6 @@ import { Language, useTranslation } from "../../types/language";
 import { Project, Zone } from "../../types/projects";
 import { FileText, FileCheck } from "lucide-react";
 import AnalysisReport from "./AnalysisReport";
-import { useAuth } from "../auth/AuthProvider";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import AnalyseData from "./AnalyseData";
 import AnalyseNorm from "./AnalyseNorm";
@@ -42,12 +41,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [selectedNorm, setSelectedNorm] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [isCreateDisabled] = useState(true); // Set to true to disable the Create Report button
   const [parameters, setParameters] = useState<any[]>([]);
   const [navigating, setNavigating] = useState(false);
   const [zoneDatapoints, setZoneDatapoints] = useState<Datapoint[]>([]);
   const t = useTranslation(currentLanguage);
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Fetch datapoints directly when zone changes
@@ -447,15 +444,6 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-primary mb-6">
-        {t("analysis.title")}
-        {selectedProject && (
-          <span className="text-sm El text-secondary-foreground ml-2">
-            {selectedProject.name} {selectedField && `→ ${selectedField.name}`} {selectedZone && `→ ${selectedZone.name}`}
-          </span>
-        )}
-      </h2>
-
       <div className="space-y-6">
         {/* Analysis Table */}
         <AnalyseData

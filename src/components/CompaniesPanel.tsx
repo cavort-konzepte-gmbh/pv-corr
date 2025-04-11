@@ -39,7 +39,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   const [selectedCeoId, setSelectedCeoId] = useState<string>("");
   const [selectedContactId, setSelectedContactId] = useState<string>("");
   const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
-  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]); 
+  const [sortedCompanies, setSortedCompanies] = useState<Company[]>([]);
+  const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
   const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
@@ -55,6 +57,25 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
 
     loadData();
   }, []);
+
+  // Sort companies and people alphabetically
+  useEffect(() => {
+    if (savedCompanies && savedCompanies.length > 0) {
+      const sorted = [...savedCompanies].sort((a, b) => a.name.localeCompare(b.name));
+      setSortedCompanies(sorted);
+    } else {
+      setSortedCompanies([]);
+    }
+    
+    if (availablePeople && availablePeople.length > 0) {
+      const sorted = [...availablePeople].sort((a, b) => 
+        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+      );
+      setSortedPeople(sorted);
+    } else {
+      setSortedPeople([]);
+    }
+  }, [savedCompanies, availablePeople]);
 
   const fetchCompanies = async () => {
     try {
@@ -189,7 +210,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       className="w-full p-2 rounded text-sm appearance-none text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">Select CEO</option>
-                      {availablePeople.map((person) => (
+                      {sortedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.salutation} {person.title ? `${person.title} ` : ""}
                           {person.firstName} {person.lastName}
@@ -211,7 +232,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                       className="w-full p-2 rounded text-sm appearance-none text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">Select Contact Person</option>
-                      {availablePeople.map((person) => (
+                      {sortedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.salutation} {person.title ? `${person.title} ` : ""}
                           {person.firstName} {person.lastName}
@@ -246,7 +267,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {savedCompanies.map((company) => (
+              {sortedCompanies.map((company) => (
                 <div
                   key={company.id}
                   className="p-4 rounded-lg border transition-all hover:translate-x-1 border-accent text-card-foreground"

@@ -1,12 +1,13 @@
 import React from "react";
 import { Theme } from "../../types/theme";
 import { Customer } from "../../types/customers";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Building2, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import CustomerList from "./elements/customers/CustomerList";
 import { Person } from "../../types/people";
 import { Company } from "../../types/companies";
 import { fetchProjects } from "../../services/projects";
+import { Button } from "../ui/button";
 
 interface CustomersProps {
   currentTheme: Theme;
@@ -27,6 +28,17 @@ const Customers: React.FC<CustomersProps> = ({
 }) => {
   const [hasUncategorizedProjects, setHasUncategorizedProjects] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sortedCustomers, setSortedCustomers] = useState<Customer[]>([]);
+
+  // Sort customers alphabetically
+  useEffect(() => {
+    if (customers && customers.length > 0) {
+      const sorted = [...customers].sort((a, b) => a.name.localeCompare(b.name));
+      setSortedCustomers(sorted);
+    } else {
+      setSortedCustomers([]);
+    }
+  }, [customers]);
 
   // Check if there are any uncategorized projects
   useEffect(() => {
@@ -63,7 +75,7 @@ const Customers: React.FC<CustomersProps> = ({
 
       <CustomerList
         currentTheme={currentTheme}
-        customers={customers}
+        customers={sortedCustomers}
         savedPeople={savedPeople}
         savedCompanies={savedCompanies}
         onSelectCustomer={onSelectCustomer}

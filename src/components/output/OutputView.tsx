@@ -614,9 +614,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                                 {paramDetail.name || key}
                               </TableCell>
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{value}</TableCell>
-                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
-                                {paramDetail.unit || "-"}
-                              </TableCell>
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{paramDetail.unit || "-"}</TableCell>
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
                                 {rating !== undefined ? (
                                   <div className="flex items-center gap-2">
@@ -709,170 +707,16 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               <h3 className="text-base font-medium mb-3">{t("analysis.norm_specific_results")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(reportData.currentVersion.content.normResults).map(([key, value]) => (
-                  <div key={key} className="p-3 border border-input rounded-md">
-                    <div className="text-sm font-medium text-muted-foreground">{key}</div>
-                    <div className="text-lg mt-1 text-foreground print:text-black">
-                      {String(value)}
-                    </div>
+                  <div key={key} className="p-4 border border-input rounded-lg">
+                    <div className="text-sm font-medium mb-1">{key}</div>
+                    <div className="text-2xl font-bold">{value}</div>
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          <div>
-            <div className="text-sm font-medium text-muted-foreground mb-2 print:text-gray-600">{t("analysis.recommendations")}</div>
-            <div className="text-foreground print:text-black">
-              {reportData?.currentVersion?.recommendations || (
-                totalRating >= 0 
-                  ? "No special measures required. Standard corrosion protection is sufficient."
-                  : totalRating >= -10
-                    ? "Moderate corrosion protection measures recommended."
-                    : "Enhanced corrosion protection measures required."
-              )}
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Report Footer */}
-      <div className="text-sm text-muted-foreground border-t border-input pt-4 print:text-gray-600 print:border-t print:border-gray-300">
-        <div className="flex justify-between items-center">
-          <div>
-            <div className="flex items-center gap-2 print:block">
-              <User size={14} />
-              <span>{analyst?.name}</span>
-              {analyst?.title && <span>• {analyst.title}</span>}
-              {analyst?.email && <span>• {analyst.email}</span>}
-            </div>
-            <div className="flex items-center gap-2 print:block">
-              <Calendar size={14} />
-              <span>{new Date(reportData.currentVersion.created_at).toLocaleDateString()}</span>
-            </div>
-          </div>
-          <div className="text-right print:hidden">
-            <div>
-              {t("analysis.software_version")}: {currentVersion}
-            </div>
-            <div>{t("analysis.page")} 1/1</div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Print Styles - only applied when printing */}
-      <style type="text/css" media="print">{`
-@page {
-  size: A4;
-  margin: 1.5cm;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  color: black;
-  background: white;
-  margin: 0;
-  padding: 0;
-}
-
-.print\\:p-0 {
-  padding: 0 !important;
-}
-
-.print\\:p-4 {
-  padding: 1rem !important;
-}
-
-.print\\:border {
-  border: 1px solid #000 !important;
-}
-
-.print\\:border-collapse {
-  border-collapse: collapse !important;
-}
-
-.print\\:border-t {
-  border-top: 1px solid #000 !important;
-}
-
-.print\\:border-black {
-  border-color: #000 !important;
-}
-
-.print\\:border-gray-300 {
-  border-color: #d1d5db !important;
-}
-
-.print\\:text-black {
-  color: #000 !important;
-}
-
-.print\\:hidden {
-  display: none !important;
-}
-
-.print\\:block {
-  display: block !important;
-}
-
-.print\\:text-gray-600 {
-  color: #4b5563 !important;
-}
-
-
-.print\\:text-transparent {
-  color: transparent !important;
-}
-
-.print\\:page-break-before-avoid {
-  page-break-before: avoid !important;
-}
-
-.print\\:page-break-after-avoid {
-  page-break-after: avoid !important;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-}
-
-th, td {
-  border: 1px solid #000;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  font-weight: bold;
-  background-color: #f9fafb;
-}
-
-.print\\:hidden {
-  display: none !important;
-}
-
-/* Hide browser UI elements when printing */
-@media print {
-  nav, header, footer, button, .print\\:hidden {
-    display: none !important; 
-  }
-
-  .hidden.print\\:block {
-    display: block !important;
-  }
-
-  /* Hide user and version info in the footer */
-  .text-right {
-    display: none !important;
-  }
-  
-  /* Ensure page breaks don't happen inside elements */
-  table, tr, td, th {
-    page-break-inside: avoid;
-  }
-}
-      `}</style>
     </div>
   );
 };

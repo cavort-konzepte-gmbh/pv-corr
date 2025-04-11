@@ -82,7 +82,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             short_name,
             unit,
             rating_logic_code
-          `,
+          `
           )
           .order("created_at", { ascending: true });
 
@@ -345,21 +345,27 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
       <div className="space-y-4">
         {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
-          <div key={datapoint.id} className="p-4 rounded-lg border border-theme ">
-            <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
-              <div className="font-medium ">{datapoint.name}</div>
-              <div className="flex items-center gap-4">
-                <div className="text-sm ">{datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}</div>
-                {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          <div key={datapoint.id} className="p-4 rounded-lg border border-theme">
+            <div className="flex flex-col gap-1 mb-3">
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
+                <div className="font-medium text-primary">
+                  <span className="font-medium">Datapoint:</span> {datapoint.name}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium">Created:</span> {datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}
+                  </div>
+                  {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
               </div>
             </div>
-
+            
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 {Array.isArray(selectedNorm?.output_config) && selectedNorm.output_config.map((output: any) => (
                   output && output.id && (
-                  <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20  bg-border" title={output.description}>
-                    {output.name}: {(() => {
+                  <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20 bg-border" title={output.description}>
+                    <span className="font-medium">{output.name}:</span> {(() => {
                       // Special handling for array outputs like zinc loss rate
                       if (Array.isArray(outputs[`${output.id}_full`])) {
                         return `${outputs[`${output.id}_full`][0]} ± ${outputs[`${output.id}_full`][1]}`;
@@ -394,7 +400,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                         <TableRow key={code}>
                           <TableCell className="p-2">{code.toUpperCase()}</TableCell>
                           <TableCell className="p-2">
-                            {value} {unit && <span className="text-secondary">({unit})</span>}
+                            {value} {unit && <span className="text-muted-foreground ml-1">[{unit}]</span>}
                           </TableCell>
                           <TableCell className="p-2">{rating}</TableCell>
                         </TableRow>
@@ -406,7 +412,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           </div>
         ))}
       </div>
-      
     </div>
   );
 };

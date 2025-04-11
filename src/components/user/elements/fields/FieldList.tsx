@@ -364,12 +364,18 @@ const FieldList: React.FC<FieldListProps> = ({
                       <div onClick={() => editingId !== field.id && onSelectField(field.id)}>
                         <div className="flex items-center gap-2">
                           <span>{field.name}</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                              {field.zones?.length || 0} {translation("zones").toLowerCase()}
+                          <div className="flex items-center gap-3 ml-2">
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {field.zones?.length || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("zones")}</span>
                             </span>
-                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                              {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints").toLowerCase()}
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("datapoints")}</span>
                             </span>
                           </div>
                         </div>
@@ -474,7 +480,15 @@ const FieldList: React.FC<FieldListProps> = ({
                         {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {editingId === field.id && (
-                        <Button onClick={(event) => handleRemoveField(event, field)} className="size-8" variant="ghost">
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(null);
+                            setEditingValues({});
+                          }} 
+                          className="size-8" 
+                          variant="ghost"
+                        >
                           <X size={14} />
                         </Button>
                       )}

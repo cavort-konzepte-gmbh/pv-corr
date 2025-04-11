@@ -7,6 +7,7 @@ import { generateHiddenId } from "../utils/generateHiddenId";
 import { Project, Zone } from "../types/projects";
 import { Company } from "../types/companies";
 import { Customer } from "../types/customers";
+import BreadcrumbNavigation from "./BreadcrumbNavigation";
 import { Standard, STANDARDS } from "../types/standards";
 import { fetchProjects } from "../services/projects";
 import { fetchReports } from "../services/reports";
@@ -669,6 +670,13 @@ const DashboardLayout = () => {
           </div>
         </div>
 
+        {/* Breadcrumb Navigation */}
+        <BreadcrumbNavigation 
+          currentLanguage={currentLanguage}
+          projects={projects}
+          customers={customers}
+        />
+
         {/* Main Content */}
         <div className="flex-1">
           {error && (
@@ -679,7 +687,7 @@ const DashboardLayout = () => {
           {renderContent()}
         </div>
         {loading && (
-          <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="flex-1 flex items-center justify-center bg-background">
             <div className="text-sm text-muted-foreground">Loading application data...</div>
           </div>
         )}

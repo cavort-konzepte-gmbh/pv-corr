@@ -6,9 +6,9 @@ import { Person } from "../../types/people";
 import { Company } from "../../types/companies";
 import { useState } from "react";
 import FieldSummary from "./elements/zones/FieldSummary";
+import ProjectSummary from "./elements/fields/ProjectSummary";
 import ZoneList from "./elements/zones/ZoneList";
 import ZoneForm from "./elements/zones/ZoneForm";
-import ProjectSummary from "./elements/fields/ProjectSummary";
 
 interface ZonesProps {
   currentTheme: Theme;
@@ -57,10 +57,6 @@ const Zones: React.FC<ZonesProps> = ({
     }
   })();
 
-  if (!selectedProject || !selectedField) {
-    return <div className="p-6 text-center">{transition("zones.please_select_field")}</div>;
-  }
-
   // Safely find manager and company with error handling
   const manager = (() => {
     try {
@@ -81,6 +77,10 @@ const Zones: React.FC<ZonesProps> = ({
       return null;
     }
   })();
+
+  if (!selectedProject || !selectedField) {
+    return <div className="p-6 text-center">{transition("zones.please_select_field")}</div>;
+  }
 
   const [showProjectSummary, setShowProjectSummary] = useState(false);
 

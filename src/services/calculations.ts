@@ -97,7 +97,7 @@ export const calculateZincLossRate = (
  */
 export const formatZincLossRate = (zincLossRate: number[]): string => {
   if (!Array.isArray(zincLossRate) || zincLossRate.length < 2) {
-    return "0 μm/year";
+    return "0 [μm/year]";
   }
-  return `${zincLossRate[0]} ± ${zincLossRate[1]} μm/year`;
+  return `${zincLossRate[0]} ± ${zincLossRate[1]} [μm/year]`;
 };

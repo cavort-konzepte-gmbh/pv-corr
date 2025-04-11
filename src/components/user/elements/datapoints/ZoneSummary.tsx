@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Theme } from "../../../../types/theme";
 import { Zone } from "../../../../types/projects";
-import { Edit2, Save, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Edit2, Save, X, ChevronDown, ChevronRight, Map } from "lucide-react";
 import { Language, useTranslation } from "../../../../types/language";
 import { updateZone } from "../../../../services/zones";
 import { fetchProjects } from "../../../../services/projects";
@@ -65,11 +65,13 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
               <TableRow>
                 <TableHead
                   colSpan={2}
-                  className="p-4 text-left border-b font-semibold border-accent"
+                  className="p-4 text-left font-semibold text-card-foreground cursor-pointer"
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="project-overview-title">ZONE OVERVIEW</span>
+                      <span className="text-lg">
                       {isEditing ? (
                         <Input
                           type="text"
@@ -78,14 +80,16 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           className="p-1 rounded text-sm text-primary "
                           onClick={(e) => e.stopPropagation()}
                         />
-                      ) : (
-                        <span>{zone.name}</span>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                          {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
+                      ) : zone.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {zone.datapoints?.length || 0}
                         </span>
-                      </div>
+                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -114,8 +118,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsEditing(true);
-                          }}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          }} 
+                          className="size-8 p-1 rounded hover:bg-opacity-80"
                         >
                           <Edit2 size={14} />
                         </Button>
@@ -169,6 +173,9 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                       </div>
                     ) : zone.latitude && zone.longitude ? (
                       <div className="flex items-center justify-between">
+                        <span>
+                          {zone.latitude?.toString()}, {zone.longitude?.toString()}
+                        </span>
                         <Button
                           onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank")}
                           className="text-xs h-8 px-2"

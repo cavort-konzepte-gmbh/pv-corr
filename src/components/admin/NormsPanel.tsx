@@ -454,7 +454,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                                   <div className="flex-1">
                                     <div className="flex items-center gap-1">
                                       <span className="text-sm">{param.shortName || param.name}</span>
-                                      {param.unit && <span className="text-xs text-muted-foreground">({param.unit})</span>}
+                                      {param.unit && <span className="text-xs text-muted-foreground">{param.unit}</span>}
                                       <div className="relative group">
                                         <Info size={12} className="text-muted-foreground cursor-help" />
                                         <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">

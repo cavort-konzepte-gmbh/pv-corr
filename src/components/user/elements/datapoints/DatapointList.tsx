@@ -3,7 +3,7 @@ import { Theme } from "../../../../types/theme";
 import { Language, useTranslation } from "../../../../types/language";
 import { Parameter } from "../../../../types/parameters";
 import { Datapoint } from "../../../../types/projects";
-import { Edit2, Save, X, Upload, Clock, Plus } from "lucide-react";
+import { Edit2, Save, X, Upload, Clock, Plus, Trash2 } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { fetchProjects } from "../../../../services/projects";
@@ -342,7 +342,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                 <TableHead></TableHead>
                 {parameters.map((param) => (
                   <TableHead key={`unit-${param.id}`} className="text-xs text-muted-foreground font-normal">
-                    {param.unit || "-"}
+                    {param.unit ? `[${param.unit}]` : "-"}
                   </TableHead>
                 ))}
                 <TableHead></TableHead>
@@ -451,7 +451,9 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           disabled={isProcessing}
                         />
                       ) : (
-                        <span>{datapoint.values?.[param.id] !== undefined ? datapoint.values[param.id] : "-"}</span>
+                        <span>
+                          {datapoint.values?.[param.id] !== undefined ? datapoint.values[param.id] : "-"}
+                        </span>
                       )}
                     </TableCell>
                   ))}
@@ -463,21 +465,34 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           {new Date(datapoint.timestamp).toLocaleString()}
                         </div>
                       </div>
-                      <Button 
-                        onClick={() => handleUpdateDatapoint(datapoint)} 
+                      <Button
+                        onClick={() => handleUpdateDatapoint(datapoint)}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         disabled={isProcessing}
                       >
                         {editingDatapoint === datapoint.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {editingDatapoint === datapoint.id && (
-                        <Button
-                          onClick={() => handleDeleteDatapoint(datapoint.id)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                          disabled={isProcessing}
-                        >
-                          <X size={14} />
-                        </Button>
+                        <>
+                          <Button
+                            onClick={() => handleDeleteDatapoint(datapoint.id)}
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            disabled={isProcessing}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                          <Button 
+                            onClick={() => {
+                              setEditingDatapoint(null);
+                              setEditingName("");
+                              setEditingValues({});
+                            }}
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            disabled={isProcessing}
+                          >
+                            <X size={14} />
+                          </Button>
+                        </>
                       )}
                       <Button 
                         onClick={() => setShowMediaDialog(datapoint.id)} 

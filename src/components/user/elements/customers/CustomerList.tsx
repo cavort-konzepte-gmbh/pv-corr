@@ -1,7 +1,7 @@
 import React from "react";
 import { Theme } from "../../../../types/theme";
 import { Customer } from "../../../../types/customers";
-import { Building2, ChevronRight, Mail, Phone, Link, User } from "lucide-react";
+import { Building2, ChevronRight, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
@@ -14,7 +14,13 @@ interface CustomerListProps {
   onSelectCustomer: (customerId: string) => void;
 }
 
-const CustomerList: React.FC<CustomerListProps> = ({ currentTheme, customers, savedPeople, savedCompanies, onSelectCustomer }) => {
+const CustomerList: React.FC<CustomerListProps> = ({ 
+  currentTheme, 
+  customers, 
+  savedPeople, 
+  savedCompanies, 
+  onSelectCustomer 
+}) => {
   return (
     <div className="space-y-4">
       {customers.map((customer) => (

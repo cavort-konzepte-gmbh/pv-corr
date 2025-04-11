@@ -434,9 +434,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       <div onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
                         <div className="flex items-center gap-2">
                           <span>{zone.name}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                            {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
-                          </span>
+                          <div className="flex items-center gap-2 ml-2">
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {zone.datapoints?.length || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("datapoints")}</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -582,12 +587,6 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       </Button>
                       {editingZoneId === zone.id && (
                         <>
-                          <Button onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteZone(zone.id);
-                          }} variant="ghost">
-                            {translation("actions.delete")}
-                          </Button>
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();

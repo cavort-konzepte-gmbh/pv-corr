@@ -532,9 +532,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                           <div>
                             {materials.find((m) => m.id === structure.coating_material_id)?.name}
                             {structure.coating_thickness && (
-                              <span className="ml-2">
-                                ({structure.coating_thickness} {structure.coating_thickness_unit || "mm"})
-                              </span>
+                              <span className="ml-2">({structure.coating_thickness})</span>
                             )}
                           </div>
                         ) : (
