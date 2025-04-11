@@ -7,7 +7,6 @@ import { supabase } from "../../lib/supabase";
 import { showToast } from "../../lib/toast";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
-import { createReport } from "../../services/reports";
 
 interface AnalyseResultProps {
   currentTheme: Theme;
@@ -35,8 +34,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
   const [navigating, setNavigating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -121,77 +118,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       }
       return next;
     });
-  };
-
-  const handleCreateReport = async () => {
-    try {
-      // Validate required data before proceeding
-      if (!selectedNorm) {
-        throw new Error("No norm selected");
-      }
-      if (!selectedDatapoints.length) {
-        throw new Error("No datapoints selected");
-      }
-
-      setIsSaving(true);
-      const toastId = showToast("Creating report...", "loading");
-      
-      // Calculate total rating
-      const totalRating = selectedDatapoints.reduce((sum, dp) => {
-        return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
-      }, 0);
-
-      // Determine classification based on total rating
-      const classification = 
-        totalRating >= 0 ? "Ia" :
-        totalRating >= -4 ? "Ib" :
-        totalRating >= -10 ? "II" : "III";
-
-      // Create report data
-      const reportData = {
-        projectId: project.id,
-        zoneId: zone.id,
-        standardId: selectedNorm.id,
-        content: {
-          projectName: project.name,
-          zoneName: zone.name,
-          normName: selectedNorm.name,
-          timestamp: new Date().toISOString(),
-        },
-        parameters: selectedDatapoints.map(dp => ({
-          id: dp.id,
-          values: dp.values,
-          ratings: dp.ratings,
-        })),
-        ratings: selectedDatapoints.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
-        totalRating,
-        classification,
-        recommendations: totalRating >= 0 
-          ? "No special measures required. Standard corrosion protection is sufficient."
-          : totalRating >= -10
-            ? "Moderate corrosion protection measures recommended."
-            : "Enhanced corrosion protection measures required.",
-      };
-
-      // Get the datapoint IDs to include in the URL
-      const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
-
-      // Create the report
-      const { report } = await createReport(reportData);
-
-      showToast("Report created successfully", "success", { id: toastId });
-      
-      // Navigate to the output view with the report ID
-      setNavigating(true);
-      window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
-    } catch (err) {
-      console.error("Error creating report:", err);
-      setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
-      showToast(`Failed to create report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-      setNavigating(false);
-    } finally {
-      setIsSaving(false);
-    }
   };
 
   // Show loading state while initializing or loading parameters
@@ -480,51 +406,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         ))}
       </div>
       
-      {/* Create Report Button */}
-      <div className="flex justify-between items-center mt-8 border-t pt-6 border-input bg-card p-4 rounded-lg">
-        <div className="flex-1">
-          <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-          {t("analysis.report_description")}
-       
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => {
-              try {
-                // Prevent multiple clicks
-                if (navigating) return;
-                setNavigating(true);
-                
-                // Get the datapoint IDs to include in the URL
-                const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
-                
-                // Navigate to output view with preview parameters and datapoint IDs
-                window.location.href = `/?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}&datapointIds=${datapointIds}`;
-              } catch (err) {
-                console.error("Error navigating to preview:", err);
-                setNavigating(false);
-              }
-            }}
-            title="Preview a report from the selected datapoints"
-            disabled={navigating || selectedDatapoints.length === 0}
-            variant="outline"
-            className="px-6 py-3 rounded text-sm flex items-center gap-2"
-          >
-            <FileText size={16} />
-            {t("analysis.preview_report")}
-          </Button>
-          <Button
-            onClick={handleCreateReport}
-            disabled={navigating || selectedDatapoints.length === 0}
-            className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
-          >
-            <FileCheck size={16} />
-            {isSaving ? t("analysis.creating_report") : t("analysis.create_report")}
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };

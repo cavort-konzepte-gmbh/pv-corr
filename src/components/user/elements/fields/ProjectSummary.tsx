@@ -47,14 +47,16 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
     latitude: project.latitude || "",
     longitude: project.longitude || "",
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
     try {
+      setError(null);
+      
       // Validate coordinates if provided
       if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
           (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
-        // Show error but don't prevent saving - the UI will show validation errors
-        console.error("Invalid coordinates format");
+        setError(translation("project.invalid_coordinates"));
         return;
       }
 
@@ -69,22 +71,40 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
 
       const updatedProject = await updateProject({
         ...project,
-        managerId: editValues.managerId,
+        managerId: editValues.managerId || null, // Ensure null if empty string
         typeProject: editValues.typeProject,
-        latitude: latitude,
-        longitude: longitude,
+        latitude: latitude || null, // Ensure null if empty string
+        longitude: longitude || null, // Ensure null if empty string
       });
 
-      const updatedProjects = await fetchProjects();
+      if (!updatedProject) {
+        throw new Error("Failed to update project");
+      }
+
+      // Fetch updated projects list with specific query parameters
+      const updatedProjects = await fetchProjects({
+        customerId: selectedCustomerId || undefined,
+        includeFields: true,
+        includeZones: true,
+        includeDatapoints: true
+      });
+
       onProjectsChange(updatedProjects);
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating project:", err);
+      setError(err instanceof Error ? err.message : "Failed to update project");
     }
   };
 
   return (
     <div className="mb-8">
+      {error && (
+        <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-md flex items-center gap-2">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
@@ -132,6 +152,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               setIsEditing(false);
+                              setError(null);
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -223,7 +244,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className={`w-1/2 p-1 ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.latitude")}
                         title="Enter decimal coordinates (e.g., 57.123456)"
-                        placeholder="e.g., 57.123456"
                       />
                       <Input
                         type="text"
@@ -235,7 +255,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className={`w-1/2 p-1 ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.longitude")}
                         title="Enter decimal coordinates (e.g., 10.123456)"
-                        placeholder="e.g., 10.123456"
                       />
                       {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
                        (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
@@ -252,7 +271,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       </span>
                       <Button 
                         onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank")}
-                       className="text-xs h-8 px-2"
+                        className="text-xs h-8 px-2"
                       >
                         {translation("general.view_on_map")}
                       </Button>

@@ -5,6 +5,7 @@ import { Project, Zone } from "../../types/projects";
 import { FileText, Download, Share, ChevronLeft, Calendar, User, Building2, MapPin, Check, X, Info, Loader2, Printer } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { getCurrentVersion } from "../../services/versions";
+import { showToast } from "../../lib/toast";
 import { Button } from "../ui/button"; 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -366,14 +367,14 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   };
 
   const handlePrint = () => {
-    window.print();
+    // Disabled for now
+    showToast("Printing is currently disabled", "info");
   };
 
   const handleDownloadPDF = async () => {
     try {
-      // This would typically use a PDF generation library
-      // For now, we'll just trigger the browser print dialog
-      window.print();
+      // Disabled for now
+      showToast("PDF download is currently disabled", "info");
     } catch (err) {
       console.error("Error generating PDF:", err);
       setError("Failed to generate PDF");
@@ -382,10 +383,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
 
   const handleShare = async () => {
     try {
-      // Create a shareable link
-      const url = window.location.href;
-      await navigator.clipboard.writeText(url);
-      alert("Link copied to clipboard");
+      // Disabled for now
+      showToast("Sharing is currently disabled", "info");
     } catch (err) {
       console.error("Error sharing report:", err);
       setError("Failed to share report");
@@ -463,15 +462,27 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         <div className="flex items-center gap-2">
           <Button onClick={handlePrint} variant="outline" className="flex items-center gap-2" title="Print report">
             <Printer size={16} />
-            {t("output.print")}
+            <span onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              showToast("Printing is currently disabled", "info");
+            }}>{t("output.print")}</span>
           </Button>
           <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2" title="Download as PDF">
             <Download size={16} />
-            {t("output.download_pdf")}
+            <span onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              showToast("PDF download is currently disabled", "info");
+            }}>{t("output.download_pdf")}</span>
           </Button>
           <Button onClick={handleShare} variant="outline" className="flex items-center gap-2" title="Share report">
             <Share size={16} />
-            {t("output.share")}
+            <span onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              showToast("Sharing is currently disabled", "info");
+            }}>{t("output.share")}</span>
           </Button>
         </div>
       </div>

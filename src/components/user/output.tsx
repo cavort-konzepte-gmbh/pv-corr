@@ -97,9 +97,13 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             .from("analysis_outputs")
             .select("*, versions:analysis_versions(*)")
             .eq("id", reportId)
-            .single();
+            .maybeSingle();
             
           if (reportError) throw reportError;
+          
+          if (!report) {
+            throw new Error("Report not found");
+          }
           
           if (!report?.versions || report.versions.length === 0) {
             throw new Error("No versions found for this report. Please try again later.");
@@ -122,9 +126,12 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             .from("norms")
             .select("*")
             .eq("id", report.norm_id)
-            .single();
+            .maybeSingle();
             
           if (normError) throw normError;
+          if (!normData) {
+            throw new Error("Norm not found");
+          }
           
           setSelectedVersion({
             ...version,
@@ -165,10 +172,10 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
                 )
               `)
               .eq('id', projectId)
-              .single();
+              .maybeSingle();
 
             if (projectError) throw projectError;
-            if (!projectData) throw new Error("Project not found in database");
+            if (!projectData) throw new Error("Project not found");
             
             foundProject = projectData;
             setProjectData(projectData);
@@ -195,16 +202,23 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             .from("norms")
             .select("*")
             .eq("id", normId)
-            .single();
+            .maybeSingle();
 
           if (normError) throw normError;
+          if (!norm) {
+            throw new Error("Norm not found");
+          }
           
           setSelectedNorm(norm);
           
           // Get user info from auth
           const {
             data: { user },
+            error: userError
           } = await supabase.auth.getUser();
+
+          if (userError) throw userError;
+          if (!user) throw new Error("User not authenticated");
 
           setSelectedVersion({
             projectId,
@@ -227,6 +241,11 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
           console.error("Error loading preview data:", err);
           setError(`Failed to load preview data: ${err instanceof Error ? err.message : String(err)}`);
           setLoading(false);
+          
+          // If error is auth-related, redirect to login
+          if (err instanceof Error && err.message.includes("not authenticated")) {
+            navigate("/login");
+          }
         }
       } else {
         // If no report or preview parameters, just show the reports list
@@ -235,7 +254,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
     };
 
     loadPreview();
-  }, [location.search, projects]);
+  }, [location.search, projects, navigate]);
 
   const getProjectName = (projectId: string): string => {
     const project = projects.find((p) => p.id === projectId) || projectData;

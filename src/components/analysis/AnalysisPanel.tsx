@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project, Zone } from "../../types/projects";
-import { FileText, Save, Download, FileCheck } from "lucide-react";
+import { FileText, FileCheck } from "lucide-react";
 import AnalysisReport from "./AnalysisReport";
 import { useAuth } from "../auth/AuthProvider";
 import { generateHiddenId } from "../../utils/generateHiddenId";
@@ -41,6 +41,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [selectedNorm, setSelectedNorm] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isCreateDisabled] = useState(true); // Set to true to disable the Create Report button
   const [parameters, setParameters] = useState<any[]>([]);
   const [navigating, setNavigating] = useState(false);
   const t = useTranslation(currentLanguage);
@@ -169,6 +170,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   };
 
   const handleCreateReport = async () => {
+    // Show toast message and return early
+    showToast("Report creation is temporarily disabled", "info");
+    return;
+    
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
       setSaveError("Please select datapoints and a norm before creating a report");
       showToast("Please select datapoints and a norm before creating a report", "error");
@@ -472,32 +477,29 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => {
-                  if (navigating) return;
-                   
-                  setNavigating(true);
-                  
-                  // Get the datapoint IDs to include in the URL
-                  const datapointIds = selectedDatapoints.join(',');
-                  
-                  // Use window.location for a full page navigation
-                  window.location.href = `/?view=output&preview=true&projectId=${selectedProject?.id}&zoneId=${selectedZone?.id}&normId=${selectedNorm?.id}&datapointIds=${datapointIds}`;
+                onClick={(e) => {
+                  e.preventDefault();
+                  showToast("Preview report is temporarily disabled", "info");
                 }}
                 title="Preview a report from the selected datapoints"
-                disabled={navigating || isSaving || selectedDatapoints.length === 0 || !selectedNormId}
+                disabled={true}
                 variant="outline"
-                className="px-6 py-3 rounded text-sm flex items-center gap-2"
+                className="px-6 py-3 rounded text-sm flex items-center gap-2 opacity-50 cursor-not-allowed"
               >
                 <FileText size={16} />
                 {t("analysis.preview_report")}
               </Button>
               <Button
-                onClick={handleCreateReport}
-                disabled={isSaving || selectedDatapoints.length === 0 || !selectedNormId}
-                className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  showToast("Report creation is temporarily disabled", "info");
+                }}
+                disabled={true}
+                className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary opacity-50 cursor-not-allowed"
+                title="Report creation is temporarily disabled"
               >
                 <FileCheck size={16} />
-                {isSaving ? t("analysis.creating_report") : t("analysis.create_report")}
+                {t("analysis.create_report")}
               </Button>
             </div>
           </div>

@@ -61,19 +61,20 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.projectName.trim()) {
-      showToast("Project name is required", "error");
+      setError("Project name is required");
       return;
     }
 
     // Validate coordinates if provided
     if ((formData.latitude && !isValidCoordinate(formData.latitude)) || 
         (formData.longitude && !isValidCoordinate(formData.longitude))) {
-      showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
+      setError("Coordinates must be in decimal format (e.g., 57.123456)");
       return;
     }
 
     try {
       setError(null);
+      const toastId = showToast("Creating project...", "loading");
       
       // Format coordinates if valid
       let latitude = formData.latitude;
@@ -101,10 +102,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           createDefaultZone: formData.createDefaultZone,
           defaultZoneName: formData.defaultZoneName.trim(),
         },
-      );
+    ).catch(err => {
+      console.error("Error in createProject:", err);
+      throw err;
+    });
 
       // Update projects list with new project
-      const updatedProjects = await fetchProjects(selectedCustomerId as string);
+      const updatedProjects = await fetchProjects(selectedCustomerId);
       onProjectsChange(updatedProjects);
 
       // If the new project has an ID, navigate to it
@@ -113,8 +117,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Refresh projects again to ensure we have the latest data including fields and zones
-        const refreshedProjects = await fetchProjects(selectedCustomerId as string);
+        const refreshedProjects = await fetchProjects(selectedCustomerId);
         onProjectsChange(refreshedProjects);
+        
+        // Show success message
+        showToast("Project created successfully", "success", { id: toastId });
       }
 
       setShowForm(false);
@@ -134,7 +141,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       setError(null);
     } catch (err) {
       console.error("Error creating project:", err);
-      setError(err instanceof Error ? err.message : "Failed to create project");
+      const errorMessage = err instanceof Error ? err.message : "Failed to create project";
+      setError(errorMessage);
+      showToast(`Failed to create project: ${errorMessage}`, "error");
     }
   };
 

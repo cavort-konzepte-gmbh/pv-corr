@@ -12,17 +12,24 @@ interface CreateProjectOptions {
 }
 
 export const createProject = async (
-  project: Omit<Project, "id" | "fields">,
+  project: Project,
   options: CreateProjectOptions = {
     createDefaultField: true,
     defaultFieldName: "Field 1",
     createDefaultZone: true,
     defaultZoneName: "Zone 1",
-  },
+  }
 ) => {
   const {
     data: { user },
+    error: userError
   } = await supabase.auth.getUser();
+  
+  if (userError) {
+    console.error("Auth error:", userError);
+    throw new Error("User authentication error");
+  }
+  
   if (!user) {
     throw new Error("User not authenticated");
   }
@@ -76,6 +83,37 @@ export const createProject = async (
     if (!projectData) {
       showToast("No project data returned after creation", "error");
       throw new Error("No project data returned after creation");
+    }
+    
+    // Check if user_project association already exists
+    const { data: existingUserProject, error: checkError } = await supabase
+      .from("user_projects")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("project_id", projectData.id)
+      .single();
+      
+    if (checkError && checkError.code !== "PGRST116") { // PGRST116 means no rows returned
+      console.error("Error checking user projects:", checkError);
+      showToast(`Warning: Failed to check existing user association: ${checkError.message}`, "warning");
+    }
+    
+    // Only create user_project if it doesn't exist
+    if (!existingUserProject) {
+      const { error: userProjectError } = await supabase
+        .from("user_projects")
+        .insert([
+          {
+            user_id: user.id,
+            project_id: projectData.id,
+            role: "owner"
+          }
+        ]);
+        
+      if (userProjectError) {
+        console.error("Error creating user_project association:", userProjectError);
+        showToast(`Warning: Project created but user association failed: ${userProjectError.message}`, "warning");
+      }
     }
 
     // Create default field if requested
@@ -202,6 +240,7 @@ export const moveProject = async (projectId: string, customerId: string | null) 
     throw err;
   }
 };
+
 export const deleteProject = async (projectId: string) => {
   try {
     // Verify project exists before deletion
@@ -237,10 +276,12 @@ export const deleteProject = async (projectId: string) => {
 
 export const fetchProjects = async (customerId?: string): Promise<Project[]> => {
   try {
-    const { data, error } = await supabase
-      .from("projects")
-      .select(
-        `*,
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Build the query for projects
+    let query = supabase.from("projects").select(`
+        *,
         fields (
           id, hidden_id, name, latitude, longitude, has_fence,
           gates (*),
@@ -248,9 +289,19 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
             id, hidden_id, name, latitude, longitude, substructure_id, foundation_id,
             datapoints (*)
           )
-        )`,
-      )
-      .order("created_at", { ascending: true });
+        )
+      `).order("created_at", { ascending: true });
+      
+    // Apply customer filter if provided
+    if (customerId !== undefined) {
+      if (customerId === null) {
+        query = query.is("customer_id", null);
+      } else {
+        query = query.eq("customer_id", customerId);
+      }
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error("Error fetching projects:", error);
@@ -267,7 +318,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
       return [];
     }
 
-    // Filter projects based on customerId after fetching
+    // Map projects to the expected format
     const projects = data.filter(project => project).map((project) => ({
       id: project.id,
       hiddenId: project.hidden_id,
@@ -304,31 +355,20 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
           foundationId: zone.foundation_id,
           datapoints: (Array.isArray(zone.datapoints) ? zone.datapoints : []).filter(dp => dp).map((dp) => ({
             id: dp.id,
-            hiddenId: dp.hidden_id,
-            sequentialId: dp.sequential_id,
-            name: dp.name,
-            type: dp.type,
-            values: dp.values || {},
-            ratings: dp.ratings || {},
-            timestamp: dp.timestamp,
-          })),
-        })),
-      })),
-    }));
-
-    // Filter projects based on customerId
-    const filteredProjects = projects.filter((project) => {
-      if (customerId === null) {
-        return !project.customerId;
+          }
+          )
+          )
+        }
+        )
+        )
       }
-      if (customerId) {
-        return project.customerId === customerId;
-      }
-      return true;
-    });
-    
+      )
+      )
+    }
+    )
+    )
     // Sort projects by name
-    return filteredProjects.sort((a, b) => a.name.localeCompare(b.name));
+    return projects.sort((a, b) => a.name.localeCompare(b.name));
   } catch (err) {
     console.error("Error fetching projects:", err);
     // Return empty array instead of throwing to prevent white screen

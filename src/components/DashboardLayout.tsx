@@ -31,6 +31,7 @@ import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, Layo
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { updateUserSettings } from "@/services/userSettings";
+import { showToast } from "../lib/toast";
 
 const DashboardLayout = () => {
   const {
@@ -633,13 +634,17 @@ const DashboardLayout = () => {
                   <FileText size={18} />
                   <span>{t("nav.analyse")}</span>
                 </ButtonSection>
-                <ButtonSection view={view} match="output" onClick={() => setView("output")}>
-                  <FileText size={18} />
-                  <span>{t("nav.output")}</span>
+                <ButtonSection view={view} match="output" onClick={() => {
+                  showToast("Output view is currently disabled", "info");
+                }}>
+                  <FileText size={18} className="opacity-50" />
+                  <span className="opacity-50">{t("nav.output")}</span>
                 </ButtonSection>
-                <ButtonSection view={view} match="reports" onClick={() => setView("reports")}>
-                  <ClipboardList size={18} />
-                  <span>{t("reports.title")}</span>
+                <ButtonSection view={view} match="reports" onClick={() => {
+                  showToast("Reports view is currently disabled", "info");
+                }}>
+                  <ClipboardList size={18} className="opacity-50" />
+                  <span className="opacity-50">{t("reports.title")}</span>
                 </ButtonSection>
               </>
             )}

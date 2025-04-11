@@ -15,7 +15,7 @@ import { showToast } from "../../../../lib/toast";
 import { ParameterInput } from "../../../DatapointForm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -50,6 +50,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [newValues, setNewValues] = useState<Record<string, string>>({});
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // Create a map of parameter id to parameter object for easier lookup
@@ -89,7 +90,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
             if (!isNaN(aNum) && !isNaN(bNum)) {
               comparison = aNum - bNum;
             } else {
-              comparison = aValue.localeCompare(bValue);
+              comparison = String(aValue).localeCompare(String(bValue));
             }
           }
           break;
@@ -121,102 +122,127 @@ const DatapointList: React.FC<DatapointListProps> = ({
   };
 
   const handleAddDatapoint = async () => {
-    if (!newName.trim()) {
-      showToast("Datapoint name is required", "error");
-      return;
-    }
-    if (Object.keys(newValues).length === 0) {
-      showToast("Please enter at least one value", "error");
-      return;
-    }
-
-    // Process values to ensure proper number formatting
-    const processedValues: Record<string, any> = {};
-    Object.entries(newValues).forEach(([key, value]) => {
-      // Convert numeric strings to numbers
-      if (typeof value === 'string' && value !== 'impurities' && value.trim() !== '' && !isNaN(parseFloat(value))) {
-        processedValues[key] = parseFloat(value);
-      } else {
-        processedValues[key] = value;
-      }
-    });
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setError(null);
     
-    console.log("Processed values for new datapoint:", processedValues);
-
     try {
-      await createDatapoint(zoneId, {
+      console.log("Adding new datapoint for zone:", zoneId);
+      
+      if (!newName.trim()) {
+        showToast("Datapoint name is required", "error");
+        setError("Datapoint name is required");
+        setIsProcessing(false);
+        return;
+      }
+      
+      if (Object.keys(newValues).length === 0) {
+        showToast("Please enter at least one parameter value", "error");
+        setError("Please enter at least one parameter value");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Process values to ensure proper number formatting
+      const processedValues: Record<string, any> = {};
+      Object.entries(newValues).forEach(([key, value]) => {
+        // Convert numeric strings to numbers
+        if (typeof value === 'string' && value !== 'impurities' && value.trim() !== '' && !isNaN(parseFloat(value))) {
+          processedValues[key] = value; // Keep as string for the service to handle
+        } else {
+          processedValues[key] = value;
+        }
+      });
+
+      const result = await createDatapoint(zoneId, {
         type: "measurement",
         name: newName.trim(),
         values: processedValues,
         ratings: {},
       });
 
+      console.log("Datapoint creation result:", result);
+      
       setIsAdding(false);
       setNewName("");
       setNewValues({});
-      setError(null);
+      
       const projects = await fetchProjects();
       onProjectsChange(projects);
     } catch (err) {
       console.error("Error creating datapoint:", err);
-      setError("Failed to create datapoint");
+      setError(`Failed to create datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
+      showToast(`Failed to create datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
+    if (isProcessing) return;
+    
     if (editingDatapoint === datapoint.id) {
       // Save changes
-      if (!editingName?.trim()) {
-        setError("Name is required");
-        return;
-      }
-
-      // Debug the values being saved
-      console.log("Saving datapoint values:", editingValues);
+      setIsProcessing(true);
+      setError(null);
       
-      const updateData = {
-        values: editingValues,
-        name: editingName.trim(),
-      };
-
-      // Convert any numeric strings to actual numbers
-      Object.keys(updateData.values).forEach(key => {
-        const value = updateData.values[key];
-        // Skip conversion for special values like 'impurities'
-        if (typeof value === 'string' && value !== 'impurities' && !isNaN(parseFloat(value))) {
-          updateData.values[key] = parseFloat(value);
-        }
-      });
-      
-      console.log("Processed datapoint values:", updateData.values);
-      
-      setEditingDatapoint(null);
-      setEditingName("");
-      setEditingValues({});
       try {
-        await updateDatapoint(editingDatapoint, updateData);
+        if (!editingName?.trim()) {
+          setError("Name is required");
+          setIsProcessing(false);
+          return;
+        }
+        
+        const updateData = {
+          values: { ...editingValues },
+          name: editingName.trim(),
+        };
+        
+        await updateDatapoint(datapoint.id, updateData);
         const projects = await fetchProjects();
         onProjectsChange(projects);
+        
+        setEditingDatapoint(null);
+        setEditingName("");
+        setEditingValues({});
       } catch (err) {
         console.error("Error updating datapoint:", err);
-        // Toast is handled in the service
+        setError(`Failed to update datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
+        showToast(`Failed to update datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+      } finally {
+        setIsProcessing(false);
       }
     } else {
       // Start editing
       setEditingDatapoint(datapoint.id);
       setEditingName(datapoint.name);
-      setEditingValues(datapoint.values);
+      // Create a copy of the values to prevent direct modification
+      setEditingValues({ ...datapoint.values });
     }
   };
 
   const handleDeleteDatapoint = async (datapointId: string) => {
-    try {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setError(null);
+    
+    try {      
       await deleteDatapoint(datapointId);
       const projects = await fetchProjects();
       onProjectsChange(projects);
+      
+      // Reset editing state if we just deleted the datapoint we were editing
+      if (editingDatapoint === datapointId) {
+        setEditingDatapoint(null);
+        setEditingName("");
+        setEditingValues({});
+      }
     } catch (err) {
       console.error("Error deleting datapoint:", err);
-      setError("Failed to delete datapoint");
+      setError(`Failed to delete datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
+      showToast(`Failed to delete datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -305,6 +331,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         onChange={(e) => setNewName(e.target.value)}
                         className="w-full p-1 "
                         placeholder="Enter custom name (optional)"
+                        disabled={isProcessing}
                       />
                     </FormHandler>
                   </TableCell>
@@ -323,12 +350,17 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           }))
                         }
                         currentTheme={currentTheme}
+                        disabled={isProcessing}
                       />
                     </TableCell>
                   ))}
                   <TableCell className="p-2 ">
                     <div className="flex items-center justify-center gap-2">
-                      <Button onClick={handleAddDatapoint} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button 
+                        onClick={handleAddDatapoint} 
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
+                      >
                         <Save size={14} />
                       </Button>
                       <Button
@@ -338,6 +370,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           setNewValues({});
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
                       >
                         <X size={14} />
                       </Button>
@@ -355,6 +388,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         onChange={(e) => setEditingName(e.target.value)}
                         className="w-full p-1 "
                         placeholder="Enter name"
+                        disabled={isProcessing}
                       />
                     ) : (
                       <span>{datapoint.name}</span>
@@ -378,9 +412,10 @@ const DatapointList: React.FC<DatapointListProps> = ({
                             }))
                           }
                           currentTheme={currentTheme}
+                          disabled={isProcessing}
                         />
                       ) : (
-                        <span>{datapoint.values[param.id] || "-"}</span>
+                        <span>{datapoint.values[param.id] !== undefined ? datapoint.values[param.id] : "-"}</span>
                       )}
                     </TableCell>
                   ))}
@@ -392,18 +427,27 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           {new Date(datapoint.timestamp).toLocaleString()}
                         </div>
                       </div>
-                      <Button onClick={() => handleUpdateDatapoint(datapoint)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button 
+                        onClick={() => handleUpdateDatapoint(datapoint)} 
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
+                      >
                         {editingDatapoint === datapoint.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {editingDatapoint === datapoint.id && (
                         <Button
                           onClick={() => handleDeleteDatapoint(datapoint.id)}
                           className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                          disabled={isProcessing}
                         >
                           <X size={14} />
                         </Button>
                       )}
-                      <Button onClick={() => setShowMediaDialog(datapoint.id)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button 
+                        onClick={() => setShowMediaDialog(datapoint.id)} 
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
+                      >
                         <Upload size={14} />
                       </Button>
                     </div>
@@ -415,7 +459,11 @@ const DatapointList: React.FC<DatapointListProps> = ({
         </div>
       </section>
       
-      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
+      <Button 
+        onClick={() => setIsAdding(true)} 
+        className="w-full py-3 px-4 mt-4"
+        disabled={isProcessing || isAdding}
+      >
         <Plus size={16} />
         {translation("datapoint.add_new")}
       </Button>

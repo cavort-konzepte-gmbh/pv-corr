@@ -408,7 +408,8 @@ const Reports: React.FC<ReportsProps> = ({
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={() => {
-                        handleViewReport(report.id);
+                        // Disabled for now
+                        showToast("Output view is currently disabled", "info");
                       }}
                       variant="ghost"
                       size="sm"
@@ -418,8 +419,9 @@ const Reports: React.FC<ReportsProps> = ({
                     </Button>
                     <Button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the parent onClick
-                        window.open(`/reports/${report.id}/latest/download`, "_blank");
+                        e.stopPropagation();
+                        // Disabled for now
+                        showToast("Report download is currently disabled", "info");
                       }}
                       variant="ghost"
                       size="sm"

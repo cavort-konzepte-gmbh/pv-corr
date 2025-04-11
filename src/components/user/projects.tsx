@@ -37,29 +37,45 @@ const Projects: React.FC<ProjectsProps> = ({
   // Add error handling for empty projects array
   useEffect(() => {
     if (!projects || projects.length === 0) {
-      console.log("No projects available or projects array is empty");
+      console.log("No projects available - this is normal for new customers");
     }
   }, [projects]);
 
   return (
     <div className="p-6">
-      {projects && projects.length > 0 ? (
-        <ProjectList
+      <div className="space-y-6">
+        {projects && projects.length > 0 ? (
+          <ProjectList
+            currentTheme={currentTheme}
+            projects={projects}
+            savedPeople={savedPeople}
+            customers={customers}
+            selectedCustomerId={selectedCustomerId}
+            onMoveProject={onMoveProject}
+            onSelectProject={onSelectProject}
+            currentLanguage={currentLanguage}
+            onProjectsChange={onProjectsChange}
+          />
+        ) : (
+          <div className="p-6 mb-4 text-center border border-input rounded-lg bg-card">
+            <h3 className="text-lg font-medium mb-2">No projects available</h3>
+            <p className="text-muted-foreground mb-4">
+              {selectedCustomerId 
+                ? "This customer doesn't have any projects yet. Create your first project below."
+                : "No uncategorized projects found. Create your first project below."}
+            </p>
+          </div>
+        )}
+        
+        <ProjectForm
           currentTheme={currentTheme}
-          projects={projects}
           savedPeople={savedPeople}
-          customers={customers}
-          selectedCustomerId={selectedCustomerId}
-          onMoveProject={onMoveProject}
-          onSelectProject={onSelectProject}
+          savedCompanies={savedCompanies}
           currentLanguage={currentLanguage}
+          selectedCustomerId={selectedCustomerId}
           onProjectsChange={onProjectsChange}
         />
-      ) : (
-        <div className="p-4 mb-4 text-center text-muted-foreground">
-          No projects available. Create your first project below.
-        </div>
-      )}
+      </div>
     </div>
   );
 };
