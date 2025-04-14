@@ -72,28 +72,25 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="min-w-[25vw] flex items-center gap-2">
-                        <span className="project-overview-title">ZONE OVERVIEW</span>
-                        <span className="text-lg">
-                          {isEditing ? (
-                            <Input
-                              type="text"
-                              value={editValues.name}
-                              onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                              className="p-1 rounded text-sm text-primary "
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : (
-                            zone.name
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center gap-1">
-                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                            {zone.datapoints?.length || 0}
-                          </span>
-                          <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                      <span className="project-overview-title">{translation("zone.overview")}</span>
+                      <span className="text-lg">
+                        {isEditing ? (
+                          <Input
+                            type="text"
+                            value={editValues.name}
+                            onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                            className="p-1 rounded text-sm text-primary "
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          zone.name
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {zone.datapoints?.length || 0}
                         </span>
                       </div>
                     </div>

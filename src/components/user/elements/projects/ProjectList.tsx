@@ -140,19 +140,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-4">
-                              <div className="min-w-[15vw] flex items-center gap-2">
-                                <Folder className="text-primary" size={16} />
-                                <span>{project.name}</span>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <span className="text-xs text-muted-foreground text-left">
+
+                              <span>{project.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                                   {translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}
                                 </span>
-                                <span className="flex items-center gap-1">
-                                  <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                                    {project.fields?.length || 0}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
+                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
+                                  {project.fields?.length || 0} {translation("fields")}
                                 </span>
                                 <span className="flex items-center gap-x-1">
                                   <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">

@@ -69,12 +69,12 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
             {selectedDatapoints.length === datapoints.length ? (
               <>
                 <CheckSquare className="h-4 w-4" />
-                <span>Deselect All</span>
+                <span>{t("deselect.all")}</span>
               </>
             ) : (
               <>
                 <Square className="h-4 w-4" />
-                <span>Select All</span>
+                <span>{t("select.all")}</span>
               </>
             )}
           </Button>

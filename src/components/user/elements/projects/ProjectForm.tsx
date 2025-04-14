@@ -219,8 +219,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Default Structure</CardTitle>
-                  <CardDescription>Configure initial project structure</CardDescription>
+                  <CardTitle className="text-base"> {translation("default.structure")}</CardTitle>
+                  <CardDescription> {translation("initial.structure")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-2">
@@ -230,7 +230,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                       onCheckedChange={(checked) => handleInputChange("createDefaultField", !!checked)}
                     />
                     <Label htmlFor="createDefaultField" className="text-sm font-medium">
-                      Create default field
+                      {translation("project.field")}
                     </Label>
                   </div>
 
@@ -255,14 +255,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                           onCheckedChange={(checked) => handleInputChange("createDefaultZone", !!checked)}
                         />
                         <Label htmlFor="createDefaultZone" className="text-sm font-medium">
-                          Create default zone
+                          {translation("project.zone")}
                         </Label>
                       </div>
 
                       {formData.createDefaultZone && (
                         <div className="pl-6 space-y-2">
                           <Label htmlFor="defaultZoneName" className="text-sm font-medium">
-                            Zone name
+                            {translation("zone.name")}
                           </Label>
                           <Input
                             id="defaultZoneName"
@@ -356,7 +356,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                 (formData.longitude && !isValidCoordinate(formData.longitude)) ? (
                   <div className="col-span-2 text-destructive flex items-center gap-1 text-xs mt-1">
                     <AlertCircle size={12} />
-                    <span>Coordinates must be in decimal format (e.g., 57.123456, 10.123456)</span>
+                    <span>{translation("coodinates.decimal.format")} (e.g., 57.123456, 10.123456)</span>
                   </div>
                 ) : null}
               </div>

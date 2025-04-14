@@ -105,7 +105,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         }
 
         setSelectedNorm(data);
-        showToast("Norm loaded successfully", "success", { id: toastId });
+        showToast(t("norm.loadede.successfully"), "success", { id: toastId });
       } catch (err) {
         console.error("Error loading norm:", err);
         setSelectedNorm(null);

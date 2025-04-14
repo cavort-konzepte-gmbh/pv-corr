@@ -105,3 +105,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Datapoint collection and analysis
 - Report generation
 - User authentication and authorization
+
+## [1.0.11] - 2025-04-14
+### Added
+- Added translation values to the database.
+- Added translations to the code for improved internationalization.
+  
+### Changed
+- Updated styles to improve the UI appearance.
+- Changed coordinates to decimal format.
+

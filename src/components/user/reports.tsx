@@ -275,7 +275,7 @@ const Reports: React.FC<ReportsProps> = ({
 
       // Show success message
       setError("Report deleted successfully");
-      showToast("Report deleted successfully", "success");
+      showToast(t("report.delete"), "success");
       showToast("Report deleted successfully", "success");
       setTimeout(() => setError(null), 3000);
     } catch (err) {
@@ -420,7 +420,7 @@ const Reports: React.FC<ReportsProps> = ({
                     <Button
                       onClick={() => {
                         // Disabled for now
-                        showToast("Output view is currently disabled", "info");
+                        showToast(t("output.view.disabled"), "info");
                       }}
                       variant="ghost"
                       size="sm"
@@ -432,7 +432,7 @@ const Reports: React.FC<ReportsProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         // Disabled for now
-                        showToast("Report download is currently disabled", "info");
+                        showToast(t("report.dowload.disabled"), "info");
                       }}
                       variant="ghost"
                       size="sm"

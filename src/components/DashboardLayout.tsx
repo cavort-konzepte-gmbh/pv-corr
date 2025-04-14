@@ -643,7 +643,8 @@ const DashboardLayout = () => {
                   view={view}
                   match="output"
                   onClick={() => {
-                    showToast("Output view is currently disabled", "info");
+
+                    showToast(t("output.view.disabled"), "info");
                   }}
                 >
                   <FileText size={18} className="opacity-50" />
@@ -653,7 +654,7 @@ const DashboardLayout = () => {
                   view={view}
                   match="reports"
                   onClick={() => {
-                    showToast("Reports view is currently disabled", "info");
+                    showToast(t("reports.view.disabled"), "info");
                   }}
                 >
                   <ClipboardList size={18} className="opacity-50" />
@@ -696,7 +697,7 @@ const DashboardLayout = () => {
         </div>
         {loading && (
           <div className="flex-1 flex items-center justify-center bg-background">
-            <div className="text-sm text-muted-foreground">Loading application data...</div>
+            <div className="text-sm text-muted-foreground">{t("loading.aplication")}... </div>
           </div>
         )}
       </div>

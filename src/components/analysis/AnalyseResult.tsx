@@ -349,11 +349,11 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             <div className="flex flex-col gap-1 mb-3">
               <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
                 <div className="font-medium text-primary">
-                  <span className="font-medium">Datapoint:</span> {datapoint.name}
+                  <span className="font-medium">{t("datapoints")}: </span> {datapoint.name}
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">Created:</span>{" "}
+                    <span className="font-medium">{t("Created")}:</span>{" "}
                     {datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}
                   </div>
                   {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
