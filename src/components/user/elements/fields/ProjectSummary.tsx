@@ -134,23 +134,22 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
                           {project.fields?.length || 0}
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {project.fields?.reduce(
-                            (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
-                            0,
-                          ) || 0}
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce(
+                              (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
+                              0,
+                            ) || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
-                      </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -204,7 +203,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               </TableRow>
             </TableHeader>
 
-            <TableBody className={isExpanded ? "" : "hidden"}>
+            <TableBody className={isExpanded || isEditing ? "" : "hidden"}>
               <TableRow>
                 <TableCell className="p-2 border-b border-r border-accent w-1/6">{translation("project.type")}</TableCell>
                 <TableCell className="p-2">

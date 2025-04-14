@@ -90,8 +90,13 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
                           {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
-                      </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (

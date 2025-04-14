@@ -92,8 +92,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
                           {zone.datapoints?.length || 0}
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
-                      </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (

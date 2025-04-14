@@ -643,6 +643,7 @@ const DashboardLayout = () => {
                   view={view}
                   match="output"
                   onClick={() => {
+
                     showToast(t("output.view.disabled"), "info");
                   }}
                 >
