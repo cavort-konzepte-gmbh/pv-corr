@@ -75,13 +75,23 @@ const DatapointForm: React.FC<DatapointFormProps> = ({ currentTheme, currentLang
                   <TableHeader>
                     <TableRow>
                       <TableHead> {t("datapoint.short_name")}</TableHead>
-                      {parameters.map((param) => (
-                        <th key={param.id} className="p-2 text-left border font-normal border-theme">
-                          {param.shortName || param.name}
-                          {param.unit && <span className="ml-1 text-xs">({param.unit})</span>}
-                        </th>
-                      ))}
+                      {parameters.map((param) => {
+                        return (
+                          <th key={param.id} className="p-2 text-left border font-normal border-theme">
+                            {param.shortName || param.name}
+                          </th>
+                        );
+                      })}
                       <TableHead className="w-24 text-center">{t("actions")}</TableHead>
+                    </TableRow>
+                    <TableRow>
+                      <TableHead></TableHead>
+                      {parameters.map((param) => (
+                        <TableHead key={`unit-${param.id}`} className="text-xs text-muted-foreground font-normal">
+                          {param.unit ? <span className="unit-text">[{param.unit}]</span> : "-"}
+                        </TableHead>
+                      ))}
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -135,12 +145,10 @@ const DatapointForm: React.FC<DatapointFormProps> = ({ currentTheme, currentLang
             </section>
           </FormHandler>
 
-          {error && (
-            <div className="p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
-          )}
+          {error && <div className="p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
         </div>
       )}
-      
+
       <button
         onClick={() => setIsAdding(true)}
         className="w-full py-3 px-4 mt-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"

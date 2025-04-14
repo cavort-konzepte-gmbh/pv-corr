@@ -37,10 +37,9 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const { id, ...data } = fields;
-    
+
     // Validate coordinates if provided
-    if ((data.latitude && !isValidCoordinate(data.latitude)) || 
-        (data.longitude && !isValidCoordinate(data.longitude))) {
+    if ((data.latitude && !isValidCoordinate(data.latitude)) || (data.longitude && !isValidCoordinate(data.longitude))) {
       // Show error but don't prevent saving - the UI will show validation errors
       console.error("Invalid coordinates format");
       return;
@@ -51,7 +50,7 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
       data.latitude = formatCoordinate(data.latitude);
       data.longitude = formatCoordinate(data.longitude);
     }
-    
+
     try {
       await updateField(id, data);
       const updatedProjects = await fetchProjects();
@@ -111,8 +110,7 @@ export const EditField = ({ field, isEditingCoordinates, setShowForm, onProjects
               title="Enter decimal coordinates (e.g., 10.123456)"
             />
           </Label>
-          {(fields.latitude && !isValidCoordinate(fields.latitude)) || 
-           (fields.longitude && !isValidCoordinate(fields.longitude)) ? (
+          {(fields.latitude && !isValidCoordinate(fields.latitude)) || (fields.longitude && !isValidCoordinate(fields.longitude)) ? (
             <div className="text-destructive flex items-center gap-1 text-xs mt-1">
               <AlertCircle size={12} />
               <span>Use decimal format (e.g., 57.123456)</span>

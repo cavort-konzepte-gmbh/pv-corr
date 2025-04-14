@@ -3,7 +3,7 @@ import { Theme } from "../../../../types/theme";
 import { Language, useTranslation } from "../../../../types/language";
 import { Parameter } from "../../../../types/parameters";
 import { Datapoint } from "../../../../types/projects";
-import { Edit2, Save, X, Upload, Clock, Plus } from "lucide-react";
+import { Edit2, Save, X, Upload, Clock, Plus, Trash2 } from "lucide-react";
 import { ArrowUpDown } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { fetchProjects } from "../../../../services/projects";
@@ -12,10 +12,11 @@ import { FormHandler } from "../../../shared/FormHandler";
 import { createDatapoint } from "../../../../services/datapoints";
 import { deleteDatapoint } from "../../../../services/datapoints";
 import { showToast } from "../../../../lib/toast";
+import { fetchDatapointsByZoneId } from "../../../../services/datapoints";
 import { ParameterInput } from "../../../DatapointForm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface DatapointListProps {
   currentTheme: Theme;
@@ -40,183 +41,215 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-  const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({});
-  const [sortField, setSortField] = useState<SortField>("timestamp");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const [sortParameter, setSortParameter] = useState<string>("");
-  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newValues, setNewValues] = useState<Record<string, string>>({});
-  const [newName, setNewName] = useState("");
+  const [updatingZone, setUpdatingZone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newValues, setNewValues] = useState({
+    name: "",
+    values: {} as Record<string, string>
+  });
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
+  const [sortParameter, setSortParameter] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const translation = useTranslation(currentLanguage);
 
+  // Use sortedDatapoints state
+  const [sortedDatapoints, setSortedDatapoints] = useState<Datapoint[]>([]);
+  // Use a ref to track if we need to refresh datapoints
+  const [refreshCounter, setRefreshCounter] = useState(0);
+
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  // Initial load of datapoints
   useEffect(() => {
-    // Create a map of parameter id to parameter object for easier lookup
-    const map = parameters.reduce(
-      (acc, param) => {
-        acc[param.id] = param;
-        return acc;
-      },
-      {} as Record<string, Parameter>,
-    );
-    setParameterMap(map);
-  }, [parameters]);
+    if (datapoints && datapoints.length > 0) {
+      setLoading(false);
+    }
+  }, [datapoints]);
 
-  // Sort datapoints based on current sort field and direction
-  const sortedDatapoints = React.useMemo(() => {
-    if (!datapoints) return [];
-    
-    return [...datapoints].sort((a, b) => {
-      let comparison = 0;
+  // Update sortedDatapoints when datapoints, sortField, or sortDirection changes
+  useEffect(() => {
+    if (!datapoints || datapoints.length === 0) {
+      setSortedDatapoints([]);
+      return;
+    }
+
+    const sorted = [...datapoints].sort((a, b) => {
+      const multiplier = sortDirection === "asc" ? 1 : -1;
       
       switch (sortField) {
         case "name":
-          comparison = (a.name || "").localeCompare(b.name || "");
-          break;
+          return multiplier * (a.name || "").localeCompare(b.name || "");
         case "timestamp":
-          comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-          break;
-        case "parameter":
-          if (sortParameter) {
-            const aValue = a.values[sortParameter] || "";
-            const bValue = b.values[sortParameter] || "";
-            
-            // Try to compare as numbers if possible
-            const aNum = parseFloat(aValue);
-            const bNum = parseFloat(bValue);
-            
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-              comparison = aNum - bNum;
-            } else {
-              comparison = aValue.localeCompare(bValue);
-            }
-          }
-          break;
+          return multiplier * (new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        default:
+          return 0;
       }
-      
-      return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [datapoints, sortField, sortDirection, sortParameter]);
 
-  const handleSortChange = (field: SortField, paramId?: string) => {
-    if (field === "parameter" && paramId) {
-      if (sortField === "parameter" && sortParameter === paramId) {
-        // Toggle direction if clicking the same parameter
-        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-      } else {
-        // Set new parameter and default to ascending
-        setSortField("parameter");
-        setSortParameter(paramId);
-        setSortDirection("asc");
+    setSortedDatapoints(sorted);
+  }, [datapoints, sortField, sortDirection]);
+
+  // Fetch datapoints when zoneId or refreshCounter changes
+  useEffect(() => {
+    if (!zoneId) return;
+    
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        console.log("Fetching datapoints for zone:", zoneId);
+        const freshDatapoints = await fetchDatapointsByZoneId(zoneId);
+        console.log("Fetched datapoints:", freshDatapoints.length);
+        setSortedDatapoints(freshDatapoints);
+      } catch (err) {
+        console.error("Error fetching datapoints:", err);
+        setError(err instanceof Error ? err.message : "Failed to fetch datapoints");
+      } finally {
+        setIsLoading(false);
       }
-    } else if (sortField === field) {
-      // Toggle direction if clicking the same field
+    }
+    
+    fetchData();
+  }, [zoneId, refreshCounter]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      // Set new field and default to ascending
       setSortField(field);
       setSortDirection("asc");
     }
   };
 
-  const handleAddDatapoint = async () => {
-    if (!newName.trim()) {
-      showToast("Datapoint name is required", "error");
-      return;
-    }
-    if (Object.keys(newValues).length === 0) {
-      showToast("Please enter at least one value", "error");
-      return;
-    }
+  const handleUpdateZone = async (values: any) => {
+    if (zoneId) {
+      try {
+        setError(null);
+        setUpdatingZone(true);
 
-    // Process values to ensure proper number formatting
-    const processedValues: Record<string, any> = {};
-    Object.entries(newValues).forEach(([key, value]) => {
-      // Convert numeric strings to numbers
-      if (typeof value === 'string' && value !== 'impurities' && value.trim() !== '' && !isNaN(parseFloat(value))) {
-        processedValues[key] = parseFloat(value);
-      } else {
-        processedValues[key] = value;
+        // Validate coordinates if provided
+        if ((values.latitude && !isValidCoordinate(values.latitude)) || (values.longitude && !isValidCoordinate(values.longitude))) {
+          throw new Error("Invalid coordinates");
+        }
+
+        await updateZone(zoneId, values);
+        showToast("success", "Zone updated successfully");
+        setUpdatingZone(false);
+      } catch (err) {
+        console.error("Error updating zone:", err);
+        setError(err instanceof Error ? err.message : "Failed to update zone");
       }
-    });
-    
-    console.log("Processed values for new datapoint:", processedValues);
-
-    try {
-      await createDatapoint(zoneId, {
-        type: "measurement",
-        name: newName.trim(),
-        values: processedValues,
-        ratings: {},
-      });
-
-      setIsAdding(false);
-      setNewName("");
-      setNewValues({});
-      setError(null);
-      const projects = await fetchProjects();
-      onProjectsChange(projects);
-    } catch (err) {
-      console.error("Error creating datapoint:", err);
-      setError("Failed to create datapoint");
     }
   };
 
-  const handleUpdateDatapoint = async (datapoint: Datapoint) => {
-    if (editingDatapoint === datapoint.id) {
-      // Save changes
-      if (!editingName?.trim()) {
+  const handleAddDatapoint = async () => {
+    try {
+      setIsProcessing(true);
+      setError(null);
+      
+      if (!zoneId) {
+        setError("Zone ID is required");
+        return;
+      }
+
+      if (!newName.trim()) {
         setError("Name is required");
         return;
       }
 
-      // Debug the values being saved
-      console.log("Saving datapoint values:", editingValues);
+      // Prepare values object from parameter inputs
+      const values: Record<string, string> = { ...parameterValues };
       
-      const updateData = {
-        values: editingValues,
-        name: editingName.trim(),
-      };
+      // Log the values being sent
+      console.log("Values being sent to createDatapoint:", values);
 
-      // Convert any numeric strings to actual numbers
-      Object.keys(updateData.values).forEach(key => {
-        const value = updateData.values[key];
-        // Skip conversion for special values like 'impurities'
-        if (typeof value === 'string' && value !== 'impurities' && !isNaN(parseFloat(value))) {
-          updateData.values[key] = parseFloat(value);
-        }
+      await createDatapoint(zoneId, {
+        type: "measurement",
+        name: newName.trim(),
+        values,
+        ratings: {},
       });
-      
-      console.log("Processed datapoint values:", updateData.values);
-      
+
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
+
+      setIsAdding(false);
+      setNewName("");
+      setNewValues({
+        name: "",
+        values: {}
+      });
+      setParameterValues({});
+    } catch (err) {
+      console.error("Error creating datapoint:", err);
+      setError(err instanceof Error ? err.message : "Failed to create datapoint");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleUpdateDatapoint = async (datapoint: Datapoint) => {
+    try {
+      setError(null);
+      setIsProcessing(true);
+
+      // If we're not in editing mode, start editing
+      if (editingDatapoint !== datapoint.id) {
+        setEditingDatapoint(datapoint.id);
+        setEditingName(datapoint.name);
+        setEditingValues(datapoint.values || {});
+        return;
+      }
+
+      // Validate name
+      if (!editingName.trim()) {
+        setError("Name is required");
+        return;
+      }
+
+      await updateDatapoint(datapoint.id, {
+        name: editingName,
+        values: editingValues,
+      });
+
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
+
+      // Reset editing state
       setEditingDatapoint(null);
       setEditingName("");
       setEditingValues({});
-      try {
-        await updateDatapoint(editingDatapoint, updateData);
-        const projects = await fetchProjects();
-        onProjectsChange(projects);
-      } catch (err) {
-        console.error("Error updating datapoint:", err);
-        // Toast is handled in the service
-      }
-    } else {
-      // Start editing
-      setEditingDatapoint(datapoint.id);
-      setEditingName(datapoint.name);
-      setEditingValues(datapoint.values);
+      
+      showToast("success", "Datapoint updated successfully");
+    } catch (err) {
+      console.error("Error updating datapoint:", err);
+      setError(err instanceof Error ? err.message : "Failed to update datapoint");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleDeleteDatapoint = async (datapointId: string) => {
     try {
       await deleteDatapoint(datapointId);
-      const projects = await fetchProjects();
-      onProjectsChange(projects);
+
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
+
+      // Reset editing state if we just deleted the datapoint we were editing
+      if (editingDatapoint === datapointId) {
+        setEditingDatapoint(null);
+        setEditingName("");
+        setEditingValues({});
+      }
     } catch (err) {
       console.error("Error deleting datapoint:", err);
-      setError("Failed to delete datapoint");
+      setError(err instanceof Error ? err.message : "Failed to delete datapoint");
     }
   };
 
@@ -227,23 +260,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("name")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                   <div className="flex items-center gap-1">
                     {translation("datapoint.short_name")}
                     {sortField === "name" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
                 {parameters.map((param) => (
-                  <TableHead 
+                  <TableHead
                     key={param.id}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleSortChange("parameter", param.id)}
@@ -251,25 +279,18 @@ const DatapointList: React.FC<DatapointListProps> = ({
                     <div className="flex items-center gap-1">
                       {param.shortName || param.name}
                       {sortField === "parameter" && sortParameter === param.id ? (
-                        <span className="text-xs ml-1">
-                          {sortDirection === "asc" ? "▲" : "▼"}
-                        </span>
+                        <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                       ) : (
                         <ArrowUpDown size={14} className="ml-1 opacity-50" />
                       )}
                     </div>
                   </TableHead>
                 ))}
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("timestamp")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("timestamp")}>
                   <div className="flex items-center gap-1">
                     {translation("actions")}
                     {sortField === "timestamp" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
@@ -280,7 +301,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                 <TableHead></TableHead>
                 {parameters.map((param) => (
                   <TableHead key={`unit-${param.id}`} className="text-xs text-muted-foreground font-normal">
-                    {param.unit || "-"}
+                    {param.unit ? `[${param.unit}]` : "-"}
                   </TableHead>
                 ))}
                 <TableHead></TableHead>
@@ -297,6 +318,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         setIsAdding(false);
                         setNewName("");
                         setNewValues({});
+                        setParameterValues({});
                       }}
                     >
                       <Input
@@ -305,6 +327,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         onChange={(e) => setNewName(e.target.value)}
                         className="w-full p-1 "
                         placeholder="Enter custom name (optional)"
+                        disabled={isProcessing}
                       />
                     </FormHandler>
                   </TableCell>
@@ -314,30 +337,42 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         parameter={{
                           ...param,
                           parameterCode: param.shortName || param.name,
+                          rangeType: param.rangeType,
+                          rangeValue: param.rangeValue,
                         }}
-                        value={newValues[param.id] || ""}
+                        value={parameterValues[param.id] || ""}
                         onChange={(value) =>
-                          setNewValues((prev) => ({
+                          setParameterValues((prev) => ({
                             ...prev,
-                            [param.id]: value,
+                            [param.id]: value
                           }))
                         }
                         currentTheme={currentTheme}
+                        disabled={isProcessing}
                       />
                     </TableCell>
                   ))}
                   <TableCell className="p-2 ">
                     <div className="flex items-center justify-center gap-2">
-                      <Button onClick={handleAddDatapoint} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button
+                        onClick={handleAddDatapoint}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing || !newName.trim()}
+                      >
                         <Save size={14} />
                       </Button>
                       <Button
                         onClick={() => {
                           setIsAdding(false);
                           setNewName("");
-                          setNewValues({});
+                          setNewValues({
+                            name: "",
+                            values: {}
+                          });
+                          setParameterValues({});
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
                       >
                         <X size={14} />
                       </Button>
@@ -355,6 +390,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         onChange={(e) => setEditingName(e.target.value)}
                         className="w-full p-1 "
                         placeholder="Enter name"
+                        disabled={isProcessing}
                       />
                     ) : (
                       <span>{datapoint.name}</span>
@@ -370,7 +406,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                             rangeType: param.rangeType,
                             rangeValue: param.rangeValue,
                           }}
-                          value={editingValues[param.id] || datapoint.values[param.id] || ""}
+                          value={editingValues[param.id] || datapoint.values?.[param.id] || ""}
                           onChange={(value) =>
                             setEditingValues((prev) => ({
                               ...prev,
@@ -378,9 +414,10 @@ const DatapointList: React.FC<DatapointListProps> = ({
                             }))
                           }
                           currentTheme={currentTheme}
+                          disabled={isProcessing}
                         />
                       ) : (
-                        <span>{datapoint.values[param.id] || "-"}</span>
+                        <span>{datapoint.values?.[param.id] !== undefined ? datapoint.values[param.id] : "-"}</span>
                       )}
                     </TableCell>
                   ))}
@@ -392,18 +429,40 @@ const DatapointList: React.FC<DatapointListProps> = ({
                           {new Date(datapoint.timestamp).toLocaleString()}
                         </div>
                       </div>
-                      <Button onClick={() => handleUpdateDatapoint(datapoint)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button
+                        onClick={() => handleUpdateDatapoint(datapoint)}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
+                      >
                         {editingDatapoint === datapoint.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {editingDatapoint === datapoint.id && (
-                        <Button
-                          onClick={() => handleDeleteDatapoint(datapoint.id)}
-                          className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                        >
-                          <X size={14} />
-                        </Button>
+                        <>
+                          <Button
+                            onClick={() => handleDeleteDatapoint(datapoint.id)}
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            disabled={isProcessing}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setEditingDatapoint(null);
+                              setEditingName("");
+                              setEditingValues({});
+                            }}
+                            className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                            disabled={isProcessing}
+                          >
+                            <X size={14} />
+                          </Button>
+                        </>
                       )}
-                      <Button onClick={() => setShowMediaDialog(datapoint.id)} className="p-1 rounded hover:bg-opacity-80 text-secondary">
+                      <Button
+                        onClick={() => setShowMediaDialog(datapoint.id)}
+                        className="p-1 rounded hover:bg-opacity-80 text-secondary"
+                        disabled={isProcessing}
+                      >
                         <Upload size={14} />
                       </Button>
                     </div>
@@ -414,12 +473,20 @@ const DatapointList: React.FC<DatapointListProps> = ({
           </Table>
         </div>
       </section>
-      
-      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
+
+      {isLoading && datapoints.length === 0 && <div className="mt-4 p-4 text-center text-muted-foreground">Loading datapoints...</div>}
+
+      {!isLoading && datapoints.length === 0 && (
+        <div className="mt-4 p-4 text-center text-muted-foreground">
+          No datapoints found. Add your first datapoint using the button below.
+        </div>
+      )}
+
+      <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4" disabled={isProcessing || isAdding}>
         <Plus size={16} />
         {translation("datapoint.add_new")}
       </Button>
-      
+
       {error && <div className="mt-2 p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
 
       {showMediaDialog && (

@@ -3,6 +3,8 @@ import { Theme } from "../types/theme";
 import { Language, useTranslation } from "../types/language";
 import { Standard } from "../types/standards";
 import { Parameter } from "../types/parameters";
+import { Plus, Save, X, AlertTriangle } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -16,9 +18,85 @@ export interface ParameterInputProps {
   value: string;
   onChange: (value: string) => void;
   currentTheme: Theme;
+  disabled?: boolean;
 }
 
-export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value, onChange, currentTheme }) => {
+export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value, onChange, currentTheme, disabled = false }) => {
+  const [localValue, setLocalValue] = useState(value);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update local value when prop value changes
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  // Function to validate and update parent component
+  const validateAndUpdate = () => {
+    if (parameter.rangeType === "range") {
+      const [minStr, maxStr] = parameter.rangeValue.split("-");
+      const min = parseFloat(minStr.replace(/[,()]/g, "").trim());
+      const max = maxStr ? parseFloat(maxStr.replace(/[,()]/g, "").trim()) : undefined;
+
+      // Special case for Z1 impurities
+      if (parameter.parameterCode === "Z1" && localValue === "impurities") {
+        onChange(localValue);
+        setError(null);
+        return;
+      }
+
+      // Empty value is allowed
+      if (localValue === "") {
+        onChange("");
+        setError(null);
+        return;
+      }
+
+      // Validate numeric value
+      const numValue = parseFloat(localValue);
+      if (!isNaN(numValue)) {
+        const isValid = (isNaN(min) || numValue >= min) && (max === undefined || isNaN(max) || numValue <= max);
+
+        if (isValid) {
+          onChange(localValue);
+          setError(null);
+        } else {
+          setError(`Value must be between ${min}${max !== undefined ? ` and ${max}` : "+"}`);
+        }
+      } else {
+        setError("Please enter a valid number");
+      }
+    } else {
+      // For non-range types, just pass the value through
+      onChange(localValue);
+      setError(null);
+    }
+  };
+
+  // Validate and update parent component on blur
+  const handleBlur = () => {
+    validateAndUpdate();
+  };
+
+  // Handle key press events
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      validateAndUpdate();
+      // Move focus to next input if available
+      if (inputRef.current) {
+        const form = inputRef.current.form;
+        if (form) {
+          const inputs = Array.from(form.elements) as HTMLElement[];
+          const index = inputs.indexOf(inputRef.current);
+          if (index > -1 && index < inputs.length - 1) {
+            (inputs[index + 1] as HTMLElement).focus();
+          }
+        }
+      }
+    }
+  };
+
   if (parameter.rangeType === "selection") {
     const options = parameter.rangeValue.split(",").map((opt) => opt.trim());
     return (
@@ -26,6 +104,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full p-2 rounded text-sm border border-input shadow-sm bg-accent"
+        disabled={disabled}
       >
         <option value="">Select value</option>
         {options.map((opt) => (
@@ -42,29 +121,27 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
       return (
         <div className="flex items-center gap-4">
           <Input
-            type="number"
-            value={value === "impurities" ? "" : value}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              // Allow 2 decimal places
-              const roundedVal = Math.round(val * 100) / 100;
-              if (!isNaN(val) && val >= 0 && val <= 100) {
-                onChange(e.target.value);
-              }
-            }}
+            type="text"
+            ref={inputRef}
+            value={localValue === "impurities" ? "" : localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             min={0}
             max={100}
             step="0.01"
-            disabled={value === "impurities"}
+            disabled={localValue === "impurities" || disabled}
             className="flex-1 p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter value (0-100)"
           />
           <Label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded border border-theme hover:bg-opacity-10 bg-surface">
             <Input
               type="checkbox"
-              checked={value === "impurities"}
+              checked={localValue === "impurities"}
               onChange={(e) => {
-                onChange(e.target.checked ? "impurities" : "");
+                const newValue = e.target.checked ? "impurities" : "";
+                setLocalValue(newValue);
+                onChange(newValue);
               }}
               className="rounded border-theme cursor-pointer"
             />
@@ -80,40 +157,27 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     const max = maxStr ? parseFloat(maxStr.replace(/[,()]/g, "").trim()) : undefined;
 
     // Debug the range values
-    console.log(`Range for ${parameter.parameterCode}: min=${min}, max=${max}`);
-    
+    // console.log(`Range for ${parameter.parameterCode}: min=${min}, max=${max}`);
+
     // Only set min/max if they are valid numbers
     return (
-      <Input
-        type="number"
-        value={value}
-        onChange={(e) => {
-          let val = parseFloat(e.target.value);
-
-          // Round to 2 decimal places
-          val = Math.round(val * 100) / 100;
-
-          // Debug the validation
-          console.log(`Validating ${val} against min=${min}, max=${max}`);
-          
-          // Validate against min/max if they exist
-          const isValid = !isNaN(val) && (
-            (isNaN(min) || val >= min) && 
-            (max === undefined || isNaN(max) || val <= max)
-          );
-
-          console.log(`Validation result: ${isValid}`);
-          
-          if (isValid) {
-            onChange(e.target.value);
-          }
-        }}
-        min={!isNaN(min) ? min : undefined}
-        max={max !== undefined && !isNaN(max) ? max : undefined}
-        step="0.01"
-        className="w-full p-2 rounded font-mono text-sm "
-        placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : "+"})`}
-      />
+      <div className="w-full">
+        <Input
+          ref={inputRef}
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          min={!isNaN(min) ? min : undefined}
+          max={max !== undefined && !isNaN(max) ? max : undefined}
+          step="0.01"
+          className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
+          placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : "+"})`}
+        />
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
+      </div>
     );
   }
 
@@ -122,30 +186,36 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     if (isNaN(limit)) {
       return (
         <Input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          ref={inputRef}
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm "
+          className="w-full p-2 rounded font-mono text-sm"
+          disabled={disabled}
           placeholder="Enter value"
         />
       );
     }
     return (
-      <Input
-        type="number"
-        value={value}
-        onChange={(e) => {
-          const val = parseFloat(e.target.value);
-          if (!isNaN(val) && (parameter.rangeType === "greater" ? val > limit : val >= limit)) {
-            onChange(e.target.value);
-          }
-        }}
-        min={parameter.rangeType === "greater" ? limit + 0.000001 : limit}
-        step="any"
-        className="w-full p-2 "
-        placeholder={`Enter value ${parameter.rangeType === "greater" ? ">" : ">="} ${limit}`}
-      />
+      <div className="w-full">
+        <Input
+          ref={inputRef}
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          min={parameter.rangeType === "greater" ? limit + 0.000001 : limit}
+          step="any"
+          className={`w-full p-2 ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
+          placeholder={`Enter value ${parameter.rangeType === "greater" ? ">" : ">="} ${limit}`}
+        />
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
+      </div>
     );
   }
 
@@ -154,40 +224,50 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     if (isNaN(limit)) {
       return (
         <Input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          ref={inputRef}
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm "
+          className="w-full p-2 rounded font-mono text-sm"
+          disabled={disabled}
           placeholder="Enter value"
         />
       );
     }
     return (
-      <Input
-        type="number"
-        value={value}
-        onChange={(e) => {
-          const val = parseFloat(e.target.value);
-          if (!isNaN(val) && (parameter.rangeType === "less" ? val < limit : val <= limit)) {
-            onChange(e.target.value);
-          }
-        }}
-        max={parameter.rangeType === "less" ? limit - 0.000001 : limit}
-        step="any"
-        className="w-full p-2 rounded font-mono text-sm "
-        placeholder={`Enter value ${parameter.rangeType === "less" ? "<" : "<="} ${limit}`}
-      />
+      <div className="w-full">
+        <Input
+          ref={inputRef}
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          max={parameter.rangeType === "less" ? limit - 0.000001 : limit}
+          step="any"
+          className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
+          placeholder={`Enter value ${parameter.rangeType === "less" ? "<" : "<="} ${limit}`}
+        />
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
+      </div>
     );
   }
 
   // Default to open input
   return (
     <Input
+      ref={inputRef}
       type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full p-2 rounded font-mono text-sm "
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      className="w-full p-2 rounded font-mono text-sm"
+      disabled={disabled}
       placeholder="Enter value"
     />
   );

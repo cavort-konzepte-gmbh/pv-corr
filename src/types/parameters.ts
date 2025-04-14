@@ -1,4 +1,21 @@
-export type ParameterUnit = "Ohm.m" | "Ohm.cm" | "mmol/kg" | "mg/kg" | "g/mol" | "mg/mmol" | "%" | "ppm" | "V" | "mV" | "A" | "mA" | "year" | "µm/year" | "cm" | "m" | "µm";
+export type ParameterUnit =
+  | "Ohm.m"
+  | "Ohm.cm"
+  | "mmol/kg"
+  | "mg/kg"
+  | "g/mol"
+  | "mg/mmol"
+  | "%"
+  | "ppm"
+  | "V"
+  | "mV"
+  | "A"
+  | "mA"
+  | "year"
+  | "µm/year"
+  | "cm"
+  | "m"
+  | "µm";
 
 export interface Parameter {
   id: string;

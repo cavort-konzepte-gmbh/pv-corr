@@ -40,10 +40,10 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
   // Sort foundations based on current sort field and direction
   const sortedFoundations = React.useMemo(() => {
     if (!foundations) return [];
-    
+
     return [...foundations].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -54,7 +54,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
           comparison = aDate - bDate;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [foundations, sortField, sortDirection]);
@@ -203,31 +203,21 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                 <TableCaption className="h-8">Foundations</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("name")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                       <div className="flex items-center gap-1">
                         Name
                         {sortField === "name" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("created_at")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("created_at")}>
                       <div className="flex items-center gap-1">
                         Created
                         {sortField === "created_at" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
@@ -282,9 +272,7 @@ const FoundationsManagement: React.FC<FoundationsManagementProps> = ({ currentTh
                           placeholder="Enter foundation name"
                         />
                       </TableCell>
-                      <TableCell className="p-2 text-muted-foreground text-sm">
-                        -
-                      </TableCell>
+                      <TableCell className="p-2 text-muted-foreground text-sm">-</TableCell>
                       <TableCell className="p-2">
                         <div className="flex items-center justify-start gap-2">
                           <Button onClick={handleAddNewFoundation} variant="ghost">

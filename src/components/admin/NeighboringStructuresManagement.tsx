@@ -54,10 +54,10 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
   // Sort structures based on current sort field and direction
   const sortedStructures = React.useMemo(() => {
     if (!structures) return [];
-    
+
     return [...structures].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -78,7 +78,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
           comparison = aYear - bYear;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [structures, sortField, sortDirection]);
@@ -287,62 +287,42 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                 <TableCaption className="h-8">Neighboring Structures</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("name")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                       <div className="flex items-center gap-1">
                         Name
                         {sortField === "name" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("depth")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("depth")}>
                       <div className="flex items-center gap-1">
                         Depth (m)
                         {sortField === "depth" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("height")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("height")}>
                       <div className="flex items-center gap-1">
                         Height (m)
                         {sortField === "height" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
                     <TableHead>Coating</TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("construction_year")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("construction_year")}>
                       <div className="flex items-center gap-1">
                         Construction Year
                         {sortField === "construction_year" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
@@ -531,11 +511,7 @@ const NeighboringStructuresManagement: React.FC<NeighboringStructuresManagementP
                         ) : structure.coating_material_id ? (
                           <div>
                             {materials.find((m) => m.id === structure.coating_material_id)?.name}
-                            {structure.coating_thickness && (
-                              <span className="ml-2">
-                                ({structure.coating_thickness} {structure.coating_thickness_unit || "mm"})
-                              </span>
-                            )}
+                            {structure.coating_thickness && <span className="ml-2">({structure.coating_thickness})</span>}
                           </div>
                         ) : (
                           "-"

@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Theme } from "../../../../types/theme";
 import { Project } from "../../../../types/projects";
 import { Person } from "../../../../types/people";
 import { Company } from "../../../../types/companies";
-import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload } from "lucide-react";
+import { Building2, ChevronDown, ChevronRight, Edit2, Save, X, Upload, FolderOpen } from "lucide-react";
 import MediaDialog from "../../../shared/MediaDialog";
 import { Language, useTranslation } from "../../../../types/language";
 import { isValidCoordinate, formatCoordinate } from "../../../../utils/coordinates";
@@ -47,21 +47,36 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
     latitude: project.latitude || "",
     longitude: project.longitude || "",
   });
+  const [error, setError] = useState<string | null>(null);
+  const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
+
+  // Sort people alphabetically
+  useEffect(() => {
+    if (savedPeople && savedPeople.length > 0) {
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+      setSortedPeople(sorted);
+    } else {
+      setSortedPeople([]);
+    }
+  }, [savedPeople]);
 
   const handleSave = async () => {
     try {
+      setError(null);
+
       // Validate coordinates if provided
-      if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-          (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
-        // Show error but don't prevent saving - the UI will show validation errors
-        console.error("Invalid coordinates format");
+      if (
+        (editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+        (editValues.longitude && !isValidCoordinate(editValues.longitude))
+      ) {
+        setError(translation("project.invalid_coordinates"));
         return;
       }
 
       // Format coordinates if valid
       let latitude = editValues.latitude;
       let longitude = editValues.longitude;
-      
+
       if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
@@ -69,22 +84,40 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
 
       const updatedProject = await updateProject({
         ...project,
-        managerId: editValues.managerId,
+        managerId: editValues.managerId || null, // Ensure null if empty string
         typeProject: editValues.typeProject,
-        latitude: latitude,
-        longitude: longitude,
+        latitude: latitude || null, // Ensure null if empty string
+        longitude: longitude || null, // Ensure null if empty string
       });
 
-      const updatedProjects = await fetchProjects();
+      if (!updatedProject) {
+        throw new Error("Failed to update project");
+      }
+
+      // Fetch updated projects list with specific query parameters
+      const updatedProjects = await fetchProjects({
+        customerId: selectedCustomerId || undefined,
+        includeFields: true,
+        includeZones: true,
+        includeDatapoints: true,
+      });
+
       onProjectsChange(updatedProjects);
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating project:", err);
+      setError(err instanceof Error ? err.message : "Failed to update project");
     }
   };
 
   return (
     <div className="mb-8">
+      {error && (
+        <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-md flex items-center gap-2">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
       <section className="border border-input rounded-md bg-card">
         <div className="w-full relative overflow-auto">
           <Table>
@@ -93,28 +126,30 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                 <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Building2 size={16} />
-                      <div className="flex items-center gap-4">
-                        <span>{project.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.typeProject === "field" ? translation("project.type.field") : translation("project.type.roof")}
+                      <span className="project-overview-title"> {translation("project.overview")}</span>
+                      <span className="text-lg">{project.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {project.fields?.length || 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
                           </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                            {project.fields.length} {translation("fields")}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border ">
-                            {project.fields.reduce((acc, field) => acc + field.zones.length, 0)} {translation("zones")}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-opacity-20">
-                            {project.fields.reduce(
-                              (acc, field) => acc + field.zones.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0),
+                          <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce(
+                              (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
                               0,
-                            )}{" "}
-                            {translation("datapoints")}
+                            ) || 0}
                           </span>
-                        </div>
-                      </div>
+                          <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                        </span>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -132,6 +167,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               setIsEditing(false);
+                              setError(null);
                             }}
                             className="size-8 p-1 rounded hover:bg-opacity-80"
                           >
@@ -167,7 +203,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               </TableRow>
             </TableHeader>
 
-            <TableBody className={isExpanded ? "" : "hidden"}>
+            <TableBody className={isExpanded || isEditing ? "" : "hidden"}>
               <TableRow>
                 <TableCell className="p-2 border-b border-r border-accent w-1/6">{translation("project.type")}</TableCell>
                 <TableCell className="p-2">
@@ -195,7 +231,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       className="w-full p-1 rounded text-sm text-primary border border-input shadow-sm bg-accent"
                     >
                       <option value="">{translation("project.manager.not_assigned")}</option>
-                      {savedPeople.map((person) => (
+                      {sortedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
                         </option>
@@ -223,7 +259,6 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className={`w-1/2 p-1 ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.latitude")}
                         title="Enter decimal coordinates (e.g., 57.123456)"
-                        placeholder="e.g., 57.123456"
                       />
                       <Input
                         type="text"
@@ -235,10 +270,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         className={`w-1/2 p-1 ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         placeholder={translation("project.longitude")}
                         title="Enter decimal coordinates (e.g., 10.123456)"
-                        placeholder="e.g., 10.123456"
                       />
-                      {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-                       (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
+                      {(editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+                      (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
                         <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                           <AlertCircle size={12} />
                           <span>Use decimal format (e.g., 57.123456)</span>
@@ -250,9 +284,9 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       <span>
                         {project.latitude}, {project.longitude}
                       </span>
-                      <Button 
+                      <Button
                         onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank")}
-                       className="text-xs h-8 px-2"
+                        className="text-xs h-8 px-2"
                       >
                         {translation("general.view_on_map")}
                       </Button>

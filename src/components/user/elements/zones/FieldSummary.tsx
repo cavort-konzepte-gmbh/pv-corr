@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Theme } from "../../../../types/theme";
 import { Edit2, Save, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Language, useTranslation } from "../../../../types/language";
+import { FolderOpen } from "lucide-react";
 import { updateField } from "../../../../services/fields";
 import { fetchProjects } from "../../../../services/projects";
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table";
@@ -63,25 +64,34 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
               <TableRow>
                 <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {isEditing ? (
-                        <Input
-                          type="text"
-                          value={editValues.name}
-                          onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                          className="p-1"
-                        />
-                      ) : (
-                        <span>{field.name}</span>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-0.5 rounded bg-opacity-20  ">
-                          {field.zones?.length || 0} {translation("zones")}
+                    <div className="flex items-center gap-2">
+                      <span className="project-overview-title">{translation("field.overview")}</span>
+                      <span className="text-lg">
+                        {isEditing ? (
+                          <Input
+                            type="text"
+                            value={editValues.name}
+                            onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                            className="p-1"
+                          />
+                        ) : (
+                          field.name
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {field.zones?.length || 0}
                         </span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 ">
-                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints")}
+                        <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
                         </span>
-                      </div>
+                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -128,10 +138,10 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                   ) : field.latitude && field.longitude ? (
                     <div className="flex items-center justify-between">
                       <span>
-                        {field.latitude}, {field.longitude}
+                        {field.latitude?.toString()}, {field.longitude?.toString()}
                       </span>
                       <Button onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, "_blank")}>
-                       <span className="text-xs">{translation("general.view_on_map")}</span>
+                        <span className="text-xs h-8 px-2">{translation("general.view_on_map")}</span>
                       </Button>
                     </div>
                   ) : (

@@ -3,23 +3,32 @@ import { useNavigate } from "react-router-dom";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project } from "../../types/projects";
-import { FileText, Download, Eye, History, Info, Loader2, Search, Filter, SortDesc, SortAsc, Calendar, Tag, User, Trash2, AlertCircle } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Eye,
+  History,
+  Info,
+  Loader2,
+  Search,
+  Filter,
+  SortDesc,
+  SortAsc,
+  Calendar,
+  Tag,
+  User,
+  Trash2,
+  AlertCircle,
+} from "lucide-react";
 import { fetchReports, deleteReport } from "../../services/reports";
 import { showToast } from "../../lib/toast";
-import { Button } from "../ui/button"; 
+import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 
 interface ReportsProps {
   currentTheme: Theme;
@@ -30,13 +39,13 @@ interface ReportsProps {
   onSelectReport: (reportId: string) => void;
 }
 
-const Reports: React.FC<ReportsProps> = ({ 
-  currentTheme, 
-  currentLanguage, 
-  projects, 
+const Reports: React.FC<ReportsProps> = ({
+  currentTheme,
+  currentLanguage,
+  projects,
   reports: initialReports,
   selectedReportId,
-  onSelectReport
+  onSelectReport,
 }) => {
   const navigate = useNavigate();
   const [reports, setReports] = useState<any[]>(initialReports || []);
@@ -44,7 +53,7 @@ const Reports: React.FC<ReportsProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<"date" | "name" | "rating">("date"); 
+  const [sortField, setSortField] = useState<"date" | "name" | "rating">("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [filterProject, setFilterProject] = useState<string>("all");
   const [filterClassification, setFilterClassification] = useState<string>("all");
@@ -75,7 +84,7 @@ const Reports: React.FC<ReportsProps> = ({
         setLoading(false);
       }
     };
-    
+
     loadReports();
   }, [initialReports]);
 
@@ -87,20 +96,21 @@ const Reports: React.FC<ReportsProps> = ({
 
     // Apply project filter
     if (filterProject !== "all") {
-      filtered = filtered.filter(report => report.project_id === filterProject);
+      filtered = filtered.filter((report) => report.project_id === filterProject);
     }
 
     // Apply classification filter
     if (filterClassification !== "all") {
-      filtered = filtered.filter(report => {
-        const latestVersion = report.versions && report.versions.length > 0 
-          ? report.versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
-          : null;
-        
+      filtered = filtered.filter((report) => {
+        const latestVersion =
+          report.versions && report.versions.length > 0
+            ? report.versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
+            : null;
+
         if (!latestVersion) return false;
-        
+
         const totalRating = latestVersion.total_rating || 0;
-        
+
         switch (filterClassification) {
           case "ia":
             return totalRating >= 0;
@@ -119,7 +129,7 @@ const Reports: React.FC<ReportsProps> = ({
     // Apply search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(report => {
+      filtered = filtered.filter((report) => {
         const projectName = getProjectName(report.project_id).toLowerCase();
         const zoneName = getZoneName(report.project_id, report.zone_id).toLowerCase();
         return projectName.includes(term) || zoneName.includes(term);
@@ -129,7 +139,7 @@ const Reports: React.FC<ReportsProps> = ({
     // Apply sorting
     filtered.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "date":
           comparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -145,7 +155,7 @@ const Reports: React.FC<ReportsProps> = ({
           comparison = bRating - aRating;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison * -1 : comparison;
     });
 
@@ -171,7 +181,7 @@ const Reports: React.FC<ReportsProps> = ({
     if (!report.versions || !Array.isArray(report.versions) || report.versions.length === 0) {
       return 0;
     }
-    
+
     const latestVersion = report.versions.sort((a: any, b: any) => b.version_number - a.version_number)[0];
     return latestVersion.total_rating || 0;
   };
@@ -191,75 +201,81 @@ const Reports: React.FC<ReportsProps> = ({
   const handleViewReport = (reportId: string) => {
     // First update the selected report ID through the parent component
     onSelectReport(reportId);
-    
+
     // Use window.location for a full page navigation
     window.location.href = `/?view=output&reportId=${reportId}`;
-    
+
     // Set viewing report to true to prevent unnecessary re-rendering
     setViewingReport(true);
   };
 
   const toggleSortDirection = () => {
-    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
   };
 
   const handleDeleteReport = async (reportId: string) => {
     try {
       setIsDeleting(true);
       setError(null);
-      
+
       console.log("Deleting report:", reportId);
       await deleteReport(reportId);
-      
+
       // Update the reports list
-      const updatedReports = reports.filter(report => report.id !== reportId);
+      const updatedReports = reports.filter((report) => report.id !== reportId);
       setReports(updatedReports);
-      
+
       // Also update filtered reports
-      setFilteredReports(filteredReports.filter(report => report.id !== reportId));
-      
+      setFilteredReports(filteredReports.filter((report) => report.id !== reportId));
+
       // Reload reports from the server to ensure UI is in sync with database
       const fetchedReports = await fetchReports();
       setReports(fetchedReports || []);
-      
+
       // Apply current filters to the newly fetched reports
       let filtered = [...fetchedReports];
       if (filterProject !== "all") {
-        filtered = filtered.filter(report => report.project_id === filterProject);
+        filtered = filtered.filter((report) => report.project_id === filterProject);
       }
       if (filterClassification !== "all") {
         // Apply classification filter logic
-        filtered = filtered.filter(report => {
-          const latestVersion = report.versions && report.versions.length > 0 
-            ? report.versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
-            : null;
-          
+        filtered = filtered.filter((report) => {
+          const latestVersion =
+            report.versions && report.versions.length > 0
+              ? report.versions.sort((a: any, b: any) => b.version_number - a.version_number)[0]
+              : null;
+
           if (!latestVersion) return false;
-          
+
           const totalRating = latestVersion.total_rating || 0;
-          
+
           switch (filterClassification) {
-            case "ia": return totalRating >= 0;
-            case "ib": return totalRating >= -4 && totalRating < 0;
-            case "ii": return totalRating >= -10 && totalRating < -4;
-            case "iii": return totalRating < -10;
-            default: return true;
+            case "ia":
+              return totalRating >= 0;
+            case "ib":
+              return totalRating >= -4 && totalRating < 0;
+            case "ii":
+              return totalRating >= -10 && totalRating < -4;
+            case "iii":
+              return totalRating < -10;
+            default:
+              return true;
           }
         });
       }
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
-        filtered = filtered.filter(report => {
+        filtered = filtered.filter((report) => {
           const projectName = getProjectName(report.project_id).toLowerCase();
           const zoneName = getZoneName(report.project_id, report.zone_id).toLowerCase();
           return projectName.includes(term) || zoneName.includes(term);
         });
       }
       setFilteredReports(filtered);
-      
+
       // Show success message
       setError("Report deleted successfully");
-      showToast("Report deleted successfully", "success");
+      showToast(t("report.delete"), "success");
       showToast("Report deleted successfully", "success");
       setTimeout(() => setError(null), 3000);
     } catch (err) {
@@ -286,7 +302,7 @@ const Reports: React.FC<ReportsProps> = ({
       <div className="p-6">
         <Card className="border border-input">
           <CardContent className="p-6 text-center">
-            <Loader2 className="mx-auto h-12 w-12 mb-4 text-muted-foreground/50 animate-spin" /> 
+            <Loader2 className="mx-auto h-12 w-12 mb-4 text-muted-foreground/50 animate-spin" />
             <h3 className="text-lg font-medium mb-2">{t("output.loading")}</h3>
           </CardContent>
         </Card>
@@ -298,18 +314,13 @@ const Reports: React.FC<ReportsProps> = ({
     <div className="p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold text-primary">{t("reports.title")}</h2>
-        
+
         <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input 
-              placeholder={t("reports.search")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
+            <Input placeholder={t("reports.search")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-9" />
           </div>
-          
+
           <div className="flex gap-2">
             <Select value={filterProject} onValueChange={setFilterProject}>
               <SelectTrigger className="w-[180px]">
@@ -318,12 +329,14 @@ const Reports: React.FC<ReportsProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("reports.all_projects")}</SelectItem>
-                {projects.map(project => (
-                  <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
+                {projects.map((project) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={filterClassification} onValueChange={setFilterClassification}>
               <SelectTrigger className="w-[180px]">
                 <Tag size={16} className="mr-2" />
@@ -337,14 +350,14 @@ const Reports: React.FC<ReportsProps> = ({
                 <SelectItem value="iii">Class III</SelectItem>
               </SelectContent>
             </Select>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               size="icon"
               onClick={toggleSortDirection}
-              title={`Sort ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+              title={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
             >
-              {sortDirection === 'asc' ? <SortAsc size={16} /> : <SortDesc size={16} />}
+              {sortDirection === "asc" ? <SortAsc size={16} /> : <SortDesc size={16} />}
             </Button>
           </div>
         </div>
@@ -356,14 +369,10 @@ const Reports: React.FC<ReportsProps> = ({
           <TabsTrigger value="recent">{t("reports.tabs.recent")}</TabsTrigger>
           <TabsTrigger value="favorites">{t("reports.tabs.favorites")}</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="all" className="mt-4">
-          {error && (
-            <div className="p-4 mb-4 rounded-md text-destructive border border-destructive bg-destructive/10">
-              {error}
-            </div>
-          )}
-          
+          {error && <div className="p-4 mb-4 rounded-md text-destructive border border-destructive bg-destructive/10">{error}</div>}
+
           {filteredReports.length === 0 && (
             <Card className="border border-input">
               <CardContent className="p-6 text-center">
@@ -373,11 +382,15 @@ const Reports: React.FC<ReportsProps> = ({
                   <p className="mb-4">{t("output.no_reports_description")}</p>
                   <div className="text-left space-y-2 mb-4">
                     <div className="flex items-start gap-2">
-                      <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                      <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                        <Info size={14} />
+                      </div>
                       <p>{t("output.create_report_instruction_1")}</p>
                     </div>
                     <div className="flex items-start gap-2">
-                      <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                      <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                        <Info size={14} />
+                      </div>
                       <p>{t("output.create_report_instruction_2")}</p>
                     </div>
                   </div>
@@ -385,11 +398,11 @@ const Reports: React.FC<ReportsProps> = ({
               </CardContent>
             </Card>
           )}
-          
+
           <div className="space-y-4 mt-6">
             {filteredReports.map((report) => (
-              <div 
-                key={report.id} 
+              <div
+                key={report.id}
                 className="p-4 rounded-lg border border-input bg-card hover:bg-accent/5 transition-colors cursor-pointer"
                 onClick={() => handleViewReport(report.id)}
               >
@@ -401,14 +414,13 @@ const Reports: React.FC<ReportsProps> = ({
                         {getProjectName(report.project_id)} - {getZoneName(report.project_id, report.zone_id)}
                       </span>
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {new Date(report.created_at).toLocaleDateString()}
-                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">{new Date(report.created_at).toLocaleDateString()}</div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
                       onClick={() => {
-                        handleViewReport(report.id);
+                        // Disabled for now
+                        showToast(t("output.view.disabled"), "info");
                       }}
                       variant="ghost"
                       size="sm"
@@ -418,8 +430,9 @@ const Reports: React.FC<ReportsProps> = ({
                     </Button>
                     <Button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the parent onClick
-                        window.open(`/reports/${report.id}/latest/download`, "_blank");
+                        e.stopPropagation();
+                        // Disabled for now
+                        showToast(t("report.dowload.disabled"), "info");
                       }}
                       variant="ghost"
                       size="sm"
@@ -441,7 +454,7 @@ const Reports: React.FC<ReportsProps> = ({
             ))}
           </div>
         </TabsContent>
-        
+
         <TabsContent value="recent" className="mt-4">
           <Card className="border border-input">
             <CardContent className="p-6 text-center">
@@ -451,11 +464,15 @@ const Reports: React.FC<ReportsProps> = ({
                 <p className="mb-4">{t("output.no_reports_description")}</p>
                 <div className="text-left space-y-2 mb-4">
                   <div className="flex items-start gap-2">
-                    <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                    <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                      <Info size={14} />
+                    </div>
                     <p>{t("output.create_report_instruction_1")}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                    <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                      <Info size={14} />
+                    </div>
                     <p>{t("output.create_report_instruction_2")}</p>
                   </div>
                 </div>
@@ -463,20 +480,18 @@ const Reports: React.FC<ReportsProps> = ({
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="favorites" className="mt-4">
           <Card className="border border-input">
             <CardContent className="p-6 text-center">
               <Info className="mx-auto h-12 w-12 mb-4 text-muted-foreground/50" />
               <h3 className="text-lg font-medium mb-2">{t("reports.no_favorites")}</h3>
-              <p className="text-muted-foreground">
-                {t("reports.no_favorites_description")}
-              </p>
+              <p className="text-muted-foreground">{t("reports.no_favorites_description")}</p>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
@@ -485,23 +500,13 @@ const Reports: React.FC<ReportsProps> = ({
               <AlertCircle className="h-5 w-5 text-destructive" />
               {t("reports.delete_confirm_title")}
             </DialogTitle>
-            <DialogDescription>
-              {t("reports.delete_confirm_description")}
-            </DialogDescription>
+            <DialogDescription>{t("reports.delete_confirm_description")}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
-            >
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
               {t("actions.cancel")}
             </Button>
-            <Button
-              variant="destructive"
-              onClick={() => reportToDelete && handleDeleteReport(reportToDelete)}
-              disabled={isDeleting}
-            >
+            <Button variant="destructive" onClick={() => reportToDelete && handleDeleteReport(reportToDelete)} disabled={isDeleting}>
               {isDeleting ? t("reports.deleting") : t("reports.delete")}
             </Button>
           </DialogFooter>

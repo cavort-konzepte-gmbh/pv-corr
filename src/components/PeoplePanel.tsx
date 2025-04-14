@@ -25,11 +25,23 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
   const translation = useTranslation(currentLanguage);
 
   useEffect(() => {
     fetchPeople();
   }, []);
+
+  // Sort people alphabetically
+  useEffect(() => {
+    if (savedPeople && savedPeople.length > 0) {
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+      setSortedPeople(sorted);
+    } else {
+      setSortedPeople([]);
+    }
+  }, [savedPeople]);
+
   const fetchPeople = async () => {
     try {
       const { data, error } = await supabase
@@ -223,7 +235,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
         </div>
       ) : (
         <div className="space-y-4">
-          {savedPeople.map((person) => (
+          {sortedPeople.map((person) => (
             <div
               key={person.id}
               className="p-4 rounded-lg border transition-all hover:translate-x-1 text-primary border-accent hover:cursor-pointer"
@@ -247,7 +259,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                       }}
                       className="px-2 py-1 text-xs hover:bg-opacity-80"
                     >
-                         {translation("make_customer")}
+                      {translation("make_customer")}
                     </Button>
                   )}
                   <ChevronRight className="text-foreground" size={16} />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Theme } from "../../../../types/theme";
 import { Plus } from "lucide-react";
 import { createCustomer } from "../../../../services/customers";
@@ -20,6 +20,25 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
   const [selectedType, setSelectedType] = useState<"person" | "company">("person");
   const [selectedId, setSelectedId] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
+  const [sortedCompanies, setSortedCompanies] = useState<Company[]>([]);
+
+  // Sort people and companies alphabetically
+  useEffect(() => {
+    if (savedPeople && savedPeople.length > 0) {
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+      setSortedPeople(sorted);
+    } else {
+      setSortedPeople([]);
+    }
+
+    if (savedCompanies && savedCompanies.length > 0) {
+      const sorted = [...savedCompanies].sort((a, b) => a.name.localeCompare(b.name));
+      setSortedCompanies(sorted);
+    } else {
+      setSortedCompanies([]);
+    }
+  }, [savedPeople, savedCompanies]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,12 +141,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
                 >
                   <option value="">Select {selectedType === "person" ? "a person" : "a company"}</option>
                   {selectedType === "person"
-                    ? savedPeople.map((person) => (
+                    ? sortedPeople.map((person) => (
                         <option key={person.id} value={person.id}>
                           {person.firstName} {person.lastName}
                         </option>
                       ))
-                    : savedCompanies.map((company) => (
+                    : sortedCompanies.map((company) => (
                         <option key={company.id} value={company.id}>
                           {company.name}
                         </option>

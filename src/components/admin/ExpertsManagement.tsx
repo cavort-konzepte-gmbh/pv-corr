@@ -48,10 +48,10 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
   // Sort experts based on current sort field and direction
   const sortedExperts = React.useMemo(() => {
     if (!experts) return [];
-    
+
     return [...experts].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -72,7 +72,7 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
           comparison = (a.registration_number || "").localeCompare(b.registration_number || "");
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [experts, sortField, sortDirection]);
@@ -224,91 +224,61 @@ const ExpertsManagement: React.FC<ExpertsManagementProps> = ({ currentTheme, onB
             <TableCaption>Experts</TableCaption>
             <TableHeader>
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("name")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                   <div className="flex items-center gap-1">
                     Name
                     {sortField === "name" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("website")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("website")}>
                   <div className="flex items-center gap-1">
                     Website
                     {sortField === "website" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("email")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("email")}>
                   <div className="flex items-center gap-1">
                     Email
                     {sortField === "email" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("phone")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("phone")}>
                   <div className="flex items-center gap-1">
                     Phone
                     {sortField === "phone" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("vat_id")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("vat_id")}>
                   <div className="flex items-center gap-1">
                     VAT ID
                     {sortField === "vat_id" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("registration_number")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("registration_number")}>
                   <div className="flex items-center gap-1">
                     Reg. No.
                     {sortField === "registration_number" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}

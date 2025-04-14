@@ -56,10 +56,10 @@ const FieldList: React.FC<FieldListProps> = ({
   // Sort fields based on current sort field and direction
   const sortedFields = React.useMemo(() => {
     if (!initialFields) return [];
-    
+
     return [...initialFields].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -77,7 +77,7 @@ const FieldList: React.FC<FieldListProps> = ({
           comparison = aHasLocation - bHasLocation;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [initialFields, sortField, sortDirection]);
@@ -143,10 +143,12 @@ const FieldList: React.FC<FieldListProps> = ({
       showToast("Invalid fence value", "error");
       return;
     }
-    
+
     // Validate coordinates if provided
-    if ((newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
-        (newValues.longitude && !isValidCoordinate(newValues.longitude))) {
+    if (
+      (newValues.latitude && !isValidCoordinate(newValues.latitude)) ||
+      (newValues.longitude && !isValidCoordinate(newValues.longitude))
+    ) {
       showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
       return;
     }
@@ -154,16 +156,16 @@ const FieldList: React.FC<FieldListProps> = ({
     try {
       setError(null);
       setUpdatingField(true);
-      
+
       // Format coordinates if valid
       let latitude = newValues.latitude;
       let longitude = newValues.longitude;
-      
+
       if (latitude && longitude) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
       }
-      
+
       const newField = await createField(selectedProjectId, {
         name: newValues.name.trim(),
         latitude: latitude || undefined,
@@ -172,8 +174,8 @@ const FieldList: React.FC<FieldListProps> = ({
       });
 
       // Wait a moment to ensure the database has completed the field and zone creation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Fetch fresh project data
       const updatedProjects = await fetchProjects(null);
       onProjectsChange(updatedProjects);
@@ -186,7 +188,7 @@ const FieldList: React.FC<FieldListProps> = ({
         has_fence: "no",
       });
       setError(null);
-      
+
       // If the new field has an ID, select it to show its zones
       if (newField && newField.id) {
         onSelectField(newField.id);
@@ -218,43 +220,22 @@ const FieldList: React.FC<FieldListProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("name")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                   <div className="flex items-center gap-1">
                     {translation("field.name")}
-                    {sortField === "name" && (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
+                    {sortField === "name" && <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("has_fence")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("has_fence")}>
                   <div className="flex items-center gap-1">
                     {translation("field.has_fence")}
-                    {sortField === "has_fence" && (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
+                    {sortField === "has_fence" && <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("location")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("location")}>
                   <div className="flex items-center gap-1">
                     {translation("zones.location")}
-                    {sortField === "location" && (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
+                    {sortField === "location" && <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>}
                   </div>
                 </TableHead>
                 <TableHead> {translation("actions")}</TableHead>
@@ -364,12 +345,18 @@ const FieldList: React.FC<FieldListProps> = ({
                       <div onClick={() => editingId !== field.id && onSelectField(field.id)}>
                         <div className="flex items-center gap-2">
                           <span>{field.name}</span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                              {field.zones?.length || 0} {translation("zones").toLowerCase()}
+                          <div className="flex items-center gap-3 ml-2">
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {field.zones?.length || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("zones")}</span>
                             </span>
-                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                              {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} {translation("datapoints").toLowerCase()}
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("datapoints")}</span>
                             </span>
                           </div>
                         </div>
@@ -435,12 +422,12 @@ const FieldList: React.FC<FieldListProps> = ({
                         />
                       </div>
                     ) : field.latitude && field.longitude ? (
-                      <Button 
+                      <Button
                         onClick={(event) => {
                           event.stopPropagation();
                           handleOpenGoogleMaps(event, parseFloat(field.latitude.toString()), parseFloat(field.longitude.toString()));
                         }}
-                       className="h-8 text-xs px-2"
+                        className="h-8 text-xs px-2"
                       >
                         {translation("general.view_on_map")}
                       </Button>
@@ -474,16 +461,24 @@ const FieldList: React.FC<FieldListProps> = ({
                         {editingId === field.id ? <Save size={14} /> : <Edit2 size={14} />}
                       </Button>
                       {editingId === field.id && (
-                        <Button onClick={(event) => handleRemoveField(event, field)} className="size-8" variant="ghost">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(null);
+                            setEditingValues({});
+                          }}
+                          className="size-8"
+                          variant="ghost"
+                        >
                           <X size={14} />
                         </Button>
                       )}
-                      <Button 
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectField(field.id);
-                        }} 
-                        className="size-8" 
+                        }}
+                        className="size-8"
                         variant="ghost"
                       >
                         <ChevronRight className="text-foreground" size={14} />
@@ -496,7 +491,7 @@ const FieldList: React.FC<FieldListProps> = ({
           </Table>
         </div>
       </section>
-      
+
       <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
         <Plus size={16} />
         {translation("field.add")}

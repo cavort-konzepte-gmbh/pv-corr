@@ -46,44 +46,44 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     createDefaultField: true,
     defaultFieldName: "Field 1",
     createDefaultZone: true,
-    defaultZoneName: "Zone 1"
+    defaultZoneName: "Zone 1",
   });
   const [error, setError] = useState<string | null>(null);
   const translation = useTranslation(currentLanguage);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.projectName.trim()) {
-      showToast("Project name is required", "error");
+      setError("Project name is required");
       return;
     }
 
     // Validate coordinates if provided
-    if ((formData.latitude && !isValidCoordinate(formData.latitude)) || 
-        (formData.longitude && !isValidCoordinate(formData.longitude))) {
-      showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
+    if ((formData.latitude && !isValidCoordinate(formData.latitude)) || (formData.longitude && !isValidCoordinate(formData.longitude))) {
+      setError("Coordinates must be in decimal format (e.g., 57.123456)");
       return;
     }
 
     try {
       setError(null);
-      
+      const toastId = showToast("Creating project...", "loading");
+
       // Format coordinates if valid
       let latitude = formData.latitude;
       let longitude = formData.longitude;
-      
+
       if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
       }
-      
+
       const newProject = await createProject(
         {
           name: formData.projectName.trim(),
@@ -101,20 +101,26 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           createDefaultZone: formData.createDefaultZone,
           defaultZoneName: formData.defaultZoneName.trim(),
         },
-      );
+      ).catch((err) => {
+        console.error("Error in createProject:", err);
+        throw err;
+      });
 
       // Update projects list with new project
-      const updatedProjects = await fetchProjects(selectedCustomerId as string);
+      const updatedProjects = await fetchProjects(selectedCustomerId);
       onProjectsChange(updatedProjects);
 
       // If the new project has an ID, navigate to it
       if (newProject && newProject.id) {
         // Wait a moment to ensure the database has completed all operations
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Refresh projects again to ensure we have the latest data including fields and zones
-        const refreshedProjects = await fetchProjects(selectedCustomerId as string);
+        const refreshedProjects = await fetchProjects(selectedCustomerId);
         onProjectsChange(refreshedProjects);
+
+        // Show success message
+        showToast("Project created successfully", "success", { id: toastId });
       }
 
       setShowForm(false);
@@ -129,12 +135,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         createDefaultField: true,
         defaultFieldName: "Field 1",
         createDefaultZone: true,
-        defaultZoneName: "Zone 1"
+        defaultZoneName: "Zone 1",
       });
       setError(null);
     } catch (err) {
       console.error("Error creating project:", err);
-      setError(err instanceof Error ? err.message : "Failed to create project");
+      const errorMessage = err instanceof Error ? err.message : "Failed to create project";
+      setError(errorMessage);
+      showToast(`Failed to create project: ${errorMessage}`, "error");
     }
   };
 
@@ -153,7 +161,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               {translation("project.new")}
             </DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
@@ -168,23 +176,18 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="projectManager" className="text-sm font-medium">
                     {translation("project.manager")}
                   </Label>
-                  <Select 
-                    value={formData.selectedManagerId} 
-                    onValueChange={(value) => handleInputChange("selectedManagerId", value)}
-                  >
+                  <Select value={formData.selectedManagerId} onValueChange={(value) => handleInputChange("selectedManagerId", value)}>
                     <SelectTrigger id="projectManager" className="w-full">
                       <SelectValue placeholder={translation("project.manager.not_assigned")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">
-                        {translation("project.manager.not_assigned")}
-                      </SelectItem>
+                      <SelectItem value="none">{translation("project.manager.not_assigned")}</SelectItem>
                       {savedPeople.map((person) => (
                         <SelectItem key={person.id} value={person.id}>
                           {person.title ? `${person.title} ` : ""}
@@ -194,13 +197,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="projectType" className="text-sm font-medium">
                     {translation("project.type")}
                   </Label>
-                  <Select 
-                    value={formData.typeProject} 
+                  <Select
+                    value={formData.typeProject}
                     onValueChange={(value) => handleInputChange("typeProject", value as "roof" | "field")}
                   >
                     <SelectTrigger id="projectType" className="w-full">
@@ -213,28 +216,30 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   </Select>
                 </div>
               </div>
-              
+
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Default Structure</CardTitle>
-                  <CardDescription>Configure initial project structure</CardDescription>
+                  <CardTitle className="text-base"> {translation("default.structure")}</CardTitle>
+                  <CardDescription> {translation("initial.structure")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="createDefaultField" 
+                    <Checkbox
+                      id="createDefaultField"
                       checked={formData.createDefaultField}
                       onCheckedChange={(checked) => handleInputChange("createDefaultField", !!checked)}
                     />
                     <Label htmlFor="createDefaultField" className="text-sm font-medium">
-                      Create default field
+                      {translation("project.field")}
                     </Label>
                   </div>
-                  
+
                   {formData.createDefaultField && (
                     <div className="pl-6 space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="defaultFieldName" className="text-sm font-medium">Field name</Label>
+                        <Label htmlFor="defaultFieldName" className="text-sm font-medium">
+                          Field name
+                        </Label>
                         <Input
                           id="defaultFieldName"
                           value={formData.defaultFieldName}
@@ -242,21 +247,23 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                           placeholder="Field name"
                         />
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="createDefaultZone" 
+                        <Checkbox
+                          id="createDefaultZone"
                           checked={formData.createDefaultZone}
                           onCheckedChange={(checked) => handleInputChange("createDefaultZone", !!checked)}
                         />
                         <Label htmlFor="createDefaultZone" className="text-sm font-medium">
-                          Create default zone
+                          {translation("project.zone")}
                         </Label>
                       </div>
-                      
+
                       {formData.createDefaultZone && (
                         <div className="pl-6 space-y-2">
-                          <Label htmlFor="defaultZoneName" className="text-sm font-medium">Zone name</Label>
+                          <Label htmlFor="defaultZoneName" className="text-sm font-medium">
+                            {translation("zone.name")}
+                          </Label>
                           <Input
                             id="defaultZoneName"
                             value={formData.defaultZoneName}
@@ -269,7 +276,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   )}
                 </CardContent>
               </Card>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="clientRef" className="text-sm font-medium">
@@ -285,7 +292,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="imageUrl" className="text-sm font-medium">
                     {translation("project.image_url")}
@@ -299,7 +306,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="latitude" className="text-sm font-medium">
@@ -322,7 +329,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="longitude" className="text-sm font-medium">
                     {translation("project.longitude")}
@@ -344,23 +351,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     />
                   </div>
                 </div>
-                
-                {(formData.latitude && !isValidCoordinate(formData.latitude)) || 
-                 (formData.longitude && !isValidCoordinate(formData.longitude)) ? (
+
+                {(formData.latitude && !isValidCoordinate(formData.latitude)) ||
+                (formData.longitude && !isValidCoordinate(formData.longitude)) ? (
                   <div className="col-span-2 text-destructive flex items-center gap-1 text-xs mt-1">
                     <AlertCircle size={12} />
-                    <span>Coordinates must be in decimal format (e.g., 57.123456, 10.123456)</span>
+                    <span>{translation("coodinates.decimal.format")} (e.g., 57.123456, 10.123456)</span>
                   </div>
                 ) : null}
               </div>
             </div>
-            
-            {error && (
-              <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
-                {error}
-              </div>
-            )}
-            
+
+            {error && <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">{error}</div>}
+
             <DialogFooter>
               <Button
                 type="button"
@@ -378,15 +381,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     createDefaultField: true,
                     defaultFieldName: "Field 1",
                     createDefaultZone: true,
-                    defaultZoneName: "Zone 1"
+                    defaultZoneName: "Zone 1",
                   });
                 }}
               >
                 {translation("actions.cancel")}
               </Button>
-              <Button type="submit">
-                {translation("project.create")}
-              </Button>
+              <Button type="submit">{translation("project.create")}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

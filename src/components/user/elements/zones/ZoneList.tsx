@@ -52,13 +52,19 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
+  // Add sortedZones state
+  const [sortedZones, setSortedZones] = useState<Zone[]>([]);
+
   // Sort zones based on current sort field and direction
-  const sortedZones = React.useMemo(() => {
-    if (!zones) return [];
-    
-    return [...zones].sort((a, b) => {
+  useEffect(() => {
+    if (!zones || zones.length === 0) {
+      setSortedZones([]);
+      return;
+    }
+
+    const sorted = [...zones].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -82,9 +88,11 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
           comparison = aHasFoundation - bHasFoundation;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
+    
+    setSortedZones(sorted);
   }, [zones, sortField, sortDirection]);
 
   const handleSortChange = (field: SortField) => {
@@ -125,8 +133,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
       setUpdatingZone(true);
 
       // Validate coordinates if provided
-      if ((values.latitude && !isValidCoordinate(values.latitude)) || 
-          (values.longitude && !isValidCoordinate(values.longitude))) {
+      if ((values.latitude && !isValidCoordinate(values.latitude)) || (values.longitude && !isValidCoordinate(values.longitude))) {
         setError("Coordinates must be in decimal format (e.g., 57.123456)");
         setUpdatingZone(false);
         return;
@@ -135,7 +142,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
       // Format coordinates if valid
       let latitude = values.latitude;
       let longitude = values.longitude;
-      
+
       if (latitude && longitude) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
@@ -187,10 +194,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
       showToast("Zone name is required", "error");
       return;
     }
-    
+
     // Validate coordinates if provided
-    if ((newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
-        (newValues.longitude && !isValidCoordinate(newValues.longitude))) {
+    if (
+      (newValues.latitude && !isValidCoordinate(newValues.latitude)) ||
+      (newValues.longitude && !isValidCoordinate(newValues.longitude))
+    ) {
       showToast("Coordinates must be in decimal format (e.g., 57.123456)", "error");
       return;
     }
@@ -199,12 +208,12 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
       // Format coordinates if valid
       let latitude = newValues.latitude;
       let longitude = newValues.longitude;
-      
+
       if (latitude && longitude) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
       }
-      
+
       await createZone(selectedFieldId, {
         name: newValues.name.trim(),
         latitude: latitude || undefined,
@@ -239,61 +248,41 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("name")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                   <div className="flex items-center gap-1">
                     {translation("zones.short_name")}
                     {sortField === "name" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("location")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("location")}>
                   <div className="flex items-center gap-1">
                     {translation("zones.location")}
                     {sortField === "location" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("substructure")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("substructure")}>
                   <div className="flex items-center gap-1">
                     {translation("zones.substructure")}
                     {sortField === "substructure" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
                   </div>
                 </TableHead>
-                <TableHead 
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => handleSortChange("foundation")}
-                >
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("foundation")}>
                   <div className="flex items-center gap-1">
                     {translation("zones.foundation")}
                     {sortField === "foundation" ? (
-                      <span className="text-xs ml-1">
-                        {sortDirection === "asc" ? "▲" : "▼"}
-                      </span>
+                      <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                     ) : (
                       <ArrowUpDown size={14} className="ml-1 opacity-50" />
                     )}
@@ -353,8 +342,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         placeholder="e.g., 10.123456"
                         title="Enter decimal coordinates (e.g., 10.123456)"
                       />
-                      {(newValues.latitude && !isValidCoordinate(newValues.latitude)) || 
-                       (newValues.longitude && !isValidCoordinate(newValues.longitude)) ? (
+                      {(newValues.latitude && !isValidCoordinate(newValues.latitude)) ||
+                      (newValues.longitude && !isValidCoordinate(newValues.longitude)) ? (
                         <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                           <AlertCircle size={12} />
                           <span>Use decimal format (e.g., 57.123456)</span>
@@ -415,10 +404,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                 </TableRow>
               )}
               {sortedZones.map((zone) => (
-                <TableRow 
-                  key={zone.id} 
-                  className={cn("hover:bg-muted/50", { "cursor-pointer": editingZoneId !== zone.id })}
-                >
+                <TableRow key={zone.id} className={cn("hover:bg-muted/50", { "cursor-pointer": editingZoneId !== zone.id })}>
                   <TableCell className="p-2">
                     {editingZoneId === zone.id ? (
                       <Input
@@ -434,9 +420,14 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       <div onClick={() => editingZoneId !== zone.id && onSelectZone(zone.id)}>
                         <div className="flex items-center gap-2">
                           <span>{zone.name}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-muted-foreground">
-                            {zone.datapoints?.length || 0} {translation("datapoints").toLowerCase()}
-                          </span>
+                          <div className="flex items-center gap-2 ml-2">
+                            <span className="inline-flex items-center gap-1 text-left">
+                              <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                {zone.datapoints?.length || 0}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{translation("datapoints")}</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -468,8 +459,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           onClick={(e) => e.stopPropagation()}
                           title="Enter decimal coordinates (e.g., 10.123456)"
                         />
-                        {(editingValues.latitude && !isValidCoordinate(editingValues.latitude)) || 
-                         (editingValues.longitude && !isValidCoordinate(editingValues.longitude)) ? (
+                        {(editingValues.latitude && !isValidCoordinate(editingValues.latitude)) ||
+                        (editingValues.longitude && !isValidCoordinate(editingValues.longitude)) ? (
                           <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                             <AlertCircle size={12} />
                             <span>Use decimal format (e.g., 57.123456)</span>
@@ -477,7 +468,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                         ) : null}
                       </div>
                     ) : zone.latitude && zone.longitude ? (
-                      <Button 
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank");
@@ -582,12 +573,6 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                       </Button>
                       {editingZoneId === zone.id && (
                         <>
-                          <Button onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteZone(zone.id);
-                          }} variant="ghost">
-                            {translation("actions.delete")}
-                          </Button>
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -601,7 +586,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
                           </Button>
                         </>
                       )}
-                      <Button 
+                      <Button
                         onClick={(e) => {
                           e.stopPropagation();
                           if (editingZoneId !== zone.id) {
@@ -621,7 +606,7 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
           </Table>
         </div>
       </section>
-      
+
       <Button onClick={() => setIsAdding(true)} className="w-full py-3 px-4 mt-4">
         <Plus size={16} />
         {translation("zones.add")}

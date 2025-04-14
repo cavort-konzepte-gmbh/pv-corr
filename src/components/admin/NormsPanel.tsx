@@ -308,7 +308,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
 
   const toggleNormExpansion = (normId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpandedNorms(prev => {
+    setExpandedNorms((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(normId)) {
         newSet.delete(normId);
@@ -379,10 +379,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
             <div className="space-y-4">
               {norms.map((norm) => (
                 <div key={norm.id} className="rounded-lg border transition-all text-primary border-accent bg-card">
-                  <div 
-                    className="p-4 flex items-center justify-between cursor-pointer"
-                    onClick={(e) => toggleNormExpansion(norm.id, e)}
-                  >
+                  <div className="p-4 flex items-center justify-between cursor-pointer" onClick={(e) => toggleNormExpansion(norm.id, e)}>
                     <div>
                       {editingNorm === norm.id ? (
                         <div className="space-y-2">
@@ -432,11 +429,11 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                       </Button>
                     </div>
                   </div>
-                  
+
                   {(expandedNorms.has(norm.id) || editingNorm === norm.id) && (
                     <div className="px-4 pb-4">
                       {norm.description && <p className="text-sm mb-4 text-secondary">{norm.description}</p>}
-                      
+
                       {editingNorm === norm.id ? (
                         <div className="mt-4">
                           <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("standards.select_parameter")}</h4>
@@ -454,7 +451,7 @@ export const NormsPanel: React.FC<NormsPanelProps> = ({ currentTheme, currentLan
                                   <div className="flex-1">
                                     <div className="flex items-center gap-1">
                                       <span className="text-sm">{param.shortName || param.name}</span>
-                                      {param.unit && <span className="text-xs text-muted-foreground">({param.unit})</span>}
+                                      {param.unit && <span className="text-xs text-muted-foreground">{param.unit}</span>}
                                       <div className="relative group">
                                         <Info size={12} className="text-muted-foreground cursor-help" />
                                         <div className="absolute left-full ml-2 p-2 rounded border border-accent invisible group-hover:visible min-w-[200px] z-10">

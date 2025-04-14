@@ -7,7 +7,6 @@ import { supabase } from "../../lib/supabase";
 import { showToast } from "../../lib/toast";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
-import { createReport } from "../../services/reports";
 
 interface AnalyseResultProps {
   currentTheme: Theme;
@@ -31,12 +30,10 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
   const [expandedDatapoints, setExpandedDatapoints] = useState<Set<string>>(new Set());
   const [parameters, setParameters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [normParameters, setNormParameters] = useState<Set<string>>(new Set());
+  const [normParameters, setNormParameters] = useState<Map<string, string>>(new Map());
   const [error, setError] = useState<string | null>(null);
   const [parameterMap, setParameterMap] = useState<Record<string, any>>({});
   const [navigating, setNavigating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -53,11 +50,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         setLoading(false);
         return;
       }
-      
+
       // Create set of parameter IDs from norm
-      const paramIds = new Set(selectedNorm.parameters.map((p: any) => p.parameter_id));
-      setNormParameters(paramIds);
-      
+      const paramMap = new Map();
+      selectedNorm.parameters.forEach((p: any) => {
+        paramMap.set(p.parameter_id, p.parameter_code);
+      });
+      setNormParameters(paramMap);
+
       // Initialize with a short delay to ensure all data is loaded
       setTimeout(() => {
         setInitializing(false);
@@ -87,7 +87,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
           .order("created_at", { ascending: true });
 
         if (error) throw error;
-        
+
         if (!data || !Array.isArray(data)) {
           throw new Error("Invalid parameters data received");
         }
@@ -123,77 +123,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
     });
   };
 
-  const handleCreateReport = async () => {
-    try {
-      // Validate required data before proceeding
-      if (!selectedNorm) {
-        throw new Error("No norm selected");
-      }
-      if (!selectedDatapoints.length) {
-        throw new Error("No datapoints selected");
-      }
-
-      setIsSaving(true);
-      const toastId = showToast("Creating report...", "loading");
-      
-      // Calculate total rating
-      const totalRating = selectedDatapoints.reduce((sum, dp) => {
-        return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
-      }, 0);
-
-      // Determine classification based on total rating
-      const classification = 
-        totalRating >= 0 ? "Ia" :
-        totalRating >= -4 ? "Ib" :
-        totalRating >= -10 ? "II" : "III";
-
-      // Create report data
-      const reportData = {
-        projectId: project.id,
-        zoneId: zone.id,
-        standardId: selectedNorm.id,
-        content: {
-          projectName: project.name,
-          zoneName: zone.name,
-          normName: selectedNorm.name,
-          timestamp: new Date().toISOString(),
-        },
-        parameters: selectedDatapoints.map(dp => ({
-          id: dp.id,
-          values: dp.values,
-          ratings: dp.ratings,
-        })),
-        ratings: selectedDatapoints.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
-        totalRating,
-        classification,
-        recommendations: totalRating >= 0 
-          ? "No special measures required. Standard corrosion protection is sufficient."
-          : totalRating >= -10
-            ? "Moderate corrosion protection measures recommended."
-            : "Enhanced corrosion protection measures required.",
-      };
-
-      // Get the datapoint IDs to include in the URL
-      const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
-
-      // Create the report
-      const { report } = await createReport(reportData);
-
-      showToast("Report created successfully", "success", { id: toastId });
-      
-      // Navigate to the output view with the report ID
-      setNavigating(true);
-      window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
-    } catch (err) {
-      console.error("Error creating report:", err);
-      setSaveError("Failed to create report: " + (err instanceof Error ? err.message : String(err)));
-      showToast(`Failed to create report: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-      setNavigating(false);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   // Show loading state while initializing or loading parameters
   if (loading || initializing) {
     return <div className="text-center p-4 text-secondary">{t("analysis.loading")}</div>;
@@ -206,49 +135,49 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   // Safety check for selectedNorm
   if (!selectedNorm) {
-    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-      {t("analysis.no_norm_selected")}
-    </div>;
+    return (
+      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{t("analysis.no_norm_selected")}</div>
+    );
   }
 
   // Calculate results for each datapoint
   const results = selectedDatapoints.map((datapoint) => {
     // Calculate ratings for each parameter
     const parameterRatings: Record<string, { value: string; rating: number; unit?: string }> = {};
-    
-    // Debug the datapoint values
-    console.log("Processing datapoint values:", datapoint.values);
-    
+
+    if (!datapoint.values) {
+      console.warn("Datapoint has no values:", datapoint);
+      return { datapoint, parameterRatings: {}, outputs: {}, classification: { class: "N/A", stress: "No data" } };
+    }
+
     // Process each parameter in the datapoint values
     Object.entries(datapoint.values || {})
       .filter(([paramId]) => normParameters.has(paramId))
       .forEach(([paramId, value]) => {
         const parameter = parameterMap[paramId];
-        if (!parameter) return;
+        if (!parameter) {
+          console.warn(`Parameter ${paramId} not found in parameter map`);
+          return;
+        }
 
-        // Debug the parameter processing
-        console.log(`Processing parameter ${parameter.short_name || parameter.name} with value ${value}`);
-        
+        const paramCode = normParameters.get(paramId) || parameter.shortName || parameter.name;
+
         // Execute rating logic code if available
         let rating = 0;
         if (parameter.rating_logic_code) {
           try {
             // Create a function from the rating logic code
             const calculateRating = new Function("value", parameter.rating_logic_code);
-            console.log(`Executing rating logic for ${parameter.short_name || parameter.name}`);
             rating = calculateRating(value);
-            console.log(`Rating result: ${rating}`);
           } catch (err) {
-            console.error(`Error calculating rating for parameter ${parameter.short_name}:`, err);
+            console.error(`Error calculating rating for parameter ${parameter.shortName || parameter.name}:`, err);
           }
         } else {
           // If no rating logic code, use the datapoint's rating if available
           rating = (datapoint.ratings && datapoint.ratings[paramId]) || 0;
-          console.log(`Using existing rating: ${rating}`);
         }
 
-        const paramName = parameter.short_name || parameter.name;
-        parameterRatings[paramName] = {
+        parameterRatings[paramCode] = {
           value,
           rating,
           unit: parameter.unit,
@@ -260,18 +189,19 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
     // Get all ratings for parameters Z1-Z15
     const zRatings: Record<number, number> = {};
-    
-    // Debug the ratings
-    console.log("Datapoint ratings:", datapoint.ratings);
-    
+
     // Process each parameter rating
     if (datapoint.ratings) {
       Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
+        // Get parameter info from map
         const param = parameterMap[paramId];
-        if (!param?.shortName) return;
+        if (!param) return;
+
+        const paramCode = normParameters.get(paramId) || param.shortName || param.name;
+        if (!paramCode) return;
 
         // Match Z1-Z15 pattern
-        const match = param.shortName.match(/^Z(\d+)$/i);
+        const match = paramCode.match(/^Z(\d+)$/i);
         if (!match) return;
 
         const num = parseInt(match[1]);
@@ -281,9 +211,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
       });
     }
 
-    // Debug Z ratings
-    console.log("Z ratings:", zRatings);
-    
     // Process each output formula from the norm configuration
     if (selectedNorm?.output_config && Array.isArray(selectedNorm.output_config)) {
       console.log("Processing output config:", selectedNorm.output_config);
@@ -295,48 +222,48 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
               values: {},
               ratings: {},
             };
-            
+
             // Add all parameter values to the context
             Object.entries(datapoint.values || {}).forEach(([paramId, value]) => {
               const param = parameterMap[paramId];
               if (param?.short_name || param?.name) {
                 // Convert string numbers to actual numbers
                 let numValue = value;
-                if (typeof value === 'string' && !isNaN(parseFloat(value))) {
+                if (typeof value === "string" && !isNaN(parseFloat(value))) {
                   numValue = parseFloat(value);
                 }
                 console.log(`Setting context value ${param.short_name || param.name} = ${numValue}`);
                 context.values[param.id] = numValue;
               }
             });
-            
+
             // Add all parameter ratings to the context
             if (datapoint.ratings) {
               Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
-              const param = parameterMap[paramId];
-              if (param?.short_name) {
-                console.log(`Setting context rating ${param.short_name} = ${rating}`);
-                context.ratings[param.short_name] = rating;
-              }
+                const param = parameterMap[paramId];
+                if (param?.short_name) {
+                  console.log(`Setting context rating ${param.short_name} = ${rating}`);
+                  context.ratings[param.short_name] = rating;
+                }
               });
             }
-            
+
             // Add Z1-Z15 ratings directly to the context for easier access
             Object.entries(zRatings).forEach(([num, rating]) => {
               console.log(`Setting Z${num} = ${rating}`);
               context[`Z${num}`] = rating;
             });
-            
+
             // Create a function from the formula and execute it with the context
             try {
               // Wrap the formula in a return statement if it doesn't have one
               let formula = output.formula.trim();
-              if (!formula.startsWith('return ') && !formula.includes('return ')) {
+              if (!formula.startsWith("return ") && !formula.includes("return ")) {
                 formula = `return ${formula}`;
               }
-              
+
               try {
-                const calculateOutput = new Function('values', 'ratings', formula);
+                const calculateOutput = new Function("values", "ratings", formula);
                 const result = calculateOutput(context.values, context.ratings);
 
                 // Handle array results (like zinc loss rate)
@@ -414,40 +341,51 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium  mb-4">{t("analysis.results")}</h3>
+      <h3 className="text-lg font-medium mb-4">{t("analysis.results")}</h3>
 
       <div className="space-y-4">
         {results.map(({ datapoint, parameterRatings, outputs, classification }) => (
-          <div key={datapoint.id} className="p-4 rounded-lg border border-theme ">
-            <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
-              <div className="font-medium ">{datapoint.name}</div>
-              <div className="flex items-center gap-4">
-                <div className="text-sm ">{new Date(datapoint.timestamp).toLocaleString()}</div>
-                {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          <div key={datapoint.id} className="p-4 rounded-lg border border-theme">
+            <div className="flex flex-col gap-1 mb-3">
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleDatapoint(datapoint.id)}>
+                <div className="font-medium text-primary">
+                  <span className="font-medium">{t("datapoints")}: </span> {datapoint.name}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium">{t("Created")}:</span>{" "}
+                    {datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}
+                  </div>
+                  {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-4">
-                {Array.isArray(selectedNorm?.output_config) && selectedNorm.output_config.map((output: any) => (
-                  output && output.id && (
-                  <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20  bg-border" title={output.description}>
-                    {output.name}: {(() => {
-                      // Special handling for array outputs like zinc loss rate
-                      if (Array.isArray(outputs[`${output.id}_full`])) {
-                        return `${outputs[`${output.id}_full`][0]} ± ${outputs[`${output.id}_full`][1]}`;
-                      } else if (output.id === 'zincLossRate' && Array.isArray(outputs[output.id])) {
-                        return `${outputs[output.id][0]} ± ${outputs[output.id][1]}`;
-                      } else if (typeof outputs[output.id] === 'number') {
-                        return outputs[output.id].toFixed(2);
-                      } else {
-                        return '0.00';
-                      }
-                    })()}
-                    {output.id === "b0" && ` (${classification.class} - ${classification.stress})`}
-                  </div>
-                  )
-                ))}
+              <div className="flex flex-wrap items-center gap-3">
+                {Array.isArray(selectedNorm?.output_config) &&
+                  selectedNorm.output_config.map(
+                    (output: any) =>
+                      output &&
+                      output.id && (
+                        <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20 bg-border" title={output.description}>
+                          <span className="font-medium">{output.name}:</span>{" "}
+                          {(() => {
+                            // Special handling for array outputs like zinc loss rate
+                            if (Array.isArray(outputs[`${output.id}_full`])) {
+                              return `${outputs[`${output.id}_full`][0]} ± ${outputs[`${output.id}_full`][1]}`;
+                            } else if (output.id === "zincLossRate" && Array.isArray(outputs[output.id])) {
+                              return `${outputs[output.id][0]} ± ${outputs[output.id][1]}`;
+                            } else if (typeof outputs[output.id] === "number") {
+                              return outputs[output.id].toFixed(2);
+                            } else {
+                              return "0.00";
+                            }
+                          })()}
+                          {output.id === "b0" && ` (${classification.class} - ${classification.stress})`}
+                        </div>
+                      ),
+                  )}
               </div>
 
               {expandedDatapoints.has(datapoint.id) && (
@@ -455,7 +393,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                   <TableCaption>{t("analysis.parameter_ratings")}</TableCaption>
                   <TableHeader>
                     <TableRow>
-                      <TableHead> {t("analysis.parameter")}</TableHead>
+                      <TableHead>{t("analysis.parameter")}</TableHead>
                       <TableHead>{t("analysis.value")}</TableHead>
                       <TableHead>{t("analysis.rating")}</TableHead>
                     </TableRow>
@@ -467,9 +405,9 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                         <TableRow key={code}>
                           <TableCell className="p-2">{code.toUpperCase()}</TableCell>
                           <TableCell className="p-2">
-                            {value} {unit && <span className="text-secondary">({unit})</span>}
+                            {value} {unit && <span className="text-muted-foreground ml-1">[{unit}]</span>}
                           </TableCell>
-                          <TableCell className="p-2 ">{rating}</TableCell>
+                          <TableCell className="p-2">{rating}</TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -478,52 +416,6 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             </div>
           </div>
         ))}
-      </div>
-      
-      {/* Create Report Button */}
-      <div className="flex justify-between items-center mt-8 border-t pt-6 border-input bg-card p-4 rounded-lg">
-        <div className="flex-1">
-          <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-          {t("analysis.report_description")}
-       
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => {
-              try {
-                // Prevent multiple clicks
-                if (navigating) return;
-                setNavigating(true);
-                
-                // Get the datapoint IDs to include in the URL
-                const datapointIds = selectedDatapoints.map(dp => dp.id).join(',');
-                
-                // Navigate to output view with preview parameters and datapoint IDs
-                window.location.href = `/?view=output&preview=true&projectId=${project.id}&zoneId=${zone.id}&normId=${selectedNorm.id}&datapointIds=${datapointIds}`;
-              } catch (err) {
-                console.error("Error navigating to preview:", err);
-                setNavigating(false);
-              }
-            }}
-            title="Preview a report from the selected datapoints"
-            disabled={navigating || selectedDatapoints.length === 0}
-            variant="outline"
-            className="px-6 py-3 rounded text-sm flex items-center gap-2"
-          >
-            <FileText size={16} />
-            {t("analysis.preview_report")}
-          </Button>
-          <Button
-            onClick={handleCreateReport}
-            disabled={navigating || selectedDatapoints.length === 0}
-            className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
-          >
-            <FileCheck size={16} />
-            {isSaving ? t("analysis.creating_report") : t("analysis.create_report")}
-          </Button>
-        </div>
       </div>
     </div>
   );

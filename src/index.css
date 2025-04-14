@@ -33,6 +33,24 @@
   font-size: 1rem !important;
 }
 
+/* Increase font size for units */
+.unit-text {
+  font-size: 15px !important;
+}
+
+.text-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+.text-xl {
+  font-size: 1.25rem !important;
+}
+
+.project-overview-title {
+  color: hsl(142.1 76.2% 36.3%) !important;
+  font-weight: bold;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

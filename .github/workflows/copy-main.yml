@@ -1,12 +1,9 @@
-name: Copy Main Branch
-
+name: Copy Main to Zimmermann Branch
 on:
   workflow_dispatch:
-
 jobs:
-  copy-main:
+  copy-main-to-zimmermann:
     runs-on: ubuntu-latest
-
     steps:
       - name: Configure Git
         run: |
@@ -17,22 +14,28 @@ jobs:
         run: |
           git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cavort-konzepte-gmbh/pv-corr.git source-repo
 
-      - name: Clone destination repository
+      - name: Clone destination repository zimmermann branch
         run: |
-          git clone -b main --single-branch https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git dest-repo
+          git clone https://${{ secrets.BACKUP_PAT }}@github.com/cvrt-jh/pv-corr.git dest-repo
+          cd dest-repo
+          # Create zimmermann branch if it doesn't exist, or checkout if it does
+          git checkout zimmermann 2>/dev/null || git checkout -b zimmermann
 
-      - name: Copy files preserving .bolt
+      - name: Copy files from main to zimmermann
         run: |
+          # Remove all files except .git from destination
+          find dest-repo -mindepth 1 ! -path "dest-repo/.git*" -delete
+
+          # Copy all files from source except .git
           cd source-repo
-          # Copy all files except .git
           find . -mindepth 1 ! -regex '^.*/\.git.*' -exec cp -r --parents {} ../dest-repo/ \;
-          cd ../dest-repo
-          # Stage all changes but preserve .bolt
+
+      - name: Commit and push changes
+        run: |
+          cd dest-repo
           git add .
-          # Restore .bolt directory if it was deleted
-          git checkout main -- .bolt || true
-          git commit -m "Update from source repository"
-          git push origin main
+          git commit -m "Overwrite zimmermann branch with main branch content"
+          git push -f origin zimmermann
 
       - name: Cleanup
         if: always()

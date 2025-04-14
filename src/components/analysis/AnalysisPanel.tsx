@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project, Zone } from "../../types/projects";
-import { FileText, Save, Download, FileCheck } from "lucide-react";
+import { FileText, FileCheck } from "lucide-react";
 import AnalysisReport from "./AnalysisReport";
-import { useAuth } from "../auth/AuthProvider";
 import { generateHiddenId } from "../../utils/generateHiddenId";
 import AnalyseData from "./AnalyseData";
 import AnalyseNorm from "./AnalyseNorm";
@@ -15,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { calculateZincLossRate, formatZincLossRate } from "../../services/calculations";
 import { supabase } from "../../lib/supabase";
+import { fetchDatapointsByZoneId } from "../../services/datapoints";
 
 interface AnalysisPanelProps {
   currentTheme: Theme;
@@ -43,9 +43,28 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [parameters, setParameters] = useState<any[]>([]);
   const [navigating, setNavigating] = useState(false);
+  const [zoneDatapoints, setZoneDatapoints] = useState<Datapoint[]>([]);
   const t = useTranslation(currentLanguage);
-  const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch datapoints directly when zone changes
+  useEffect(() => {
+    const loadDatapoints = async () => {
+      if (selectedZoneId) {
+        try {
+          console.log("Fetching datapoints for analysis from zone:", selectedZoneId);
+          const datapoints = await fetchDatapointsByZoneId(selectedZoneId);
+          console.log("Fetched datapoints for analysis:", datapoints.length);
+          setZoneDatapoints(datapoints);
+        } catch (err) {
+          console.error("Error loading datapoints for analysis:", err);
+          showToast("Failed to load datapoints for analysis", "error");
+        }
+      }
+    };
+
+    loadDatapoints();
+  }, [selectedZoneId]);
 
   // Handle norm selection
   useEffect(() => {
@@ -58,7 +77,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
       try {
         // Show loading toast
         const toastId = showToast("Loading norm data...", "loading");
-        
+
         const { data, error } = await supabase
           .from("norms")
           .select(
@@ -79,14 +98,14 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           showToast(`Failed to load norm: ${error.message}`, "error", { id: toastId });
           throw error;
         }
-        
+
         // Ensure output_config is an array
         if (data && (!data.output_config || !Array.isArray(data.output_config))) {
           data.output_config = [];
         }
-        
+
         setSelectedNorm(data);
-        showToast("Norm loaded successfully", "success", { id: toastId });
+        showToast(t("norm.loadede.successfully"), "success", { id: toastId });
       } catch (err) {
         console.error("Error loading norm:", err);
         setSelectedNorm(null);
@@ -169,6 +188,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
   };
 
   const handleCreateReport = async () => {
+    // Show toast message and return early
+    showToast("Report creation is temporarily disabled", "info");
+    return;
+
     if (!selectedProject || !selectedZone || !selectedNorm || selectedDatapoints.length === 0) {
       setSaveError("Please select datapoints and a norm before creating a report");
       showToast("Please select datapoints and a norm before creating a report", "error");
@@ -183,27 +206,26 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
 
       // Get selected datapoints
       const selectedDps = selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id));
-      
+
       // Calculate total rating
       const totalRating = selectedDps.reduce((sum, dp) => {
         return sum + Object.values(dp.ratings || {}).reduce((a, b) => a + b, 0);
       }, 0);
-      
+
       // Apply any custom calculations from norm output_config
       let calculatedRating = totalRating;
       if (selectedNorm?.output_config && Array.isArray(selectedNorm.output_config)) {
-        
         // Check if we need to calculate zinc loss rate
-        const zincLossOutput = selectedNorm.output_config.find(o => o.id === 'zincLossRate');
+        const zincLossOutput = selectedNorm.output_config.find((o) => o.id === "zincLossRate");
         if (zincLossOutput) {
           try {
             // Find parameter IDs for zinc loss calculation
-            const resistivityParam = parameters.find(p => p.shortName?.toLowerCase() === 'resistivity');
-            const chloridesParam = parameters.find(p => p.shortName?.toLowerCase() === 'chlorides');
-            const soilTypeParam = parameters.find(p => p.shortName?.toLowerCase() === 'soil type');
-            const phParam = parameters.find(p => p.shortName?.toLowerCase() === 'ph');
-            const coatingThicknessParam = parameters.find(p => p.shortName?.toLowerCase() === 'coating thickness');
-            
+            const resistivityParam = parameters.find((p) => p.shortName?.toLowerCase() === "resistivity");
+            const chloridesParam = parameters.find((p) => p.shortName?.toLowerCase() === "chlorides");
+            const soilTypeParam = parameters.find((p) => p.shortName?.toLowerCase() === "soil type");
+            const phParam = parameters.find((p) => p.shortName?.toLowerCase() === "ph");
+            const coatingThicknessParam = parameters.find((p) => p.shortName?.toLowerCase() === "coating thickness");
+
             if (resistivityParam && chloridesParam && soilTypeParam && phParam) {
               // Get values from first datapoint
               const firstDatapoint = selectedDps[0];
@@ -213,26 +235,26 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
                   CHLORIDES: chloridesParam.id,
                   SOIL_TYPE: soilTypeParam.id,
                   PH: phParam.id,
-                  COATING_THICKNESS: coatingThicknessParam?.id
+                  COATING_THICKNESS: coatingThicknessParam?.id,
                 };
-                
+
                 // Calculate zinc loss rate
                 const results = calculateZincLossRate(firstDatapoint.values, parameterIds);
                 const [zincLossRate, steelLossRate, zincLifetime, requiredReserve] = results;
-                
+
                 console.log("Zinc loss calculation results:", {
                   zincLossRate,
                   steelLossRate,
                   zincLifetime,
-                  requiredReserve
+                  requiredReserve,
                 });
-                
+
                 // Store the results in the correct format
                 reportData.normResults = {
                   "Zinc Loss Rate": formatZincLossRate(zincLossRate),
                   "Steel Loss Rate": `${steelLossRate} μm/year`,
                   "Zinc Lifetime": `${zincLifetime} years`,
-                  "Required Reserve": `${requiredReserve} mm`
+                  "Required Reserve": `${requiredReserve} mm`,
                 };
               }
             }
@@ -240,62 +262,62 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
             console.error("Error in zinc loss calculation:", err);
           }
         }
-        
+
         // Find the main output formula (usually b0)
-        const mainOutput = selectedNorm.output_config.find(o => o.id === 'b0');
+        const mainOutput = selectedNorm.output_config.find((o) => o.id === "b0");
         if (mainOutput?.formula) {
           try {
             // Create context for each datapoint
-            const results = selectedDps.map(dp => {
+            const results = selectedDps.map((dp) => {
               // Create a context with parameter values and ratings
               const context: Record<string, any> = {
                 values: {},
                 ratings: {},
               };
-              
+
               // Add all parameter values to the context
               Object.entries(dp.values).forEach(([paramId, value]) => {
-                const param = parameters.find(p => p.id === paramId);
+                const param = parameters.find((p) => p.id === paramId);
                 if (param?.shortName) {
                   // Convert string numbers to actual numbers
                   let numValue = value;
-                  if (typeof value === 'string' && !isNaN(parseFloat(value))) {
+                  if (typeof value === "string" && !isNaN(parseFloat(value))) {
                     numValue = parseFloat(value);
                   }
                   context.values[param.shortName] = numValue;
                 }
               });
-              
+
               // Add all parameter ratings to the context
               Object.entries(dp.ratings || {}).forEach(([paramId, rating]) => {
-                const param = parameters.find(p => p.id === paramId);
+                const param = parameters.find((p) => p.id === paramId);
                 if (param?.shortName) {
                   context.ratings[param.shortName] = rating;
                 }
               });
-              
+
               try {
                 // Create a function from the formula and execute it with the context
                 let formula = output.formula.trim();
-                if (!formula.startsWith('return ') && !formula.includes('return ')) {
+                if (!formula.startsWith("return ") && !formula.includes("return ")) {
                   formula = `return ${formula}`;
                 }
-                
-                const calculateOutput = new Function('values', 'ratings', formula);
+
+                const calculateOutput = new Function("values", "ratings", formula);
                 return calculateOutput(context.values, context.ratings);
               } catch (err) {
                 console.error(`Error calculating output for datapoint:`, err);
                 return 0;
               }
             });
-            
+
             // Add the result to the report data
             if (results.length > 0) {
               // Format the result based on its type
               const result = results[0];
               if (Array.isArray(result)) {
                 reportData.normResults[output.name || output.id] = `${result[0]} ± ${result[1]}`;
-              } else if (typeof result === 'number') {
+              } else if (typeof result === "number") {
                 reportData.normResults[output.name || output.id] = result.toFixed(2);
               } else {
                 reportData.normResults[output.name || output.id] = String(result);
@@ -306,15 +328,12 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           }
         }
       }
-      
+
       // Get the datapoint IDs to include in the URL
-      const datapointIds = selectedDatapoints.join(',');
+      const datapointIds = selectedDatapoints.join(",");
 
       // Determine classification based on total rating
-      const classification = 
-        calculatedRating >= 0 ? "Ia" :
-        calculatedRating >= -4 ? "Ib" :
-        calculatedRating >= -10 ? "II" : "III";
+      const classification = calculatedRating >= 0 ? "Ia" : calculatedRating >= -4 ? "Ib" : calculatedRating >= -10 ? "II" : "III";
 
       // Create report data
       const reportData = {
@@ -328,7 +347,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           timestamp: new Date().toISOString(),
         },
         normResults: {}, // Will be populated with calculation results
-        parameters: selectedDps.map(dp => ({
+        parameters: selectedDps.map((dp) => ({
           id: dp.id,
           values: dp.values,
           ratings: dp.ratings,
@@ -336,18 +355,19 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         ratings: selectedDps.reduce((acc, dp) => ({ ...acc, [dp.id]: dp.ratings }), {}),
         totalRating: calculatedRating,
         classification,
-        recommendations: calculatedRating >= 0 
-          ? "No special measures required. Standard corrosion protection is sufficient."
-          : calculatedRating >= -10
-            ? "Moderate corrosion protection measures recommended."
-            : "Enhanced corrosion protection measures required.",
+        recommendations:
+          calculatedRating >= 0
+            ? "No special measures required. Standard corrosion protection is sufficient."
+            : calculatedRating >= -10
+              ? "Moderate corrosion protection measures recommended."
+              : "Enhanced corrosion protection measures required.",
       };
 
       // Create the report
       const { report } = await createReport(reportData);
 
       showToast("Report created successfully", "success", { id: toastId });
-      
+
       // Navigate to output view with the report ID and datapoint IDs
       window.location.href = `/?view=output&reportId=${report.id}&datapointIds=${datapointIds}`;
     } catch (err) {
@@ -364,23 +384,19 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
     // Handle special cases for select all/deselect all
     if (datapointId === "__select_all__") {
       // Select all datapoints
-      const allDatapointIds = selectedZone?.datapoints.map(dp => dp.id) || [];
+      const allDatapointIds = selectedZone?.datapoints.map((dp) => dp.id) || [];
       setSelectedDatapoints(allDatapointIds);
       return;
     }
-    
+
     if (datapointId === "__deselect_all__") {
       // Deselect all datapoints
       setSelectedDatapoints([]);
       return;
     }
-    
+
     // Normal toggle behavior for individual datapoints
-    setSelectedDatapoints((prev) => 
-      prev.includes(datapointId) 
-        ? prev.filter((id) => id !== datapointId) 
-        : [...prev, datapointId]
-    );
+    setSelectedDatapoints((prev) => (prev.includes(datapointId) ? prev.filter((id) => id !== datapointId) : [...prev, datapointId]));
   };
 
   // Get selected project and zone from navigation state
@@ -414,23 +430,17 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
     return <div className="p-6 text-center text-secondary">{t("datapoint.please_select_zone")}</div>;
   }
 
+  // Use directly fetched datapoints if available, otherwise use the ones from the zone
+  const availableDatapoints = zoneDatapoints.length > 0 ? zoneDatapoints : selectedZone?.datapoints || [];
+
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold text-primary mb-6">
-        {t("analysis.title")}
-        {selectedProject && (
-          <span className="text-sm El text-secondary-foreground ml-2">
-            {selectedProject.name} {selectedField && `→ ${selectedField.name}`} {selectedZone && `→ ${selectedZone.name}`}
-          </span>
-        )}
-      </h2>
-
       <div className="space-y-6">
         {/* Analysis Table */}
         <AnalyseData
           currentTheme={currentTheme}
           currentLanguage={currentLanguage}
-          datapoints={selectedZone.datapoints}
+          datapoints={availableDatapoints}
           selectedDatapoints={selectedDatapoints}
           onToggleDatapoint={toggleDatapoint}
         />
@@ -446,10 +456,10 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
         {/* Analysis Result */}
         {selectedDatapoints.length > 0 && selectedNormId && (
           <AnalyseResult
-            key={`result-${selectedDatapoints.join("-")}-${selectedNormId}-${selectedNorm?.id || 'loading'}`}
+            key={`result-${selectedDatapoints.join("-")}-${selectedNormId}-${selectedNorm?.id || "loading"}`}
             currentTheme={currentTheme}
             currentLanguage={currentLanguage}
-            selectedDatapoints={selectedZone.datapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
+            selectedDatapoints={availableDatapoints.filter((dp) => selectedDatapoints.includes(dp.id))}
             selectedNorm={selectedNorm}
             project={selectedProject}
             zone={selectedZone}
@@ -461,43 +471,34 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({
           <div className="flex justify-between items-center mt-8 border-t pt-6 border-input bg-card p-4 rounded-lg">
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-2">{t("analysis.report_options")}</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                {t("analysis.report_description")}
-              </p>
-              {saveError && (
-                <div className="p-3 mb-4 text-sm rounded bg-destructive/10 text-destructive">
-                  {saveError}
-                </div>
-              )}
+              <p className="text-sm text-muted-foreground mb-4">{t("analysis.report_description")}</p>
+              {saveError && <div className="p-3 mb-4 text-sm rounded bg-destructive/10 text-destructive">{saveError}</div>}
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => {
-                  if (navigating) return;
-                   
-                  setNavigating(true);
-                  
-                  // Get the datapoint IDs to include in the URL
-                  const datapointIds = selectedDatapoints.join(',');
-                  
-                  // Use window.location for a full page navigation
-                  window.location.href = `/?view=output&preview=true&projectId=${selectedProject?.id}&zoneId=${selectedZone?.id}&normId=${selectedNorm?.id}&datapointIds=${datapointIds}`;
+                onClick={(e) => {
+                  e.preventDefault();
+                  showToast("Preview report is temporarily disabled", "info");
                 }}
                 title="Preview a report from the selected datapoints"
-                disabled={navigating || isSaving || selectedDatapoints.length === 0 || !selectedNormId}
+                disabled={true}
                 variant="outline"
-                className="px-6 py-3 rounded text-sm flex items-center gap-2"
+                className="px-6 py-3 rounded text-sm flex items-center gap-2 opacity-50 cursor-not-allowed"
               >
                 <FileText size={16} />
                 {t("analysis.preview_report")}
               </Button>
               <Button
-                onClick={handleCreateReport}
-                disabled={isSaving || selectedDatapoints.length === 0 || !selectedNormId}
-                className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  showToast("Report creation is temporarily disabled", "info");
+                }}
+                disabled={true}
+                className="px-6 py-3 rounded text-sm flex items-center gap-2 text-white bg-accent-primary opacity-50 cursor-not-allowed"
+                title="Report creation is temporarily disabled"
               >
                 <FileCheck size={16} />
-                {isSaving ? t("analysis.creating_report") : t("analysis.create_report")}
+                {t("analysis.create_report")}
               </Button>
             </div>
           </div>

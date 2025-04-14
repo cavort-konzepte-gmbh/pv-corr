@@ -56,28 +56,70 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
     loadTranslations();
   }, [currentLanguage]);
 
+  const refreshSession = async () => {
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.refreshSession();
+      if (error) {
+        throw error;
+      }
+      if (session) {
+        handleSession(session);
+      } else {
+        // If no session after refresh, sign out
+        await signOut();
+      }
+    } catch (error) {
+      console.error("Error refreshing session:", error);
+      await signOut();
+    }
+  };
+
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error getting session:", error);
+        signOut();
+        return;
+      }
+      if (session) {
+        handleSession(session);
+      }
       setLoading(false);
     });
 
     // Listen for changes on auth state (sign in, sign out, etc.)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_OUT") {
         setUser(null);
         setIsAdmin(false);
         setViewMode("user");
         setLoginType(null);
+      } else if (event === "TOKEN_REFRESHED") {
+        if (session) {
+          handleSession(session);
+        }
+      } else if (event === "USER_UPDATED") {
+        if (session) {
+          handleSession(session);
+        }
       } else if (session?.user) {
         handleSession(session);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Set up session refresh interval
+    const refreshInterval = setInterval(refreshSession, 3600000); // Refresh every hour
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(refreshInterval);
+    };
   }, []);
 
   const handleSession = (session: Session | null) => {
@@ -112,13 +154,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
       // Clear any cached auth state before signing out
       localStorage.removeItem("sb-auth-token");
       sessionStorage.removeItem("sb-auth-token");
-      
+
       await supabase.auth.signOut();
       setLoginType(null);
       setUser(null);
       setIsAdmin(false);
       setViewMode("user");
-      
+
       // Force page reload to clear any cached state
       window.location.href = "/";
     } catch (error) {

@@ -24,7 +24,7 @@ export const fetchTranslations = async (language: Language) => {
     if (translationCache[language] && Object.keys(translationCache[language]).length > 0) {
       return translationCache[language];
     }
-    
+
     // Try to get from localStorage as fallback
     try {
       const cachedTranslations = localStorage.getItem(`translations_${language}`);
@@ -58,7 +58,7 @@ export const fetchTranslations = async (language: Language) => {
     if (Object.keys(translationMap).length > 0) {
       // Cache translations in memory
       translationCache[language] = translationMap;
-      
+
       // Also cache in localStorage as backup
       try {
         localStorage.setItem(`translations_${language}`, JSON.stringify(translationMap));
@@ -70,7 +70,7 @@ export const fetchTranslations = async (language: Language) => {
     return translationMap;
   } catch (err) {
     console.error("Error fetching translations:", err);
-    
+
     // Try to get from localStorage as fallback in case of API error
     try {
       const cachedTranslations = localStorage.getItem(`translations_${language}`);
@@ -80,7 +80,7 @@ export const fetchTranslations = async (language: Language) => {
     } catch (e) {
       console.warn("Failed to load fallback translations from localStorage:", e);
     }
-    
+
     // Return basic fallback translations for critical UI elements
     return {
       "nav.customers": "Customers",
@@ -211,8 +211,8 @@ export const deleteTranslation = async (key: string) => {
     // Clear all language caches since we don't know which languages had this key
     translationCache = {} as Record<Language, Record<string, string>>;
     Object.keys(localStorage)
-      .filter(key => key.startsWith("translations_"))
-      .forEach(key => localStorage.removeItem(key));
+      .filter((key) => key.startsWith("translations_"))
+      .forEach((key) => localStorage.removeItem(key));
   } catch (err) {
     console.error("Error deleting translation:", err);
     throw err;

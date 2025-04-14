@@ -5,6 +5,7 @@ import { Datapoint } from "../../types/projects";
 import { Check, ArrowUpDown, CheckSquare, Square } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { showToast } from "../../lib/toast";
 
 interface AnalyseDataProps {
   currentTheme: Theme;
@@ -24,7 +25,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
 
   // Get name from datapoint, falling back to id if not available
   const getDatapointName = (datapoint: Datapoint) => {
-    return datapoint.name || datapoint.id;
+    return datapoint?.name || datapoint?.id || "Unnamed Datapoint";
   };
 
   const handleSort = (field: SortField) => {
@@ -37,8 +38,9 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
   };
 
   const sortedDatapoints = [...datapoints].sort((a, b) => {
-    const aValue = sortField === "name" ? getDatapointName(a).toLowerCase() : a.timestamp;
-    const bValue = sortField === "name" ? getDatapointName(b).toLowerCase() : b.timestamp;
+    // Safely access properties with null checks
+    const aValue = sortField === "name" ? (a ? getDatapointName(a).toLowerCase() : "") : a?.timestamp || "";
+    const bValue = sortField === "name" ? (b ? getDatapointName(b).toLowerCase() : "") : b?.timestamp || "";
 
     if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
     if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
@@ -50,7 +52,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <h3 className="text-lg font-medium">{t("analysis.select_datapoints")}</h3>
-          <Button 
+          <Button
             onClick={() => {
               if (selectedDatapoints.length === datapoints.length) {
                 // If all are selected, deselect all
@@ -67,12 +69,12 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
             {selectedDatapoints.length === datapoints.length ? (
               <>
                 <CheckSquare className="h-4 w-4" />
-                <span>Deselect All</span>
+                <span>{t("deselect.all")}</span>
               </>
             ) : (
               <>
                 <Square className="h-4 w-4" />
-                <span>Select All</span>
+                <span>{t("select.all")}</span>
               </>
             )}
           </Button>
@@ -94,7 +96,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
             }`}
           >
             {t("date")}
-          
+
             <ArrowUpDown size={12} />
           </Button>
         </div>
@@ -102,7 +104,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {sortedDatapoints.map((datapoint) => {
-          return (
+          return datapoint && datapoint.id ? (
             <Button
               key={datapoint.id}
               onClick={() => onToggleDatapoint(datapoint.id)}
@@ -117,7 +119,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
                 {selectedDatapoints.includes(datapoint.id) && <Check size={12} className="text-accent-primary" />}
               </div>
             </Button>
-          );
+          ) : null;
         })}
       </div>
     </div>

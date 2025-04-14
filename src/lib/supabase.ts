@@ -25,11 +25,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   },
   db: {
-    schema: 'public',
+    schema: "public",
   },
 });
 
@@ -41,20 +41,20 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   },
   global: {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   },
   db: {
-    schema: 'public',
+    schema: "public",
   },
 });
 
 // Add error handling helper
 export const handleSupabaseError = (error: unknown) => {
   if (error instanceof Error) {
-    console.error('Supabase error:', error.message);
+    console.error("Supabase error:", error.message);
     throw new Error(`Database operation failed: ${error.message}`);
   }
-  console.error('Unknown error:', error);
-  throw new Error('An unexpected error occurred');
+  console.error("Unknown error:", error);
+  throw new Error("An unexpected error occurred");
 };
