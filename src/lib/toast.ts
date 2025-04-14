@@ -20,11 +20,7 @@ interface ToastOptions {
   position?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "top-center" | "bottom-center";
 }
 
-export const showToast = (
-  message: string,
-  type: ToastType = "default",
-  options?: ToastOptions
-) => {
+export const showToast = (message: string, type: ToastType = "default", options?: ToastOptions) => {
   switch (type) {
     case "success":
       return toast.success(message, options);
@@ -47,12 +43,7 @@ export const dismissToast = (id?: string) => {
   }
 };
 
-export const updateToast = (
-  id: string,
-  message: string,
-  type: ToastType = "default",
-  options?: Omit<ToastOptions, "id">
-) => {
+export const updateToast = (id: string, message: string, type: ToastType = "default", options?: Omit<ToastOptions, "id">) => {
   switch (type) {
     case "success":
       return toast.success(message, { id, ...options });
@@ -77,7 +68,7 @@ export const promiseToast = <T>(
     loading?: string;
     success?: string | ((data: T) => string);
     error?: string | ((error: any) => string);
-  } = {}
+  } = {},
 ) => {
   return toast.promise(promise, {
     loading,

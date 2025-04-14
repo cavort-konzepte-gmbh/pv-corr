@@ -44,10 +44,10 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
   // Sort materials based on current sort field and direction
   const sortedMaterials = React.useMemo(() => {
     if (!materials) return [];
-    
+
     return [...materials].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortField) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -68,7 +68,7 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
           comparison = aMass - bMass;
           break;
       }
-      
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [materials, sortField, sortDirection]);
@@ -222,61 +222,41 @@ export const MaterialsPanel: React.FC<MaterialsPanelProps> = ({ currentTheme, cu
                 <TableCaption className="h-8">Materials</TableCaption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("name")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("name")}>
                       <div className="flex items-center gap-1">
                         Name
                         {sortField === "name" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("e_potential")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("e_potential")}>
                       <div className="flex items-center gap-1">
                         E-Potential
                         {sortField === "e_potential" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("valency")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("valency")}>
                       <div className="flex items-center gap-1">
                         Valency
                         {sortField === "valency" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}
                       </div>
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleSortChange("molar_mass")}
-                    >
+                    <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSortChange("molar_mass")}>
                       <div className="flex items-center gap-1">
                         Molar Mass
                         {sortField === "molar_mass" ? (
-                          <span className="text-xs ml-1">
-                            {sortDirection === "asc" ? "▲" : "▼"}
-                          </span>
+                          <span className="text-xs ml-1">{sortDirection === "asc" ? "▲" : "▼"}</span>
                         ) : (
                           <ArrowUpDown size={14} className="ml-1 opacity-50" />
                         )}

@@ -31,8 +31,10 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
   const handleSave = async () => {
     try {
       // Validate coordinates if provided
-      if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-          (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
+      if (
+        (editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+        (editValues.longitude && !isValidCoordinate(editValues.longitude))
+      ) {
         // Show error but don't prevent saving - the UI will show validation errors
         console.error("Invalid coordinates format");
         return;
@@ -41,7 +43,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
       // Format coordinates if valid
       let latitude = editValues.latitude;
       let longitude = editValues.longitude;
-      
+
       if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
@@ -70,17 +72,19 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="project-overview-title">ZONE OVERVIEW</span>
+                      <span className="project-overview-title">{translation("zone.overview")}</span>
                       <span className="text-lg">
-                      {isEditing ? (
-                        <Input
-                          type="text"
-                          value={editValues.name}
-                          onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                          className="p-1 rounded text-sm text-primary "
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      ) : zone.name}
+                        {isEditing ? (
+                          <Input
+                            type="text"
+                            value={editValues.name}
+                            onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                            className="p-1 rounded text-sm text-primary "
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          zone.name
+                        )}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -118,7 +122,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsEditing(true);
-                          }} 
+                          }}
                           className="size-8 p-1 rounded hover:bg-opacity-80"
                         >
                           <Edit2 size={14} />
@@ -163,8 +167,8 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           placeholder="e.g., 10.123456"
                           className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         />
-                        {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-                         (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
+                        {(editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+                        (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
                           <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                             <AlertCircle size={12} />
                             <span>Use decimal format (e.g., 57.123456)</span>
@@ -177,7 +181,12 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                           {zone.latitude?.toString()}, {zone.longitude?.toString()}
                         </span>
                         <Button
-                          onClick={() => window.open(`https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`, "_blank")}
+                          onClick={() =>
+                            window.open(
+                              `https://www.google.com/maps?q=${zone.latitude?.toString()},${zone.longitude?.toString()}`,
+                              "_blank",
+                            )
+                          }
                           className="text-xs h-8 px-2"
                         >
                           {translation("general.view_on_map")}

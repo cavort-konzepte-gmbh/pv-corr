@@ -14,13 +14,7 @@ interface CustomerListProps {
   onSelectCustomer: (customerId: string) => void;
 }
 
-const CustomerList: React.FC<CustomerListProps> = ({ 
-  currentTheme, 
-  customers, 
-  savedPeople, 
-  savedCompanies, 
-  onSelectCustomer 
-}) => {
+const CustomerList: React.FC<CustomerListProps> = ({ currentTheme, customers, savedPeople, savedCompanies, onSelectCustomer }) => {
   return (
     <div className="space-y-4">
       {customers.map((customer) => (

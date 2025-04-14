@@ -58,7 +58,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
 
   const refreshSession = async () => {
     try {
-      const { data: { session }, error } = await supabase.auth.refreshSession();
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.refreshSession();
       if (error) {
         throw error;
       }
@@ -151,13 +154,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
       // Clear any cached auth state before signing out
       localStorage.removeItem("sb-auth-token");
       sessionStorage.removeItem("sb-auth-token");
-      
+
       await supabase.auth.signOut();
       setLoginType(null);
       setUser(null);
       setIsAdmin(false);
       setViewMode("user");
-      
+
       // Force page reload to clear any cached state
       window.location.href = "/";
     } catch (error) {

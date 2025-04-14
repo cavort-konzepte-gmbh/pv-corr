@@ -6,7 +6,7 @@ import { FileText, Download, Share, ChevronLeft, Calendar, User, Building2, MapP
 import { supabase } from "../../lib/supabase";
 import { getCurrentVersion } from "../../services/versions";
 import { showToast } from "../../lib/toast";
-import { Button } from "../ui/button"; 
+import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<any>(null);
   const [selectedDatapoints, setSelectedDatapoints] = useState<any[]>([]);
-  const [norm, setNorm] = useState<any>(null); 
+  const [norm, setNorm] = useState<any>(null);
   const [currentVersion, setCurrentVersion] = useState<string>("1.0.0");
   const [analyst, setAnalyst] = useState<{
     name: string;
@@ -36,8 +36,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   const t = useTranslation(currentLanguage);
   const location = useLocation();
   const navigate = useNavigate();
-  const [parameterDetails, setParameterDetails] = useState<Record<string, {name: string, unit: string}>>({});
-  
+  const [parameterDetails, setParameterDetails] = useState<Record<string, { name: string; unit: string }>>({});
+
   // Debug function to help trace data flow
   const debugLog = (message: string, data?: any) => {
     if (import.meta.env.DEV) {
@@ -49,15 +49,15 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   useEffect(() => {
     const loadReportData = async () => {
       try {
-        setLoading(true);        
+        setLoading(true);
         // Get parameters from URL
         const params = new URLSearchParams(location.search);
         const reportIdFromUrl = params.get("reportId") || reportId;
         const versionNumber = params.get("version") || undefined;
         const preview = params.get("preview") === "true";
-        const projectId = params.get("projectId") || project?.id; 
-        const zoneId = params.get("zoneId") || zone?.id; 
-        const normIdFromUrl = params.get("normId"); 
+        const projectId = params.get("projectId") || project?.id;
+        const zoneId = params.get("zoneId") || zone?.id;
+        const normIdFromUrl = params.get("normId");
         const normIdToUse = normId || normIdFromUrl;
 
         if (reportIdFromUrl) {
@@ -67,31 +67,28 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
             .select("*, versions:analysis_versions(*)")
             .eq("id", reportIdFromUrl)
             .single();
-            
+
           if (reportError) throw reportError;
-          
+
           // Get the specific version or latest
           let version;
           if (versionNumber) {
             version = report.versions?.find((v: any) => v.version_number?.toString() === versionNumber);
           } else {
             // Sort versions by version number descending and get the first one
-            version = report.versions && report.versions.length > 0 
-              ? [...report.versions].sort((a, b) => b.version_number - a.version_number)[0]
-              : null;
+            version =
+              report.versions && report.versions.length > 0
+                ? [...report.versions].sort((a, b) => b.version_number - a.version_number)[0]
+                : null;
           }
-          
+
           if (!version) throw new Error("Version not found");
-          
+
           // Load norm data
-          const { data: normData, error: normError } = await supabase
-            .from("norms")
-            .select("*")
-            .eq("id", report.norm_id)
-            .single();
-            
+          const { data: normData, error: normError } = await supabase.from("norms").select("*").eq("id", report.norm_id).single();
+
           if (normError) throw normError;
-          
+
           setReportData({
             id: report.id,
             hidden_id: report.hidden_id,
@@ -104,15 +101,21 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           });
           setNorm(normData);
           debugLog("Loaded report data:", { report, version, normData });
-          
+
           // Load project and zone data if needed
           if (!project || !zone) {
             const projectResponse = await supabase
-              .from("projects").select("*").eq("id", report.project_id || projectId).single();
-              
+              .from("projects")
+              .select("*")
+              .eq("id", report.project_id || projectId)
+              .single();
+
             const zoneResponse = await supabase
-              .from("zones").select("*").eq("id", report.zone_id || zoneId).single();
-              
+              .from("zones")
+              .select("*")
+              .eq("id", report.zone_id || zoneId)
+              .single();
+
             if (!projectResponse.error && !zoneResponse.error) {
               // We would set project and zone here if they weren't passed as props
               // This is just for reference
@@ -121,54 +124,48 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         } else if ((project && zone && normIdToUse) || (preview === "true" && projectId && zoneId && normIdToUse)) {
           // Preview mode - construct data from current selection or URL parameters
           debugLog("Preview mode with normId:", normIdToUse);
-          
+
           if (!normIdToUse) {
             debugLog("Missing norm ID");
             throw new Error("Norm ID is required");
           }
-          
-          const { data: normData, error: normError } = await supabase
-            .from("norms")
-            .select("*")
-            .eq("id", normIdToUse)
-            .single();
-            
+
+          const { data: normData, error: normError } = await supabase.from("norms").select("*").eq("id", normIdToUse).single();
+
           if (normError) throw normError;
-          
+
           setNorm(normData);
           debugLog("Loaded norm data:", normData);
-          
+
           // If we have project and zone directly, use them
           let projectToUse = project;
           let zoneToUse = zone;
           let datapointsToUse: any[] = [];
-          
+
           // If we don't have project or zone directly, try to fetch them
           if (!projectToUse && projectId) {
             projectToUse = await fetchProject(projectId);
           }
-          
+
           if (!zoneToUse && zoneId) {
             zoneToUse = await fetchZone(zoneId);
           }
-          
+
           debugLog("Using project and zone:", { projectToUse, zoneToUse });
-          
+
           if (!projectToUse || !zoneToUse) {
             debugLog("Missing project or zone");
             throw new Error("Project and Zone are required");
           }
-          
+
           // If we don't have the zone's datapoints, fetch them
           if (zoneToUse && (!zoneToUse.datapoints || zoneToUse.datapoints.length === 0)) {
             debugLog("Fetching datapoints for zone:", zoneToUse?.id);
             // Get datapoint IDs from URL if available
             const datapointIds = params.get("datapointIds")?.split(",") || [];
-            
-            let query = supabase
-              .from("datapoints")
-              .select("id, hidden_id, name, type, values, ratings, timestamp");
-              
+
+            let query = supabase.from("datapoints").select("id, hidden_id, name, type, values, ratings, timestamp");
+
             // If specific datapoints are requested, filter by IDs
             if (datapointIds.length > 0) {
               query = query.in("id", datapointIds);
@@ -176,55 +173,53 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               // Otherwise get all datapoints for the zone
               query = query.eq("zone_id", zoneToUse?.id);
             }
-            
+
             const { data: datapointsData, error: datapointsError } = await query;
-              
+
             if (datapointsError) {
               debugLog("Error fetching datapoints:", datapointsError);
               throw datapointsError;
             }
-            
+
             // If we have specific datapoint IDs, make sure they're in the right order
             if (datapointIds.length > 0 && datapointsData) {
               // Sort datapoints according to the order in datapointIds
-              datapointsToUse = datapointIds
-                .map(id => datapointsData.find(dp => dp.id === id))
-                .filter(dp => dp !== undefined);
+              datapointsToUse = datapointIds.map((id) => datapointsData.find((dp) => dp.id === id)).filter((dp) => dp !== undefined);
             } else {
               datapointsToUse = datapointsData || [];
             }
-            
+
             debugLog("Fetched datapoints:", datapointsToUse);
             setSelectedDatapoints(datapointsToUse);
           } else {
             // Get datapoint IDs from URL if available
             const datapointIds = params.get("datapointIds")?.split(",") || [];
-            
+
             if (datapointIds.length > 0) {
               // Filter and sort datapoints according to the datapointIds
               datapointsToUse = datapointIds
-                .map(id => zoneToUse?.datapoints?.find(dp => dp.id === id))
-                .filter(dp => dp !== undefined);
+                .map((id) => zoneToUse?.datapoints?.find((dp) => dp.id === id))
+                .filter((dp) => dp !== undefined);
             } else {
               datapointsToUse = zoneToUse?.datapoints || [];
             }
-            
+
             debugLog("Using existing datapoints from zone:", datapointsToUse);
             setSelectedDatapoints(datapointsToUse);
           }
-          
+
           // Create a preview report
           debugLog("Creating preview report with datapoints:", datapointsToUse);
-           
+
           try {
             // Calculate total rating from datapoints
             const totalRating = datapointsToUse.reduce((sum, dp) => {
               const dpRatings = dp.ratings || {};
               return sum + Object.values(dpRatings).reduce((a: number, b: number) => a + b, 0);
             }, 0);
-           
+
             debugLog("Calculated total rating:", totalRating);
-           
+
             setReportData({
               id: "preview",
               hidden_id: "preview",
@@ -236,15 +231,15 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               currentVersion: {
                 id: "preview-version",
                 version_number: 1,
-                parameters: datapointsToUse.map(dp => ({
+                parameters: datapointsToUse.map((dp) => ({
                   id: dp.id,
                   values: dp.values,
-                  ratings: dp.ratings
+                  ratings: dp.ratings,
                 })),
                 total_rating: totalRating,
                 classification: "Preview",
-                created_at: new Date().toISOString()
-              }
+                created_at: new Date().toISOString(),
+              },
             });
           } catch (err) {
             console.error("Error creating preview:", err);
@@ -253,72 +248,70 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         } else {
           throw new Error("Insufficient data to display report");
         }
-        
+
         // Get app version
         getCurrentVersion()
-          .then(version => {
+          .then((version) => {
             if (version) {
               setCurrentVersion(version.version);
             }
           })
-          .catch(versionError => {
+          .catch((versionError) => {
             debugLog("Error getting current version:", versionError);
             // Non-critical error, continue with default version
           });
-        
+
         // Get current user info
-        supabase.auth.getUser()
+        supabase.auth
+          .getUser()
           .then(({ data: { user } }) => {
             if (user) {
               setAnalyst({
                 name: user.user_metadata?.display_name || user.email || "",
                 title: user.user_metadata?.title || "",
-                email: user.email || ""
+                email: user.email || "",
               });
             }
           })
-          .catch(userError => {
+          .catch((userError) => {
             debugLog("Error getting user:", userError);
             // Non-critical error, continue with default analyst info
           });
-          
+
         // Load parameter details for all datapoints
         const loadParameterDetails = async () => {
-           try {
-             // Get all parameter IDs from the datapoints
-             const pointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : (zone?.datapoints || []);
-             if (!pointsToUse || pointsToUse.length === 0) return;
-             
-             const firstDatapoint = pointsToUse[0];
-             if (!firstDatapoint?.values) return;
-             
-             const paramIds = Object.keys(firstDatapoint.values);
-             if (paramIds.length === 0) return;
-             
-             // Fetch parameter details from database
-             const { data, error } = await supabase
-               .from("parameters")
-               .select("id, name, short_name, unit")
-               .in("id", paramIds);
-               
-             if (error) throw error;
-             
-             // Create a map of parameter ID to details
-             const detailsMap = data.reduce((acc: Record<string, {name: string, unit: string}>, param: any) => {
-               acc[param.id] = {
-                 name: param.short_name || param.name,
-                 unit: param.unit || ""
-               };
-               return acc;
-             }, {});
-             
-             setParameterDetails(detailsMap);
-           } catch (err) {
-             console.error("Error loading parameter details:", err);
-           }
-          };
-          
-          loadParameterDetails();
+          try {
+            // Get all parameter IDs from the datapoints
+            const pointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : zone?.datapoints || [];
+            if (!pointsToUse || pointsToUse.length === 0) return;
+
+            const firstDatapoint = pointsToUse[0];
+            if (!firstDatapoint?.values) return;
+
+            const paramIds = Object.keys(firstDatapoint.values);
+            if (paramIds.length === 0) return;
+
+            // Fetch parameter details from database
+            const { data, error } = await supabase.from("parameters").select("id, name, short_name, unit").in("id", paramIds);
+
+            if (error) throw error;
+
+            // Create a map of parameter ID to details
+            const detailsMap = data.reduce((acc: Record<string, { name: string; unit: string }>, param: any) => {
+              acc[param.id] = {
+                name: param.short_name || param.name,
+                unit: param.unit || "",
+              };
+              return acc;
+            }, {});
+
+            setParameterDetails(detailsMap);
+          } catch (err) {
+            console.error("Error loading parameter details:", err);
+          }
+        };
+
+        loadParameterDetails();
       } catch (err) {
         console.error("Error loading report data:", err);
         setError(err instanceof Error ? err.message : "Failed to load report");
@@ -326,7 +319,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         setLoading(false);
       }
     };
-    
+
     loadReportData();
   }, [location.search, project, zone, normId]);
 
@@ -334,12 +327,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
   const fetchProject = async (projectId: string): Promise<Project | null> => {
     try {
       debugLog("Fetching project:", projectId);
-      const { data, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", projectId)
-        .single();
-        
+      const { data, error } = await supabase.from("projects").select("*").eq("id", projectId).single();
+
       if (error) throw error;
       return data;
     } catch (err) {
@@ -347,17 +336,13 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
       return null;
     }
   };
-  
+
   // Helper function to fetch a zone by ID
   const fetchZone = async (zoneId: string): Promise<Zone | null> => {
     try {
       debugLog("Fetching zone:", zoneId);
-      const { data, error } = await supabase
-        .from("zones")
-        .select("*")
-        .eq("id", zoneId)
-        .single();
-        
+      const { data, error } = await supabase.from("zones").select("*").eq("id", zoneId).single();
+
       if (error) throw error;
       return data;
     } catch (err) {
@@ -444,11 +429,14 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
 
   // Calculate classification based on total rating
   const totalRating = reportData?.currentVersion?.total_rating ?? 0;
-  const classification = 
-    totalRating >= 0 ? { class: "Ia", stress: t("analysis.stress.very_low") } :
-    totalRating >= -4 ? { class: "Ib", stress: t("analysis.stress.low") } :
-    totalRating >= -10 ? { class: "II", stress: t("analysis.stress.medium") } :
-    { class: "III", stress: t("analysis.stress.high") };
+  const classification =
+    totalRating >= 0
+      ? { class: "Ia", stress: t("analysis.stress.very_low") }
+      : totalRating >= -4
+        ? { class: "Ib", stress: t("analysis.stress.low") }
+        : totalRating >= -10
+          ? { class: "II", stress: t("analysis.stress.medium") }
+          : { class: "III", stress: t("analysis.stress.high") };
 
   return (
     <div className="p-6 max-w-[210mm] mx-auto bg-background print:bg-white print:p-0">
@@ -458,31 +446,43 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           <ChevronLeft size={16} />
           {t("nav.back")}
         </Button>
-        
+
         <div className="flex items-center gap-2">
           <Button onClick={handlePrint} variant="outline" className="flex items-center gap-2" title="Print report">
             <Printer size={16} />
-            <span onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              showToast("Printing is currently disabled", "info");
-            }}>{t("output.print")}</span>
+            <span
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showToast("Printing is currently disabled", "info");
+              }}
+            >
+              {t("output.print")}
+            </span>
           </Button>
           <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2" title="Download as PDF">
             <Download size={16} />
-            <span onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              showToast("PDF download is currently disabled", "info");
-            }}>{t("output.download_pdf")}</span>
+            <span
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showToast("PDF download is currently disabled", "info");
+              }}
+            >
+              {t("output.download_pdf")}
+            </span>
           </Button>
           <Button onClick={handleShare} variant="outline" className="flex items-center gap-2" title="Share report">
             <Share size={16} />
-            <span onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              showToast("Sharing is currently disabled", "info");
-            }}>{t("output.share")}</span>
+            <span
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showToast("Sharing is currently disabled", "info");
+              }}
+            >
+              {t("output.share")}
+            </span>
           </Button>
         </div>
       </div>
@@ -500,7 +500,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
             <div>{new Date(reportData.currentVersion.created_at).toLocaleDateString()}</div>
             <div>
               {t("analysis.report_id")}: {reportData.hidden_id || "Preview"}
-            </div> 
+            </div>
           </div>
         </div>
 
@@ -558,8 +558,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         <h2 className="text-lg font-medium text-foreground mb-4 print:text-black">{t("analysis.parameters_results")}</h2>
         {(() => {
           // Use the selected datapoints
-          const datapointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : (zone?.datapoints || []);
-          
+          const datapointsToUse = selectedDatapoints.length > 0 ? selectedDatapoints : zone?.datapoints || [];
+
           if (!datapointsToUse || datapointsToUse.length === 0) {
             return (
               <div className="p-4 text-center border border-input rounded-md">
@@ -570,7 +570,7 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
           }
 
           // Check if any datapoint has values
-          const hasValues = datapointsToUse.some(dp => dp?.values && Object.keys(dp.values).length > 0);
+          const hasValues = datapointsToUse.some((dp) => dp?.values && Object.keys(dp.values).length > 0);
           if (!hasValues) {
             return (
               <div className="p-4 text-center border border-input rounded-md">
@@ -579,20 +579,18 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               </div>
             );
           }
-          
+
           return (
             <div className="space-y-6">
               {datapointsToUse.map((datapoint, index) => (
                 <div key={datapoint.id} className="mb-6">
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-base font-medium text-foreground print:text-black">
-                      {datapoint.name || `Datapoint ${index + 1}`}
-                    </h3>
+                    <h3 className="text-base font-medium text-foreground print:text-black">{datapoint.name || `Datapoint ${index + 1}`}</h3>
                     <div className="text-xs text-muted-foreground print:text-gray-600">
-                      {typeof totalRating === 'number' ? totalRating.toFixed(2) : '0.00'}
+                      {typeof totalRating === "number" ? totalRating.toFixed(2) : "0.00"}
                     </div>
                   </div>
-                  
+
                   <div className="overflow-x-auto print:border-black print:border print:border-collapse">
                     <Table>
                       <TableHeader>
@@ -607,14 +605,16 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                         {Object.entries(datapoint.values || {}).map(([key, value]) => {
                           const rating = datapoint.ratings?.[key] || 0;
                           const paramDetail = parameterDetails[key] || { name: key, unit: "" };
-                          
+
                           return (
                             <TableRow key={key} className="hover:bg-muted/50">
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
                                 {paramDetail.name || key}
                               </TableCell>
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{value}</TableCell>
-                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">{paramDetail.unit || "-"}</TableCell>
+                              <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
+                                {paramDetail.unit || "-"}
+                              </TableCell>
                               <TableCell className="p-2 border border-input print:border-gray-300 print:text-black">
                                 {rating !== undefined ? (
                                   <div className="flex items-center gap-2">
@@ -634,14 +634,18 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                           );
                         })}
                         <TableRow className="bg-muted/20">
-                          <TableCell colSpan={3} className="p-2 border border-input print:border-gray-300 font-bold print:text-black text-right">
+                          <TableCell
+                            colSpan={3}
+                            className="p-2 border border-input print:border-gray-300 font-bold print:text-black text-right"
+                          >
                             {t("analysis.datapoint_total")}
                           </TableCell>
                           <TableCell className="p-2 border border-input print:border-gray-300 font-bold print:text-black">
-                            {Object.values(datapoint.ratings || {}).length > 0 
-                              ? Object.values(datapoint.ratings || {}).reduce((sum: number, rating: number) => sum + rating, 0).toFixed(2)
-                              : '0.00'
-                            }
+                            {Object.values(datapoint.ratings || {}).length > 0
+                              ? Object.values(datapoint.ratings || {})
+                                  .reduce((sum: number, rating: number) => sum + rating, 0)
+                                  .toFixed(2)
+                              : "0.00"}
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -649,12 +653,10 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
                   </div>
                 </div>
               ))}
-              
+
               <div className="mt-6 p-4 border border-input rounded-lg bg-muted/10 print:border-black">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-base font-medium text-foreground print:text-black">
-                    {t("analysis.combined_results")}
-                  </h3>
+                  <h3 className="text-base font-medium text-foreground print:text-black">{t("analysis.combined_results")}</h3>
                   <div className="text-sm font-medium text-foreground print:text-black">
                     {t("analysis.total_rating")}: {totalRating}
                   </div>
@@ -662,7 +664,8 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
               </div>
             </div>
           );
-        })()}</div>
+        })()}
+      </div>
 
       {/* Analysis Results */}
       <div className="mb-8 p-6 rounded-lg border border-input bg-card print:border-black print:border print:p-4 print:page-break-before-avoid">
@@ -671,13 +674,11 @@ const OutputView: React.FC<OutputViewProps> = ({ currentTheme, currentLanguage, 
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <div className="text-sm font-medium text-muted-foreground mb-2 print:text-gray-600">
-                {t("analysis.classification")}
-              </div>
+              <div className="text-sm font-medium text-muted-foreground mb-2 print:text-gray-600">{t("analysis.classification")}</div>
               <div className="text-3xl font-bold text-foreground print:text-black">{classification.class}</div>
               <div className="text-sm text-muted-foreground print:text-gray-600">{classification.stress}</div>
             </div>
-            
+
             <div>
               <div className="text-sm font-medium text-muted-foreground mb-2 print:text-gray-600">{t("analysis.corrosion_risk")}</div>
               <div className="flex items-center gap-2">

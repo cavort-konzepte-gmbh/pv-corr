@@ -212,9 +212,9 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
       try {
         setError(null);
         console.log("Attempting to create parameter:", createData);
-        
+
         await createParameter(createData as any);
-        
+
         // Success is handled by the service with toast
         const updatedParameters = await fetchParameters();
         setParameters(updatedParameters);
@@ -537,12 +537,8 @@ export const ParameterPanel: React.FC<ParameterPanelProps> = ({ currentTheme, cu
               </Table>
             </div>
           </section>
-          
-          {error && (
-            <div className="mt-4 p-3 text-sm bg-destructive/10 text-destructive rounded-md">
-              {error}
-            </div>
-          )}
+
+          {error && <div className="mt-4 p-3 text-sm bg-destructive/10 text-destructive rounded-md">{error}</div>}
         </div>
       )}
 

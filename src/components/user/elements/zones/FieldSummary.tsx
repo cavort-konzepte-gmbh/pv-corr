@@ -65,7 +65,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                 <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="project-overview-title">FIELD OVERVIEW</span>
+                      <span className="project-overview-title">{translation("field.overview")}</span>
                       <span className="text-lg">
                         {isEditing ? (
                           <Input
@@ -82,13 +82,13 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                     <div className="flex items-center gap-3">
                       <span className="inline-flex items-center gap-1">
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {field.zones?.length || 0} 
+                          {field.zones?.length || 0}
                         </span>
                         <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0} 
+                          {field.zones?.reduce((acc, zone) => acc + (zone.datapoints?.length || 0), 0) || 0}
                         </span>
                         <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
                       </span>
@@ -141,7 +141,7 @@ const FieldSummary: React.FC<FieldSummaryProps> = ({
                         {field.latitude?.toString()}, {field.longitude?.toString()}
                       </span>
                       <Button onClick={() => window.open(`https://www.google.com/maps?q=${field.latitude},${field.longitude}`, "_blank")}>
-                       <span className="text-xs h-8 px-2">{translation("general.view_on_map")}</span>
+                        <span className="text-xs h-8 px-2">{translation("general.view_on_map")}</span>
                       </Button>
                     </div>
                   ) : (

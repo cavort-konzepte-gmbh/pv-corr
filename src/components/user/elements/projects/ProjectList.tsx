@@ -68,9 +68,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         } catch (fetchErr) {
           console.error("Error fetching updated projects:", fetchErr);
           // Use existing projects if fetch fails
-          updatedProjects = projects.map(p => 
-            p.id === project.id ? { ...p, ...editingValues } : p
-          );
+          updatedProjects = projects.map((p) => (p.id === project.id ? { ...p, ...editingValues } : p));
         }
       }
 
@@ -97,7 +95,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         } catch (fetchErr) {
           console.error("Error fetching updated projects:", fetchErr);
           // Filter out deleted project if fetch fails
-          updatedProjects = projects.filter(p => p.id !== projectId);
+          updatedProjects = projects.filter((p) => p.id !== projectId);
         }
       }
 
@@ -125,17 +123,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   return (
     <div>
-      {error && (
-        <div className="p-4 mb-4 rounded text-destructive border-destructive border bg-destructive/10">
-          {error}
-        </div>
-      )}
-      
+      {error && <div className="p-4 mb-4 rounded text-destructive border-destructive border bg-destructive/10">{error}</div>}
+
       <div className="space-y-4 mt-6">
         {sortedProjects.map((project) => (
           <div key={project.id} className="relative">
-            <section 
-              className="border border-input rounded-md bg-card cursor-pointer hover:bg-muted/50" 
+            <section
+              className="border border-input rounded-md bg-card cursor-pointer hover:bg-muted/50"
               onClick={() => handleSelectProject(project.id)}
             >
               <div className="w-full relative overflow-auto">
@@ -149,7 +143,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             <div className="flex items-center gap-4">
                               <span>{project.name}</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">{translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}</span>
+                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
+                                  {translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}
+                                </span>
                                 <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                                   {project.fields?.length || 0} {translation("fields")}
                                 </span>
@@ -158,7 +154,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
                                 </span>
                                 <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
                                   {project.fields?.reduce(
-                                    (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
+                                    (acc, field) =>
+                                      acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
                                     0,
                                   ) || 0}{" "}
                                   {translation("datapoints")}
@@ -277,7 +274,10 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             <Button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(`https://www.google.com/maps?q=${project.latitude?.toString()},${project.longitude?.toString()}`, "_blank");
+                                window.open(
+                                  `https://www.google.com/maps?q=${project.latitude?.toString()},${project.longitude?.toString()}`,
+                                  "_blank",
+                                );
                               }}
                               className="text-xs h-8 px-2 ml-2"
                             >

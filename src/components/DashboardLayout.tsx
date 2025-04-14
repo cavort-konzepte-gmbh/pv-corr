@@ -28,7 +28,18 @@ import Settings from "./user/settings";
 import Output from "./user/output";
 import Reports from "./user/reports";
 import AnalysisPanel from "./analysis/AnalysisPanel";
-import { LogOut, FolderOpen, Grid, Map, Settings as SettingsIcon, Database, LayoutDashboard, Building2, FileText, ClipboardList } from "lucide-react";
+import {
+  LogOut,
+  FolderOpen,
+  Grid,
+  Map,
+  Settings as SettingsIcon,
+  Database,
+  LayoutDashboard,
+  Building2,
+  FileText,
+  ClipboardList,
+} from "lucide-react";
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { updateUserSettings } from "@/services/userSettings";
@@ -149,11 +160,11 @@ const DashboardLayout = () => {
 
   const handleLanguageChange = (language: Language) => {
     if (!language || !LANGUAGES.find((l) => l.id === language)) return;
-    
+
     // Reset translations loaded flag to trigger reload
     setTranslationsLoaded(false);
     setCurrentLanguage(language);
-    
+
     // Immediately load translations when language changes
     const loadTranslations = async () => {
       setLoading(true);
@@ -179,10 +190,10 @@ const DashboardLayout = () => {
         setLoading(true);
         // Load initial data with reports
         const [people, companies, fetchedCustomers, fetchedReports] = await Promise.all([
-          fetchPeople(), 
-          fetchCompanies(), 
+          fetchPeople(),
+          fetchCompanies(),
           fetchCustomers(),
-          fetchReports()
+          fetchReports(),
         ]);
 
         setSavedPeople(people);
@@ -460,14 +471,7 @@ const DashboardLayout = () => {
           />
         );
       case "output":
-        return (
-          <Output
-            currentTheme={currentTheme}
-            currentLanguage={currentLanguage}
-            projects={projects}
-            reports={reports}
-          />
-        );
+        return <Output currentTheme={currentTheme} currentLanguage={currentLanguage} projects={projects} reports={reports} />;
       case "reports":
         return (
           <Reports
@@ -635,15 +639,23 @@ const DashboardLayout = () => {
                   <FileText size={18} />
                   <span>{t("nav.analyse")}</span>
                 </ButtonSection>
-                <ButtonSection view={view} match="output" onClick={() => {
-                  showToast("Output view is currently disabled", "info");
-                }}>
+                <ButtonSection
+                  view={view}
+                  match="output"
+                  onClick={() => {
+                    showToast(t("output.view.disabled"), "info");
+                  }}
+                >
                   <FileText size={18} className="opacity-50" />
                   <span className="opacity-50">{t("nav.output")}</span>
                 </ButtonSection>
-                <ButtonSection view={view} match="reports" onClick={() => {
-                  showToast("Reports view is currently disabled", "info");
-                }}>
+                <ButtonSection
+                  view={view}
+                  match="reports"
+                  onClick={() => {
+                    showToast(t("reports.view.disabled"), "info");
+                  }}
+                >
                   <ClipboardList size={18} className="opacity-50" />
                   <span className="opacity-50">{t("reports.title")}</span>
                 </ButtonSection>
@@ -671,11 +683,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* Breadcrumb Navigation */}
-        <BreadcrumbNavigation 
-          currentLanguage={currentLanguage}
-          projects={projects}
-          customers={customers}
-        />
+        <BreadcrumbNavigation currentLanguage={currentLanguage} projects={projects} customers={customers} />
 
         {/* Main Content */}
         <div className="flex-1">
@@ -688,7 +696,7 @@ const DashboardLayout = () => {
         </div>
         {loading && (
           <div className="flex-1 flex items-center justify-center bg-background">
-            <div className="text-sm text-muted-foreground">Loading application data...</div>
+            <div className="text-sm text-muted-foreground">{t("loading.aplication")}... </div>
           </div>
         )}
       </div>
