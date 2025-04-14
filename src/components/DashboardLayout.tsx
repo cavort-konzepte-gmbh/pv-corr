@@ -39,6 +39,7 @@ import {
   Building2,
   FileText,
   ClipboardList,
+  ArrowLeftRight,
 } from "lucide-react";
 import { ButtonSection } from "./ui/ButtonSection";
 import { useAppNavigation } from "../hooks/useAppNavigation";
@@ -78,6 +79,7 @@ const DashboardLayout = () => {
   const [error, setError] = useState<string | null>(null);
   const [standards, setStandards] = useState<Standard[]>(STANDARDS);
   const t = useTranslation(currentLanguage);
+  const { isAdmin, toggleViewMode } = useAuth();
 
   // Preload translations when component mounts
   useEffect(() => {
@@ -181,7 +183,7 @@ const DashboardLayout = () => {
     loadTranslations();
   };
 
-  const { user, signOut: handleSignOut, isAdmin, toggleViewMode } = useAuth();
+  const { user, signOut: handleSignOut } = useAuth();
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -673,9 +675,9 @@ const DashboardLayout = () => {
               </ButtonSection>
             )}
             {isAdmin && (
-              <ButtonSection view={settingsView} match="admin" onClick={toggleViewMode}>
-                <LayoutDashboard size={18} />
-                <span>{t("nav.administration")}</span>
+              <ButtonSection view={settingsView} match="admin" onClick={() => toggleViewMode(true)}>
+                <ArrowLeftRight size={18} />
+                <span>Switch to Admin View</span>
               </ButtonSection>
             )}
             <ButtonSection view={settingsView} match="signout" onClick={handleSignOut}>
@@ -707,4 +709,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout
+export default DashboardLayout;

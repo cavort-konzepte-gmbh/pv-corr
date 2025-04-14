@@ -1,6 +1,6 @@
 import React from "react";
 import { Theme } from "../../types/theme";
-import { Users, Database, Settings, LogOut, BellRing } from "lucide-react";
+import { Users, Database, Settings, LogOut, BellRing, ArrowLeftRight, LayoutDashboard } from "lucide-react";
 import DatabaseManagement from "./DatabaseManagement";
 import UserManagement from "./UserManagement";
 import AdminSettings from "./AdminSettings";
@@ -12,9 +12,10 @@ import { Button } from "../ui/button";
 interface AdminDashboardProps {
   currentTheme: Theme;
   currentLanguage: Language;
+  onSwitchToUserView?: () => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage, onSwitchToUserView }) => {
   const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings">("overview");
 
   const handleSignOut = async () => {
@@ -41,10 +42,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
         <div className="p-8">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold text-card-foreground">Admin Dashboard</h1>
-            <Button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors">
-              <LogOut size={16} />
-              Sign Out
-            </Button>
+            <div className="flex items-center gap-2">
+              {onSwitchToUserView && (
+                <Button 
+                  onClick={onSwitchToUserView} 
+                  variant="outline" 
+                  className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors"
+                >
+                  <LayoutDashboard size={16} />
+                  Switch to User View
+                </Button>
+              )}
+              <Button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors">
+                <LogOut size={16} />
+                Sign Out
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
