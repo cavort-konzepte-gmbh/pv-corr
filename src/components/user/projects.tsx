@@ -60,13 +60,13 @@ const Projects: React.FC<ProjectsProps> = ({
           <div className="p-6 mb-4 text-center border border-input rounded-lg bg-card">
             <h3 className="text-lg font-medium mb-2">No projects available</h3>
             <p className="text-muted-foreground mb-4">
-              {selectedCustomerId 
+              {selectedCustomerId
                 ? "This customer doesn't have any projects yet. Create your first project below."
                 : "No uncategorized projects found. Create your first project below."}
             </p>
           </div>
         )}
-        
+
         <ProjectForm
           currentTheme={currentTheme}
           savedPeople={savedPeople}

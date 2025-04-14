@@ -26,14 +26,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ currentTheme, savedPeople, 
   // Sort people and companies alphabetically
   useEffect(() => {
     if (savedPeople && savedPeople.length > 0) {
-      const sorted = [...savedPeople].sort((a, b) => 
-        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      );
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
       setSortedPeople(sorted);
     } else {
       setSortedPeople([]);
     }
-    
+
     if (savedCompanies && savedCompanies.length > 0) {
       const sorted = [...savedCompanies].sort((a, b) => a.name.localeCompare(b.name));
       setSortedCompanies(sorted);

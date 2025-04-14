@@ -30,7 +30,7 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
   }
 
   showToast("Field created successfully", "success");
-  
+
   // Automatically create a default zone for the new field
   try {
     await createZone(newField.id, {
@@ -44,8 +44,8 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
   }
 
   // Fetch complete field data after creation with a small delay to ensure zone is created
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   const { data: completeField, error: fetchError } = await supabase
     .from("fields")
     .select(
@@ -68,8 +68,8 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
 
   // If the field doesn't have zones yet (race condition), fetch again after a delay
   if (!completeField.zones || completeField.zones.length === 0) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const { data: retryField, error: retryError } = await supabase
       .from("fields")
       .select(
@@ -84,7 +84,7 @@ export const createField = async (projectId: string, field: Omit<Field, "id" | "
       )
       .eq("id", newField.id)
       .single();
-      
+
     if (!retryError) {
       return retryField;
     }
@@ -134,7 +134,7 @@ export const deleteField = async (fieldId: string) => {
       showToast(`Failed to delete field: ${error.message}`, "error");
       throw error;
     }
-    
+
     showToast("Field deleted successfully", "success");
   } catch (err) {
     console.error("Error deleting field:", err);

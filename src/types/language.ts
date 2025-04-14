@@ -43,7 +43,7 @@ let translations: TranslationMap = {
   "output.no_reports": "No Reports Found",
   "output.no_reports_description": "No reports found. You can create reports in two ways:",
   "output.create_report_instruction_1": "Go to the Analyse section, select datapoints and a norm, then click Create Report",
-  "output.create_report_instruction_2": "Preview a report first, then save it permanently", 
+  "output.create_report_instruction_2": "Preview a report first, then save it permanently",
   "reports.title": "Reports",
   "reports.search": "Search reports...",
   "reports.filter_project": "Filter by project",
@@ -52,12 +52,14 @@ let translations: TranslationMap = {
   "reports.all_classifications": "All Classifications",
   "reports.no_reports": "No Reports Found",
   "reports.no_favorites": "No Favorites Yet",
-  "reports.no_favorites_description": "You haven't marked any reports as favorites yet. Click the star icon on a report to add it to your favorites.",
+  "reports.no_favorites_description":
+    "You haven't marked any reports as favorites yet. Click the star icon on a report to add it to your favorites.",
   "reports.view_all": "View All Reports",
   "reports.delete": "Delete Report",
   "reports.deleting": "Deleting...",
   "reports.delete_confirm_title": "Delete Report",
-  "reports.delete_confirm_description": "Are you sure you want to delete this report? This action cannot be undone and will permanently remove the report and all its versions.",
+  "reports.delete_confirm_description":
+    "Are you sure you want to delete this report? This action cannot be undone and will permanently remove the report and all its versions.",
   "reports.rating": "Rating",
   "reports.class": "Class",
   "reports.date": "Date",
@@ -81,17 +83,17 @@ let translations: TranslationMap = {
   "actions.cancel": "Cancel",
   "actions.create": "Create",
   "actions.save_changes": "Save Changes",
-  "datapoints": "Datapoints",
-  "fields": "Fields",
-  "zones": "Zones",
- "analysis.norm_specific_results": "Norm-Specific Results",
- "analysis.risk.low": "Low Risk",
- "analysis.risk.medium": "Medium Risk",
- "analysis.risk.high": "High Risk",
- "analysis.stress.very_low": "Very Low Stress",
- "analysis.stress.low": "Low Stress",
- "analysis.stress.medium": "Medium Stress",
- "analysis.stress.high": "High Stress",
+  datapoints: "Datapoints",
+  fields: "Fields",
+  zones: "Zones",
+  "analysis.norm_specific_results": "Norm-Specific Results",
+  "analysis.risk.low": "Low Risk",
+  "analysis.risk.medium": "Medium Risk",
+  "analysis.risk.high": "High Risk",
+  "analysis.stress.very_low": "Very Low Stress",
+  "analysis.stress.low": "Low Stress",
+  "analysis.stress.medium": "Medium Stress",
+  "analysis.stress.high": "High Stress",
   "version.type.alpha": "Alpha",
   "version.type.beta": "Beta",
   "version.type.stable": "Stable",
@@ -123,7 +125,7 @@ export const setTranslations = (newTranslations: TranslationMap) => {
 export const useTranslation = (currentLanguage: Language) => {
   return (key: string): string => {
     // Return the translation if it exists, otherwise return the key
-    if (!key) return '';
-    return translations[key] !== undefined ? translations[key] as string : key;
+    if (!key) return "";
+    return translations[key] !== undefined ? (translations[key] as string) : key;
   };
 };

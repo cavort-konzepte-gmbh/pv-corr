@@ -68,9 +68,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         } catch (fetchErr) {
           console.error("Error fetching updated projects:", fetchErr);
           // Use existing projects if fetch fails
-          updatedProjects = projects.map(p => 
-            p.id === project.id ? { ...p, ...editingValues } : p
-          );
+          updatedProjects = projects.map((p) => (p.id === project.id ? { ...p, ...editingValues } : p));
         }
       }
 
@@ -97,7 +95,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         } catch (fetchErr) {
           console.error("Error fetching updated projects:", fetchErr);
           // Filter out deleted project if fetch fails
-          updatedProjects = projects.filter(p => p.id !== projectId);
+          updatedProjects = projects.filter((p) => p.id !== projectId);
         }
       }
 
@@ -125,17 +123,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   return (
     <div>
-      {error && (
-        <div className="p-4 mb-4 rounded text-destructive border-destructive border bg-destructive/10">
-          {error}
-        </div>
-      )}
-      
+      {error && <div className="p-4 mb-4 rounded text-destructive border-destructive border bg-destructive/10">{error}</div>}
+
       <div className="space-y-4 mt-6">
         {sortedProjects.map((project) => (
           <div key={project.id} className="relative">
-            <section 
-              className="border border-input rounded-md bg-card cursor-pointer hover:bg-muted/50" 
+            <section
+              className="border border-input rounded-md bg-card cursor-pointer hover:bg-muted/50"
               onClick={() => handleSelectProject(project.id)}
             >
               <div className="w-full relative overflow-auto">
@@ -145,23 +139,36 @@ const ProjectList: React.FC<ProjectListProps> = ({
                       <TableHead colSpan={2} className="p-4 text-left border-b font-semibold border-accent">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Folder className="text-primary" size={16} />
                             <div className="flex items-center gap-4">
-                              <span>{project.name}</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">{translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}</span>
-                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                  {project.fields?.length || 0} {translation("fields")}
+                              <div className="min-w-[15vw] flex items-center gap-2">
+                                <Folder className="text-primary" size={16} />
+                                <span>{project.name}</span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <span className="text-xs text-muted-foreground text-left">
+                                  {translation(project.typeProject === "field" ? "project.type.field" : "project.type.roof")}
                                 </span>
-                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                  {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0} {translation("zones")}
+                                <span className="flex items-center gap-1">
+                                  <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                    {project.fields?.length || 0}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
                                 </span>
-                                <span className="text-xs px-2 py-0.5 rounded bg-opacity-20 bg-border">
-                                  {project.fields?.reduce(
-                                    (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
-                                    0,
-                                  ) || 0}{" "}
-                                  {translation("datapoints")}
+                                <span className="flex items-center gap-x-1">
+                                  <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                    {project.fields?.reduce((acc: any, field: any) => acc + (field.zones?.length || 0), 0) || 0}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
+                                </span>
+                                <span className="flex items-center gap-x-1">
+                                  <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                                    {project.fields?.reduce(
+                                      (acc, field) =>
+                                        acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
+                                      0,
+                                    ) || 0}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
                                 </span>
                               </div>
                             </div>
@@ -277,7 +284,10 @@ const ProjectList: React.FC<ProjectListProps> = ({
                             <Button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(`https://www.google.com/maps?q=${project.latitude?.toString()},${project.longitude?.toString()}`, "_blank");
+                                window.open(
+                                  `https://www.google.com/maps?q=${project.latitude?.toString()},${project.longitude?.toString()}`,
+                                  "_blank",
+                                );
                               }}
                               className="text-xs h-8 px-2 ml-2"
                             >

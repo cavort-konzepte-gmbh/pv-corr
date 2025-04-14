@@ -145,12 +145,10 @@ const DatapointForm: React.FC<DatapointFormProps> = ({ currentTheme, currentLang
             </section>
           </FormHandler>
 
-          {error && (
-            <div className="p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>
-          )}
+          {error && <div className="p-2 rounded text-sm text-accent-primary border-accent-primary border-solid bg-surface">{error}</div>}
         </div>
       )}
-      
+
       <button
         onClick={() => setIsAdding(true)}
         className="w-full py-3 px-4 mt-4 flex items-center justify-center gap-x-2 text-sm text-white rounded bg-accent-primary"

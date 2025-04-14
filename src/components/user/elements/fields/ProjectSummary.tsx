@@ -53,9 +53,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   // Sort people alphabetically
   useEffect(() => {
     if (savedPeople && savedPeople.length > 0) {
-      const sorted = [...savedPeople].sort((a, b) => 
-        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      );
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
       setSortedPeople(sorted);
     } else {
       setSortedPeople([]);
@@ -65,10 +63,12 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
   const handleSave = async () => {
     try {
       setError(null);
-      
+
       // Validate coordinates if provided
-      if ((editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-          (editValues.longitude && !isValidCoordinate(editValues.longitude))) {
+      if (
+        (editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+        (editValues.longitude && !isValidCoordinate(editValues.longitude))
+      ) {
         setError(translation("project.invalid_coordinates"));
         return;
       }
@@ -76,7 +76,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
       // Format coordinates if valid
       let latitude = editValues.latitude;
       let longitude = editValues.longitude;
-      
+
       if (latitude && longitude && isValidCoordinate(latitude) && isValidCoordinate(longitude)) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
@@ -99,7 +99,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
         customerId: selectedCustomerId || undefined,
         includeFields: true,
         includeZones: true,
-        includeDatapoints: true
+        includeDatapoints: true,
       });
 
       onProjectsChange(updatedProjects);
@@ -126,31 +126,33 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                 <TableHead colSpan={2} className="p-4 text-left font-semibold text-card-foreground cursor-pointer" onClick={onToggle}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="project-overview-title">PROJECT OVERVIEW</span>
-                      <span className="text-lg">{project.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {project.fields?.length || 0}
+                      <div className="min-w-[25vw] flex items-center gap-2">
+                        <span className="project-overview-title">PROJECT OVERVIEW</span>
+                        <span className="text-lg">{project.name}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.length || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("fields")}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce((acc, field) => acc + (field.zones?.length || 0), 0) || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("zones")}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
-                          {project.fields?.reduce(
-                            (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
-                            0,
-                          ) || 0}
+                        <span className="inline-flex items-center gap-1">
+                          <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
+                            {project.fields?.reduce(
+                              (acc, field) => acc + (field.zones?.reduce((zAcc, zone) => zAcc + (zone.datapoints?.length || 0), 0) || 0),
+                              0,
+                            ) || 0}
+                          </span>
+                          <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
                         </span>
-                        <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
-                      </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -204,7 +206,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
               </TableRow>
             </TableHeader>
 
-            <TableBody className={isExpanded ? "" : "hidden"}>
+            <TableBody className={isExpanded || isEditing ? "" : "hidden"}>
               <TableRow>
                 <TableCell className="p-2 border-b border-r border-accent w-1/6">{translation("project.type")}</TableCell>
                 <TableCell className="p-2">
@@ -272,8 +274,8 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                         placeholder={translation("project.longitude")}
                         title="Enter decimal coordinates (e.g., 10.123456)"
                       />
-                      {(editValues.latitude && !isValidCoordinate(editValues.latitude)) || 
-                       (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
+                      {(editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
+                      (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (
                         <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                           <AlertCircle size={12} />
                           <span>Use decimal format (e.g., 57.123456)</span>
@@ -285,7 +287,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                       <span>
                         {project.latitude}, {project.longitude}
                       </span>
-                      <Button 
+                      <Button
                         onClick={() => window.open(`https://www.google.com/maps?q=${project.latitude},${project.longitude}`, "_blank")}
                         className="text-xs h-8 px-2"
                       >

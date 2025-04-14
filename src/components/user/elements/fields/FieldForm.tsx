@@ -48,40 +48,39 @@ const FieldForm: React.FC<FieldFormProps> = ({ currentTheme, selectedProjectId, 
     event.preventDefault();
     if (!newField || !selectedProjectId) return;
     setError(null);
-    
+
     // Validate coordinates if provided
-    if ((newField.latitude && !isValidCoordinate(newField.latitude)) || 
-        (newField.longitude && !isValidCoordinate(newField.longitude))) {
+    if ((newField.latitude && !isValidCoordinate(newField.latitude)) || (newField.longitude && !isValidCoordinate(newField.longitude))) {
       setError("Coordinates must be in decimal format (e.g., 57.123456)");
       return;
     }
-    
+
     try {
       // Format coordinates if valid
       let latitude = newField.latitude;
       let longitude = newField.longitude;
-      
+
       if (latitude && longitude) {
         latitude = formatCoordinate(latitude);
         longitude = formatCoordinate(longitude);
       }
-      
+
       await createField(selectedProjectId, {
         name: newField.name,
         latitude: latitude || undefined,
         longitude: longitude || undefined,
         has_fence: newField.has_fence,
       });
-      
+
       // Fetch fresh projects data to ensure everything is in sync
       // Wait a moment to ensure the database has completed the field and zone creation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const updatedProjects = await fetchProjects(null);
       if (updatedProjects) {
         onProjectsChange(updatedProjects);
       }
-      
+
       // Close the form after successful creation
       handleReset();
     } catch (err) {
@@ -147,8 +146,8 @@ const FieldForm: React.FC<FieldFormProps> = ({ currentTheme, selectedProjectId, 
                   title="Enter decimal coordinates (e.g., 10.123456)"
                 />
               </Label>
-              {(newField.latitude && !isValidCoordinate(newField.latitude)) || 
-               (newField.longitude && !isValidCoordinate(newField.longitude)) ? (
+              {(newField.latitude && !isValidCoordinate(newField.latitude)) ||
+              (newField.longitude && !isValidCoordinate(newField.longitude)) ? (
                 <div className="text-destructive flex items-center gap-1 text-xs mt-1">
                   <AlertCircle size={12} />
                   <span>Use decimal format (e.g., 57.123456)</span>
