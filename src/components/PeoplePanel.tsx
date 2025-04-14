@@ -35,9 +35,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
   // Sort people alphabetically
   useEffect(() => {
     if (savedPeople && savedPeople.length > 0) {
-      const sorted = [...savedPeople].sort((a, b) => 
-        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      );
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
       setSortedPeople(sorted);
     } else {
       setSortedPeople([]);
@@ -261,7 +259,7 @@ const PeoplePanel: React.FC<PeoplePanelProps> = ({ currentTheme, currentLanguage
                       }}
                       className="px-2 py-1 text-xs hover:bg-opacity-80"
                     >
-                         {translation("make_customer")}
+                      {translation("make_customer")}
                     </Button>
                   )}
                   <ChevronRight className="text-foreground" size={16} />

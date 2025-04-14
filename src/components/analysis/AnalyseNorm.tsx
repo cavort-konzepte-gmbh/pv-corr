@@ -44,7 +44,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
           console.error("Error loading norms:", error);
           throw error;
         }
-        
+
         setNorms(data || []);
       } catch (err) {
         console.error("Error loading norms:", err);
@@ -58,21 +58,22 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
     loadNorms();
   }, []);
 
-  const handleSelectNorm = useCallback(async (normId: string) => {
-    try {
-      setLoadingNorm(true);
-      
-      // If clicking the already selected norm, deselect it
-      if (selectedNormId === normId) {
-        onSelectNorm("");
-        return;
-      }
-      
-      // Fetch the complete norm data to ensure we have all parameters
-      const { data, error } = await supabase
-        .from("norms")
-        .select(
-          `
+  const handleSelectNorm = useCallback(
+    async (normId: string) => {
+      try {
+        setLoadingNorm(true);
+
+        // If clicking the already selected norm, deselect it
+        if (selectedNormId === normId) {
+          onSelectNorm("");
+          return;
+        }
+
+        // Fetch the complete norm data to ensure we have all parameters
+        const { data, error } = await supabase
+          .from("norms")
+          .select(
+            `
           *,
           parameters:norm_parameters (
             parameter_id,
@@ -80,24 +81,26 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
             rating_ranges
           )
         `,
-        )
-        .eq("id", normId)
-        .single();
+          )
+          .eq("id", normId)
+          .single();
 
-      if (error) {
-        console.error("Error fetching norm details:", error);
-        throw error;
+        if (error) {
+          console.error("Error fetching norm details:", error);
+          throw error;
+        }
+
+        // Now that we have the data, update the selection
+        onSelectNorm(normId);
+      } catch (err) {
+        console.error("Error selecting norm:", err);
+        showToast(`Error selecting norm: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+      } finally {
+        setLoadingNorm(false);
       }
-      
-      // Now that we have the data, update the selection
-      onSelectNorm(normId);
-    } catch (err) {
-      console.error("Error selecting norm:", err);
-      showToast(`Error selecting norm: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-    } finally {
-      setLoadingNorm(false);
-    }
-  }, [selectedNormId, onSelectNorm]);
+    },
+    [selectedNormId, onSelectNorm],
+  );
 
   if (loading) {
     return <div className="text-center p-4 text-secondary">{t("analysis.loading")}</div>;
@@ -113,7 +116,7 @@ const AnalyseNorm: React.FC<AnalyseNormProps> = ({ currentTheme, currentLanguage
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {norms.map((norm) => (
           <Button
-            key={norm.id} 
+            key={norm.id}
             onClick={() => handleSelectNorm(norm.id)}
             disabled={loadingNorm}
             className={`px-3 py-1 rounded text-sm transition-colors ${loadingNorm ? "opacity-50 cursor-not-allowed" : ""} ${

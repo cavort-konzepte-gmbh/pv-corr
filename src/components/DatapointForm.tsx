@@ -35,32 +35,31 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
       const [minStr, maxStr] = parameter.rangeValue.split("-");
       const min = parseFloat(minStr.replace(/[,()]/g, "").trim());
       const max = maxStr ? parseFloat(maxStr.replace(/[,()]/g, "").trim()) : undefined;
-      
+
       // Special case for Z1 impurities
       if (parameter.parameterCode === "Z1" && localValue === "impurities") {
         onChange(localValue);
         setError(null);
         return;
       }
-      
+
       // Empty value is allowed
-      if (localValue === '') {
-        onChange('');
+      if (localValue === "") {
+        onChange("");
         setError(null);
         return;
       }
-      
+
       // Validate numeric value
       const numValue = parseFloat(localValue);
       if (!isNaN(numValue)) {
-        const isValid = (isNaN(min) || numValue >= min) && 
-                       (max === undefined || isNaN(max) || numValue <= max);
-        
+        const isValid = (isNaN(min) || numValue >= min) && (max === undefined || isNaN(max) || numValue <= max);
+
         if (isValid) {
           onChange(localValue);
           setError(null);
         } else {
-          setError(`Value must be between ${min}${max !== undefined ? ` and ${max}` : '+'}`);
+          setError(`Value must be between ${min}${max !== undefined ? ` and ${max}` : "+"}`);
         }
       } else {
         setError("Please enter a valid number");
@@ -130,7 +129,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
 
     // Debug the range values
     // console.log(`Range for ${parameter.parameterCode}: min=${min}, max=${max}`);
-    
+
     // Only set min/max if they are valid numbers
     return (
       <div className="w-full">
@@ -145,11 +144,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
           className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
           placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : "+"})`}
         />
-        {error && (
-          <div className="text-destructive text-xs mt-1">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
       </div>
     );
   }
@@ -181,11 +176,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
           className={`w-full p-2 ${error ? "border-destructive" : ""}`}
           placeholder={`Enter value ${parameter.rangeType === "greater" ? ">" : ">="} ${limit}`}
         />
-        {error && (
-          <div className="text-destructive text-xs mt-1">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
       </div>
     );
   }
@@ -217,11 +208,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
           className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
           placeholder={`Enter value ${parameter.rangeType === "less" ? "<" : "<="} ${limit}`}
         />
-        {error && (
-          <div className="text-destructive text-xs mt-1">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-destructive text-xs mt-1">{error}</div>}
       </div>
     );
   }

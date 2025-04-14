@@ -39,12 +39,8 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
 
   const sortedDatapoints = [...datapoints].sort((a, b) => {
     // Safely access properties with null checks
-    const aValue = sortField === "name" 
-      ? (a ? getDatapointName(a).toLowerCase() : "") 
-      : (a?.timestamp || "");
-    const bValue = sortField === "name" 
-      ? (b ? getDatapointName(b).toLowerCase() : "") 
-      : (b?.timestamp || "");
+    const aValue = sortField === "name" ? (a ? getDatapointName(a).toLowerCase() : "") : a?.timestamp || "";
+    const bValue = sortField === "name" ? (b ? getDatapointName(b).toLowerCase() : "") : b?.timestamp || "";
 
     if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
     if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
@@ -56,7 +52,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <h3 className="text-lg font-medium">{t("analysis.select_datapoints")}</h3>
-          <Button 
+          <Button
             onClick={() => {
               if (selectedDatapoints.length === datapoints.length) {
                 // If all are selected, deselect all
@@ -100,7 +96,7 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
             }`}
           >
             {t("date")}
-          
+
             <ArrowUpDown size={12} />
           </Button>
         </div>
@@ -108,24 +104,22 @@ const AnalyseData: React.FC<AnalyseDataProps> = ({ currentTheme, currentLanguage
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {sortedDatapoints.map((datapoint) => {
-          return (
-            datapoint && datapoint.id ? (
-              <Button
-                key={datapoint.id}
-                onClick={() => onToggleDatapoint(datapoint.id)}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  selectedDatapoints.includes(datapoint.id) ? "bg-accent-primary text-primary" : "text-primary-foreground hover:bg-theme"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm ">{getDatapointName(datapoint)}</div>
-                  </div>
-                  {selectedDatapoints.includes(datapoint.id) && <Check size={12} className="text-accent-primary" />}
+          return datapoint && datapoint.id ? (
+            <Button
+              key={datapoint.id}
+              onClick={() => onToggleDatapoint(datapoint.id)}
+              className={`px-3 py-1 rounded text-sm transition-colors ${
+                selectedDatapoints.includes(datapoint.id) ? "bg-accent-primary text-primary" : "text-primary-foreground hover:bg-theme"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm ">{getDatapointName(datapoint)}</div>
                 </div>
-              </Button>
-            ) : null
-          );
+                {selectedDatapoints.includes(datapoint.id) && <Check size={12} className="text-accent-primary" />}
+              </div>
+            </Button>
+          ) : null;
         })}
       </div>
     </div>

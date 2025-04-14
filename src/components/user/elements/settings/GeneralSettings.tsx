@@ -32,17 +32,17 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
   const handleLanguageChange = async (language: Language) => {
     if (updating) return;
     setUpdating(true);
-    
+
     try {
       // First load the translations for the new language
       const translations = await fetchTranslations(language);
       setTranslations(translations);
-      
+
       // Then update the user settings
       await updateUserSettings({ language });
-      
-      showToast(`Language changed to ${LANGUAGES.find(l => l.id === language)?.name}`, "success");
-      
+
+      showToast(`Language changed to ${LANGUAGES.find((l) => l.id === language)?.name}`, "success");
+
       // Update the UI
       onLanguageChange(language);
     } catch (err) {
@@ -63,7 +63,7 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
         await handleLanguageChange(value as Language);
         return;
       }
-      
+
       // Update settings through service
       const success = await updateUserSettings({
         [key === "language"
@@ -161,7 +161,6 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
           <option value="green.dark">Green Dark</option>
         </select>
       </div>
-      
     </div>
   );
 };

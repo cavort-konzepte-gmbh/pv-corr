@@ -26,7 +26,7 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
       latitude: zone.latitude || null,
       longitude: zone.longitude || null,
       substructure_id: zone.substructureId || null,
-      foundation_id: zone.foundationId || null
+      foundation_id: zone.foundationId || null,
     })
     .select()
     .single();
@@ -38,10 +38,10 @@ export const createZone = async (fieldId: string, zone: Omit<Zone, "id" | "hidde
   }
 
   showToast("Zone created successfully", "success");
-  
+
   // Fetch complete zone data after creation
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   const { data: completeZone, error: fetchError } = await supabase
     .from("zones")
     .select(
@@ -94,7 +94,7 @@ export const updateZone = async (zoneId: string, zone: Partial<Zone>): Promise<Z
       showToast(`Failed to update zone: ${error.message}`, "error");
       throw error;
     }
-    
+
     showToast("Zone updated successfully", "success");
     return data;
   } catch (err) {
@@ -113,7 +113,7 @@ export const deleteZone = async (zoneId: string) => {
       showToast(`Failed to delete zone: ${error.message}`, "error");
       throw error;
     }
-    
+
     showToast("Zone deleted successfully", "success");
   } catch (err) {
     console.error("Error deleting zone:", err);

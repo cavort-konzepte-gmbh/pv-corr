@@ -2,7 +2,24 @@ import React, { useState } from "react";
 import { Theme } from "../../types/theme";
 import { Language, useTranslation } from "../../types/language";
 import { Project } from "../../types/projects";
-import { FileText, Download, Eye, History, Info, Loader2, Share, ChevronLeft, Calendar, User, Building2, MapPin, Check, X, Printer, AlertTriangle } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Eye,
+  History,
+  Info,
+  Loader2,
+  Share,
+  ChevronLeft,
+  Calendar,
+  User,
+  Building2,
+  MapPin,
+  Check,
+  X,
+  Printer,
+  AlertTriangle,
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "../../lib/supabase";
@@ -15,7 +32,7 @@ import { Card, CardContent } from "../ui/card";
 interface OutputProps {
   currentTheme: Theme;
   currentLanguage: Language;
-  projects: Project[]; 
+  projects: Project[];
   reports: any[];
 }
 
@@ -29,7 +46,7 @@ interface Report {
   versions: {
     id: string;
     versionNumber: number;
-    totalRating: number; 
+    totalRating: number;
     classification: string;
     createdAt: string;
   }[];
@@ -60,20 +77,20 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
         setReports(fetchedReports || []);
       } catch (err) {
         console.error("Error loading reports:", err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load reports';
+        const errorMessage = err instanceof Error ? err.message : "Failed to load reports";
         setError(errorMessage);
-        
+
         // Implement retry logic
         if (retryCount < 3) {
           setTimeout(() => {
-            setRetryCount(prev => prev + 1);
+            setRetryCount((prev) => prev + 1);
           }, 1000); // Wait 1 second before retrying
         }
       } finally {
         setLoadingReports(false);
       }
     };
-    
+
     loadReports();
   }, [initialReports, retryCount]);
 
@@ -86,9 +103,9 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
       const projectId = params.get("projectId") || "";
       const zoneId = params.get("zoneId") || "";
       const normId = params.get("normId") || "";
-      
+
       console.log("URL parameters:", { reportId, versionNumber, preview, projectId, zoneId, normId });
-      
+
       if (reportId) {
         try {
           setError(null);
@@ -98,17 +115,17 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             .select("*, versions:analysis_versions(*)")
             .eq("id", reportId)
             .maybeSingle();
-            
+
           if (reportError) throw reportError;
-          
+
           if (!report) {
             throw new Error("Report not found");
           }
-          
+
           if (!report?.versions || report.versions.length === 0) {
             throw new Error("No versions found for this report. Please try again later.");
           }
-          
+
           // Get the specific version or latest
           let version;
           if (versionNumber) {
@@ -120,31 +137,26 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             // Sort versions by version number descending and get the first one
             version = [...report.versions].sort((a, b) => b.version_number - a.version_number)[0];
           }
-          
+
           // Load norm data
-          const { data: normData, error: normError } = await supabase
-            .from("norms")
-            .select("*")
-            .eq("id", report.norm_id)
-            .maybeSingle();
-            
+          const { data: normData, error: normError } = await supabase.from("norms").select("*").eq("id", report.norm_id).maybeSingle();
+
           if (normError) throw normError;
           if (!normData) {
             throw new Error("Norm not found");
           }
-          
+
           setSelectedVersion({
             ...version,
             projectId: report.project_id,
             zoneId: report.zone_id,
-            normId: report.norm_id
+            normId: report.norm_id,
           });
           setSelectedNorm(normData);
           setShowPreview(true);
-          
+
           // Set loading to false after successful data load
           setLoading(false);
-          
         } catch (err) {
           console.error("Error loading report:", err);
           setError(err instanceof Error ? err.message : "Failed to load report");
@@ -158,25 +170,27 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
         try {
           setError(null);
           // First try to find project in props
-          let foundProject = projects.find(p => p.id === projectId);
-          
+          let foundProject = projects.find((p) => p.id === projectId);
+
           // If not found in props, fetch from Supabase
           if (!foundProject) {
             const { data: projectData, error: projectError } = await supabase
-              .from('projects')
-              .select(`
+              .from("projects")
+              .select(
+                `
                 *,
                 fields (
                   *,
                   zones (*)
                 )
-              `)
-              .eq('id', projectId)
+              `,
+              )
+              .eq("id", projectId)
               .maybeSingle();
 
             if (projectError) throw projectError;
             if (!projectData) throw new Error("Project not found");
-            
+
             foundProject = projectData;
             setProjectData(projectData);
           }
@@ -192,29 +206,25 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             }
             if (foundZone) break;
           }
-          
+
           if (!foundZone) {
             throw new Error("Zone not found");
           }
 
           // Load norm data
-          const { data: norm, error: normError } = await supabase
-            .from("norms")
-            .select("*")
-            .eq("id", normId)
-            .maybeSingle();
+          const { data: norm, error: normError } = await supabase.from("norms").select("*").eq("id", normId).maybeSingle();
 
           if (normError) throw normError;
           if (!norm) {
             throw new Error("Norm not found");
           }
-          
+
           setSelectedNorm(norm);
-          
+
           // Get user info from auth
           const {
             data: { user },
-            error: userError
+            error: userError,
           } = await supabase.auth.getUser();
 
           if (userError) throw userError;
@@ -233,15 +243,14 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             },
           });
           setShowPreview(true);
-          
+
           // Set loading to false after successful data load
           setLoading(false);
-          
         } catch (err) {
           console.error("Error loading preview data:", err);
           setError(`Failed to load preview data: ${err instanceof Error ? err.message : String(err)}`);
           setLoading(false);
-          
+
           // If error is auth-related, redirect to login
           if (err instanceof Error && err.message.includes("not authenticated")) {
             navigate("/login");
@@ -278,15 +287,15 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
 
   // Check if we should show the report view
   const shouldShowReport = () => {
-    const hasReportId = new URLSearchParams(location.search).has('reportId');
+    const hasReportId = new URLSearchParams(location.search).has("reportId");
     const params = new URLSearchParams(location.search);
-    
+
     if (showPreview) return true;
-    
+
     // Check URL parameters for direct report viewing
     const isPreview = params.get("preview") === "true";
     const result = hasReportId || (isPreview && params.get("projectId") && params.get("zoneId") && params.get("normId"));
-    
+
     return result;
   };
 
@@ -296,7 +305,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
       ...version,
       projectId: report.projectId,
       zoneId: report.zoneId,
-      normId: report.normId
+      normId: report.normId,
     });
     setShowPreview(true);
   };
@@ -310,7 +319,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
       setReports(fetchedReports || []);
     } catch (err) {
       console.error("Error retrying report fetch:", err);
-      setError(err instanceof Error ? err.message : 'Failed to load reports');
+      setError(err instanceof Error ? err.message : "Failed to load reports");
     } finally {
       setLoadingReports(false);
     }
@@ -327,29 +336,29 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
   if (shouldShowReport()) {
     // Find the project and zone based on the selected version or URL parameters
     const projectId = selectedVersion?.projectId || new URLSearchParams(location.search).get("projectId");
-    const zoneId = selectedVersion?.zoneId || new URLSearchParams(location.search).get("zoneId"); 
+    const zoneId = selectedVersion?.zoneId || new URLSearchParams(location.search).get("zoneId");
     const reportId = new URLSearchParams(location.search).get("reportId");
     const normIdParam = new URLSearchParams(location.search).get("normId");
     const normIdToUse = selectedVersion?.normId || normIdParam || "";
 
     // Use the project and zone from selectedVersion if available, otherwise find them in projects or projectData
-    const project = selectedVersion?.project || projects.find(p => p.id === projectId) || projectData;
+    const project = selectedVersion?.project || projects.find((p) => p.id === projectId) || projectData;
     let zone = selectedVersion?.zone;
 
     // If we don't have the zone from selectedVersion, find it in the project
     if (!zone && project) {
       // Search through all fields and their zones to find the matching zone
       for (const field of project.fields || []) {
-        const matchingZone = field.zones?.find(z => z.id === zoneId);
+        const matchingZone = field.zones?.find((z) => z.id === zoneId);
         if (matchingZone) {
           zone = matchingZone;
           break;
         }
       }
     }
-    
+
     return (
-      <OutputView 
+      <OutputView
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         project={project}
@@ -361,7 +370,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
           setSelectedVersion(null);
           setSelectedNorm(null);
           setProjectData(null);
-          
+
           // If we came from a direct URL, navigate back to reports list
           const params = new URLSearchParams(location.search);
           if (params.has("reportId") || params.get("preview") === "true") {
@@ -385,17 +394,8 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
                 <div className="flex-1">
                   <h3 className="font-medium text-destructive mb-2">{t("common.error")}</h3>
                   <p className="text-sm text-destructive/90 mb-4">{error}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRetry}
-                    disabled={loadingReports}
-                  >
-                    {loadingReports ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                    )}
+                  <Button variant="outline" size="sm" onClick={handleRetry} disabled={loadingReports}>
+                    {loadingReports ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <AlertTriangle className="h-4 w-4 mr-2" />}
                     {t("common.retry")}
                   </Button>
                 </div>
@@ -403,7 +403,7 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
             </CardContent>
           </Card>
         )}
-        
+
         {loadingReports ? (
           <Card className="border border-input">
             <CardContent className="p-6 text-center">
@@ -420,11 +420,15 @@ const Output: React.FC<OutputProps> = ({ currentTheme, currentLanguage, projects
                 <p className="mb-4">{t("output.no_reports_description")}</p>
                 <div className="text-left space-y-2 mb-4">
                   <div className="flex items-start gap-2">
-                    <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                    <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                      <Info size={14} />
+                    </div>
                     <p>{t("output.create_report_instruction_1")}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <div className="bg-primary/10 rounded-full p-1 mt-0.5"><Info size={14} /></div>
+                    <div className="bg-primary/10 rounded-full p-1 mt-0.5">
+                      <Info size={14} />
+                    </div>
                     <p>{t("output.create_report_instruction_2")}</p>
                   </div>
                 </div>

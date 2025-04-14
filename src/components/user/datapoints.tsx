@@ -83,7 +83,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         }
       }
     };
-    
+
     loadDatapoints();
   }, [selectedZone?.id]);
 
@@ -145,7 +145,7 @@ const Datapoints: React.FC<DatapointsProps> = ({
         currentTheme={currentTheme}
         currentLanguage={currentLanguage}
         zoneId={selectedZone.id || ""}
-        datapoints={zoneDatapoints.length > 0 ? zoneDatapoints : (selectedZone.datapoints || [])}
+        datapoints={zoneDatapoints.length > 0 ? zoneDatapoints : selectedZone.datapoints || []}
         parameters={filteredParameters}
         onProjectsChange={onProjectsChange}
       />

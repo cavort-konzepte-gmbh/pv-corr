@@ -23,19 +23,7 @@ type InputProps = {
 };
 
 const Dropzone = React.forwardRef<HTMLDivElement, InputProps>(
-  (
-    {
-      width,
-      height,
-      className,
-      value,
-      onChange,
-      onFilesAdded,
-      disabled = false,
-      dropzoneOptions,
-    },
-    ref
-  ) => {
+  ({ width, height, className, value, onChange, onFilesAdded, disabled = false, dropzoneOptions }, ref) => {
     const [files, setFiles] = React.useState<File[]>(value || []);
 
     React.useEffect(() => {
@@ -51,7 +39,7 @@ const Dropzone = React.forwardRef<HTMLDivElement, InputProps>(
         onChange?.(newFiles);
         onFilesAdded?.(acceptedFiles);
       },
-      [files, onChange, onFilesAdded]
+      [files, onChange, onFilesAdded],
     );
 
     const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
@@ -69,7 +57,7 @@ const Dropzone = React.forwardRef<HTMLDivElement, InputProps>(
             isDragAccept && variants.accept,
             isDragReject && variants.reject,
             disabled && variants.disabled,
-            className
+            className,
           ),
           style: {
             width,
@@ -86,7 +74,7 @@ const Dropzone = React.forwardRef<HTMLDivElement, InputProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 Dropzone.displayName = "Dropzone";

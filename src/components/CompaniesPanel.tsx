@@ -39,7 +39,7 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
   const [selectedCeoId, setSelectedCeoId] = useState<string>("");
   const [selectedContactId, setSelectedContactId] = useState<string>("");
   const [savedCompaniesList, setSavedCompaniesList] = useState<Company[]>(savedCompanies || []);
-  const [availablePeople, setAvailablePeople] = useState<Person[]>([]); 
+  const [availablePeople, setAvailablePeople] = useState<Person[]>([]);
   const [sortedCompanies, setSortedCompanies] = useState<Company[]>([]);
   const [sortedPeople, setSortedPeople] = useState<Person[]>([]);
   const translation = useTranslation(currentLanguage);
@@ -66,11 +66,9 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
     } else {
       setSortedCompanies([]);
     }
-    
+
     if (availablePeople && availablePeople.length > 0) {
-      const sorted = [...availablePeople].sort((a, b) => 
-        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      );
+      const sorted = [...availablePeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
       setSortedPeople(sorted);
     } else {
       setSortedPeople([]);
@@ -287,7 +285,6 @@ const CompaniesPanel: React.FC<CompaniesPanelProps> = ({
                           className="px-2 py-1 text-xs rounded hover:bg-opacity-80 text-white"
                         >
                           {translation("make_customer")}
-                      
                         </Button>
                       )}
                       <ChevronRight className="text-foreground" size={16} />

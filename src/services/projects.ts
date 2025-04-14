@@ -18,18 +18,18 @@ export const createProject = async (
     defaultFieldName: "Field 1",
     createDefaultZone: true,
     defaultZoneName: "Zone 1",
-  }
+  },
 ) => {
   const {
     data: { user },
-    error: userError
+    error: userError,
   } = await supabase.auth.getUser();
-  
+
   if (userError) {
     console.error("Auth error:", userError);
     throw new Error("User authentication error");
   }
-  
+
   if (!user) {
     throw new Error("User not authenticated");
   }
@@ -84,7 +84,7 @@ export const createProject = async (
       showToast("No project data returned after creation", "error");
       throw new Error("No project data returned after creation");
     }
-    
+
     // Check if user_project association already exists
     const { data: existingUserProject, error: checkError } = await supabase
       .from("user_projects")
@@ -92,24 +92,23 @@ export const createProject = async (
       .eq("user_id", user.id)
       .eq("project_id", projectData.id)
       .single();
-      
-    if (checkError && checkError.code !== "PGRST116") { // PGRST116 means no rows returned
+
+    if (checkError && checkError.code !== "PGRST116") {
+      // PGRST116 means no rows returned
       console.error("Error checking user projects:", checkError);
       showToast(`Warning: Failed to check existing user association: ${checkError.message}`, "warning");
     }
-    
+
     // Only create user_project if it doesn't exist
     if (!existingUserProject) {
-      const { error: userProjectError } = await supabase
-        .from("user_projects")
-        .insert([
-          {
-            user_id: user.id,
-            project_id: projectData.id,
-            role: "owner"
-          }
-        ]);
-        
+      const { error: userProjectError } = await supabase.from("user_projects").insert([
+        {
+          user_id: user.id,
+          project_id: projectData.id,
+          role: "owner",
+        },
+      ]);
+
       if (userProjectError) {
         console.error("Error creating user_project association:", userProjectError);
         showToast(`Warning: Project created but user association failed: ${userProjectError.message}`, "warning");
@@ -232,7 +231,7 @@ export const moveProject = async (projectId: string, customerId: string | null) 
       showToast(`Failed to move project: ${error.message}`, "error");
       throw error;
     }
-    
+
     showToast("Project moved successfully", "success");
   } catch (err) {
     console.error("Error moving project:", err);
@@ -277,10 +276,15 @@ export const deleteProject = async (projectId: string) => {
 export const fetchProjects = async (customerId?: string): Promise<Project[]> => {
   try {
     // Get current user
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     // Build the query for projects
-    let query = supabase.from("projects").select(`
+    let query = supabase
+      .from("projects")
+      .select(
+        `
         *,
         fields (
           id, hidden_id, name, latitude, longitude, has_fence,
@@ -290,8 +294,10 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
             datapoints (*)
           )
         )
-      `).order("created_at", { ascending: true });
-      
+      `,
+      )
+      .order("created_at", { ascending: true });
+
     // Apply customer filter if provided
     if (customerId !== undefined) {
       if (customerId === null) {
@@ -300,7 +306,7 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
         query = query.eq("customer_id", customerId);
       }
     }
-    
+
     const { data, error } = await query;
 
     if (error) {
@@ -319,54 +325,56 @@ export const fetchProjects = async (customerId?: string): Promise<Project[]> => 
     }
 
     // Map projects to the expected format
-    const projects = data.filter(project => project).map((project) => ({
-      id: project.id,
-      hiddenId: project.hidden_id,
-      name: project.name,
-      clientRef: project.client_ref,
-      latitude: project.latitude,
-      longitude: project.longitude,
-      imageUrl: project.image_url,
-      companyId: project.company_id,
-      managerId: project.manager_id,
-      typeProject: project.type_project,
-      customerId: project.customer_id,
-      fields: (Array.isArray(project.fields) ? project.fields : []).filter(field => field).map((field) => ({
-        id: field.id,
-        hiddenId: field.hidden_id,
-        name: field.name,
-        latitude: field.latitude,
-        longitude: field.longitude,
-        has_fence: field.has_fence,
-        gates: (Array.isArray(field.gates) ? field.gates : []).filter(gate => gate).map((gate) => ({
-          id: gate.id,
-          hiddenId: gate.hidden_id,
-          name: gate.name,
-          latitude: gate.latitude,
-          longitude: gate.longitude,
-        })),
-        zones: (Array.isArray(field.zones) ? field.zones : []).filter(zone => zone).map((zone) => ({
-          id: zone.id,
-          hiddenId: zone.hidden_id,
-          name: zone.name,
-          latitude: zone.latitude,
-          longitude: zone.longitude,
-          substructureId: zone.substructure_id,
-          foundationId: zone.foundation_id,
-          datapoints: (Array.isArray(zone.datapoints) ? zone.datapoints : []).filter(dp => dp).map((dp) => ({
-            id: dp.id,
-          }
-          )
-          )
-        }
-        )
-        )
-      }
-      )
-      )
-    }
-    )
-    )
+    const projects = data
+      .filter((project) => project)
+      .map((project) => ({
+        id: project.id,
+        hiddenId: project.hidden_id,
+        name: project.name,
+        clientRef: project.client_ref,
+        latitude: project.latitude,
+        longitude: project.longitude,
+        imageUrl: project.image_url,
+        companyId: project.company_id,
+        managerId: project.manager_id,
+        typeProject: project.type_project,
+        customerId: project.customer_id,
+        fields: (Array.isArray(project.fields) ? project.fields : [])
+          .filter((field) => field)
+          .map((field) => ({
+            id: field.id,
+            hiddenId: field.hidden_id,
+            name: field.name,
+            latitude: field.latitude,
+            longitude: field.longitude,
+            has_fence: field.has_fence,
+            gates: (Array.isArray(field.gates) ? field.gates : [])
+              .filter((gate) => gate)
+              .map((gate) => ({
+                id: gate.id,
+                hiddenId: gate.hidden_id,
+                name: gate.name,
+                latitude: gate.latitude,
+                longitude: gate.longitude,
+              })),
+            zones: (Array.isArray(field.zones) ? field.zones : [])
+              .filter((zone) => zone)
+              .map((zone) => ({
+                id: zone.id,
+                hiddenId: zone.hidden_id,
+                name: zone.name,
+                latitude: zone.latitude,
+                longitude: zone.longitude,
+                substructureId: zone.substructure_id,
+                foundationId: zone.foundation_id,
+                datapoints: (Array.isArray(zone.datapoints) ? zone.datapoints : [])
+                  .filter((dp) => dp)
+                  .map((dp) => ({
+                    id: dp.id,
+                  })),
+              })),
+          })),
+      }));
     // Sort projects by name
     return projects.sort((a, b) => a.name.localeCompare(b.name));
   } catch (err) {

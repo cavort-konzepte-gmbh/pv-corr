@@ -61,17 +61,13 @@ export const createParameter = async (parameter: Omit<Parameter, "id" | "hiddenI
     range_type: parameter.rangeType,
     range_value: parameter.rangeValue || "",
     order_number: parameter.orderNumber || 0,
-    rating_ranges: parameter.ratingRanges || '[]'
+    rating_ranges: parameter.ratingRanges || "[]",
   };
 
   try {
     console.log("Creating parameter with data:", JSON.stringify(parameterData));
-    
-    const { data, error } = await supabase
-      .from("parameters")
-      .insert(parameterData)
-      .select()
-      .single();
+
+    const { data, error } = await supabase.from("parameters").insert(parameterData).select().single();
 
     if (error) {
       console.error("Error creating parameter:", error);
@@ -85,9 +81,7 @@ export const createParameter = async (parameter: Omit<Parameter, "id" | "hiddenI
   } catch (err) {
     console.error("Error in createParameter:", err);
     showToast(`Failed to create parameter: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-    throw err instanceof Error 
-      ? err 
-      : new Error("Failed to create parameter. Please check your input values.");
+    throw err instanceof Error ? err : new Error("Failed to create parameter. Please check your input values.");
   }
 };
 
@@ -107,21 +101,21 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
   if (parameter.rangeType !== undefined) updateData.range_type = parameter.rangeType;
   if (parameter.rangeValue !== undefined) updateData.range_value = parameter.rangeValue;
   if (parameter.orderNumber !== undefined) updateData.order_number = parameter.orderNumber;
-  if (parameter.ratingRanges !== undefined) updateData.rating_ranges = parameter.ratingRanges || '[]';
+  if (parameter.ratingRanges !== undefined) updateData.rating_ranges = parameter.ratingRanges || "[]";
   if (parameter.rating_logic_code !== undefined) updateData.rating_logic_code = parameter.rating_logic_code;
   if (parameter.rating_logic_test_cases !== undefined) updateData.rating_logic_test_cases = parameter.rating_logic_test_cases;
 
   try {
     console.log("Updating parameter with data:", JSON.stringify(updateData));
-    
+
     const { data, error } = await supabase.from("parameters").update(updateData).eq("id", id.toString()).select().single();
-  
+
     if (error) {
       console.error("Error updating parameter:", error);
       showToast(`Failed to update parameter: ${error.message}`, "error");
       throw error;
     }
-  
+
     console.log("Parameter updated successfully:", data);
     showToast("Parameter updated successfully", "success");
     return {
@@ -132,9 +126,7 @@ export const updateParameter = async (id: string, parameter: Partial<Parameter>)
   } catch (err) {
     console.error("Error in updateParameter:", err);
     showToast(`Failed to update parameter: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-    throw err instanceof Error 
-      ? err 
-      : new Error("Failed to update parameter. Please check your input values.");
+    throw err instanceof Error ? err : new Error("Failed to update parameter. Please check your input values.");
   }
 };
 
@@ -147,7 +139,7 @@ export const deleteParameter = async (id: string) => {
       showToast(`Failed to delete parameter: ${error.message}`, "error");
       throw error;
     }
-    
+
     showToast("Parameter deleted successfully", "success");
   } catch (err) {
     console.error("Error deleting parameter:", err);

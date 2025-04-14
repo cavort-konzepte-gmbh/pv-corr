@@ -67,7 +67,7 @@ const Zones: React.FC<ZonesProps> = ({
       return null;
     }
   })();
-  
+
   const company = (() => {
     try {
       if (!companies || !Array.isArray(companies) || !selectedProject.companyId) return null;

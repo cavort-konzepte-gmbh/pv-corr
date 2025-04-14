@@ -1,13 +1,7 @@
 import React from "react";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { useTranslation } from "../types/language";
-import { 
-  Breadcrumb, 
-  BreadcrumbList, 
-  BreadcrumbItem, 
-  BreadcrumbSeparator, 
-  BreadcrumbCurrent 
-} from "./ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator, BreadcrumbCurrent } from "./ui/breadcrumb";
 import { Tag, User } from "lucide-react";
 import { useAuth } from "./auth/AuthProvider";
 import { getCurrentVersion } from "../services/versions";
@@ -18,32 +12,21 @@ interface BreadcrumbNavigationProps {
   customers: any[];
 }
 
-const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({ 
-  currentLanguage,
-  projects,
-  customers
-}) => {
+const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({ currentLanguage, projects, customers }) => {
   const t = useTranslation(currentLanguage);
   const { user } = useAuth();
   const [version, setVersion] = React.useState<string>("0.0.0");
   const [versionType, setVersionType] = React.useState<string>("stable");
-  
-  const {
-    view,
-    selectedProjectId,
-    selectedFieldId,
-    selectedZoneId,
-    selectedCustomerId,
-    selectedReportId
-  } = useAppNavigation();
+
+  const { view, selectedProjectId, selectedFieldId, selectedZoneId, selectedCustomerId, selectedReportId } = useAppNavigation();
 
   // Find the selected project, field, and zone
-  const selectedProject = projects.find(p => p.id === selectedProjectId);
-  const selectedField = selectedProject?.fields?.find(f => f.id === selectedFieldId);
-  const selectedZone = selectedField?.zones?.find(z => z.id === selectedZoneId);
-  
+  const selectedProject = projects.find((p) => p.id === selectedProjectId);
+  const selectedField = selectedProject?.fields?.find((f) => f.id === selectedFieldId);
+  const selectedZone = selectedField?.zones?.find((z) => z.id === selectedZoneId);
+
   // Find the selected customer
-  const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+  const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
 
   // Load version information
   React.useEffect(() => {
@@ -59,7 +42,7 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
         setVersion("0.0.0");
       }
     };
-    
+
     loadVersion();
   }, []);
 
@@ -69,48 +52,38 @@ const BreadcrumbNavigation: React.FC<BreadcrumbNavigationProps> = ({
         <BreadcrumbList>
           {selectedCustomerId && view !== "customers" && (
             <>
-              <BreadcrumbItem>
-                {selectedCustomer?.name || "Customer"}
-              </BreadcrumbItem>
+              <BreadcrumbItem>{selectedCustomer?.name || "Customer"}</BreadcrumbItem>
               <BreadcrumbSeparator />
             </>
           )}
-          
+
           {view !== "customers" && view !== "projects" && selectedProjectId && (
             <>
-              <BreadcrumbItem>
-                {selectedProject?.name || "Project"}
-              </BreadcrumbItem>
+              <BreadcrumbItem>{selectedProject?.name || "Project"}</BreadcrumbItem>
               <BreadcrumbSeparator />
             </>
           )}
-          
+
           {view !== "customers" && view !== "projects" && view !== "fields" && selectedFieldId && (
             <>
-              <BreadcrumbItem>
-                {selectedField?.name || "Field"}
-              </BreadcrumbItem>
+              <BreadcrumbItem>{selectedField?.name || "Field"}</BreadcrumbItem>
               <BreadcrumbSeparator />
             </>
           )}
-          
+
           {view !== "customers" && view !== "projects" && view !== "fields" && view !== "zones" && selectedZoneId && (
             <>
-              <BreadcrumbItem>
-                {selectedZone?.name || "Zone"}
-              </BreadcrumbItem>
+              <BreadcrumbItem>{selectedZone?.name || "Zone"}</BreadcrumbItem>
               <BreadcrumbSeparator />
             </>
           )}
-          
+
           <BreadcrumbItem>
-            <BreadcrumbCurrent>
-              {t(`nav.${view}`)}
-            </BreadcrumbCurrent>
+            <BreadcrumbCurrent>{t(`nav.${view}`)}</BreadcrumbCurrent>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
+
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <User size={12} className="text-muted-foreground" />

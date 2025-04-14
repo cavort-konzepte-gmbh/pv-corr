@@ -106,7 +106,7 @@ const ZoneForm: React.FC<ZoneFormProps> = ({ currentTheme, selectedFieldId, onPr
           </div>
         </div>
       )}
-      
+
       <Button className="w-full py-3 px-4 mt-4 flex items-center justify-center gap-x-2" onClick={() => setShowForm(true)}>
         <Plus className="size-4 text-primary" />
         {translation("zones.add")}

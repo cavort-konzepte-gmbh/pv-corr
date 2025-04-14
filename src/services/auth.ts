@@ -66,7 +66,7 @@ export const updateUserMetadata = async (metadata: Partial<UserMetadata>): Promi
         detail: data.user.user_metadata,
       }),
     );
-    
+
     showToast("User settings updated successfully", "success");
     return true;
   } catch (error) {

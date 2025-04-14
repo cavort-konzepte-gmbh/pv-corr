@@ -19,9 +19,7 @@ const PeopleSettings: React.FC<PeopleSettingsProps> = ({ currentTheme, currentLa
   // Sort people alphabetically
   useEffect(() => {
     if (savedPeople && savedPeople.length > 0) {
-      const sorted = [...savedPeople].sort((a, b) => 
-        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      );
+      const sorted = [...savedPeople].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
       setSortedPeople(sorted);
     } else {
       setSortedPeople([]);

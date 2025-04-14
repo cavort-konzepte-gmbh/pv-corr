@@ -41,7 +41,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     major: 0,
     minor: 0,
     patch: 0,
-    type: "stable"
+    type: "stable",
   });
 
   useEffect(() => {
@@ -63,19 +63,19 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
 
   const validateForm = () => {
     const versionString = `${formValues.major}.${formValues.minor}.${formValues.patch}`;
-    const versionExists = versions.some(v => v.version === versionString);
-    
+    const versionExists = versions.some((v) => v.version === versionString);
+
     if (versionExists) {
       setError(`Version ${versionString} already exists. Please use a different version number.`);
       return false;
     }
 
     // Validate type is one of the allowed values
-    if (!['beta', 'stable'].includes(formValues.type)) {
+    if (!["beta", "stable"].includes(formValues.type)) {
       setError('Version type must be either "beta" or "stable"');
       return false;
     }
-        
+
     return true;
   };
 
@@ -92,9 +92,9 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         major: formValues.major,
         minor: formValues.minor,
         patch: formValues.patch,
-        type: formValues.type
+        type: formValues.type,
       };
-     
+
       await createVersion(versionData);
       await loadVersions();
       setShowNewForm(false);
@@ -102,11 +102,11 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
         major: 0,
         minor: 0,
         patch: 0,
-        type: "stable"
+        type: "stable",
       });
     } catch (err) {
       console.error("Error creating version:", err);
-      setError(typeof err === 'string' ? err : err instanceof Error ? err.message : "Failed to create version");
+      setError(typeof err === "string" ? err : err instanceof Error ? err.message : "Failed to create version");
     }
   };
 
@@ -116,19 +116,16 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
 
   const handleUpdateVersion = async () => {
     if (!editingVersion) return;
-    
+
     try {
       setError(null);
-            
+
       const updateData = {
-        type: editingVersion.type || 'stable',
+        type: editingVersion.type || "stable",
         is_current: editingVersion.is_current || false,
       };
-      
-      const { error: updateError } = await supabase
-        .from('versions')
-        .update(updateData)
-        .eq('id', editingVersion.id);
+
+      const { error: updateError } = await supabase.from("versions").update(updateData).eq("id", editingVersion.id);
 
       if (updateError) {
         throw updateError;
@@ -139,13 +136,13 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
       setEditingVersion(null);
     } catch (err) {
       console.error("Error updating version:", err);
-      setError(typeof err === 'string' ? err : err instanceof Error ? err.message : "Failed to update version");
+      setError(typeof err === "string" ? err : err instanceof Error ? err.message : "Failed to update version");
     }
   };
 
   const handleConfirmDelete = async () => {
     if (!versionToDelete) return;
-    
+
     try {
       setError(null);
       await deleteVersion(versionToDelete.id);
@@ -154,15 +151,14 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
       setDeleteConfirmOpen(false);
     } catch (err) {
       console.error("Error deleting version:", err);
-      setError(typeof err === 'string' ? err : err instanceof Error ? err.message : "Failed to delete version");
+      setError(typeof err === "string" ? err : err instanceof Error ? err.message : "Failed to delete version");
     }
   };
 
   const handleSetCurrent = async (versionId: string) => {
     try {
-      await supabase
-        .rpc('set_version_as_current', { version_id: versionId });
-      
+      await supabase.rpc("set_version_as_current", { version_id: versionId });
+
       await loadVersions();
     } catch (err) {
       console.error("Error setting current version:", err);
@@ -240,12 +236,14 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
 
               <div className="space-y-2 mt-4">
                 <Label className="block text-sm">Version Type</Label>
-                <Select 
-                  value={formValues.type} 
-                  onValueChange={(value) => setFormValues({ 
-                    ...formValues, 
-                    type: value 
-                  })}
+                <Select
+                  value={formValues.type}
+                  onValueChange={(value) =>
+                    setFormValues({
+                      ...formValues,
+                      type: value,
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select version type" />
@@ -267,18 +265,14 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                       major: 0,
                       minor: 0,
                       patch: 0,
-                      type: "stable"
+                      type: "stable",
                     });
                   }}
                   variant="destructive"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit"
-                  className="px-4 py-2"
-                  disabled={loading}
-                >
+                <Button type="submit" className="px-4 py-2" disabled={loading}>
                   {t("version.create")}
                 </Button>
               </div>
@@ -305,9 +299,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                 <TableRow key={version.id}>
                   <TableCell className="font-mono">{version.version}</TableCell>
                   <TableCell className="whitespace-nowrap">
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10">
-                      {version.type === "beta" ? "Beta" : "Stable"}
-                    </span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10">{version.type === "beta" ? "Beta" : "Stable"}</span>
                   </TableCell>
                   <TableCell>{new Date(version.created_at).toLocaleString()}</TableCell>
                   <TableCell>
@@ -315,7 +307,9 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                       <Check className="text-green-500" size={16} />
                     ) : (
                       <Button
-                        onClick={() => { handleSetCurrent(version.id); }}
+                        onClick={() => {
+                          handleSetCurrent(version.id);
+                        }}
                         variant="ghost"
                         className="text-xs whitespace-nowrap"
                       >
@@ -325,12 +319,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <Button
-                        onClick={() => handleEditVersion(version)}
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                      >
+                      <Button onClick={() => handleEditVersion(version)} variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <Edit size={16} />
                       </Button>
                       <Button
@@ -368,7 +357,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
           </Table>
         </div>
       </section>
-      
+
       {/* Edit Version Dialog */}
       {editingVersion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -377,64 +366,64 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
               <Tag size={20} />
               Edit Version {editingVersion.version}
             </h3>
-            
+
             <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Label className="flex items-center space-x-2">
-                    <Select 
-                      value={editingVersion.type} 
-                      onValueChange={(value) => setEditingVersion({
+              <div className="flex items-center space-x-2">
+                <Label className="flex items-center space-x-2">
+                  <Select
+                    value={editingVersion.type}
+                    onValueChange={(value) =>
+                      setEditingVersion({
                         ...editingVersion,
-                        type: value
-                      })}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="beta">Beta</SelectItem>
-                        <SelectItem value="stable">Stable</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Label>
-                  
-                  <Label className="flex items-center space-x-2">
-                    <Input 
-                      type="checkbox" 
-                      checked={editingVersion.is_current}
-                      onChange={(e) => setEditingVersion({
+                        type: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beta">Beta</SelectItem>
+                      <SelectItem value="stable">Stable</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Label>
+
+                <Label className="flex items-center space-x-2">
+                  <Input
+                    type="checkbox"
+                    checked={editingVersion.is_current}
+                    onChange={(e) =>
+                      setEditingVersion({
                         ...editingVersion,
-                        is_current: e.target.checked
-                      })}
-                      className="h-4 w-4"
-                    />
-                    <span>Current Version</span>
-                  </Label>
-                </div>
-                                
-                <div className="flex justify-between items-center mt-4">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setEditingVersion(null);
-                    }}
-                    variant="destructive"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="button"
-                    onClick={handleUpdateVersion}
-                    disabled={loading}
-                  >
-                    Save Changes
-                  </Button>
-                </div>
+                        is_current: e.target.checked,
+                      })
+                    }
+                    className="h-4 w-4"
+                  />
+                  <span>Current Version</span>
+                </Label>
               </div>
+
+              <div className="flex justify-between items-center mt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setEditingVersion(null);
+                  }}
+                  variant="destructive"
+                >
+                  Cancel
+                </Button>
+                <Button type="button" onClick={handleUpdateVersion} disabled={loading}>
+                  Save Changes
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
-      
+
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent>
@@ -448,16 +437,10 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteConfirmOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setDeleteConfirmOpen(false)}>
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-            >
+            <Button variant="destructive" onClick={handleConfirmDelete}>
               Delete
             </Button>
           </DialogFooter>

@@ -50,14 +50,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         setLoading(false);
         return;
       }
-      
+
       // Create set of parameter IDs from norm
       const paramMap = new Map();
       selectedNorm.parameters.forEach((p: any) => {
         paramMap.set(p.parameter_id, p.parameter_code);
       });
       setNormParameters(paramMap);
-      
+
       // Initialize with a short delay to ensure all data is loaded
       setTimeout(() => {
         setInitializing(false);
@@ -82,12 +82,12 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
             short_name,
             unit,
             rating_logic_code
-          `
+          `,
           )
           .order("created_at", { ascending: true });
 
         if (error) throw error;
-        
+
         if (!data || !Array.isArray(data)) {
           throw new Error("Invalid parameters data received");
         }
@@ -135,21 +135,21 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
   // Safety check for selectedNorm
   if (!selectedNorm) {
-    return <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">
-      {t("analysis.no_norm_selected")}
-    </div>;
+    return (
+      <div className="p-4 rounded text-accent-primary border-accent-primary border-solid bg-surface">{t("analysis.no_norm_selected")}</div>
+    );
   }
 
   // Calculate results for each datapoint
   const results = selectedDatapoints.map((datapoint) => {
     // Calculate ratings for each parameter
     const parameterRatings: Record<string, { value: string; rating: number; unit?: string }> = {};
-    
+
     if (!datapoint.values) {
       console.warn("Datapoint has no values:", datapoint);
       return { datapoint, parameterRatings: {}, outputs: {}, classification: { class: "N/A", stress: "No data" } };
     }
-    
+
     // Process each parameter in the datapoint values
     Object.entries(datapoint.values || {})
       .filter(([paramId]) => normParameters.has(paramId))
@@ -161,7 +161,7 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
         }
 
         const paramCode = normParameters.get(paramId) || parameter.shortName || parameter.name;
-        
+
         // Execute rating logic code if available
         let rating = 0;
         if (parameter.rating_logic_code) {
@@ -189,14 +189,14 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
 
     // Get all ratings for parameters Z1-Z15
     const zRatings: Record<number, number> = {};
-        
+
     // Process each parameter rating
     if (datapoint.ratings) {
       Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
         // Get parameter info from map
         const param = parameterMap[paramId];
         if (!param) return;
-        
+
         const paramCode = normParameters.get(paramId) || param.shortName || param.name;
         if (!paramCode) return;
 
@@ -222,48 +222,48 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
               values: {},
               ratings: {},
             };
-            
+
             // Add all parameter values to the context
             Object.entries(datapoint.values || {}).forEach(([paramId, value]) => {
               const param = parameterMap[paramId];
               if (param?.short_name || param?.name) {
                 // Convert string numbers to actual numbers
                 let numValue = value;
-                if (typeof value === 'string' && !isNaN(parseFloat(value))) {
+                if (typeof value === "string" && !isNaN(parseFloat(value))) {
                   numValue = parseFloat(value);
                 }
                 console.log(`Setting context value ${param.short_name || param.name} = ${numValue}`);
                 context.values[param.id] = numValue;
               }
             });
-            
+
             // Add all parameter ratings to the context
             if (datapoint.ratings) {
               Object.entries(datapoint.ratings).forEach(([paramId, rating]) => {
-              const param = parameterMap[paramId];
-              if (param?.short_name) {
-                console.log(`Setting context rating ${param.short_name} = ${rating}`);
-                context.ratings[param.short_name] = rating;
-              }
+                const param = parameterMap[paramId];
+                if (param?.short_name) {
+                  console.log(`Setting context rating ${param.short_name} = ${rating}`);
+                  context.ratings[param.short_name] = rating;
+                }
               });
             }
-            
+
             // Add Z1-Z15 ratings directly to the context for easier access
             Object.entries(zRatings).forEach(([num, rating]) => {
               console.log(`Setting Z${num} = ${rating}`);
               context[`Z${num}`] = rating;
             });
-            
+
             // Create a function from the formula and execute it with the context
             try {
               // Wrap the formula in a return statement if it doesn't have one
               let formula = output.formula.trim();
-              if (!formula.startsWith('return ') && !formula.includes('return ')) {
+              if (!formula.startsWith("return ") && !formula.includes("return ")) {
                 formula = `return ${formula}`;
               }
-              
+
               try {
-                const calculateOutput = new Function('values', 'ratings', formula);
+                const calculateOutput = new Function("values", "ratings", formula);
                 const result = calculateOutput(context.values, context.ratings);
 
                 // Handle array results (like zinc loss rate)
@@ -353,34 +353,39 @@ const AnalyseResult: React.FC<AnalyseResultProps> = ({
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-sm text-muted-foreground">
-                    <span className="font-medium">Created:</span> {datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}
+                    <span className="font-medium">Created:</span>{" "}
+                    {datapoint.timestamp ? new Date(datapoint.timestamp).toLocaleString() : "No date"}
                   </div>
                   {expandedDatapoints.has(datapoint.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 </div>
               </div>
             </div>
-            
+
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-3">
-                {Array.isArray(selectedNorm?.output_config) && selectedNorm.output_config.map((output: any) => (
-                  output && output.id && (
-                  <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20 bg-border" title={output.description}>
-                    <span className="font-medium">{output.name}:</span> {(() => {
-                      // Special handling for array outputs like zinc loss rate
-                      if (Array.isArray(outputs[`${output.id}_full`])) {
-                        return `${outputs[`${output.id}_full`][0]} ± ${outputs[`${output.id}_full`][1]}`;
-                      } else if (output.id === 'zincLossRate' && Array.isArray(outputs[output.id])) {
-                        return `${outputs[output.id][0]} ± ${outputs[output.id][1]}`;
-                      } else if (typeof outputs[output.id] === 'number') {
-                        return outputs[output.id].toFixed(2);
-                      } else {
-                        return '0.00';
-                      }
-                    })()}
-                    {output.id === "b0" && ` (${classification.class} - ${classification.stress})`}
-                  </div>
-                  )
-                ))}
+                {Array.isArray(selectedNorm?.output_config) &&
+                  selectedNorm.output_config.map(
+                    (output: any) =>
+                      output &&
+                      output.id && (
+                        <div key={output.id} className="text-sm px-3 py-1 rounded bg-opacity-20 bg-border" title={output.description}>
+                          <span className="font-medium">{output.name}:</span>{" "}
+                          {(() => {
+                            // Special handling for array outputs like zinc loss rate
+                            if (Array.isArray(outputs[`${output.id}_full`])) {
+                              return `${outputs[`${output.id}_full`][0]} ± ${outputs[`${output.id}_full`][1]}`;
+                            } else if (output.id === "zincLossRate" && Array.isArray(outputs[output.id])) {
+                              return `${outputs[output.id][0]} ± ${outputs[output.id][1]}`;
+                            } else if (typeof outputs[output.id] === "number") {
+                              return outputs[output.id].toFixed(2);
+                            } else {
+                              return "0.00";
+                            }
+                          })()}
+                          {output.id === "b0" && ` (${classification.class} - ${classification.stress})`}
+                        </div>
+                      ),
+                  )}
               </div>
 
               {expandedDatapoints.has(datapoint.id) && (

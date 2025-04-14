@@ -34,7 +34,7 @@ const Fields: React.FC<FieldsProps> = ({
   selectedCustomerId,
 }) => {
   const translation = useTranslation(currentLanguage);
-  
+
   // Refresh projects data when component mounts or when selectedProjectId changes
   useEffect(() => {
     if (selectedProjectId) {
@@ -48,11 +48,11 @@ const Fields: React.FC<FieldsProps> = ({
           console.error("Error refreshing projects:", err);
         }
       };
-      
+
       refreshProjects();
     }
   }, [selectedProjectId]);
-  
+
   // Refresh projects data when component mounts or when selectedProjectId changes
   useEffect(() => {
     if (selectedProjectId) {
@@ -66,11 +66,11 @@ const Fields: React.FC<FieldsProps> = ({
           console.error("Error refreshing projects:", err);
         }
       };
-      
+
       refreshProjects();
     }
   }, [selectedProjectId]);
-  
+
   // Safely find the selected project with error handling
   const selectedProject = (() => {
     try {
@@ -96,7 +96,7 @@ const Fields: React.FC<FieldsProps> = ({
       return null;
     }
   })();
-  
+
   const company = (() => {
     try {
       if (!companies || !Array.isArray(companies) || !selectedProject.companyId) return null;

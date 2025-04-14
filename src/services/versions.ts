@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from "../lib/supabase";
 
 export interface Version {
   id: string;
@@ -14,11 +14,7 @@ export interface Version {
 export const getCurrentVersion = async (): Promise<Version | null> => {
   try {
     // First try to get the current version
-    const { data: currentVersion, error: currentError } = await supabase
-      .from("versions")
-      .select("*")
-      .eq("is_current", true)
-      .maybeSingle();
+    const { data: currentVersion, error: currentError } = await supabase.from("versions").select("*").eq("is_current", true).maybeSingle();
 
     if (currentError) throw currentError;
 
@@ -49,10 +45,7 @@ export const getCurrentVersion = async (): Promise<Version | null> => {
       }
 
       // Then set the latest version as current
-      const { error: updateError } = await supabase
-        .from("versions")
-        .update({ is_current: true })
-        .eq("id", latestVersion.id);
+      const { error: updateError } = await supabase.from("versions").update({ is_current: true }).eq("id", latestVersion.id);
 
       if (updateError) console.warn("Could not set current version:", updateError);
 
@@ -67,12 +60,10 @@ export const getCurrentVersion = async (): Promise<Version | null> => {
 };
 
 export const getAllVersions = async () => {
-  const { data, error } = await supabase
-    .from('versions')
-    .select('*');
+  const { data, error } = await supabase.from("versions").select("*");
 
   if (error) throw error;
-  
+
   // Sort versions by semantic versioning
   return data.sort((a, b) => {
     if (a.major !== b.major) return b.major - a.major;
@@ -81,46 +72,38 @@ export const getAllVersions = async () => {
   });
 };
 
-export const createVersion = async (versionData: {
-  version: string;
-  major: number;
-  minor: number;
-  patch: number;
-  type: string;
-}) => {
+export const createVersion = async (versionData: { version: string; major: number; minor: number; patch: number; type: string }) => {
   try {
     // Check if version already exists
     const { data: existingVersion, error: checkError } = await supabase
-      .from('versions')
-      .select('id')
-      .eq('version', versionData.version)
+      .from("versions")
+      .select("id")
+      .eq("version", versionData.version)
       .maybeSingle();
-      
+
     if (checkError) throw checkError;
-    
+
     if (existingVersion) {
       throw new Error(`Version ${versionData.version} already exists`);
     }
-    
+
     // If there are no versions, make this one current
-    const { count, error: countError } = await supabase
-      .from('versions')
-      .select('id', { count: 'exact', head: true });
-      
+    const { count, error: countError } = await supabase.from("versions").select("id", { count: "exact", head: true });
+
     if (countError) throw countError;
-    
+
     const isFirstVersion = count === 0;
-    
+
     // Insert the new version
     const { data, error } = await supabase
-      .from('versions')
+      .from("versions")
       .insert({
         version: versionData.version,
         major: versionData.major,
         minor: versionData.minor,
         patch: versionData.patch,
         type: versionData.type,
-        is_current: isFirstVersion
+        is_current: isFirstVersion,
       })
       .select()
       .single();
@@ -135,16 +118,12 @@ export const createVersion = async (versionData: {
 
 export const updateVersion = async (id: string, updateData: Partial<Version>) => {
   // First check if the version exists
-  const { data: existingVersion, error: checkError } = await supabase
-    .from('versions')
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-    
+  const { data: existingVersion, error: checkError } = await supabase.from("versions").select("*").eq("id", id).maybeSingle();
+
   if (checkError) {
     throw new Error(`Version not found: ${checkError.message}`);
   }
-  
+
   if (!existingVersion) {
     throw new Error(`Version with ID ${id} not found`);
   }
@@ -152,7 +131,7 @@ export const updateVersion = async (id: string, updateData: Partial<Version>) =>
   // If setting as current version, first set all versions to not current
   if (updateData.is_current) {
     const { error: resetError } = await supabase
-      .from('versions')
+      .from("versions")
       .update({ is_current: false })
       .neq("id", "00000000-0000-0000-0000-000000000000"); // Dummy WHERE clause to match all rows
 
@@ -160,64 +139,53 @@ export const updateVersion = async (id: string, updateData: Partial<Version>) =>
       throw new Error(`Failed to reset current versions: ${resetError.message}`);
     }
   }
-  
+
   // Then update the version
   const { error } = await supabase
-    .from('versions')
+    .from("versions")
     .update({
       type: updateData.type,
       is_current: updateData.is_current,
     })
-    .eq('id', id);
+    .eq("id", id);
 
   if (error) {
     console.error("Error updating version:", error);
     throw error;
   }
-  
+
   // Return the updated version
-  const { data: updatedVersion, error: fetchError } = await supabase
-    .from('versions')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-    
+  const { data: updatedVersion, error: fetchError } = await supabase.from("versions").select("*").eq("id", id).maybeSingle();
+
   if (fetchError) {
     console.error("Error fetching updated version:", fetchError);
     throw fetchError;
   }
-  
+
   if (!updatedVersion) {
     throw new Error(`Updated version with ID ${id} not found`);
   }
-  
+
   return updatedVersion;
 };
 
 export const deleteVersion = async (id: string) => {
   // First check if the version exists and is not current
-  const { data: version, error: checkError } = await supabase
-    .from("versions")
-    .select("is_current")
-    .eq("id", id)
-    .maybeSingle();
-    
+  const { data: version, error: checkError } = await supabase.from("versions").select("is_current").eq("id", id).maybeSingle();
+
   if (checkError) {
     throw new Error(`Version not found: ${checkError.message}`);
   }
-  
+
   if (!version) {
     throw new Error(`Version with ID ${id} not found`);
   }
-  
+
   if (version.is_current) {
-    throw new Error('Cannot delete the current version');
+    throw new Error("Cannot delete the current version");
   }
-  
-  const { error } = await supabase
-    .from('versions')
-    .delete()
-    .eq('id', id);
+
+  const { error } = await supabase.from("versions").delete().eq("id", id);
 
   if (error) throw error;
   return true;

@@ -15,9 +15,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLanguage }) => {
-  const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings">(
-    "overview",
-  );
+  const [activeView, setActiveView] = React.useState<"overview" | "database" | "users" | "notifications" | "settings">("overview");
 
   const handleSignOut = async () => {
     try {
