@@ -92,7 +92,7 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                         <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-sm bg-primary/10 text-xs font-medium">
                           {zone.datapoints?.length || 0}
                         </span>
-                      </div>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (
@@ -147,11 +147,9 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                             const value = e.target.value;
                             setEditValues({ ...editValues, latitude: value });
                           }}
-                          className="w-1/2 p-1 rounded text-sm text-primary "
+                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                           placeholder={translation("project.latitude")}
                           title="Enter decimal coordinates (e.g., 57.123456)"
-                          placeholder="e.g., 57.123456"
-                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.latitude) && editValues.latitude ? "border-destructive" : ""}`}
                         />
                         <Input
                           type="text"
@@ -160,11 +158,9 @@ const ZoneSummary: React.FC<ZoneSummaryProps> = ({ zone, currentTheme, currentLa
                             const value = e.target.value;
                             setEditValues({ ...editValues, longitude: value });
                           }}
-                          className="w-1/2 p-1 rounded text-sm text-primary "
+                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                           placeholder={translation("project.longitude")}
                           title="Enter decimal coordinates (e.g., 10.123456)"
-                          placeholder="e.g., 10.123456"
-                          className={`w-1/2 p-1 rounded text-sm text-primary ${!isValidCoordinate(editValues.longitude) && editValues.longitude ? "border-destructive" : ""}`}
                         />
                         {(editValues.latitude && !isValidCoordinate(editValues.latitude)) ||
                         (editValues.longitude && !isValidCoordinate(editValues.longitude)) ? (

@@ -8,12 +8,13 @@ interface ParameterResponse {
   id: string;
   hidden_id: string;
   name: string;
-  description: string;
+  description?: string;
   custom_name?: string;
   short_name?: string;
   unit?: string;
   range_type: string;
   range_value: string;
+  order_number?: number;
   rating_logic_code?: string;
   rating_logic_test_cases?: any;
   created_at?: string;
@@ -22,7 +23,15 @@ interface ParameterResponse {
 
 export type { Parameter };
 
+// Cache parameters to avoid repeated fetches
+let parametersCache: Parameter[] | null = null;
+
 export const fetchParameters = async (): Promise<Parameter[]> => {
+  // Return cached parameters if available
+  if (parametersCache && parametersCache.length > 0) {
+    return parametersCache;
+  }
+
   const { data, error } = await supabase.from("parameters").select("*").order("order_number", { ascending: true });
 
   if (error) {
@@ -30,15 +39,20 @@ export const fetchParameters = async (): Promise<Parameter[]> => {
     throw error;
   }
 
-  return data.map((param: ParameterResponse) => {
+  const parameters = data.map((param: ParameterResponse) => {
     const camelCased = toCase(param, "camelCase");
     return {
       ...camelCased,
-      orderNumber: param.order_number || 0,
+      orderNumber: param.order_number ?? 0,
       rating_logic_code: param.rating_logic_code || "",
       rating_logic_test_cases: param.rating_logic_test_cases || [],
     };
   });
+
+  // Cache the parameters
+  parametersCache = parameters;
+  
+  return parameters;
 };
 
 export const createParameter = async (parameter: Omit<Parameter, "id" | "hiddenId">) => {

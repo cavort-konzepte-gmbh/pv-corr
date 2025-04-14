@@ -41,231 +41,205 @@ const DatapointList: React.FC<DatapointListProps> = ({
   const [editingDatapoint, setEditingDatapoint] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
   const [editingValues, setEditingValues] = useState<Record<string, string>>({});
-  const [parameterMap, setParameterMap] = useState<Record<string, Parameter>>({});
-  const [sortField, setSortField] = useState<SortField>("timestamp");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-  const [sortParameter, setSortParameter] = useState<string>("");
-  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
-  const translation = useTranslation(currentLanguage);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newValues, setNewValues] = useState<Record<string, string>>({});
-  const [newName, setNewName] = useState("");
+  const [updatingZone, setUpdatingZone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newValues, setNewValues] = useState({
+    name: "",
+    values: {} as Record<string, string>
+  });
+  const [showMediaDialog, setShowMediaDialog] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
+  const [sortParameter, setSortParameter] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const translation = useTranslation(currentLanguage);
 
+  // Use sortedDatapoints state
+  const [sortedDatapoints, setSortedDatapoints] = useState<Datapoint[]>([]);
+  // Use a ref to track if we need to refresh datapoints
+  const [refreshCounter, setRefreshCounter] = useState(0);
+
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  // Initial load of datapoints
   useEffect(() => {
-    // Create a map of parameter id to parameter object for easier lookup
-    const map = parameters.reduce(
-      (acc, param) => {
-        acc[param.id] = param;
-        return acc;
-      },
-      {} as Record<string, Parameter>,
-    );
-    setParameterMap(map);
-  }, [parameters]);
+    if (datapoints && datapoints.length > 0) {
+      setLoading(false);
+    }
+  }, [datapoints]);
 
-  // Fetch datapoints directly when component mounts or zoneId changes
+  // Update sortedDatapoints when datapoints, sortField, or sortDirection changes
   useEffect(() => {
-    const loadDatapoints = async () => {
-      if (zoneId) {
-        try {
-          setIsLoading(true);
-          const fetchedDatapoints = await fetchDatapointsByZoneId(zoneId);
-          console.log("Directly fetched datapoints:", fetchedDatapoints.length);
+    if (!datapoints || datapoints.length === 0) {
+      setSortedDatapoints([]);
+      return;
+    }
 
-          // If we have datapoints from direct fetch but not from props, refresh the projects
-          if (fetchedDatapoints.length > 0 && datapoints.length === 0) {
-            const projects = await fetchProjects();
-            onProjectsChange(projects);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    loadDatapoints();
-  }, [zoneId]);
-
-  // Sort datapoints based on current sort field and direction
-  const sortedDatapoints = React.useMemo(() => {
-    if (!datapoints) return [];
-
-    return [...datapoints].sort((a, b) => {
-      let comparison = 0;
-
+    const sorted = [...datapoints].sort((a, b) => {
+      const multiplier = sortDirection === "asc" ? 1 : -1;
+      
       switch (sortField) {
         case "name":
-          comparison = (a.name || "").localeCompare(b.name || "");
-          break;
+          return multiplier * (a.name || "").localeCompare(b.name || "");
         case "timestamp":
-          comparison = new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-          break;
-        case "parameter":
-          if (sortParameter) {
-            const aValue = a.values?.[sortParameter] || "";
-            const bValue = b.values?.[sortParameter] || "";
-
-            // Try to compare as numbers if possible
-            const aNum = parseFloat(aValue);
-            const bNum = parseFloat(bValue);
-
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-              comparison = aNum - bNum;
-            } else {
-              comparison = String(aValue).localeCompare(String(bValue));
-            }
-          }
-          break;
+          return multiplier * (new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        default:
+          return 0;
       }
-
-      return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [datapoints, sortField, sortDirection, sortParameter]);
 
-  const handleSortChange = (field: SortField, paramId?: string) => {
-    if (field === "parameter" && paramId) {
-      if (sortField === "parameter" && sortParameter === paramId) {
-        // Toggle direction if clicking the same parameter
-        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-      } else {
-        // Set new parameter and default to ascending
-        setSortField("parameter");
-        setSortParameter(paramId);
-        setSortDirection("asc");
+    setSortedDatapoints(sorted);
+  }, [datapoints, sortField, sortDirection]);
+
+  // Fetch datapoints when zoneId or refreshCounter changes
+  useEffect(() => {
+    if (!zoneId) return;
+    
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        console.log("Fetching datapoints for zone:", zoneId);
+        const freshDatapoints = await fetchDatapointsByZoneId(zoneId);
+        console.log("Fetched datapoints:", freshDatapoints.length);
+        setSortedDatapoints(freshDatapoints);
+      } catch (err) {
+        console.error("Error fetching datapoints:", err);
+        setError(err instanceof Error ? err.message : "Failed to fetch datapoints");
+      } finally {
+        setIsLoading(false);
       }
-    } else if (sortField === field) {
-      // Toggle direction if clicking the same field
+    }
+    
+    fetchData();
+  }, [zoneId, refreshCounter]);
+
+  const handleSortChange = (field: SortField) => {
+    if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      // Set new field and default to ascending
       setSortField(field);
       setSortDirection("asc");
     }
   };
 
-  const handleAddDatapoint = async () => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    setError(null);
+  const handleUpdateZone = async (values: any) => {
+    if (zoneId) {
+      try {
+        setError(null);
+        setUpdatingZone(true);
 
+        // Validate coordinates if provided
+        if ((values.latitude && !isValidCoordinate(values.latitude)) || (values.longitude && !isValidCoordinate(values.longitude))) {
+          throw new Error("Invalid coordinates");
+        }
+
+        await updateZone(zoneId, values);
+        showToast("success", "Zone updated successfully");
+        setUpdatingZone(false);
+      } catch (err) {
+        console.error("Error updating zone:", err);
+        setError(err instanceof Error ? err.message : "Failed to update zone");
+      }
+    }
+  };
+
+  const handleAddDatapoint = async () => {
     try {
-      console.log("Adding new datapoint for zone:", zoneId);
-      console.log("Zone ID type:", typeof zoneId);
-      console.log("Zone ID value:", zoneId);
+      setIsProcessing(true);
+      setError(null);
+      
+      if (!zoneId) {
+        setError("Zone ID is required");
+        return;
+      }
 
       if (!newName.trim()) {
-        showToast("Datapoint name is required", "error");
-        setError("Datapoint name is required");
-        setIsProcessing(false);
+        setError("Name is required");
         return;
       }
 
-      if (Object.keys(newValues).length === 0) {
-        showToast("Please enter at least one parameter value", "error");
-        setError("Please enter at least one parameter value");
-        setIsProcessing(false);
-        return;
-      }
+      // Prepare values object from parameter inputs
+      const values: Record<string, string> = { ...parameterValues };
+      
+      // Log the values being sent
+      console.log("Values being sent to createDatapoint:", values);
 
-      // Process values to ensure proper number formatting
-      const processedValues: Record<string, any> = {};
-      Object.entries(newValues).forEach(([key, value]) => {
-        // Convert numeric strings to numbers
-        if (typeof value === "string" && value !== "impurities" && value.trim() !== "" && !isNaN(parseFloat(value))) {
-          processedValues[key] = value; // Keep as string for the service to handle
-        } else {
-          processedValues[key] = value;
-        }
-      });
-
-      const result = await createDatapoint(zoneId, {
+      await createDatapoint(zoneId, {
         type: "measurement",
         name: newName.trim(),
-        values: processedValues,
+        values,
         ratings: {},
       });
 
-      console.log("Datapoint creation result:", result);
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
 
       setIsAdding(false);
       setNewName("");
-      setNewValues({});
-
-      const projects = await fetchProjects();
-      onProjectsChange(projects);
+      setNewValues({
+        name: "",
+        values: {}
+      });
+      setParameterValues({});
     } catch (err) {
       console.error("Error creating datapoint:", err);
-      setError(`Failed to create datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
-      showToast(`Failed to create datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
+      setError(err instanceof Error ? err.message : "Failed to create datapoint");
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleUpdateDatapoint = async (datapoint: Datapoint) => {
-    if (isProcessing) return;
-
-    if (editingDatapoint === datapoint.id) {
-      // Save changes
-      setIsProcessing(true);
+    try {
       setError(null);
+      setIsProcessing(true);
 
-      try {
-        if (!editingName?.trim()) {
-          setError("Name is required");
-          setIsProcessing(false);
-          return;
-        }
-
-        const updateData = {
-          values: { ...editingValues },
-          name: editingName.trim(),
-        };
-
-        // Update the datapoint
-        await updateDatapoint(datapoint.id, updateData);
-
-        // Refresh the datapoints list directly
-        const refreshedDatapoints = await fetchDatapointsByZoneId(zoneId);
-
-        // Also refresh projects to ensure UI consistency
-        const projects = await fetchProjects();
-        onProjectsChange(projects);
-
-        // Show success message
-        showToast("Datapoint updated successfully", "success");
-
-        setEditingDatapoint(null);
-        setEditingName("");
-        setEditingValues({});
-      } catch (err) {
-        console.error("Error updating datapoint:", err);
-        setError(`Failed to update datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
-        showToast(`Failed to update datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-      } finally {
-        setIsProcessing(false);
+      // If we're not in editing mode, start editing
+      if (editingDatapoint !== datapoint.id) {
+        setEditingDatapoint(datapoint.id);
+        setEditingName(datapoint.name);
+        setEditingValues(datapoint.values || {});
+        return;
       }
-    } else {
-      // Start editing
-      setEditingDatapoint(datapoint.id);
-      setEditingName(datapoint.name);
-      // Create a copy of the values to prevent direct modification
-      // Ensure we're working with a copy and handle potential undefined values
-      setEditingValues(datapoint.values ? { ...datapoint.values } : {});
+
+      // Validate name
+      if (!editingName.trim()) {
+        setError("Name is required");
+        return;
+      }
+
+      await updateDatapoint(datapoint.id, {
+        name: editingName,
+        values: editingValues,
+      });
+
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
+
+      // Reset editing state
+      setEditingDatapoint(null);
+      setEditingName("");
+      setEditingValues({});
+      
+      showToast("success", "Datapoint updated successfully");
+    } catch (err) {
+      console.error("Error updating datapoint:", err);
+      setError(err instanceof Error ? err.message : "Failed to update datapoint");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleDeleteDatapoint = async (datapointId: string) => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    setError(null);
-
     try {
       await deleteDatapoint(datapointId);
-      const projects = await fetchProjects();
-      onProjectsChange(projects);
+
+      // Trigger a refresh by incrementing the counter
+      setRefreshCounter(prev => prev + 1);
 
       // Reset editing state if we just deleted the datapoint we were editing
       if (editingDatapoint === datapointId) {
@@ -275,10 +249,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
       }
     } catch (err) {
       console.error("Error deleting datapoint:", err);
-      setError(`Failed to delete datapoint: ${err instanceof Error ? err.message : "Unknown error"}`);
-      showToast(`Failed to delete datapoint: ${err instanceof Error ? err.message : "Unknown error"}`, "error");
-    } finally {
-      setIsProcessing(false);
+      setError(err instanceof Error ? err.message : "Failed to delete datapoint");
     }
   };
 
@@ -347,6 +318,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         setIsAdding(false);
                         setNewName("");
                         setNewValues({});
+                        setParameterValues({});
                       }}
                     >
                       <Input
@@ -365,12 +337,14 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         parameter={{
                           ...param,
                           parameterCode: param.shortName || param.name,
+                          rangeType: param.rangeType,
+                          rangeValue: param.rangeValue,
                         }}
-                        value={newValues[param.id] || ""}
+                        value={parameterValues[param.id] || ""}
                         onChange={(value) =>
-                          setNewValues((prev) => ({
+                          setParameterValues((prev) => ({
                             ...prev,
-                            [param.id]: value,
+                            [param.id]: value
                           }))
                         }
                         currentTheme={currentTheme}
@@ -383,7 +357,7 @@ const DatapointList: React.FC<DatapointListProps> = ({
                       <Button
                         onClick={handleAddDatapoint}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
-                        disabled={isProcessing}
+                        disabled={isProcessing || !newName.trim()}
                       >
                         <Save size={14} />
                       </Button>
@@ -391,7 +365,11 @@ const DatapointList: React.FC<DatapointListProps> = ({
                         onClick={() => {
                           setIsAdding(false);
                           setNewName("");
-                          setNewValues({});
+                          setNewValues({
+                            name: "",
+                            values: {}
+                          });
+                          setParameterValues({});
                         }}
                         className="p-1 rounded hover:bg-opacity-80 text-secondary"
                         disabled={isProcessing}

@@ -452,6 +452,8 @@ const DashboardLayout = () => {
               setSelectedZone(undefined);
             }}
             onProjectsChange={setProjects}
+            savedPeople={savedPeople}
+            companies={savedCompanies}
             selectedCustomerId={selectedCustomerId}
           />
         ) : (
@@ -705,4 +707,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default DashboardLayout

@@ -149,7 +149,7 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({
                           </span>
                           <span className="text-xs text-muted-foreground text-left">{translation("datapoints")}</span>
                         </span>
-                      </div>
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {isEditing ? (

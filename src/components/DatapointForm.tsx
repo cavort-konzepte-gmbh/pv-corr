@@ -3,8 +3,8 @@ import { Theme } from "../types/theme";
 import { Language, useTranslation } from "../types/language";
 import { Standard } from "../types/standards";
 import { Parameter } from "../types/parameters";
-import { Plus, Save, X } from "lucide-react";
-import { useEffect } from "react";
+import { Plus, Save, X, AlertTriangle } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -18,19 +18,21 @@ export interface ParameterInputProps {
   value: string;
   onChange: (value: string) => void;
   currentTheme: Theme;
+  disabled?: boolean;
 }
 
-export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value, onChange, currentTheme }) => {
+export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value, onChange, currentTheme, disabled = false }) => {
   const [localValue, setLocalValue] = useState(value);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Update local value when prop value changes
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
 
-  // Validate and update parent component on blur
-  const handleBlur = () => {
+  // Function to validate and update parent component
+  const validateAndUpdate = () => {
     if (parameter.rangeType === "range") {
       const [minStr, maxStr] = parameter.rangeValue.split("-");
       const min = parseFloat(minStr.replace(/[,()]/g, "").trim());
@@ -71,6 +73,30 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     }
   };
 
+  // Validate and update parent component on blur
+  const handleBlur = () => {
+    validateAndUpdate();
+  };
+
+  // Handle key press events
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      validateAndUpdate();
+      // Move focus to next input if available
+      if (inputRef.current) {
+        const form = inputRef.current.form;
+        if (form) {
+          const inputs = Array.from(form.elements) as HTMLElement[];
+          const index = inputs.indexOf(inputRef.current);
+          if (index > -1 && index < inputs.length - 1) {
+            (inputs[index + 1] as HTMLElement).focus();
+          }
+        }
+      }
+    }
+  };
+
   if (parameter.rangeType === "selection") {
     const options = parameter.rangeValue.split(",").map((opt) => opt.trim());
     return (
@@ -78,6 +104,7 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full p-2 rounded text-sm border border-input shadow-sm bg-accent"
+        disabled={disabled}
       >
         <option value="">Select value</option>
         {options.map((opt) => (
@@ -95,13 +122,15 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
         <div className="flex items-center gap-4">
           <Input
             type="text"
+            ref={inputRef}
             value={localValue === "impurities" ? "" : localValue}
             onChange={(e) => setLocalValue(e.target.value)}
             onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
             min={0}
             max={100}
             step="0.01"
-            disabled={localValue === "impurities"}
+            disabled={localValue === "impurities" || disabled}
             className="flex-1 p-2 rounded font-mono text-sm border focus:outline-none text-primary border-theme bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Enter value (0-100)"
           />
@@ -134,14 +163,17 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     return (
       <div className="w-full">
         <Input
+          ref={inputRef}
           type="text"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           min={!isNaN(min) ? min : undefined}
           max={max !== undefined && !isNaN(max) ? max : undefined}
           step="0.01"
           className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
           placeholder={`Enter value (${min}${max !== undefined ? ` to ${max}` : "+"})`}
         />
         {error && <div className="text-destructive text-xs mt-1">{error}</div>}
@@ -154,12 +186,15 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     if (isNaN(limit)) {
       return (
         <Input
+          ref={inputRef}
           type="text"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm "
+          className="w-full p-2 rounded font-mono text-sm"
+          disabled={disabled}
           placeholder="Enter value"
         />
       );
@@ -167,13 +202,16 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     return (
       <div className="w-full">
         <Input
+          ref={inputRef}
           type="text"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           min={parameter.rangeType === "greater" ? limit + 0.000001 : limit}
           step="any"
           className={`w-full p-2 ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
           placeholder={`Enter value ${parameter.rangeType === "greater" ? ">" : ">="} ${limit}`}
         />
         {error && <div className="text-destructive text-xs mt-1">{error}</div>}
@@ -186,12 +224,15 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     if (isNaN(limit)) {
       return (
         <Input
+          ref={inputRef}
           type="text"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           step="any"
-          className="w-full p-2 rounded font-mono text-sm "
+          className="w-full p-2 rounded font-mono text-sm"
+          disabled={disabled}
           placeholder="Enter value"
         />
       );
@@ -199,13 +240,16 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
     return (
       <div className="w-full">
         <Input
+          ref={inputRef}
           type="text"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           max={parameter.rangeType === "less" ? limit - 0.000001 : limit}
           step="any"
           className={`w-full p-2 rounded font-mono text-sm ${error ? "border-destructive" : ""}`}
+          disabled={disabled}
           placeholder={`Enter value ${parameter.rangeType === "less" ? "<" : "<="} ${limit}`}
         />
         {error && <div className="text-destructive text-xs mt-1">{error}</div>}
@@ -216,11 +260,14 @@ export const ParameterInput: React.FC<ParameterInputProps> = ({ parameter, value
   // Default to open input
   return (
     <Input
+      ref={inputRef}
       type="text"
       value={localValue}
       onChange={(e) => setLocalValue(e.target.value)}
       onBlur={handleBlur}
-      className="w-full p-2 rounded font-mono text-sm "
+      onKeyDown={handleKeyDown}
+      className="w-full p-2 rounded font-mono text-sm"
+      disabled={disabled}
       placeholder="Enter value"
     />
   );

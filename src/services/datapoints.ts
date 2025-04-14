@@ -5,19 +5,47 @@ import { showToast } from "../lib/toast";
 
 // Helper function to convert string to UUID format
 const toUUID = (id: string) => {
+  if (!id) return null;
   // Remove any 'uuid.' prefix if present
   const cleanId = id.startsWith("uuid.") ? id.substring(5) : id;
   return cleanId;
 };
 
+// Retry configuration
+const RETRY_COUNT = 3;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
+
+// Helper function to implement exponential backoff
+const wait = (delay: number) => new Promise((resolve) => setTimeout(resolve, delay));
+
+// Helper function to handle retries with exponential backoff
+const retryOperation = async <T>(
+  operation: () => Promise<T>,
+  retries = RETRY_COUNT,
+  delay = INITIAL_RETRY_DELAY
+): Promise<T> => {
+  try {
+    return await operation();
+  } catch (error) {
+    if (retries === 0) throw error;
+    
+    console.log(`Retrying operation. Attempts remaining: ${retries}`);
+    await wait(delay);
+    
+    return retryOperation(operation, retries - 1, delay * 2);
+  }
+};
+
 export const deleteDatapoint = async (datapointId: string) => {
   try {
-    const { data, error } = await supabase.rpc("handle_datapoint_operation_v2", {
-      dp_id: toUUID(datapointId),
-      dp_name: null,
-      dp_values: null,
-      operation: "delete",
-    });
+    const { data, error } = await retryOperation(() => 
+      supabase.rpc("handle_datapoint_operation_v2", {
+        dp_id: toUUID(datapointId),
+        dp_name: null,
+        dp_values: null,
+        operation: "delete",
+      })
+    );
 
     if (error) {
       showToast(`Failed to delete datapoint: ${error.message}`, "error");
@@ -62,14 +90,16 @@ export const updateDatapoint = async (
 
     console.log("Processed values:", processedValues);
 
-    const { data: result, error } = await supabase
-      .from("datapoints")
-      .update({
-        name: data.name.trim(),
-        values: processedValues,
-      })
-      .eq("id", toUUID(datapointId))
-      .select("*");
+    const { data: result, error } = await retryOperation(() =>
+      supabase
+        .from("datapoints")
+        .update({
+          name: data.name.trim(),
+          values: processedValues,
+        })
+        .eq("id", toUUID(datapointId))
+        .select("*")
+    );
 
     if (error) {
       showToast(`Failed to update datapoint: ${error.message}`, "error");
@@ -79,7 +109,13 @@ export const updateDatapoint = async (
     console.log("Datapoint updated successfully");
     showToast("Datapoint updated successfully", "success");
 
-    const { data: zoneData, error: zoneError } = await supabase.from("datapoints").select("zone_id").eq("id", toUUID(datapointId)).single();
+    const { data: zoneData, error: zoneError } = await retryOperation(() =>
+      supabase
+        .from("datapoints")
+        .select("zone_id")
+        .eq("id", toUUID(datapointId))
+        .single()
+    );
 
     if (zoneError) {
       console.error("Error fetching zone_id:", zoneError);
@@ -107,8 +143,6 @@ export const createDatapoint = async (
 ) => {
   try {
     console.log("Creating datapoint for zone:", zoneId);
-    console.log("Zone ID type:", typeof zoneId);
-    console.log("Zone ID value:", zoneId);
 
     // Validate zoneId
     if (!zoneId || typeof zoneId !== "string" || zoneId.trim() === "") {
@@ -118,41 +152,59 @@ export const createDatapoint = async (
       throw new Error(error);
     }
 
+    // Validate name
+    if (!data.name || typeof data.name !== "string" || data.name.trim() === "") {
+      const error = "Datapoint name is required";
+      console.error(error);
+      showToast(error, "error");
+      throw new Error(error);
+    }
+
     // Convert zoneId to UUID format
     const zoneUUID = toUUID(zoneId);
-    console.log("Converted Zone UUID:", zoneUUID);
+    if (!zoneUUID) {
+      throw new Error("Invalid zone ID format");
+    }
+
+    console.log("Using Zone UUID:", zoneUUID);
 
     // Process values to ensure proper number formatting
-    const processedValues = { ...data.values };
-    Object.keys(processedValues).forEach((key) => {
-      const value = processedValues[key];
-      // Skip conversion for special values like 'impurities'
-      if (typeof value === "string" && value !== "impurities" && !isNaN(parseFloat(value))) {
-        processedValues[key] = parseFloat(value);
-      }
-    });
+    const processedValues: Record<string, string> = {};
 
-    console.log("Creating datapoint with processed values:", JSON.stringify(processedValues));
+    // Copy all values from data.values to processedValues
+    Object.entries(data.values || {}).forEach(([key, value]) => {
+      // Include all values, even empty ones
+      processedValues[key] = value;
+    });
+    
+    // Log the processed values for debugging
+    console.log("Processed values for datapoint:", processedValues);
+
+    // Ensure ratings is a proper JSON object
+    const processedRatings = data.ratings || {};
 
     const hiddenId = generateHiddenId();
     const datapointData = {
       hidden_id: hiddenId,
       name: data.name.trim(),
       type: data.type,
-      values: processedValues,
-      ratings: data.ratings,
+      values: processedValues, // Use the processed values
+      ratings: processedRatings,
       timestamp: new Date().toISOString(),
-      zone_id: zoneUUID, // Use the converted UUID
+      zone_id: zoneUUID,
     };
 
     console.log("Full datapoint data being sent:", JSON.stringify(datapointData, null, 2));
 
-    const { data: result, error } = await supabase.rpc("handle_datapoint_operation_v2", {
-      dp_id: null,
-      dp_name: data.name.trim(),
-      dp_values: datapointData,
-      operation: "create",
-    });
+    // Create the datapoint using the RPC function with retry mechanism
+    const { data: result, error } = await retryOperation(() =>
+      supabase.rpc("handle_datapoint_operation_v3", {
+        dp_id: null,
+        dp_name: data.name.trim(),
+        dp_values: datapointData,
+        operation: "create",
+      })
+    );
 
     if (error) {
       console.error("Error creating datapoint:", error.message);
@@ -174,10 +226,10 @@ export const createDatapoint = async (
     if (!result.data) {
       console.log("No data returned from RPC, attempting to fetch datapoints for zone");
       // Wait a moment for the database to complete the operation
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await wait(500);
 
       // Fetch all datapoints for this zone to ensure we have the latest data
-      const datapoints = await fetchDatapointsByZoneId(zoneId);
+      const datapoints = await fetchDatapointsByZoneId(zoneUUID);
       console.log("Fetched datapoints after creation:", datapoints.length);
       return datapoints;
     }
@@ -193,14 +245,24 @@ export const createDatapoint = async (
 export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint[]> => {
   try {
     console.log("Fetching datapoints for zone:", zoneId);
-
     if (!zoneId) {
       console.error("No zone ID provided for fetching datapoints");
       return [];
     }
 
-    // First check if the zone exists
-    const { data: zoneExists, error: zoneError } = await supabase.from("zones").select("id").eq("id", toUUID(zoneId)).single();
+    const zoneUUID = toUUID(zoneId);
+    if (!zoneUUID) {
+      throw new Error("Invalid zone ID format");
+    }
+
+    // First check if the zone exists with retry mechanism
+    const { data: zoneExists, error: zoneError } = await retryOperation(() =>
+      supabase
+        .from("zones")
+        .select("id")
+        .eq("id", zoneUUID)
+        .single()
+    );
 
     if (zoneError) {
       console.error("Error checking zone existence:", zoneError);
@@ -214,12 +276,14 @@ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint
       throw new Error(`Zone with ID ${zoneId} not found`);
     }
 
-    // Query datapoints
-    const { data, error } = await supabase
-      .from("datapoints")
-      .select("*")
-      .eq("zone_id", toUUID(zoneId))
-      .order("timestamp", { ascending: false });
+    // Query datapoints with retry mechanism
+    const { data, error } = await retryOperation(() =>
+      supabase
+        .from("datapoints")
+        .select("*")
+        .eq("zone_id", zoneUUID)
+        .order("timestamp", { ascending: false })
+    );
 
     if (error) {
       console.error("Error fetching datapoints:", error);
@@ -234,8 +298,9 @@ export const fetchDatapointsByZoneId = async (zoneId: string): Promise<Datapoint
     console.log("Datapoints fetched successfully:", data.length);
     return data;
   } catch (err) {
-    console.error("Error fetching datapoints:", err);
-    // Return empty array instead of throwing to prevent UI errors
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    console.error("Error fetching datapoints:", errorMessage);
+    showToast(`Failed to fetch datapoints: ${errorMessage}`, "error");
     return [];
   }
 };

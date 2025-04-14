@@ -52,11 +52,17 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
-  // Sort zones based on current sort field and direction
-  const sortedZones = React.useMemo(() => {
-    if (!zones) return [];
+  // Add sortedZones state
+  const [sortedZones, setSortedZones] = useState<Zone[]>([]);
 
-    return [...zones].sort((a, b) => {
+  // Sort zones based on current sort field and direction
+  useEffect(() => {
+    if (!zones || zones.length === 0) {
+      setSortedZones([]);
+      return;
+    }
+
+    const sorted = [...zones].sort((a, b) => {
       let comparison = 0;
 
       switch (sortField) {
@@ -85,6 +91,8 @@ const ZoneList: React.FC<ZoneListProps> = ({ currentTheme, zones, onSelectZone, 
 
       return sortDirection === "asc" ? comparison : -comparison;
     });
+    
+    setSortedZones(sorted);
   }, [zones, sortField, sortDirection]);
 
   const handleSortChange = (field: SortField) => {
