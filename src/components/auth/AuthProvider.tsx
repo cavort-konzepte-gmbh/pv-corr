@@ -172,7 +172,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
   const toggleViewMode = (showToasts = true) => {
     const newMode = viewMode === "user" ? "admin" : "user";
     setViewMode(newMode);
-    
+
     if (showToasts) {
       showToast(`Switched to ${newMode === "user" ? "User" : "Admin"} view`, "success");
     }
@@ -192,13 +192,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, currentThe
 
   // Show admin dashboard for admin users who logged in through admin login
   if (isAdmin && (loginType === "admin" || viewMode === "admin")) {
-    return (
-      <AdminDashboard 
-        currentTheme={currentTheme} 
-        currentLanguage={currentLanguage} 
-        onSwitchToUserView={() => toggleViewMode(true)}
-      />
-    );
+    return <AdminDashboard currentTheme={currentTheme} currentLanguage={currentLanguage} onSwitchToUserView={() => toggleViewMode(true)} />;
   }
 
   return <AuthContext.Provider value={{ user, signOut, isAdmin, loginType, viewMode, toggleViewMode }}>{children}</AuthContext.Provider>;

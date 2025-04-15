@@ -51,7 +51,7 @@ export const fetchParameters = async (): Promise<Parameter[]> => {
 
   // Cache the parameters
   parametersCache = parameters;
-  
+
   return parameters;
 };
 
