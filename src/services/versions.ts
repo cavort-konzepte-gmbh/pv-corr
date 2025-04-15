@@ -133,18 +133,18 @@ export const updateVersion = async (id: string, updateData: Partial<Version>) =>
     try {
       // Use the RPC function to set the version as current
       const { error } = await supabase.rpc("set_version_as_current", { version_id: id });
-      
+
       if (error) {
         throw new Error(`Failed to set version as current: ${error.message}`);
       }
-      
+
       // Return the updated version
       const { data: updatedVersion, error: fetchError } = await supabase.from("versions").select("*").eq("id", id).single();
-      
+
       if (fetchError) {
         throw new Error(`Failed to fetch updated version: ${fetchError.message}`);
       }
-      
+
       return updatedVersion;
     } catch (err) {
       console.error("Error setting version as current:", err);

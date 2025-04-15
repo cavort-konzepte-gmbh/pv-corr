@@ -44,9 +44,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentTheme, currentLa
             <h1 className="text-3xl font-bold text-card-foreground">Admin Dashboard</h1>
             <div className="flex items-center gap-2">
               {onSwitchToUserView && (
-                <Button 
-                  onClick={onSwitchToUserView} 
-                  variant="outline" 
+                <Button
+                  onClick={onSwitchToUserView}
+                  variant="outline"
                   className="flex items-center gap-2 px-4 py-2 rounded text-sm transition-colors"
                 >
                   <LayoutDashboard size={16} />

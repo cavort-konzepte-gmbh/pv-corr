@@ -159,7 +159,7 @@ const VersionManagement: React.FC<VersionManagementProps> = ({ currentTheme, onB
     try {
       setLoading(true);
       const { error } = await supabase.rpc("set_version_as_current", { version_id: versionId });
-      
+
       if (error) {
         console.error("Error setting current version:", error);
         setError(`Failed to set current version: ${error.message}`);
